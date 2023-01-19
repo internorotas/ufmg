@@ -1,19 +1,23 @@
-# Interno Rotas
+# Interno Rotas 🚌
+
+<h1 align="center">
+  <img alt="Logo Interno Rotas" title="Interno Rotas" src="./github/logo_Capa.png"/>
+</h1>
 
 <p align="center">
-  <img alt="GitHub repo status" src="https://img.shields.io/badge/STATUS-IN%20DEVELOPMENT-brightgreen?style=for-the-badge">
+  <img alt="GitHub repo status" src="https://img.shields.io/badge/status-In%20Development-brightgreen">
   <a href="https://github.com/internorotas/internorotas/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/internorotas/internorotas?style=for-the-badge" alt="Contributors">
+    <img src="https://img.shields.io/github/contributors/internorotas/internorotas" alt="Contributors">
   </a>  
   <a href="https://github.com/internorotas/internorotas/stargazers">
-    <img alt="GitHub stars" src="https://img.shields.io/github/stars/internorotas/internorotas?style=for-the-badge">
+    <img alt="GitHub stars" src="https://img.shields.io/github/stars/internorotas/internorotas">
   </a>
   <a href="https://github.com/internorotas/internorotas/network">
-    <img alt="GitHub forks" src="https://img.shields.io/github/forks/internorotas/internorotas?style=for-the-badge">
+    <img alt="GitHub forks" src="https://img.shields.io/github/forks/internorotas/internorotas">
   </a>
-  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/internorotas/internorotas?style=for-the-badge">
+  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/internorotas/internorotas">
   <a href="https://github.com/internorotas/     internorotas/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/internorotas/internorotas?style=for-the-badge" >
+    <img src="https://img.shields.io/github/license/internorotas/internorotas" >
   </a>
 </p>
 
