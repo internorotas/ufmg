@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <title>logo</title>
+  <g id="e1ee820c-9508-4923-b289-1bfff48101a9" data-name="Fundo">
+    <rect width="1080" height="1080" fill="#2c0eeb"/>
+  </g>
+  <g id="b0eb1fe8-2094-4f67-aa8a-8e9ec8e0313a" data-name="Elementos">
+    <g>
+      <path d="M919.33,245.67V838.09c0,55.16-27.55,81.91-81.88,81.91h-595c-54.34,0-81.81-28.16-81.81-81.91V245.67c0-57.45,30.58-85.59,85-85.59-.22-.18,590.06,0,590.06,0C891.78,160.08,919.33,189.64,919.33,245.67Z" fill="#ecdcc4"/>
+      <g>
+        <circle cx="808.45" cy="323.61" r="22.79" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.9"/>
+        <circle cx="808.45" cy="483.52" r="36.25" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.9"/>
+        <line x1="808.45" y1="447.24" x2="808.45" y2="346.36" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.9"/>
+        <line x1="808.45" y1="681.15" x2="808.45" y2="629.61" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.9"/>
+        <line x1="808.45" y1="583.12" x2="808.45" y2="519.74" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.9"/>
+        <line x1="808.45" y1="779.17" x2="808.45" y2="727.63" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.9"/>
+      </g>
+      <path d="M601.57,261.59H369.91A117.81,117.81,0,0,0,252.1,379.4V684.23A61.88,61.88,0,0,0,310.77,746v40.08a32.35,32.35,0,0,0,64.69,0v-40H596.08v40a32.33,32.33,0,0,0,64.66,0V746a61.87,61.87,0,0,0,58.64-61.78V379.4A117.79,117.79,0,0,0,601.57,261.59ZM389.62,290H581.87a14.21,14.21,0,1,1,0,28.41H389.62a14.21,14.21,0,0,1,0-28.41ZM343.09,688.24a32.34,32.34,0,1,1,32.32-32.32A32.34,32.34,0,0,1,343.09,688.24Zm285.31,0a32.34,32.34,0,1,1,32.34-32.32A32.33,32.33,0,0,1,628.4,688.24Zm50.48-194.09a29.43,29.43,0,0,1-29.46,29.43H322.09a29.43,29.43,0,0,1-29.46-29.43V376.46A29.46,29.46,0,0,1,322.09,347H649.42a29.46,29.46,0,0,1,29.46,29.46Z" fill="#2c0eeb"/>
+    </g>
+  </g>
+</svg>
