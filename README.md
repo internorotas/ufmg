@@ -56,7 +56,39 @@ O projeto será acessível através de um site, hospedado no GitHub Pages e disp
 
 ## Layout
 
-Em desenvolvimento no Figma, será anexado assim que finalizado.
+Seção com o layout do projeto. O layout serve para auxiliar no desenvolvimento do código, servindo como guia e economizando tempo. O layout serve apenas para se ter uma ideia e referência, não sendo necessário que seja perfeito. O design do projeto pode ser visto com mais detalhes aqui no [Figma](https://www.figma.com/file/eTM6soQcsMP2vZr4d2zGus/Interno-Rotas?node-id=0%3A1&t=np3vESaYKP8h6Bn1-1).
+
+## Tela Inicial - Desktop
+
+Tela inicial em que o usuário consegue ver o mapa ao fundo, com as linhas internas em uma painel lateral. Cada linha tem sua cor única, para facilitar sua identificação. Na tela não é possível ver, mas o menu lateral conta com scroll para ver mais linhas e um botão de reportar problemas e outro para exibir informações sobre o projeto.
+
+![Tela Inicial no Desktop](/github/Desktop%20-%20Inicial.png)
+
+## Escolher Linha - Desktop
+
+Tela em que o usuário escolhe uma linha específica. Com isso, é exibida o horário anterior e o próximo horário daquele interno. O usuário também pode escolher se deseja ver mais horários daquela linha.
+
+![Escolher Linha no Desktop](/github/Desktop%20-%20Escolher%20Linha.png)
+
+## Exibir Horários - Desktop
+
+Nesta tela são mostrados todos os horários em que aquela linha roda.
+
+![Exibir Horários no Desktop](/github/Desktop%20-%20Exibir%20Hor%C3%A1rios.png)
+
+## Tela Inicial - Mobile
+
+Pensando no fato de a maioria das pessoas utilizarem o celular, foi feito o layout com as mesmas funções, porém adaptado para as telas de celulares e outros dispositivos com telas pequenas. A responsividade deve ser trabalhada nesse projeto para melhorar a acessibilidade.
+
+![Tela Inicial no Mobile](/github/Mobile%20-%20Inicial.png)
+
+## Escolher Linha - Mobile
+
+![Escolher Linha no Mobile](/github/Mobile%20-%20Escolher%20Linha.png)
+
+## Exibir Horários - Mobile
+
+![Exibir Horários no Mobile](/github/Mobile%20-%20Exibir%20Hor%C3%A1rios.png)
 
 ## Requisitos
 
