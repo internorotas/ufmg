@@ -1,4 +1,14 @@
-/* Elementos =================================================================*/
+/* Global ====================================================================*/
+
+:root {
+  --primary-color: #2c0eeb;
+  --secondary-color: #ecdcc4;
+
+  --bg: #16161a;
+  --color-text: #333333;
+
+  transition: all 0.3s linear;
+}
 
 * {
   margin: 0;
@@ -8,20 +18,155 @@
 
 html {
   font-size: 93.75w;
+  font-family: "Raleway", sans-serif;
+  color: var(--secondary-color);
 }
 
 body {
-  background: #2c0eeb;
-}
-
-body {
-  padding: 0;
-  margin: 0;
+  background: var(--primary-color);
 }
 
 html,
-body,
-#map {
+body {
   height: 100%;
-  width: 100vw;
+  width: 100%;
+  max-height: 100%;
 }
+
+/* Mapa e Menu Lateral =======================================================*/
+
+#mapa {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+#menu-lateral {
+  height: 100vh;
+  max-width: 380px;
+  background-color: var(--bg);
+
+  position: relative;
+
+  z-index: 100;
+  top: 0;
+  right: 0;
+}
+
+/* Header Menu Lateral =======================================================*/
+
+#menu-lateral header {
+  height: 70px;
+  background-color: var(--primary-color);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+#menu-lateral header img {
+  max-height: 40px;
+  margin: 0 auto;
+}
+
+/* Lateral com Linhas ========================================================*/
+
+/* Header com dia e universidade que os dados mostram */
+#menu-lateral main {
+  padding: 1rem;
+}
+
+#menu-lateral main section.dia-itinerario {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  font-size: 1.2rem;
+  font-weight: 700;
+
+  margin: 1rem 0;
+}
+
+/* Classe de todos os botões das linhas de ônibus */
+
+#menu-lateral section.linha button {
+  border: 1px solid var(--bg);
+  border-radius: 0.4rem;
+  width: 100%;
+
+  font-weight: 700;
+  font-size: 2rem;
+
+  margin: 0.5rem 0 0.1rem;
+  padding: 0.4rem;
+
+  display: flex;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+/* Cada linha conta com uma cor diferente */
+
+.linha#linha-um > button {
+  background: #f6a91e;
+  color: var(--bg);
+}
+
+.linha#linha-dois > button {
+  background: #f6451e;
+  color: var(--bg);
+}
+
+.linha#linha-tres > button {
+  background: #2a8500;
+  color: var(--secondary-color);
+}
+
+.linha#linha-quatro > button {
+  background: #293291;
+  color: var(--secondary-color);
+}
+
+.linha#linha-dois-sabado > button {
+  background: #8000ff;
+  color: var(--secondary-color);
+}
+
+#menu-lateral section.linha button {
+  padding: 0.5rem;
+}
+
+.linha#linha-dois-ferias > button {
+  background: #9f1180;
+  color: var(--secondary-color);
+
+  font-size: 1.5rem !important;
+}
+
+/* Footer */
+
+footer section#reportar-problema > button {
+
+  border: 1px solid var(--bg);
+  border-radius: 0.4rem;
+  width: 100%;
+
+  font-weight: 700;
+  font-size: 1rem;
+
+  margin: 0.5rem 0 0.1rem;
+  padding: 0.4rem;
+
+  display: flex;
+  justify-content: center;
+
+  cursor: pointer;
+
+
+  background: #C02C2C;
+  color: var(--secondary-color);
+}
+
