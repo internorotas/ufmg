@@ -14,6 +14,9 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html {
@@ -54,6 +57,31 @@ body {
   z-index: 100;
   top: 0;
   right: 0;
+
+  overflow-y: auto;
+}
+
+/* Estilizar  o scrollbar do menu lateral */
+
+/* Works on Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text) var(--bg);
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-text);
+  border-radius: 20px;
+  border: 3px solid var(--bg);
 }
 
 /* Header Menu Lateral =======================================================*/
@@ -149,19 +177,21 @@ body {
 /* Footer */
 
 #menu-lateral > main > footer {
-  text-align: -webkit-center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 footer section#reportar-problema > button {
   border: 1px solid var(--bg);
   border-radius: 0.4rem;
-  width: 80%;
 
   font-weight: 700;
   font-size: 1rem;
 
   margin: 5rem 0 0.1rem;
-  padding: 0.4rem;
+  padding: 0.6rem;
 
   display: flex;
   justify-content: center;
@@ -169,20 +199,19 @@ footer section#reportar-problema > button {
 
   cursor: pointer;
 
-  background: #c02c2c;
+  background: #891313;
   color: var(--secondary-color);
 }
 
 footer section#sobre-projeto > button {
   border: 1px solid var(--bg);
   border-radius: 0.4rem;
-  width: 60%;
 
   font-weight: 700;
   font-size: 1rem;
 
   margin: 0.5rem 0 0.1rem;
-  padding: 0.4rem;
+  padding: 0.5rem;
 
   display: flex;
   justify-content: center;
