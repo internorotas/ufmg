@@ -37,16 +37,16 @@ body {
 
 #mapa {
   position: absolute;
-  width: 100%;
+  width: 70%;
   height: 100%;
   top: 0;
-  bottom: 0;
+  right: 0;
   overflow: hidden;
 }
 
 #menu-lateral {
   height: 100vh;
-  max-width: 380px;
+  max-width: 30vw;
   background-color: var(--bg);
 
   position: relative;
@@ -67,7 +67,7 @@ body {
 }
 
 #menu-lateral header img {
-  max-height: 40px;
+  max-height: 3rem;
   margin: 0 auto;
 }
 
@@ -97,13 +97,15 @@ body {
   width: 100%;
 
   font-weight: 700;
-  font-size: 2rem;
+  font-size: 1.4rem;
 
   margin: 0.5rem 0 0.1rem;
   padding: 0.4rem;
+  /* min-height: 50px; */
 
   display: flex;
   justify-content: center;
+  align-items: center;
 
   cursor: pointer;
 }
@@ -142,17 +144,39 @@ body {
 .linha#linha-dois-ferias > button {
   background: #9f1180;
   color: var(--secondary-color);
-
-  font-size: 1.5rem !important;
 }
 
 /* Footer */
 
-footer section#reportar-problema > button {
+#menu-lateral > main > footer {
+  text-align: -webkit-center;
+}
 
+footer section#reportar-problema > button {
   border: 1px solid var(--bg);
   border-radius: 0.4rem;
-  width: 100%;
+  width: 80%;
+
+  font-weight: 700;
+  font-size: 1rem;
+
+  margin: 5rem 0 0.1rem;
+  padding: 0.4rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+
+  background: #c02c2c;
+  color: var(--secondary-color);
+}
+
+footer section#sobre-projeto > button {
+  border: 1px solid var(--bg);
+  border-radius: 0.4rem;
+  width: 60%;
 
   font-weight: 700;
   font-size: 1rem;
@@ -162,11 +186,10 @@ footer section#reportar-problema > button {
 
   display: flex;
   justify-content: center;
+  align-items: center;
 
   cursor: pointer;
 
-
-  background: #C02C2C;
+  background: #1e1e1e;
   color: var(--secondary-color);
 }
-
