@@ -67,7 +67,7 @@ body {
 }
 
 #menu-lateral header img {
-  max-height: 3rem;
+  width: 80%;
   margin: 0 auto;
 }
 
