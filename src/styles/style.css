@@ -174,6 +174,87 @@ body {
   color: var(--secondary-color);
 }
 
+/* Box de Horário Anterior e Próximo */
+
+/* Container de horários e do botão */
+#menu-lateral main .exibir-horario {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+#menu-lateral main .horario-atual {
+  background: #ecdcc4;
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 1rem;
+
+  display: flex;
+
+  justify-content: space-around;
+  width: 100%;
+
+  text-align: center;
+
+  padding: 0.5rem;
+
+  border-radius: 0.4rem;
+}
+
+#menu-lateral > main > div > div > div.anterior > p:nth-child(2),
+#menu-lateral > main > div > div > div.proximo > p:nth-child(2) {
+  font-size: 2rem;
+}
+
+/* Botão de exibir mais horários */
+
+#menu-lateral > main > div > button {
+  border: 1px solid var(--bg);
+  border-radius: 0.4rem;
+
+  font-weight: 700;
+  font-size: 1rem;
+
+  margin-top: 0.5rem;
+  padding: 0.4rem 2rem;
+
+  cursor: pointer;
+
+  background: var(--primary-color);
+  color: var(--secondary-color);
+}
+
+/* Box de mais horários */
+#menu-lateral main .horarios-interno {
+  background: var(--secondary-color);
+  color: var(--secondary-color);
+  font-weight: 700;
+  font-size: 1rem;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  width: 100%;
+
+  text-align: center;
+
+  margin-top: 0.5rem;  
+  padding: 0.5rem;
+
+  border-radius: 0.4rem;
+}
+
+#menu-lateral > main > div > div.horarios-interno > li {
+  list-style: none;
+  border-radius: 0.2rem;
+
+  padding: 0.2rem 0.3rem;
+  margin: 0.2rem;
+
+  background-color: var(--bg);
+}
+
 /* Footer */
 
 #menu-lateral > main > footer {
