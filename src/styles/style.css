@@ -203,11 +203,11 @@ footer section#reportar-problema > button {
   color: var(--secondary-color);
 }
 
-footer section#sobre-projeto > button {
+footer a#sobre-projeto {
   border: 1px solid var(--bg);
   border-radius: 0.4rem;
+  width: 60%;
 
-  font-weight: 700;
   font-size: 1rem;
 
   margin: 0.5rem 0 0.1rem;
@@ -221,4 +221,10 @@ footer section#sobre-projeto > button {
 
   background: #1e1e1e;
   color: var(--secondary-color);
+  text-decoration: none;
+}
+
+#sobre-projeto > img {
+  width: 7%;
+  margin: 0 0.5rem;
 }
