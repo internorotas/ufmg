@@ -1,4 +1,4 @@
-# Interno Rotas 🚌
+# Interno Rotas - UFMG 🚌
 
 <h1 align="center">
   <img alt="Logo Interno Rotas" title="Interno Rotas" src="./github/logo_Capa.png"/>
