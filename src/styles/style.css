@@ -5,7 +5,7 @@
   --secondary-color: #ecdcc4;
 
   --bg: #16161a;
-  --color-text: #333333;
+  --bg-secondary: #333333;
 
   transition: all 0.3s linear;
 }
@@ -66,7 +66,7 @@ body {
 /* Works on Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-text) var(--bg);
+  scrollbar-color: var(--bg-secondary) var(--bg);
 }
 
 /* Works on Chrome, Edge, and Safari */
@@ -79,7 +79,7 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: var(--color-text);
+  background-color: var(--bg-secondary);
   border-radius: 20px;
   border: 3px solid var(--bg);
 }
@@ -181,11 +181,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+
+  display: none;
 }
 
 #menu-lateral main .horario-atual {
-  background: #ecdcc4;
-  color: var(--bg);
+  background: var(--bg-secondary);
+  color: var(--secondary-color);
   font-weight: 700;
   font-size: 1rem;
 
@@ -199,6 +201,8 @@ body {
   padding: 0.5rem;
 
   border-radius: 0.4rem;
+
+  /* display: none; */
 }
 
 #menu-lateral > main > div > div > div.anterior > p:nth-child(2),
@@ -226,8 +230,8 @@ body {
 
 /* Box de mais horários */
 #menu-lateral main .horarios-interno {
-  background: var(--secondary-color);
-  color: var(--secondary-color);
+  background: var(--bg-secondary);
+  color: var(--bg-secondary);
   font-weight: 700;
   font-size: 1rem;
 
@@ -239,10 +243,12 @@ body {
 
   text-align: center;
 
-  margin-top: 0.5rem;  
+  margin-top: 0.5rem;
   padding: 0.5rem;
 
   border-radius: 0.4rem;
+
+  display: none;
 }
 
 #menu-lateral > main > div > div.horarios-interno > li {
@@ -252,7 +258,7 @@ body {
   padding: 0.2rem 0.3rem;
   margin: 0.2rem;
 
-  background-color: var(--bg);
+  background-color: var(--secondary-color);
 }
 
 /* Footer */
