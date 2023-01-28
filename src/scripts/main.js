@@ -127,12 +127,20 @@ function exibeMaisHorarios(posicaoBotao) {
 
 /* Lateral arrasta - mobile ==================================================*/
 
-let lateral = document.getElementById("#menu-lateral");
+let lateral = document.querySelector("#menu-lateral");
+// header = lateral.querySelector("#menu-lateral");
 
-function arrastar() {
-  console.log("Oi")
+function ondDrag({ movementX, movementY }) {
+  let getStyle = window.getComputedStyle(lateral);
+  let left = parseInt(getStyle.left);
+  let top = parseInt(getStyle.top);
+
+  lateral.style.left = `${left + movementX}px`;
+  lateral.style.top = `${top + movementY}px`;
+
+  console.log(top);
 }
 
 lateral.addEventListener("mousedown", () => {
-  lateral.addEventListener("mousemove", arrastar);
+  lateral.addEventListener("mousemove", ondDrag);
 });
