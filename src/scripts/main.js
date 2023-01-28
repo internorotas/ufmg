@@ -124,3 +124,15 @@ function exibeMaisHorarios(posicaoBotao) {
 
   containerHorarios[posicaoBotao].style.display = "flex";
 }
+
+/* Lateral arrasta - mobile ==================================================*/
+
+let lateral = document.getElementById("#menu-lateral");
+
+function arrastar() {
+  console.log("Oi")
+}
+
+lateral.addEventListener("mousedown", () => {
+  lateral.addEventListener("mousemove", arrastar);
+});
