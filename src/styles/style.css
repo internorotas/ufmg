@@ -315,3 +315,62 @@ footer a#sobre-projeto {
   width: 7%;
   margin: 0 0.5rem;
 }
+
+/* Responsivo ================================================================*/
+
+@media (max-width: 750px) {
+  html {
+    font-size: 87.5%;
+    overflow: hidden;
+  }
+
+  .container {
+    width: min(100vw, 1000px);
+    margin: auto;
+  }
+
+  /* Mapa e Menu Lateral =====================================================*/
+
+  #mapa {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    overflow: hidden;
+  }
+
+  #menu-lateral {
+    height: 100vh;
+    max-width: 100vw;
+    background-color: var(--bg);
+    border-radius: 1rem 1rem 0 0;
+
+    position: relative;
+
+    z-index: 100;
+    top: 50vh;
+    right: 0;
+
+    /* overflow: hidden; */
+  }
+
+  /* Header Menu Lateral =======================================================*/
+
+  #menu-lateral header {
+    height: 50px;
+    background-color: var(--primary-color);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+
+    border-radius: 1rem 1rem 0 0;
+
+    cursor: grab;
+  }
+
+  #menu-lateral header img {
+    height: 100%;
+    margin: 0 auto;
+  }
+}
