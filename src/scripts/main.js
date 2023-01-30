@@ -1,13 +1,164 @@
-let linhas = [
-  {
-    linha: 1,
-    horarios: ["0610", "0610", "0610", "0610", "0610", "0610", "0610", "0610"],
-  },
-  {
-    linha: 2,
-    horarios: ["0610", "0610", "0610", "0610", "0610", "0610", "0610", "0610"],
-  },
-];
+let listaLinhas = {
+  diasUteis: [
+    {
+      linha: 1,
+      sublinha: null,
+      horarios: [
+        "0610",
+        "0650",
+        "0730",
+        "0835",
+        "0940",
+        "1110",
+        "1150",
+        "1230",
+        "1315",
+        "1410",
+        "1510",
+        "1550",
+        "1630",
+        "1710",
+        "1755",
+        "1850",
+        "1940",
+      ],
+    },
+    {
+      linha: 2,
+      sublinha: null,
+      horarios: [
+        "0555",
+        "0630",
+        "0710",
+        "0750",
+        "0905",
+        "1020",
+        "1430",
+        "1530",
+        "1610",
+        "1650",
+        "1920",
+        "2000",
+        "2050",
+        "2135",
+        "2230",
+      ],
+    },
+    {
+      linha: 2,
+      sublinha: "Retorno na Área Militar",
+      horarios: ["1130", "1210", "1250", "1345", "1730", "1820"],
+    },
+    {
+      linha: 3,
+      sublinha: null,
+      horarios: [
+        "0540",
+        "0620",
+        "0700",
+        "0740",
+        "0820",
+        "0920",
+        "1000",
+        "1040",
+        "1455",
+        "1600",
+        "1640",
+        "1905",
+        "2030",
+        "2110",
+        "2150",
+        "2210",
+      ],
+    },
+    {
+      linha: 3,
+      sublinha: "Retorno na Área Militar",
+      horarios: ["1120", "1200", "1240", "1330", "1720", "1810", "2250"],
+    },
+    {
+      linha: 3,
+      sublinha: "Atendimento ao BH-Tec",
+      horarios: ["0740", "1720"],
+    },
+    {
+      linha: 4,
+      sublinha: null,
+      horarios: ["0600", "0805", "0850", "1445", "1540", "1620", "2015"],
+    },
+    {
+      linha: 4,
+      sublinha: "Retorno na Área Militar",
+      horarios: [
+        "1100",
+        "1140",
+        "1220",
+        "1305",
+        "1355",
+        "1700",
+        "1740",
+        "1835",
+      ],
+    },
+    {
+      linha: 4,
+      sublinha: "Atendimento ao Ponto McDonald's",
+      horarios: [
+        "0640",
+        "0720",
+        "1100",
+        "1140",
+        "1220",
+        "1305",
+        "1355",
+        "1700",
+        "1740",
+      ],
+    },
+    {
+      linha: 4,
+      sublinha: "Atendimento ao BH-Tec e McDonald's",
+      horarios: ["0720", "1220", "1700"],
+    },
+  ],
+  sabado: [
+    {
+      linha: 5,
+      sublinha: null,
+      horarios: ["1100", "1140", "1220", "1300", "1340"],
+    },
+  ],
+  feriasRecessos: [
+    {
+      linha: 6,
+      sublinha: null,
+      horarios: [
+        "0555",
+        "0640",
+        "0720",
+        "0805",
+        "0910",
+        "1040",
+        "1130",
+        "1210",
+        "1250",
+        "1350",
+        "1440",
+        "1530",
+        "1610",
+        "1650",
+        "1730",
+        "1820",
+        "1920",
+        "2000",
+      ],
+    },
+  ],
+};
+
+console.log(listaLinhas);
+
+function imprimeDados() {}
 
 // pega todos os botões da página
 let botoesLinha = document.querySelectorAll(".linha");
@@ -144,3 +295,6 @@ function exibeMaisHorarios(posicaoBotao) {
 // lateral.addEventListener("mousedown", () => {
 //   lateral.addEventListener("mousemove", ondDrag);
 // });
+
+// quando todos os itens da tela terminas de ser carregados, chama a função imprimeDados
+window.addEventListener("load", imprimeDados);
