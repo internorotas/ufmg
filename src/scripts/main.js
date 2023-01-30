@@ -2,6 +2,8 @@ let listaLinhas = {
   diasUteis: [
     {
       linha: 1,
+      nome: "Linha 01",
+      tipo: "um",
       sublinha: null,
       horarios: [
         "0610",
@@ -25,6 +27,8 @@ let listaLinhas = {
     },
     {
       linha: 2,
+      nome: "Linha 02",
+      tipo: "dois",
       sublinha: null,
       horarios: [
         "0555",
@@ -46,11 +50,15 @@ let listaLinhas = {
     },
     {
       linha: 2,
+      nome: "Linha 02",
+      tipo: "dois",
       sublinha: "Retorno na Área Militar",
       horarios: ["1130", "1210", "1250", "1345", "1730", "1820"],
     },
     {
       linha: 3,
+      nome: "Linha 03",
+      tipo: "tres",
       sublinha: null,
       horarios: [
         "0540",
@@ -73,21 +81,29 @@ let listaLinhas = {
     },
     {
       linha: 3,
+      nome: "Linha 03",
+      tipo: "tres",
       sublinha: "Retorno na Área Militar",
       horarios: ["1120", "1200", "1240", "1330", "1720", "1810", "2250"],
     },
     {
       linha: 3,
+      nome: "Linha 03",
+      tipo: "tres",
       sublinha: "Atendimento ao BH-Tec",
       horarios: ["0740", "1720"],
     },
     {
       linha: 4,
+      nome: "Linha 04",
+      tipo: "quatro",
       sublinha: null,
       horarios: ["0600", "0805", "0850", "1445", "1540", "1620", "2015"],
     },
     {
       linha: 4,
+      nome: "Linha 04",
+      tipo: "quatro",
       sublinha: "Retorno na Área Militar",
       horarios: [
         "1100",
@@ -102,6 +118,8 @@ let listaLinhas = {
     },
     {
       linha: 4,
+      nome: "Linha 04",
+      tipo: "quatro",
       sublinha: "Atendimento ao Ponto McDonald's",
       horarios: [
         "0640",
@@ -117,6 +135,8 @@ let listaLinhas = {
     },
     {
       linha: 4,
+      nome: "Linha 04",
+      tipo: "quatro",
       sublinha: "Atendimento ao BH-Tec e McDonald's",
       horarios: ["0720", "1220", "1700"],
     },
@@ -124,6 +144,8 @@ let listaLinhas = {
   sabado: [
     {
       linha: 5,
+      nome: "Linha 02 - Sábado",
+      tipo: "dois-sabado",
       sublinha: null,
       horarios: ["1100", "1140", "1220", "1300", "1340"],
     },
@@ -131,6 +153,8 @@ let listaLinhas = {
   feriasRecessos: [
     {
       linha: 6,
+      nome: "Linha 02 - Férias e Recessos",
+      tipo: "dois-ferias",
       sublinha: null,
       horarios: [
         "0555",
@@ -158,7 +182,58 @@ let listaLinhas = {
 
 console.log(listaLinhas);
 
-function imprimeDados() {}
+function imprimeDados() {
+  let containerLinhas = document.getElementById("container-linhas-dias-uteis");
+  let conteudoLinhas = "";
+
+  for (let i = 0; i < listaLinhas.diasUteis.length; i++) {
+    if (listaLinhas.diasUteis[i].sublinha == null) {
+      conteudoLinhas += `
+        <section class="linha" id="linha-${listaLinhas.diasUteis[i].tipo}">
+          <Button id="linha">${listaLinhas.diasUteis[i].nome}</Button>
+        </section>
+      `;
+    } else {
+      conteudoLinhas += `
+        <section class="linha" id="linha-${listaLinhas.diasUteis[i].tipo}">
+          <Button>${listaLinhas.diasUteis[i].nome}<p>${listaLinhas.diasUteis[i].sublinha}</p></Button>
+        </section>
+      `;
+    }
+  }
+
+  // coloca a variável no HTML da página
+  containerLinhas.innerHTML = conteudoLinhas;
+}
+
+function imprimeHorario(i) {
+  let containerHorario = document.getElementsByClassName("exibir-horario");
+  let conteudoHorario = "";
+
+  conteudoHorario += `
+    <div class="exibir-horario">
+      <div class="horario-atual">
+        <div class="anterior">
+          <p>Anterior</p>
+          <p>${listaLinhas.diasUteis[i].horarios[3]}</p>
+        </div>
+        <div class="proximo">
+          <p>Próximo</p>
+          <p>${listaLinhas.diasUteis[i].horarios[4]}</p>
+        </div>
+      </div>
+      
+      <button class="mais-horarios">+ mais horários</button>
+
+      <div class="horarios-interno">
+        <li>${listaLinhas.diasUteis[i].horarios[i]}</li>
+      </div>
+    </div>
+  `;
+
+  // coloca a variável no HTML da página
+  containerHorario.innerHTML = conteudoHorario;
+}
 
 // pega todos os botões da página
 let botoesLinha = document.querySelectorAll(".linha");
@@ -167,32 +242,6 @@ let botoesLinha = document.querySelectorAll(".linha");
 for (let i = 0; i < botoesLinha.length; i++) {
   // adiciona um Event Listener em cada um deles
   botoesLinha[i].addEventListener("click", function () {
-    /*
-    // confere se o valor do item da a troca é maior do que o saldo do usuário
-    if (dadosUser.produtosTrocas[i].preco > dadosUser.pontos) {
-      // caso seja, exibe uma mensagem de alerta avisando o usuário
-      alert(
-        "Saldo insuficiente para trocar " +
-          '"' +
-          dadosUser.produtosTrocas[i].titulo +
-          '"'
-      );
-    } else {
-      // caso tenha saldo, mostra o produto e o valor dele
-      alert(
-        '"' +
-          dadosUser.produtosTrocas[i].titulo +
-          '"' +
-          " trocado por " +
-          dadosUser.produtosTrocas[i].preco +
-          " pontos"
-      );
-      // chama a função que troca pontos, passando o objeto de dados e a posição do botão
-      trocaPontos(dadosUser, i);
-    }*/
-
-    // alert("O botão " + [i] + " foi clicado.");
-
     exibeHorario(i);
   });
 }
@@ -208,48 +257,6 @@ function exibeHorario(posicaoBotao) {
   }
 
   containerHorario[posicaoBotao].style.display = "flex";
-
-  /*
-
-  // declara variável que irá receber os itens
-  let conteudoHorario = "";
-
-  // define o objeto de dados como o retorno da função de ler dados
-  //let dadosUser = JSON.parse(localStorage.getItem("usuarioCorrente"));
-
-  console.log(linhas);
-  
-  conteudoHorario += `
-    <div class="horario-atual">
-      <div class="anterior">
-        <p>Anterior</p>
-        <p>12:30</p>
-      </div>
-      <div class="proximo">
-        <p>Próximo</p>
-        <p>13:15</p>
-      </div>
-    </div>
-  `;
-  */
-
-  /*
-
-  // executa item por item e salva dentro da variável
-  for (let i = 0; i < produtosTroca.length; i++) {
-    conteudoTroca += `
-          <article class="item">
-            <img src=${produtosTroca[i].imagem} alt="Imagem ilustrativa">
-            <span>${produtosTroca[i].titulo}</span>
-            <p>${produtosTroca[i].descricao}</p>
-            <span>Preço: ${produtosTroca[i].preco} pontos</span>
-            <button type="button" id="button" class=button-${i}>Trocar</button>
-            </article>
-  `;
-  }*/
-
-  // coloca a variável no HTML da página
-  //containerHorario.innerHTML = conteudoHorario;
 }
 
 // pega todos os botões da página
