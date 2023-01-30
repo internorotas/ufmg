@@ -139,7 +139,7 @@ body {
   cursor: pointer;
 }
 
-#linha-quatro > button > p {
+.linha > button > p {
   font-weight: 500;
   font-size: 1rem;
 }
@@ -183,7 +183,7 @@ body {
 /* Box de Horário Anterior e Próximo */
 
 /* Container de horários e do botão */
-main > #container-linhas > .exibir-horario {
+.exibir-horario {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -191,7 +191,7 @@ main > #container-linhas > .exibir-horario {
   display: none;
 }
 
-#container-linhas > .exibir-horario > .horario-atual {
+.exibir-horario > .horario-atual {
   background: var(--bg-secondary);
   color: var(--secondary-color);
   font-weight: 500;
@@ -235,7 +235,7 @@ main > #container-linhas > .exibir-horario {
 }
 
 /* Box de mais horários */
-#container-linhas > .exibir-horario > .horarios-interno {
+.exibir-horario > .horarios-interno {
   background: var(--bg-secondary);
   color: var(--bg-secondary);
   font-weight: 700;
@@ -257,7 +257,7 @@ main > #container-linhas > .exibir-horario {
   display: none;
 }
 
-#container-linhas > .exibir-horario > .horarios-interno > li {
+.exibir-horario > .horarios-interno > li {
   list-style: none;
   border-radius: 0.2rem;
 

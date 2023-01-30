@@ -3,6 +3,7 @@
         "diasUteis": [
             {
                 "linha": 1,
+                "class": "um",
                 "sublinha": null,
                 "horarios": [
                     "0610",
@@ -26,6 +27,7 @@
             },
             {
                 "linha": 2,
+                "class": "dois",
                 "sublinha": null,
                 "horarios": [
                     "0555",
@@ -47,6 +49,7 @@
             },
             {
                 "linha": 2,
+                "class": "dois",
                 "sublinha": "Retorno na Área Militar",
                 "horarios": [
                     "1130",
@@ -59,6 +62,7 @@
             },
             {
                 "linha": 3,
+                "class": "tres",
                 "sublinha": null,
                 "horarios": [
                     "0540",
@@ -81,6 +85,7 @@
             },
             {
                 "linha": 3,
+                "class": "tres",
                 "sublinha": "Retorno na Área Militar",
                 "horarios": [
                     "1120",
@@ -94,6 +99,7 @@
             },
             {
                 "linha": 3,
+                "class": "tres",
                 "sublinha": "Atendimento ao BH-Tec",
                 "horarios": [
                     "0740",
@@ -102,6 +108,7 @@
             },
             {
                 "linha": 4,
+                "class": "quatro",
                 "sublinha": null,
                 "horarios": [
                     "0600",
@@ -115,6 +122,7 @@
             },
             {
                 "linha": 4,
+                "class": "quatro",
                 "sublinha": "Retorno na Área Militar",
                 "horarios": [
                     "1100",
@@ -129,6 +137,7 @@
             },
             {
                 "linha": 4,
+                "class": "quatro",
                 "sublinha": "Atendimento ao Ponto McDonald's",
                 "horarios": [
                     "0640",
@@ -144,6 +153,7 @@
             },
             {
                 "linha": 4,
+                "class": "quatro",
                 "sublinha": "Atendimento ao BH-Tec e McDonald's",
                 "horarios": [
                     "0720",
@@ -155,6 +165,7 @@
         "sabado": [
             {
                 "linha": 5,
+                "class": "dois-sabado",
                 "sublinha": null,
                 "horarios": [
                     "1100",
@@ -168,6 +179,7 @@
         "feriasRecessos": [
             {
                 "linha": 6,
+                "class": "dois-ferias",
                 "sublinha": null,
                 "horarios": [
                     "0555",
@@ -193,3 +205,5 @@
         ]
     }
 }
+
+
