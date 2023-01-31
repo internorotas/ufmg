@@ -339,10 +339,10 @@ footer a#sobre-projeto {
 
 /* Responsivo ================================================================*/
 
-@media (max-width: 750px) {
+@media (max-width: 850px) {
   html,
   body {
-    height: calc(100vh + 50vh);
+    height: calc(100vh + 70vh);
   }
 
   html {
@@ -350,7 +350,7 @@ footer a#sobre-projeto {
     /* overflow: hidden; */
   }
 
-  /* Header Menu Lateral =======================================================*/
+  /* Header Menu Lateral =======================================*/
 
   #menu-lateral header {
     height: 6vh;
@@ -372,7 +372,7 @@ footer a#sobre-projeto {
     margin: 0 auto;
   }
 
-  /* Mapa e Menu Lateral =====================================================*/
+  /* Mapa e Menu Lateral =======================================*/
 
   #mapa {
     position: absolute;
@@ -391,6 +391,32 @@ footer a#sobre-projeto {
     position: relative;
 
     z-index: 100;
-    top: 50vh;
+    top: 70vh;
+  }
+
+  #menu-lateral main section.dia-itinerario {
+    margin: 0;
+  }
+
+  /* Barra de puxar no mobile */
+
+  #menu-lateral main::before {
+    content: "";
+    position: absolute;
+    text-align: center;
+
+    left: calc(50% - 60px);
+
+    top: 0.5rem;
+
+    width: 120px;
+    height: 5px;
+
+    background-color: var(--secondary-color);
+    border-radius: 2rem;
+  }
+
+  #menu-lateral > main > section.aviso {
+    text-align: center;
   }
 }
