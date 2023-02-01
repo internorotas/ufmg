@@ -295,11 +295,11 @@ footer section#reportar-problema > button {
   border: 1px solid var(--bg);
   border-radius: 0.4rem;
 
-  font-weight: 700;
+  font-weight: 500;
   font-size: 1rem;
 
   margin: 1rem 0 0.1rem;
-  padding: 0.6rem;
+  padding: 0.8rem;
 
   display: flex;
   justify-content: center;
@@ -333,7 +333,7 @@ footer a#sobre-projeto {
 }
 
 #sobre-projeto > img {
-  width: 7%;
+  width: 15px;
   margin: 0 0.5rem;
 }
 
@@ -395,7 +395,7 @@ footer a#sobre-projeto {
   }
 
   #menu-lateral main section.dia-itinerario {
-    margin: 0;
+    margin: 1rem 0;
   }
 
   /* Barra de puxar no mobile */
@@ -407,7 +407,7 @@ footer a#sobre-projeto {
 
     left: calc(50% - 60px);
 
-    top: 0.5rem;
+    top: 0.8rem;
 
     width: 120px;
     height: 5px;
