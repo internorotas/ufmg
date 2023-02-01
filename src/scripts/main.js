@@ -6,23 +6,23 @@ let listaLinhas = {
       tipo: "um",
       sublinha: null,
       horarios: [
-        "0610",
-        "0650",
-        "0730",
-        "0835",
-        "0940",
-        "1110",
-        "1150",
-        "1230",
-        "1315",
-        "1410",
-        "1510",
-        "1550",
-        "1630",
-        "1710",
-        "1755",
-        "1850",
-        "1940",
+        "06:10",
+        "06:50",
+        "07:30",
+        "08:35",
+        "09:40",
+        "11:10",
+        "11:50",
+        "12:30",
+        "13:15",
+        "14:10",
+        "15:10",
+        "15:50",
+        "16:30",
+        "17:10",
+        "17:55",
+        "18:50",
+        "19:40",
       ],
     },
     {
@@ -31,21 +31,21 @@ let listaLinhas = {
       tipo: "dois",
       sublinha: null,
       horarios: [
-        "0555",
-        "0630",
-        "0710",
-        "0750",
-        "0905",
-        "1020",
-        "1430",
-        "1530",
-        "1610",
-        "1650",
-        "1920",
-        "2000",
-        "2050",
-        "2135",
-        "2230",
+        "05:55",
+        "06:30",
+        "07:10",
+        "07:50",
+        "09:05",
+        "10:20",
+        "14:30",
+        "15:30",
+        "16:10",
+        "16:50",
+        "19:20",
+        "20:00",
+        "20:50",
+        "21:35",
+        "22:30",
       ],
     },
     {
@@ -53,7 +53,7 @@ let listaLinhas = {
       nome: "Linha 02",
       tipo: "dois",
       sublinha: "Retorno na Área Militar",
-      horarios: ["1130", "1210", "1250", "1345", "1730", "1820"],
+      horarios: ["11:30", "12:10", "12:50", "13:45", "17:30", "18:20"],
     },
     {
       linha: 3,
@@ -61,22 +61,22 @@ let listaLinhas = {
       tipo: "tres",
       sublinha: null,
       horarios: [
-        "0540",
-        "0620",
-        "0700",
-        "0740",
-        "0820",
-        "0920",
-        "1000",
-        "1040",
-        "1455",
-        "1600",
-        "1640",
-        "1905",
-        "2030",
-        "2110",
-        "2150",
-        "2210",
+        "05:40",
+        "06:20",
+        "07:00",
+        "07:40",
+        "08:20",
+        "09:20",
+        "10:00",
+        "10:40",
+        "14:55",
+        "16:00",
+        "16:40",
+        "19:05",
+        "20:30",
+        "21:10",
+        "21:50",
+        "22:10",
       ],
     },
     {
@@ -84,21 +84,21 @@ let listaLinhas = {
       nome: "Linha 03",
       tipo: "tres",
       sublinha: "Retorno na Área Militar",
-      horarios: ["1120", "1200", "1240", "1330", "1720", "1810", "2250"],
+      horarios: ["11:20", "12:00", "12:40", "13:30", "17:20", "18:10", "22:50"],
     },
     {
       linha: 3,
       nome: "Linha 03",
       tipo: "tres",
       sublinha: "Atendimento ao BH-Tec",
-      horarios: ["0740", "1720"],
+      horarios: ["07:40", "17:20"],
     },
     {
       linha: 4,
       nome: "Linha 04",
       tipo: "quatro",
       sublinha: null,
-      horarios: ["0600", "0805", "0850", "1445", "1540", "1620", "2015"],
+      horarios: ["06:00", "08:05", "08:50", "14:45", "15:40", "16:20", "20:15"],
     },
     {
       linha: 4,
@@ -106,14 +106,14 @@ let listaLinhas = {
       tipo: "quatro",
       sublinha: "Retorno na Área Militar",
       horarios: [
-        "1100",
-        "1140",
-        "1220",
-        "1305",
-        "1355",
-        "1700",
-        "1740",
-        "1835",
+        "11:00",
+        "11:40",
+        "12:20",
+        "13:05",
+        "13:55",
+        "17:00",
+        "17:40",
+        "18:35",
       ],
     },
     {
@@ -122,15 +122,15 @@ let listaLinhas = {
       tipo: "quatro",
       sublinha: "Atendimento ao Ponto McDonald's",
       horarios: [
-        "0640",
-        "0720",
-        "1100",
-        "1140",
-        "1220",
-        "1305",
-        "1355",
-        "1700",
-        "1740",
+        "06:40",
+        "07:20",
+        "11:00",
+        "11:40",
+        "12:20",
+        "13:05",
+        "13:55",
+        "17:00",
+        "17:40",
       ],
     },
     {
@@ -138,43 +138,43 @@ let listaLinhas = {
       nome: "Linha 04",
       tipo: "quatro",
       sublinha: "Atendimento ao BH-Tec e McDonald's",
-      horarios: ["0720", "1220", "1700"],
+      horarios: ["07:20", "12:20", "17:00"],
     },
   ],
   sabado: [
     {
       linha: 5,
-      nome: "Linha 02 - Sábado",
+      nome: "Linha 02",
       tipo: "dois-sabado",
-      sublinha: null,
-      horarios: ["1100", "1140", "1220", "1300", "1340"],
+      sublinha: "Sábado",
+      horarios: ["11:00", "11:40", "12:20", "13:00", "13:40"],
     },
   ],
   feriasRecessos: [
     {
       linha: 6,
-      nome: "Linha 02 - Férias e Recessos",
+      nome: "Linha 02",
       tipo: "dois-ferias",
-      sublinha: null,
+      sublinha: "Férias e Recessos",
       horarios: [
-        "0555",
-        "0640",
-        "0720",
-        "0805",
-        "0910",
-        "1040",
-        "1130",
-        "1210",
-        "1250",
-        "1350",
-        "1440",
-        "1530",
-        "1610",
-        "1650",
-        "1730",
-        "1820",
-        "1920",
-        "2000",
+        "05:55",
+        "06:40",
+        "07:20",
+        "08:05",
+        "09:10",
+        "10:40",
+        "11:30",
+        "12:10",
+        "12:50",
+        "13:50",
+        "14:40",
+        "15:30",
+        "16:10",
+        "16:50",
+        "17:30",
+        "18:20",
+        "19:20",
+        "20:00",
       ],
     },
   ],
@@ -182,58 +182,205 @@ let listaLinhas = {
 
 console.log(listaLinhas);
 
-function imprimeDados() {
-  let containerLinhas = document.getElementById("container-linhas-dias-uteis");
-  let conteudoLinhas = "";
+function imprimeLinhasDiasUteis() {
+  let containerLinhasDiasUteis = document.getElementById(
+    "container-linhas-dias-uteis"
+  );
+  let conteudoLinhasDiasUteis = "";
+
+  let containerLinhasSabado = document.getElementById(
+    "container-linhas-sabado"
+  );
+  let conteudoLinhasSabado = "";
 
   for (let i = 0; i < listaLinhas.diasUteis.length; i++) {
     if (listaLinhas.diasUteis[i].sublinha == null) {
-      conteudoLinhas += `
+      conteudoLinhasDiasUteis += `
         <section class="linha" id="linha-${listaLinhas.diasUteis[i].tipo}">
           <Button id="linha">${listaLinhas.diasUteis[i].nome}</Button>
         </section>
       `;
     } else {
-      conteudoLinhas += `
+      conteudoLinhasDiasUteis += `
         <section class="linha" id="linha-${listaLinhas.diasUteis[i].tipo}">
           <Button>${listaLinhas.diasUteis[i].nome}<p>${listaLinhas.diasUteis[i].sublinha}</p></Button>
         </section>
       `;
     }
+
+    conteudoLinhasDiasUteis += `
+      <div class="exibir-horario">
+        <div class="horario-atual">
+          <div class="anterior">
+            <p>Anterior</p>
+            <p>${listaLinhas.diasUteis[i].horarios[0]}</p>
+          </div>
+          <div class="proximo">
+            <p>Próximo</p>
+            <p>${listaLinhas.diasUteis[i].horarios[1]}</p>
+          </div>
+        </div>
+        <button class="mais-horarios">+ mais horários</button>
+
+        <div class="horarios-interno">
+    `;
+
+    for (let j = 0; j < listaLinhas.diasUteis[i].horarios.length; j++) {
+      conteudoLinhasDiasUteis += ` 
+            <li>${listaLinhas.diasUteis[i].horarios[j]}</li>
+      `;
+    }
+
+    conteudoLinhasDiasUteis += `
+        </div>
+      </div>
+    `;
   }
 
   // coloca a variável no HTML da página
-  containerLinhas.innerHTML = conteudoLinhas;
+  containerLinhasDiasUteis.innerHTML = conteudoLinhasDiasUteis;
+
+  imprimeLinhasSabado();
+  imprimeLinhasFeriasRecessos();
 }
 
-function imprimeHorario(i) {
-  let containerHorario = document.getElementsByClassName("exibir-horario");
-  let conteudoHorario = "";
+imprimeLinhasDiasUteis();
 
-  conteudoHorario += `
-    <div class="exibir-horario">
-      <div class="horario-atual">
-        <div class="anterior">
-          <p>Anterior</p>
-          <p>${listaLinhas.diasUteis[i].horarios[3]}</p>
+
+
+
+
+
+function imprimeLinhasSabado() {
+  let containerLinhasSabado = document.getElementById(
+    "container-linhas-sabado"
+  );
+  let conteudoLinhasSabado = "";
+
+  for (let i = 0; i < listaLinhas.sabado.length; i++) {
+    if (listaLinhas.sabado[i].sublinha == null) {
+      conteudoLinhasSabado += `
+        <section class="linha" id="linha-${listaLinhas.sabado[i].tipo}">
+          <Button id="linha">${listaLinhas.sabado[i].nome}</Button>
+        </section>
+      `;
+    } else {
+      conteudoLinhasSabado += `
+        <section class="linha" id="linha-${listaLinhas.sabado[i].tipo}">
+          <Button>${listaLinhas.sabado[i].nome}<p>${listaLinhas.sabado[i].sublinha}</p></Button>
+        </section>
+      `;
+    }
+
+    conteudoLinhasSabado += `
+      <div class="exibir-horario">
+        <div class="horario-atual">
+          <div class="anterior">
+            <p>Anterior</p>
+            <p>${listaLinhas.sabado[i].horarios[0]}</p>
+          </div>
+          <div class="proximo">
+            <p>Próximo</p>
+            <p>${listaLinhas.sabado[i].horarios[1]}</p>
+          </div>
         </div>
-        <div class="proximo">
-          <p>Próximo</p>
-          <p>${listaLinhas.diasUteis[i].horarios[4]}</p>
+        <button class="mais-horarios">+ mais horários</button>
+
+        <div class="horarios-interno">
+    `;
+
+    for (let j = 0; j < listaLinhas.sabado[i].horarios.length; j++) {
+      conteudoLinhasSabado += ` 
+            <li>${listaLinhas.sabado[i].horarios[j]}</li>
+      `;
+    }
+
+    conteudoLinhasSabado += `
         </div>
       </div>
-      
-      <button class="mais-horarios">+ mais horários</button>
-
-      <div class="horarios-interno">
-        <li>${listaLinhas.diasUteis[i].horarios[i]}</li>
-      </div>
-    </div>
-  `;
+    `;
+  }
 
   // coloca a variável no HTML da página
-  containerHorario.innerHTML = conteudoHorario;
+  containerLinhasSabado.innerHTML = conteudoLinhasSabado;
 }
+
+
+
+
+
+
+
+
+
+
+
+function imprimeLinhasFeriasRecessos() {
+  let containerLinhasFeriasRecessos = document.getElementById(
+    "container-linhas-ferias-recessos"
+  );
+  let conteudoLinhasFeriasRecessos = "";
+
+  for (let i = 0; i < listaLinhas.feriasRecessos.length; i++) {
+    if (listaLinhas.feriasRecessos[i].sublinha == null) {
+      conteudoLinhasFeriasRecessos += `
+        <section class="linha" id="linha-${listaLinhas.feriasRecessos[i].tipo}">
+          <Button id="linha">${listaLinhas.feriasRecessos[i].nome}</Button>
+        </section>
+      `;
+    } else {
+      conteudoLinhasFeriasRecessos += `
+        <section class="linha" id="linha-${listaLinhas.feriasRecessos[i].tipo}">
+          <Button>${listaLinhas.feriasRecessos[i].nome}<p>${listaLinhas.feriasRecessos[i].sublinha}</p></Button>
+        </section>
+      `;
+    }
+
+    conteudoLinhasFeriasRecessos += `
+      <div class="exibir-horario">
+        <div class="horario-atual">
+          <div class="anterior">
+            <p>Anterior</p>
+            <p>${listaLinhas.feriasRecessos[i].horarios[0]}</p>
+          </div>
+          <div class="proximo">
+            <p>Próximo</p>
+            <p>${listaLinhas.feriasRecessos[i].horarios[1]}</p>
+          </div>
+        </div>
+        <button class="mais-horarios">+ mais horários</button>
+
+        <div class="horarios-interno">
+    `;
+
+    for (let j = 0; j < listaLinhas.feriasRecessos[i].horarios.length; j++) {
+      conteudoLinhasFeriasRecessos += ` 
+            <li>${listaLinhas.feriasRecessos[i].horarios[j]}</li>
+      `;
+    }
+
+    conteudoLinhasFeriasRecessos += `
+        </div>
+      </div>
+    `;
+  }
+
+  // coloca a variável no HTML da página
+  containerLinhasFeriasRecessos.innerHTML = conteudoLinhasFeriasRecessos;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // pega todos os botões da página
 let botoesLinha = document.querySelectorAll(".linha");
@@ -248,8 +395,6 @@ for (let i = 0; i < botoesLinha.length; i++) {
 
 // função que imprime os dados na tela
 function exibeHorario(posicaoBotao) {
-  // pega algumas informações do usuário no HTML da página
-  // pega o container dos itens para troca
   let containerHorario = document.getElementsByClassName("exibir-horario");
 
   for (let i = 0; i < containerHorario.length; i++) {
@@ -272,8 +417,6 @@ for (let i = 0; i < botoesHorarios.length; i++) {
 
 // função que imprime os dados na tela
 function exibeMaisHorarios(posicaoBotao) {
-  // pega algumas informações do usuário no HTML da página
-  // pega o container dos itens para troca
   let containerHorarios = document.getElementsByClassName("horarios-interno");
 
   for (let i = 0; i < containerHorarios.length; i++) {
@@ -282,26 +425,3 @@ function exibeMaisHorarios(posicaoBotao) {
 
   containerHorarios[posicaoBotao].style.display = "flex";
 }
-
-/* Lateral arrasta - mobile ==================================================*/
-
-// let lateral = document.querySelector("#menu-lateral");
-// // header = lateral.querySelector("#menu-lateral");
-
-// function ondDrag({ movementX, movementY }) {
-//   let getStyle = window.getComputedStyle(lateral);
-//   let left = parseInt(getStyle.left);
-//   let top = parseInt(getStyle.top);
-
-//   lateral.style.left = `${left + movementX}px`;
-//   lateral.style.top = `${top + movementY}px`;
-
-//   console.log(top);
-// }
-
-// lateral.addEventListener("mousedown", () => {
-//   lateral.addEventListener("mousemove", ondDrag);
-// });
-
-// quando todos os itens da tela terminas de ser carregados, chama a função imprimeDados
-window.addEventListener("load", imprimeDados);
