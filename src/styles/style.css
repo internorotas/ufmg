@@ -379,6 +379,8 @@ footer a#sobre-projeto {
     width: 100vw;
     height: 94vh;
 
+    z-index: 1;
+
     margin-top: 6vh;
   }
 

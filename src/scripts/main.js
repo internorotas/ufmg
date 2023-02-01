@@ -7,11 +7,6 @@ function imprimeLinhasDiasUteis() {
   );
   let conteudoLinhasDiasUteis = "";
 
-  let containerLinhasSabado = document.getElementById(
-    "container-linhas-sabado"
-  );
-  let conteudoLinhasSabado = "";
-
   for (let i = 0; i < data.diasUteis.length; i++) {
     if (data.diasUteis[i].sublinha == null) {
       conteudoLinhasDiasUteis += `
