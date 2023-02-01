@@ -46,7 +46,7 @@ Para o tornar o projeto real é planejado, pelo menos por enquanto, utilizar as 
 - HTML
 - CSS
 - JavaScript
-- API de mapas (ainda a definir qual será utilizada)
+- API de mapas (OpenStreetMap e Leaflet)
 - Moment.js
 - Axios
 
