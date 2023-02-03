@@ -13,11 +13,11 @@ tiles.addTo(map);
 
 const stationIcon = L.icon({
   iconUrl: "./src/assets/marker.svg",
-  iconSize: [50, 32],
-  iconAnchor: [25, 16],
+  iconSize: [20, 20],
+  iconAnchor: [0, 0],
 });
 
-const marker = L.marker([-19.864066379453362, -43.960112218157626], {
+const marker = L.marker(data.paradas[0].coordinates[0], {
   icon: stationIcon,
 }).addTo(map);
 marker.bindPopup("Parada de Ônibus");
