@@ -286,7 +286,6 @@ body {
 
 #menu-lateral > main > footer {
   display: flex;
-  justify-content: center;
   flex-direction: column;
   align-items: center;
 }
@@ -295,15 +294,17 @@ footer section#reportar-problema > button {
   border: 1px solid var(--bg);
   border-radius: 0.4rem;
 
-  font-weight: 500;
+  width: 10 0%;
+
+  font-weight: 700;
   font-size: 1rem;
 
   margin: 1rem 0 0.1rem;
-  padding: 0.8rem;
+  padding: 1rem;
 
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-self: center;
 
   cursor: pointer;
 
@@ -324,6 +325,7 @@ footer a#sobre-projeto {
   display: flex;
   justify-content: center;
   align-items: center;
+  align-self: center;
 
   cursor: pointer;
 
@@ -342,7 +344,7 @@ footer a#sobre-projeto {
 @media (max-width: 850px) {
   html,
   body {
-    height: calc(100vh + 70vh);
+    height: calc(100vh + 80vh);
   }
 
   html {
@@ -393,7 +395,7 @@ footer a#sobre-projeto {
     position: relative;
 
     z-index: 100;
-    top: 70vh;
+    top: 80vh;
   }
 
   #menu-lateral main section.dia-itinerario {
