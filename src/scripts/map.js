@@ -2,7 +2,7 @@ import data from "./dadosRotas.json" assert { type: "json" };
 
 console.log(data);
 
-const map = L.map("mapa").setView([-19.87, -43.967], 16);
+const map = L.map("mapa").setView([-19.868035, -43.965033], 15);
 
 const attribution =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
@@ -17,10 +17,14 @@ const stationIcon = L.icon({
   iconAnchor: [0, 0],
 });
 
+let nome =
+  `<h4>${data.paradas[0].nome}</h4>` +
+  `<span>${data.paradas[0].linhaAtendidas}</span>`;
+
 const marker = L.marker(data.paradas[0].coordinates[0], {
   icon: stationIcon,
 }).addTo(map);
-marker.bindPopup("Parada de Ônibus");
+marker.bindPopup(nome);
 
 const latlngs = [data.rotas[0].coordinates];
 
