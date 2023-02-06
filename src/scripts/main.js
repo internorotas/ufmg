@@ -1,4 +1,7 @@
 import data from "./dadosLinhas.json" assert { type: "json" };
+
+import exibeLinha from "./map.js";
+
 console.log(data);
 
 function imprimeLinhasDiasUteis() {
@@ -152,11 +155,7 @@ function imprimeLinhasFeriasRecessos() {
         <div class="horarios-interno">
     `;
 
-    for (
-      let j = 0;
-      j < data.feriasRecessos[i].horarios.length;
-      j++
-    ) {
+    for (let j = 0; j < data.feriasRecessos[i].horarios.length; j++) {
       conteudoLinhasFeriasRecessos += ` 
             <li>${data.feriasRecessos[i].horarios[j]}</li>
       `;
@@ -180,6 +179,7 @@ for (let i = 0; i < botoesLinha.length; i++) {
   // adiciona um Event Listener em cada um deles
   botoesLinha[i].addEventListener("click", function () {
     exibeHorario(i);
+    exibeLinha(i);
   });
 }
 
@@ -192,6 +192,7 @@ function exibeHorario(posicaoBotao) {
   }
 
   containerHorario[posicaoBotao].style.display = "flex";
+  exibeLinha(posicaoBotao);
 }
 
 // pega todos os botões da página
