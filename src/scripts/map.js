@@ -4,7 +4,7 @@ import data from "./dadosRotas.json" assert { type: "json" };
 console.log(data);
 
 // Abrindo o mapa com centro na UFMG e o zoom
-const map = L.map("mapa").setView([-19.868035, -43.965033], 15, {
+const map = L.map("mapa").setView([-19.868035, -43.965033], 18, {
   maxZoom: 21,
   zoomControl: true,
 });
@@ -42,78 +42,47 @@ const marker = L.marker(data.paradas[0].coordinates[0], {
 }).addTo(map);
 marker.bindPopup(nome);
 
-// Pega as coordenadas da linha no JSON
-const latlngs = [data.rotas[0].coordinates];
+let coresLinhas = [
+  "#f6a91e",
+  "#f6451e",
+  "#f6451e",
+  "#2a8500",
+  "#2a8500",
+  "#2a8500",
+  "#293291",
+  "#293291",
+  "#293291",
+  "#293291",
+  "#8000ff",
+  "#9f1180",
+];
 
-// Configurações do traçado da rota do ônibus
-const options = {
-  use: L.polyline,
-  delay: 600,
-  dashArray: [40, 100],
-  weight: 10,
-  color: "#f6a91e",
-  pulseColor: "#f6a91e",
-};
-// Cria o traçado no mapa com as configurações definidas e o coloca no mapa
-let polyline = new L.Polyline.AntPath(latlngs, options);
-polyline.addTo(map);
+let active_polyline = L.featureGroup().addTo(map);
 
-// Pega as coordenadas da linha no JSON
-const latlngsLinhaDois = [data.rotas[1].coordinates];
+function exibeLinha(posicao) {
+  active_polyline.clearLayers();
 
-// Configurações do traçado da rota do ônibus
-const optionsLinhaDois = {
-  use: L.polyline,
-  delay: 600,
-  dashArray: [40, 100],
-  weight: 10,
-  color: "#f6451e",
-  pulseColor: "#f6451e",
-};
+  // Pega as coordenadas da linha no JSON
+  const latlngs = [data.rotas[posicao].coordinates];
 
-// Cria o traçado no mapa com as configurações definidas e o coloca no mapa
-let polylineLinhaDois = new L.Polyline.AntPath(
-  latlngsLinhaDois,
-  optionsLinhaDois
-);
-polylineLinhaDois.addTo(map);
+  // Configurações do traçado da rota do ônibus
+  const options = {
+    use: L.polyline,
+    delay: 600,
+    dashArray: [40, 100],
+    weight: 10,
+    color: coresLinhas[posicao],
+    pulseColor: coresLinhas[posicao],
+  };
 
-// Pega as coordenadas da linha no JSON
-const latlngsLinhaTres = [data.rotas[2].coordinates];
+  // Cria o traçado no mapa com as configurações definidas e o coloca no mapa
+  let polyline = new L.Polyline.AntPath(latlngs, options).addTo(
+    active_polyline
+  );
 
-// Configurações do traçado da rota do ônibus
-const optionsLinhaTres = {
-  use: L.polyline,
-  delay: 600,
-  dashArray: [40, 100],
-  weight: 10,
-  color: "#2a8500",
-  pulseColor: "#2a8500",
-};
+  polyline.addTo(map);
 
-// Cria o traçado no mapa com as configurações definidas e o coloca no mapa
-let polylineLinhaTres = new L.Polyline.AntPath(
-  latlngsLinhaTres,
-  optionsLinhaTres
-);
-polylineLinhaTres.addTo(map);
+  map.fitBounds(polyline.getBounds());
+}
 
-// Pega as coordenadas da linha no JSON
-const latlngsLinhaQuatro = [data.rotas[3].coordinates];
-
-// Configurações do traçado da rota do ônibus
-const optionsLinhaQuatro = {
-  use: L.polyline,
-  delay: 800,
-  dashArray: [40, 100],
-  weight: 10,
-  color: "#293291",
-  pulseColor: "#293291",
-};
-
-// Cria o traçado no mapa com as configurações definidas e o coloca no mapa
-let polylineLinhaQuatro = new L.Polyline.AntPath(
-  latlngsLinhaQuatro,
-  optionsLinhaQuatro
-);
-polylineLinhaQuatro.addTo(map);
+export default exibeLinha;
