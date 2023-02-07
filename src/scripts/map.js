@@ -44,8 +44,8 @@ marker.bindPopup(nome);
 
 let coresLinhas = [
   "#ed1c24",
-  "#ba6831",
-  "#ba6831",
+  "#7f6000",
+  "#7f6000",
   "#008d39",
   "#008d39",
   "#008d39",
@@ -53,8 +53,8 @@ let coresLinhas = [
   "#0a4392",
   "#0a4392",
   "#0a4392",
-  "#8b259c",
   "#96002d",
+  "#8b259c",
 ];
 
 let active_polyline = L.featureGroup().addTo(map);
