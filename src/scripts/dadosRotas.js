@@ -1,4 +1,4 @@
-{
+const data = {
   "rotas": [
     {
       "linha": 1,
@@ -2097,3 +2097,5 @@
     }
   ]
 }
+
+export default data;

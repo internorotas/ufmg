@@ -1,5 +1,5 @@
 // Importando as rotas dos ônibus
-import data from "./dadosRotas.json" assert { type: "json" };
+import data from "./dadosRotas.js";
 
 console.log(data);
 

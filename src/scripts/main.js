@@ -1,5 +1,4 @@
-import data from "./dadosLinhas.json" assert { type: "json" };
-
+import data from "./dadosLinhas.js";
 import exibeLinha from "./map.js";
 
 console.log(data);

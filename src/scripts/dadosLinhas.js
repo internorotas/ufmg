@@ -1,4 +1,4 @@
-{
+const data = {
   "diasUteis": [
     {
       "linha": 1,
@@ -646,3 +646,5 @@
     }
   ]
 }
+
+export default data;
