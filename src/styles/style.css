@@ -152,7 +152,7 @@ body {
 }
 
 .linha#linha-dois > button {
-  background: #ba6831;
+  background: #7f6000;
   color: var(--secondary-color);
 }
 
@@ -167,7 +167,7 @@ body {
 }
 
 .linha#linha-dois-sabado > button {
-  background: #8b259c;
+  background: #96002d;
   color: var(--secondary-color);
 }
 
@@ -176,7 +176,7 @@ body {
 }
 
 .linha#linha-dois-ferias > button {
-  background: #96002d;
+  background: #8b259c;
   color: var(--secondary-color);
 }
 
