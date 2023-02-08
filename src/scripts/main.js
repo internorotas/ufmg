@@ -33,7 +33,7 @@ function imprimeLinhasDiasUteis() {
           </div>
           <div class="proximo">
             <p>Próximo</p>
-            <p>${data.diasUteis[i].horarios[1]}</p>
+            <p>${retornaProximoHorario(i)}</p>
           </div>
         </div>
         <button class="mais-horarios">+ mais horários</button>
@@ -92,7 +92,7 @@ function imprimeLinhasSabado() {
           </div>
           <div class="proximo">
             <p>Próximo</p>
-            <p>${data.sabado[i].horarios[1]}</p>
+            <p>${retornaProximoHorario(i)}</p>
           </div>
         </div>
         <button class="mais-horarios">+ mais horários</button>
@@ -146,7 +146,7 @@ function imprimeLinhasFeriasRecessos() {
           </div>
           <div class="proximo">
             <p>Próximo</p>
-            <p>${data.feriasRecessos[i].horarios[1]}</p>
+            <p>${retornaProximoHorario(i)}</p>
           </div>
         </div>
         <button class="mais-horarios">+ mais horários</button>
@@ -214,4 +214,36 @@ function exibeMaisHorarios(posicaoBotao) {
   }
 
   containerHorarios[posicaoBotao].style.display = "flex";
+}
+
+function retornaProximoHorario(posicao) {
+  let proximoHorario;
+
+  for (let i = 0; i < data.diasUteis[posicao].horarios.length; i++) {
+    proximoHorario = compararProximoHorario(
+      data.diasUteis[posicao].horarios[i]
+    );
+    if (proximoHorario != "-") {
+      break;
+    }
+  }
+  return proximoHorario;
+}
+
+// Verifica se o horário passado por parâmetro é o do próximo ônibus
+function compararProximoHorario(horario) {
+  let horas = horario.split(":");
+
+  let agora = new Date();
+  let comparado = new Date();
+
+  comparado.setHours(horas[0]);
+  comparado.setMinutes(horas[1]);
+
+  if (comparado > agora) {
+    console.log(comparado);
+    return horario;
+  } else {
+    return "-";
+  }
 }
