@@ -29,7 +29,7 @@ function imprimeLinhasDiasUteis() {
         <div class="horario-atual">
           <div class="anterior">
             <p>Anterior</p>
-            <p>${data.diasUteis[i].horarios[0]}</p>
+            <p>${retornaHorarioAnterior(i)}</p>
           </div>
           <div class="proximo">
             <p>Próximo</p>
@@ -88,7 +88,7 @@ function imprimeLinhasSabado() {
         <div class="horario-atual">
           <div class="anterior">
             <p>Anterior</p>
-            <p>${data.sabado[i].horarios[0]}</p>
+            <p>${retornaHorarioAnterior(i)}</p>
           </div>
           <div class="proximo">
             <p>Próximo</p>
@@ -142,7 +142,7 @@ function imprimeLinhasFeriasRecessos() {
         <div class="horario-atual">
           <div class="anterior">
             <p>Anterior</p>
-            <p>${data.feriasRecessos[i].horarios[0]}</p>
+            <p>${retornaHorarioAnterior(i)}</p>
           </div>
           <div class="proximo">
             <p>Próximo</p>
@@ -216,6 +216,39 @@ function exibeMaisHorarios(posicaoBotao) {
   containerHorarios[posicaoBotao].style.display = "flex";
 }
 
+function retornaHorarioAnterior(posicao) {
+  let horarioAnterior;
+
+  for (let i = data.diasUteis[posicao].horarios.length - 1; i >= 0; i--) {
+    horarioAnterior = compararHorarioAnterior(
+      data.diasUteis[posicao].horarios[i]
+    );
+    if (horarioAnterior != "-") {
+      break;
+    }
+  }
+  console.log(horarioAnterior);
+  return horarioAnterior;
+}
+
+// Verifica se o horário passado por parâmetro é o do próximo ônibus
+function compararHorarioAnterior(horario) {
+  let horas = horario.split(":");
+
+  let agora = new Date();
+
+  let comparado = new Date();
+
+  comparado.setHours(horas[0]);
+  comparado.setMinutes(horas[1]);
+
+  if (comparado < agora) {
+    return horario;
+  } else {
+    return "-";
+  }
+}
+
 function retornaProximoHorario(posicao) {
   let proximoHorario;
 
@@ -235,15 +268,26 @@ function compararProximoHorario(horario) {
   let horas = horario.split(":");
 
   let agora = new Date();
+
   let comparado = new Date();
 
   comparado.setHours(horas[0]);
   comparado.setMinutes(horas[1]);
 
   if (comparado > agora) {
-    console.log(comparado);
     return horario;
   } else {
     return "-";
+  }
+}
+
+function verificaDia() {
+  let diaAtual = new Date().getDay();
+  if (diaAtual > 0 && diaAtual < 6) {
+    return 0;
+  } else if (diaAtual == 6) {
+    return 0;
+  } else {
+    return 1;
   }
 }
