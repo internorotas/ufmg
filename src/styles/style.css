@@ -147,12 +147,12 @@ body {
 /* Cada linha conta com uma cor diferente */
 
 .linha#linha-um > button {
-  background: #ed1c24;
+  background: #7f6000;
   color: var(--secondary-color);
 }
 
 .linha#linha-dois > button {
-  background: #7f6000;
+  background: #ed1c24;
   color: var(--secondary-color);
 }
 
