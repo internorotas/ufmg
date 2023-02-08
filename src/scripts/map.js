@@ -4,7 +4,7 @@ import data from "./dadosRotas.js";
 console.log(data);
 
 // Abrindo o mapa com centro na UFMG e o zoom
-const map = L.map("mapa").setView([-19.868035, -43.965033], 18, {
+const map = L.map("mapa").setView([-19.868035, -43.965033], 16, {
   maxZoom: 21,
   zoomControl: true,
 });
@@ -43,9 +43,9 @@ const marker = L.marker(data.paradas[0].coordinates[0], {
 marker.bindPopup(nome);
 
 let coresLinhas = [
+  "#7f6000",
   "#ed1c24",
-  "#7f6000",
-  "#7f6000",
+  "#ed1c24",
   "#008d39",
   "#008d39",
   "#008d39",
@@ -69,8 +69,8 @@ function exibeLinha(posicao) {
   const options = {
     use: L.polyline,
     delay: 600,
-    dashArray: [40, 100],
-    weight: 10,
+    dashArray: [20, 100],
+    weight: 8,
     color: coresLinhas[posicao],
     pulseColor: coresLinhas[posicao],
   };
