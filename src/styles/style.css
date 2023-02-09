@@ -147,7 +147,7 @@ body {
 /* Cada linha conta com uma cor diferente */
 
 .linha#linha-um > button {
-  background: #7f6000;
+  background: #a6422b;
   color: var(--secondary-color);
 }
 
@@ -176,7 +176,7 @@ body {
 }
 
 .linha#linha-dois-ferias > button {
-  background: #8b259c;
+  background: #820d97;
   color: var(--secondary-color);
 }
 
@@ -261,8 +261,10 @@ body {
   list-style: none;
   border-radius: 0.2rem;
 
-  padding: 0.2rem 0.3rem;
+  padding: 0.1rem 0.2rem;
   margin: 0.2rem;
+
+  min-width: 3rem;
 
   background-color: var(--secondary-color);
 }

@@ -43,7 +43,7 @@ const marker = L.marker(data.paradas[0].coordinates[0], {
 marker.bindPopup(nome);
 
 let coresLinhas = [
-  "#7f6000",
+  "#A6422B",
   "#ed1c24",
   "#ed1c24",
   "#008d39",
@@ -54,7 +54,7 @@ let coresLinhas = [
   "#0a4392",
   "#0a4392",
   "#96002d",
-  "#8b259c",
+  "#820d97",
 ];
 
 let active_polyline = L.featureGroup().addTo(map);
