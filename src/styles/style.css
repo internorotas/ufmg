@@ -341,6 +341,16 @@ footer a#sobre-projeto {
   margin: 0 0.5rem;
 }
 
+#menu-lateral > main > footer > a:nth-child(3) {
+  color: var(--bg-secondary);
+  text-decoration-line: none;
+  font-weight: 500;
+
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
 /* Responsivo ================================================================*/
 
 @media (max-width: 850px) {
