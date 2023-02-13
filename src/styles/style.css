@@ -147,7 +147,7 @@ body {
 /* Cada linha conta com uma cor diferente */
 
 .linha#linha-um > button {
-  background: #a6422b;
+  background: #b52c64;
   color: var(--secondary-color);
 }
 
@@ -344,7 +344,7 @@ footer a#sobre-projeto {
 #menu-lateral > main > footer > a:nth-child(3) {
   color: var(--bg-secondary);
   text-decoration-line: none;
-  font-weight: 500;
+  font-weight: 700;
 
   margin-top: 0.5rem;
   padding-top: 0.5rem;

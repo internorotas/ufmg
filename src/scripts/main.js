@@ -1,6 +1,11 @@
 import data from "./dadosLinhas.js";
 import exibeLinha from "./map.js";
 
+const ferias = {
+  inicio: "December 23, 2022",
+  fim: "March 6, 2023",
+};
+
 console.log(data);
 
 function imprimeLinhasDiasUteis() {
@@ -29,11 +34,11 @@ function imprimeLinhasDiasUteis() {
         <div class="horario-atual">
           <div class="anterior">
             <p>Anterior</p>
-            <p>${retornaHorarioAnterior(i)}</p>
+            <p>${retornaHorarioAnterior(i, "uteis")}</p>
           </div>
           <div class="proximo">
             <p>Próximo</p>
-            <p>${retornaProximoHorario(i)}</p>
+            <p>${retornaProximoHorario(i, "uteis")}</p>
           </div>
         </div>
         <button class="mais-horarios">+ mais horários</button>
@@ -88,11 +93,11 @@ function imprimeLinhasSabado() {
         <div class="horario-atual">
           <div class="anterior">
             <p>Anterior</p>
-            <p>${retornaHorarioAnterior(i)}</p>
+            <p>${retornaHorarioAnterior(i, "sabado")}</p>
           </div>
           <div class="proximo">
             <p>Próximo</p>
-            <p>${retornaProximoHorario(i)}</p>
+            <p>${retornaProximoHorario(i, "sabado")}</p>
           </div>
         </div>
         <button class="mais-horarios">+ mais horários</button>
@@ -142,11 +147,11 @@ function imprimeLinhasFeriasRecessos() {
         <div class="horario-atual">
           <div class="anterior">
             <p>Anterior</p>
-            <p>${retornaHorarioAnterior(i)}</p>
+            <p>${retornaHorarioAnterior(i, "ferias")}</p>
           </div>
           <div class="proximo">
             <p>Próximo</p>
-            <p>${retornaProximoHorario(i)}</p>
+            <p>${retornaProximoHorario(i, "ferias")}</p>
           </div>
         </div>
         <button class="mais-horarios">+ mais horários</button>
@@ -216,18 +221,55 @@ function exibeMaisHorarios(posicaoBotao) {
   containerHorarios[posicaoBotao].style.display = "flex";
 }
 
-function retornaHorarioAnterior(posicao) {
+function retornaHorarioAnterior(posicao, funcaoChamada) {
   let horarioAnterior;
+  let itinerario = verificaDia();
 
-  for (let i = data.diasUteis[posicao].horarios.length - 1; i >= 0; i--) {
-    horarioAnterior = compararHorarioAnterior(
-      data.diasUteis[posicao].horarios[i]
-    );
-    if (horarioAnterior != "-") {
-      break;
+  if (itinerario == "util") {
+    if (funcaoChamada == "uteis") {
+      for (let i = data.diasUteis[posicao].horarios.length - 1; i >= 0; i--) {
+        horarioAnterior = compararHorarioAnterior(
+          data.diasUteis[posicao].horarios[i]
+        );
+        if (horarioAnterior != "-") {
+          break;
+        }
+      }
+    } else {
+      horarioAnterior = "-";
+    }
+  } else if (itinerario == "sab") {
+    if (funcaoChamada == "sabado") {
+      for (let i = data.sabado[posicao].horarios.length - 1; i >= 0; i--) {
+        horarioAnterior = compararHorarioAnterior(
+          data.sabado[posicao].horarios[i]
+        );
+        if (horarioAnterior != "-") {
+          break;
+        }
+      }
+    } else {
+      horarioAnterior = "-";
+    }
+  } else if (itinerario == "ferias") {
+    if (funcaoChamada == "ferias") {
+      for (
+        let i = data.feriasRecessos[posicao].horarios.length - 1;
+        i >= 0;
+        i--
+      ) {
+        horarioAnterior = compararHorarioAnterior(
+          data.feriasRecessos[posicao].horarios[i]
+        );
+        if (horarioAnterior != "-") {
+          break;
+        }
+      }
+    } else {
+      horarioAnterior = "-";
     }
   }
-  console.log(horarioAnterior);
+
   return horarioAnterior;
 }
 
@@ -249,17 +291,51 @@ function compararHorarioAnterior(horario) {
   }
 }
 
-function retornaProximoHorario(posicao) {
+function retornaProximoHorario(posicao, funcaoChamada) {
   let proximoHorario;
+  let itinerario = verificaDia();
 
-  for (let i = 0; i < data.diasUteis[posicao].horarios.length; i++) {
-    proximoHorario = compararProximoHorario(
-      data.diasUteis[posicao].horarios[i]
-    );
-    if (proximoHorario != "-") {
-      break;
+  if (itinerario == "util") {
+    if (funcaoChamada == "uteis") {
+      for (let i = 0; i < data.diasUteis[posicao].horarios.length; i++) {
+        proximoHorario = compararProximoHorario(
+          data.diasUteis[posicao].horarios[i]
+        );
+        if (proximoHorario != "-") {
+          break;
+        }
+      }
+    } else {
+      proximoHorario = "-";
+    }
+  } else if (itinerario == "sab") {
+    if (funcaoChamada == "sabado") {
+      for (let i = 0; i < data.sabado[posicao].horarios.length; i++) {
+        proximoHorario = compararProximoHorario(
+          data.sabado[posicao].horarios[i]
+        );
+        if (proximoHorario != "-") {
+          break;
+        }
+      }
+    } else {
+      proximoHorario = "-";
+    }
+  } else if (itinerario == "ferias") {
+    if (funcaoChamada == "ferias") {
+      for (let i = 0; i < data.feriasRecessos[posicao].horarios.length; i++) {
+        proximoHorario = compararProximoHorario(
+          data.feriasRecessos[posicao].horarios[i]
+        );
+        if (proximoHorario != "-") {
+          break;
+        }
+      }
+    } else {
+      proximoHorario = "-";
     }
   }
+
   return proximoHorario;
 }
 
@@ -283,11 +359,24 @@ function compararProximoHorario(horario) {
 
 function verificaDia() {
   let diaAtual = new Date().getDay();
-  if (diaAtual > 0 && diaAtual < 6) {
-    return 0;
-  } else if (diaAtual == 6) {
-    return 0;
+  let feriasInicio = new Date().setDate([ferias[0]]);
+  let feriasFim = new Date().setDate([ferias[1]]);
+
+  if (
+    diaAtual > 0 &&
+    diaAtual < 6 &&
+    diaAtual < feriasInicio &&
+    diaAtual > feriasFim
+  ) {
+    return "util";
+  } else if (
+    diaAtual == 6 &&
+    diaAtual < 6 &&
+    diaAtual < feriasInicio &&
+    diaAtual > feriasFim
+  ) {
+    return "sab";
   } else {
-    return 1;
+    return "ferias";
   }
 }
