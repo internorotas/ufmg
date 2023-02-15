@@ -2103,9 +2103,21 @@ const data = {
         "Linha 03 - Todas",
         "Linha 04 - Todas"
       ],
-      "coordinates": [[-19.864092926022906, -43.96013637514593]]
-    }
+      "coordinates": [[-19.8640279685214, -43.96020879478788]]
+    },
+    {
+      "nome": "CAD 2 - Centro de Atividades Didáticas 2",
+      "linhaAtendidas": [
+        "Linha 01",
+        "Linha 02 - Todas",
+      ],
+      "coordinates": [[-19.864232300770478, -43.96037911506045]]
+    },
+    
   ]
 }
 
 export default data;
+
+
+
