@@ -377,16 +377,17 @@ footer a#sobre-projeto {
 }
 
 #mapa div.leaflet-popup-content-wrapper h4 {
+  font-weight: 700;
 
   font-size: 0.9rem;
   font-family: "Poppins", sans-serif;
 }
 
 #mapa div.leaflet-popup-content-wrapper p {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-family: "Poppins", sans-serif;
 
-  margin: 0.5rem 0;
+  margin: 0.2rem 0;
 }
 
 /* Responsivo ================================================================*/
