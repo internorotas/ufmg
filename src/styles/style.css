@@ -341,14 +341,14 @@ footer a#sobre-projeto {
   margin: 0 0.5rem;
 }
 
-#menu-lateral > main > footer > a:nth-child(3) {
-  color: var(--bg-secondary);
+#menu-lateral > main > footer > #creditos {
+  color: var(--secondary-color);
   text-decoration-line: none;
   font-weight: 700;
 
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 /* Responsivo ================================================================*/
@@ -367,7 +367,7 @@ footer a#sobre-projeto {
   /* Header Menu Lateral =======================================*/
 
   #menu-lateral header {
-    height: 6vh;
+    height: 50px;
 
     background-color: var(--primary-color);
     padding: 0.5rem;
@@ -382,7 +382,7 @@ footer a#sobre-projeto {
   }
 
   #menu-lateral header img {
-    height: 100%;
+    height: 80%;
     margin: 0 auto;
   }
 
@@ -395,7 +395,7 @@ footer a#sobre-projeto {
 
     z-index: 1;
 
-    margin-top: 6vh;
+    margin-top: 50px;
   }
 
   #menu-lateral {
