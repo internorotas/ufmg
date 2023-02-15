@@ -2085,6 +2085,7 @@ const data = {
     },
   ],
   paradas: [
+    // Começando pela Linha 02
     {
       nome: "Escola de Música (Ida)",
       linhaAtendidas: [
@@ -2258,6 +2259,17 @@ const data = {
         "Linha 04 (Todas)",
       ],
       coordinates: [-19.86282358298027, -43.96097901053493],
+    },
+    // Continuando com o Linha 01
+    {
+      nome: "ICEX - FACE (Volta)",
+      linhaAtendidas: ["Linha 01"],
+      coordinates: [-19.868278388660904, -43.96354229707841],
+    },
+    {
+      nome: "CAD 2 - Letras - Ciência da Informação - FAFICH (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 03 (Todas)"],
+      coordinates: [-19.865724373667415, -43.961750820377226],
     },
   ],
 };
