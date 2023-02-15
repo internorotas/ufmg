@@ -212,7 +212,7 @@ body {
   background: var(--bg-secondary);
   color: var(--secondary-color);
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.9rem;
 
   display: flex;
 
@@ -230,7 +230,7 @@ body {
 
 .horario-atual > .anterior > p:nth-child(2),
 .horario-atual > .proximo > p:nth-child(2) {
-  font-size: 2rem;
+  font-size: 1rem;
 }
 
 /* Botão de exibir mais horários */
@@ -278,10 +278,10 @@ body {
   list-style: none;
   border-radius: 0.2rem;
 
-  padding: 0.1rem 0.2rem;
+  padding: 0.2rem;
   margin: 0.2rem;
 
-  min-width: 3rem;
+  width: 4rem;
 
   background-color: var(--secondary-color);
 }
