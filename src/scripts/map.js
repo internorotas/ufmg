@@ -79,11 +79,11 @@ for (let i = 0; i < data.paradas.length; i++) {
   let nome = `<h4>${data.paradas[i].nome}</h4>`;
 
   for (let j = 0; j < data.paradas[i].linhaAtendidas.length; j++) {
-    nome +=  `<p>${data.paradas[i].linhaAtendidas[j]}</p>`;
+    nome += `<p>${data.paradas[i].linhaAtendidas[j]}</p>`;
   }
-  
+
   // Pega as configurações do ícone e coloca ele no mapa, puxando as coordenadas do arquivo de JSON
-  const marker = L.marker(data.paradas[i].coordinates[i], {
+  const marker = L.marker(data.paradas[i].coordinates[0], {
     icon: stationIcon,
   }).addTo(map);
   marker.bindPopup(nome);
