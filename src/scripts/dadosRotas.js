@@ -2136,30 +2136,130 @@ const data = {
     },
     {
       nome: "Unidade Administrativa II (Ida)",
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)"
-      ],
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
       coordinates: [-19.862539674966527, -43.96713237253709],
     },
     {
       nome: "Av. Antônio Abrahão Caram (em frente ao Restaurante Farroupilha) (Ida)",
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)"
-      ],
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
       coordinates: [-19.8626495277957, -43.96993297019641],
     },
     {
       nome: "Centro Esportivo Universitário - CEU (Ida)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.86634692381805, -43.97313237352062],
+    },
+    {
+      nome: "Veterinária (Lado de Fora) (Ida)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.868652895489674, -43.97225744035409],
+    },
+    {
+      nome: "Centro de Treinamento Esportivo - CTE (Ida)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.869852627120906, -43.97545081272303],
+    },
+    {
+      nome: "Av.Presidente Carlos Luz (em frente McDonald's) (Ida)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.87334489433249, -43.97710039322493],
+    },
+    {
+      nome: "EEFFTO (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.876632574930333, -43.97571363916382],
+    },
+    {
+      nome: "Odontologia (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.87328246300903, -43.97348575014181],
+    },
+    {
+      nome: "Veterinária - Estação Ecológica (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.871816972689945, -43.97046642831759],
+    },
+    {
+      nome: "Farmácia (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.87024439190227, -43.96839369702036],
+    },
+    {
+      nome: "Restaurante Universitário Setorial II (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.869982361625382, -43.96667044024115],
+    },
+    {
+      nome: "Física – Engenharia Elétrica (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.870758284545175, -43.96523691696325],
+    },
+    {
+      nome: "CNEN / CDTN (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.873184994054483, -43.966534085339894],
+    },
+    {
+      nome: "Centro de Pesquisa e Recursos Hídricos (CPH) - Túnel de Vento (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.874441354711273, -43.967735795957495],
+    },
+    {
+      nome: "CNEN / CDTN - Final da Linha 9502 (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.87318008718384, -43.96626798814181],
+    },
+    {
+      nome: "CAD 3 - Química - Colégio Técnico",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.870788120876036, -43.9650737061928],
+    },
+    {
+      nome: "ICEX - Engenharia (Volta)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.869555795528473, -43.963949680063905],
+    },
+    {
+      nome: "Geociências (Volta)",
+      linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.868758913034767, -43.96286288862562],
+    },
+    {
+      nome: "Restaurante Universitário Setorial I (Volta)",
+      linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.8689961617339, -43.960109940258924],
+    },
+    {
+      nome: "FAE - Centro Pedagógico (Volta)",
+      linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.867834336840456, -43.958552358960816],
+    },
+    {
+      nome: "Creche da UFMG (Volta)",
+      linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.864795131981317, -43.95928985684761],
+    },
+    {
+      nome: "Escola de Música (Volta)",
       linhaAtendidas: [
         "Linha 01",
-        "Linha 02 (Todas)"
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
       ],
-      coordinates: [-19.86634692381805, -43.97313237352062],
+      coordinates: [-19.864009627413022, -43.960120198461276],
+    },
+    {
+      nome: "Belas Artes (Volta)",
+      linhaAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
+      ],
+      coordinates: [-19.86282358298027, -43.96097901053493],
     },
   ],
 };
 
 export default data;
-
