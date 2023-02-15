@@ -2095,16 +2095,16 @@ const data = {
       ],
       "coordinates": [[-19.86287799458614, -43.961197296562915]]
     },
-    // {
-    //   "nome": "Belas Artes",
-    //   "linhaAtendidas": [
-    //     "Linha 01",
-    //     "Linha 02 - Todas",
-    //     "Linha 03 - Todas",
-    //     "Linha 04 - Todas"
-    //   ],
-    //   "coordinates": [[-19.864092926022906, -43.96013637514593]]
-    // }
+    {
+      "nome": "Belas Artes",
+      "linhaAtendidas": [
+        "Linha 01",
+        "Linha 02 - Todas",
+        "Linha 03 - Todas",
+        "Linha 04 - Todas"
+      ],
+      "coordinates": [[-19.864092926022906, -43.96013637514593]]
+    }
   ]
 }
 
