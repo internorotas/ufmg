@@ -71,7 +71,7 @@ function exibeLinha(posicao) {
 const stationIcon = L.icon({
   iconUrl: "./src/assets/marker.svg",
   iconSize: [20, 20],
-  iconAnchor: [0, 0],
+  iconAnchor: [20, 10],
 });
 
 for (let i = 0; i < data.paradas.length; i++) {
@@ -83,7 +83,7 @@ for (let i = 0; i < data.paradas.length; i++) {
   }
 
   // Pega as configurações do ícone e coloca ele no mapa, puxando as coordenadas do arquivo de JSON
-  const marker = L.marker(data.paradas[i].coordinates[0], {
+  const marker = L.marker(data.paradas[i].coordinates, {
     icon: stationIcon,
   }).addTo(map);
   marker.bindPopup(nome);

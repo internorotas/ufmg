@@ -1,9 +1,9 @@
 const data = {
-  "rotas": [
+  rotas: [
     {
-      "linha": 1,
-      "sublinha": null,
-      "coordinates": [
+      linha: 1,
+      sublinha: null,
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -162,14 +162,14 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
 
     {
-      "linha": 2,
-      "sublinha": null,
-      "coordinates": [
+      linha: 2,
+      sublinha: null,
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -338,14 +338,14 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
 
     {
-      "linha": 2,
-      "sublinha": "Retorno na Área Militar",
-      "coordinates": [
+      linha: 2,
+      sublinha: "Retorno na Área Militar",
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -533,14 +533,14 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
 
     {
-      "linha": 3,
-      "sublinha": null,
-      "coordinates": [
+      linha: 3,
+      sublinha: null,
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -675,14 +675,14 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
 
     {
-      "linha": 3,
-      "sublinha": "Retorno na Área Militar",
-      "coordinates": [
+      linha: 3,
+      sublinha: "Retorno na Área Militar",
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -836,14 +836,14 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
 
     {
-      "linha": 3,
-      "sublinha": "Atendimento ao BH-Tec",
-      "coordinates": [
+      linha: 3,
+      sublinha: "Atendimento ao BH-Tec",
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -1038,14 +1038,14 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
 
     {
-      "linha": 4,
-      "sublinha": null,
-      "coordinates": [
+      linha: 4,
+      sublinha: null,
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -1167,13 +1167,13 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
     {
-      "linha": 4,
-      "sublinha": "Retorno na Área Militar",
-      "coordinates": [
+      linha: 4,
+      sublinha: "Retorno na Área Militar",
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -1332,13 +1332,13 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
     {
-      "linha": 4,
-      "sublinha": "Atendimento ao Ponto McDonald's",
-      "coordinates": [
+      linha: 4,
+      sublinha: "Atendimento ao Ponto McDonald's",
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -1526,13 +1526,13 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
     {
-      "linha": 4,
-      "sublinha": "Atendimento ao BH-Tec e McDonald's",
-      "coordinates": [
+      linha: 4,
+      sublinha: "Atendimento ao BH-Tec e McDonald's",
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -1730,13 +1730,13 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
     {
-      "linha": 2,
-      "sublinha": "Sábado",
-      "coordinates": [
+      linha: 2,
+      sublinha: "Sábado",
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -1905,13 +1905,13 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
+        [-19.86173, -43.96205],
+      ],
     },
     {
-      "linha": 2,
-      "sublinha": "Férias e Recessos",
-      "coordinates": [
+      linha: 2,
+      sublinha: "Férias e Recessos",
+      coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
         [-19.86249, -43.96142],
@@ -2080,44 +2080,86 @@ const data = {
         [-19.86261, -43.96133],
         [-19.86249, -43.96142],
         [-19.86177, -43.96209],
-        [-19.86173, -43.96205]
-      ]
-    }
+        [-19.86173, -43.96205],
+      ],
+    },
   ],
-  "paradas": [
+  paradas: [
     {
-      "nome": "Escola de Música",
-      "linhaAtendidas": [
+      nome: "Escola de Música (Ida)",
+      linhaAtendidas: [
         "Linha 01",
-        "Linha 02 - Todas",
-        "Linha 03 - Todas",
-        "Linha 04 - Todas"
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
       ],
-      "coordinates": [[-19.86287799458614, -43.961197296562915]]
+      coordinates: [-19.86287799458614, -43.961197296562915],
     },
     {
-      "nome": "Belas Artes",
-      "linhaAtendidas": [
+      nome: "Belas Artes (Ida)",
+      linhaAtendidas: [
         "Linha 01",
-        "Linha 02 - Todas",
-        "Linha 03 - Todas",
-        "Linha 04 - Todas"
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
       ],
-      "coordinates": [[-19.8640279685214, -43.96020879478788]]
+      coordinates: [-19.864005462253772, -43.96029825730666],
     },
     {
-      "nome": "CAD 2 - Centro de Atividades Didáticas 2",
-      "linhaAtendidas": [
-        "Linha 01",
-        "Linha 02 - Todas",
-      ],
-      "coordinates": [[-19.864232300770478, -43.96037911506045]]
+      nome: "CAD 2 - Letras - Ciência da Informação - FAFICH (Ida)",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.865026983179526, -43.961424437234214],
     },
-    
-  ]
-}
+    {
+      nome: "Reitoria - FACE",
+      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordinates: [-19.866801812650163, -43.963722425199386],
+    },
+    {
+      nome: "Praça de Serviços – Biblioteca Universitária – Reitoria (Ida)",
+      linhaAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
+      ],
+      coordinates: [-19.866306847634856, -43.9652399167434],
+    },
+    {
+      nome: "Unidade Administrativa III",
+      linhaAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas/Volta)",
+      ],
+      coordinates: [-19.862289079650914, -43.96406056180162],
+    },
+    {
+      nome: "Unidade Administrativa II (Ida)",
+      linhaAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)"
+      ],
+      coordinates: [-19.862539674966527, -43.96713237253709],
+    },
+    {
+      nome: "Av. Antônio Abrahão Caram (em frente ao Restaurante Farroupilha) (Ida)",
+      linhaAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)"
+      ],
+      coordinates: [-19.8626495277957, -43.96993297019641],
+    },
+    {
+      nome: "Centro Esportivo Universitário - CEU (Ida)",
+      linhaAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)"
+      ],
+      coordinates: [-19.86634692381805, -43.97313237352062],
+    },
+  ],
+};
 
 export default data;
-
-
 
