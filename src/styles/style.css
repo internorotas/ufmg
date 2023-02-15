@@ -106,6 +106,23 @@ body {
   padding: 1rem;
 }
 
+#menu-lateral main section.aviso-header {
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+
+  border: 1px solid var(--bg);
+  border-radius: 0.4rem;
+  width: 100%;
+
+  margin: 0.5rem 0;
+  padding: 1rem;
+
+  /* background: #1e1e1e; */
+  background: var(--bg-secondary);
+  color: var(--secondary-color);
+}
+
 #menu-lateral main section.dia-itinerario {
   display: flex;
   flex-direction: row;
@@ -114,7 +131,7 @@ body {
   font-size: 1.2rem;
   font-weight: 500;
 
-  margin: 1rem 0;
+  margin: 0.5rem 0;
 }
 
 /* Classe de todos os botões das linhas de ônibus */
@@ -408,10 +425,6 @@ footer a#sobre-projeto {
 
     z-index: 100;
     top: 80vh;
-  }
-
-  #menu-lateral main section.dia-itinerario {
-    margin: 1rem 0;
   }
 
   /* Barra de puxar no mobile */
