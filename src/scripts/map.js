@@ -24,24 +24,6 @@ const tiles = L.tileLayer(
 );
 tiles.addTo(map);
 
-// Configurações dos ícones de marcadores das paradas de ônibus
-const stationIcon = L.icon({
-  iconUrl: "./src/assets/marker.svg",
-  iconSize: [20, 20],
-  iconAnchor: [0, 0],
-});
-
-// Nome e descrição dos marcadores de paradas dos ônibus
-let nome =
-  `<h4>${data.paradas[0].nome}</h4>` +
-  `<span>${data.paradas[0].linhaAtendidas}</span>`;
-
-// Pega as configurações do ícone e coloca ele no mapa, puxando as coordenadas do arquivo de JSON
-const marker = L.marker(data.paradas[0].coordinates[0], {
-  icon: stationIcon,
-}).addTo(map);
-marker.bindPopup(nome);
-
 let coresLinhas = [
   "#b52c64",
   "#ed1c24",
@@ -83,6 +65,28 @@ function exibeLinha(posicao) {
   polyline.addTo(map);
 
   map.fitBounds(polyline.getBounds());
+}
+
+// Configurações dos ícones de marcadores das paradas de ônibus
+const stationIcon = L.icon({
+  iconUrl: "./src/assets/marker.svg",
+  iconSize: [20, 20],
+  iconAnchor: [0, 0],
+});
+
+for (let i = 0; i < data.paradas.length; i++) {
+  // Nome e descrição dos marcadores de paradas dos ônibus
+  let nome = `<h4>${data.paradas[i].nome}</h4>`;
+
+  for (let j = 0; j < data.paradas[i].linhaAtendidas.length; j++) {
+    nome +=  `<p>${data.paradas[i].linhaAtendidas[j]}</p>`;
+  }
+  
+  // Pega as configurações do ícone e coloca ele no mapa, puxando as coordenadas do arquivo de JSON
+  const marker = L.marker(data.paradas[i].coordinates[i], {
+    icon: stationIcon,
+  }).addTo(map);
+  marker.bindPopup(nome);
 }
 
 export default exibeLinha;
