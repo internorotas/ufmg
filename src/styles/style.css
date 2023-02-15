@@ -368,6 +368,27 @@ footer a#sobre-projeto {
   font-size: 0.8rem;
 }
 
+/* Personalizar o popup do Leaflet */
+#mapa div.leaflet-popup-content-wrapper {
+  background-color: var(--bg);
+  color: var(--secondary-color);
+
+  font-family: "Poppins", sans-serif;
+}
+
+#mapa div.leaflet-popup-content-wrapper h4 {
+
+  font-size: 0.9rem;
+  font-family: "Poppins", sans-serif;
+}
+
+#mapa div.leaflet-popup-content-wrapper p {
+  font-size: 0.8rem;
+  font-family: "Poppins", sans-serif;
+
+  margin: 0.5rem 0;
+}
+
 /* Responsivo ================================================================*/
 
 @media (max-width: 850px) {
