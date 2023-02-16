@@ -2112,7 +2112,7 @@ const data = {
       coordinates: [-19.865026983179526, -43.961424437234214],
     },
     {
-      nome: "Reitoria - FACE",
+      nome: "Reitoria - FACE (Ida)",
       linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
       coordinates: [-19.866801812650163, -43.963722425199386],
     },
@@ -2131,7 +2131,7 @@ const data = {
       linhaAtendidas: [
         "Linha 01",
         "Linha 02 (Todas)",
-        "Linha 03 (Todas/Volta)",
+        "Linha 03 (Todas) (Volta)",
       ],
       coordinates: [-19.862289079650914, -43.96406056180162],
     },
@@ -2162,7 +2162,11 @@ const data = {
     },
     {
       nome: "Av.Presidente Carlos Luz (em frente McDonald's) (Ida)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      linhaAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 04 (Atendimento ao ponto McDonald's e/ou BH-Tec)",
+      ],
       coordinates: [-19.87334489433249, -43.97710039322493],
     },
     {
@@ -2193,7 +2197,7 @@ const data = {
     {
       nome: "Física – Engenharia Elétrica (Volta)",
       linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.870758284545175, -43.96523691696325],
+      coordinates: [-19.870752293238624, -43.96531645193499],
     },
     {
       nome: "CNEN / CDTN (Volta)",
@@ -2211,7 +2215,7 @@ const data = {
       coordinates: [-19.87318008718384, -43.96626798814181],
     },
     {
-      nome: "CAD 3 - Química - Colégio Técnico",
+      nome: "CAD 3 - Química - Colégio Técnico (COLTEC) (Volta)",
       linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
       coordinates: [-19.870788120876036, -43.9650737061928],
     },
@@ -2223,10 +2227,10 @@ const data = {
     {
       nome: "Geociências (Volta)",
       linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.868758913034767, -43.96286288862562],
+      coordinates: [-19.86872536254893, -43.96290638484716],
     },
     {
-      nome: "Restaurante Universitário Setorial I (Volta)",
+      nome: "Restaurante Universitário Setorial I (Entrada Rampa) (Volta)",
       linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
       coordinates: [-19.8689961617339, -43.960109940258924],
     },
@@ -2241,6 +2245,17 @@ const data = {
       coordinates: [-19.864795131981317, -43.95928985684761],
     },
     {
+      nome: "Belas Artes (Volta)",
+
+      linhaAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
+      ],
+      coordinates: [-19.863942344424277, -43.9600520561966],
+    },
+    {
       nome: "Escola de Música (Volta)",
       linhaAtendidas: [
         "Linha 01",
@@ -2248,28 +2263,145 @@ const data = {
         "Linha 03 (Todas)",
         "Linha 04 (Todas)",
       ],
-      coordinates: [-19.864009627413022, -43.960120198461276],
-    },
-    {
-      nome: "Belas Artes (Volta)",
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)",
-        "Linha 03 (Todas)",
-        "Linha 04 (Todas)",
-      ],
-      coordinates: [-19.86282358298027, -43.96097901053493],
+      coordinates: [-19.862868916085574, -43.96100450532476],
     },
     // Continuando com o Linha 01
     {
       nome: "ICEX - FACE (Volta)",
       linhaAtendidas: ["Linha 01"],
-      coordinates: [-19.868278388660904, -43.96354229707841],
+      coordinates: [-19.868409927713813, -43.96352635935817],
     },
     {
       nome: "CAD 2 - Letras - Ciência da Informação - FAFICH (Volta)",
       linhaAtendidas: ["Linha 01", "Linha 03 (Todas)"],
       coordinates: [-19.865724373667415, -43.961750820377226],
+    },
+    // Continuando com o Linha 03
+    {
+      nome: "Creche da UFMG (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.86519700179325, -43.95928709454078],
+    },
+    {
+      nome: "FAE - Centro Pedagógico (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.867799194741085, -43.958920546798744],
+    },
+    {
+      nome: "Restaurante Universitário Setorial I (Entrada Rampa) (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.868837316782614, -43.96027282842894],
+    },
+    {
+      nome: "Geociências (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.86859335063858, -43.9630303217288],
+    },
+    {
+      nome: "ICEX - FACE (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.868216229056493, -43.96368612183323],
+    },
+    {
+      nome: "CAD 1 - ICB (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.86720214489026, -43.96725778862436],
+    },
+    {
+      nome: "Biotério Central - ICB (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.86854229636154, -43.967920147732734],
+    },
+    {
+      nome: "Farmácia (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.870043672302177, -43.968596159091305],
+    },
+    {
+      nome: "Veterinária - Estação Ecológica (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.871481650764963, -43.970445558741844],
+    },
+    {
+      nome: "Odontologia (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.87283785450227, -43.97344409249714],
+    },
+    {
+      nome: "EEFFTO (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordinates: [-19.876394774914708, -43.97594804676533],
+    },
+    {
+      nome: "Av.Presidente Carlos Luz (em frente McDonald's) (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)"],
+      coordinates: [-19.87339309568137, -43.976607144376736],
+    },
+
+    {
+      nome: "CEU - Veterinária (Lado de Fora) (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)"],
+      coordinates: [-19.86967940665683, -43.9723549563709],
+    },
+    {
+      nome: "Avenida C (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)"],
+      coordinates: [-19.864246036343225, -43.969652967111415],
+    },
+    {
+      nome: "Av. Antônio Abrahão Caram (em frente ao Restaurante Farroupilha) (Ida)",
+      linhaAtendidas: ["Linha 03 (Todas)"],
+      coordinates: [-19.862973316654763, -43.96959700070347],
+    },
+    {
+      nome: "Unidade Administrativa II (Volta)",
+      linhaAtendidas: ["Linha 03 (Todas)"],
+      coordinates: [-19.862750703381952, -43.96736279706283],
+    },
+    {
+      nome: "Reitoria (Volta)",
+      linhaAtendidas: ["Linha 03 (Todas)"],
+      coordinates: [-19.86534055790254, -43.96384762039304],
+    },
+    {
+      nome: "Rua Prof. Eduardo M. Guimarães - Reitoria (Volta)",
+      linhaAtendidas: ["Linha 03 (Todas)"],
+      coordinates: [-19.865614864852443, -43.96243719367546],
+    },
+    // Linha 02, 03 e 04 com retorno na área militar
+    {
+      nome: "Restaurante Universitário Setorial I (Entrada Escada)",
+      linhaAtendidas: [
+        "Linha 02 (Retorno na Área Militar) (Volta)",
+        "Linha 04 (Retorno na Área Militar) (Volta)",
+      ],
+      coordinates: [-19.869980968928637, -43.96033490875403],
+    },
+    {
+      nome: "Restaurante Universitário Setorial I - Portaria Área Militar",
+      linhaAtendidas: [
+        "Linha 02 (Retorno na Área Militar) (Volta)",
+        "Linha 03 (Retorno na Área Militar) (Ida)",
+        "Linha 04 (Retorno na Área Militar) (Volta)",
+      ],
+      coordinates: [-19.870083909625748, -43.95992714744056],
+    },
+    // Linha 03 e 04 BH-Tec
+    {
+      nome: "Restaurante Universitário Setorial I (Entrada Escada)",
+      linhaAtendidas: [
+        "Linha 02 (Retorno na Área Militar) (Volta)",
+        "Linha 04 (Retorno na Área Militar) (Volta)",
+      ],
+      coordinates: [-19.869980968928637, -43.96033490875403],
+    },
+    {
+      nome: "BH-Tec",
+      linhaAtendidas: [
+        "Linha 03 (Atendimento ao BH-Tec) (Ida)",
+        "Linha 04 (Atendimento ao BH-Tec) (Ida)",
+      ],
+      coordinates: [-19.88434212304126, -43.97543339398637],
     },
   ],
 };
