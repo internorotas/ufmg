@@ -369,7 +369,8 @@ footer a#sobre-projeto {
 }
 
 /* Personalizar o popup do Leaflet */
-#mapa div.leaflet-popup-content-wrapper {
+#mapa div.leaflet-popup-content-wrapper,
+#mapa div.leaflet-popup-tip-container > div {
   background-color: var(--bg);
   color: var(--secondary-color);
 
