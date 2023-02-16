@@ -2388,18 +2388,18 @@ const data = {
     },
     // Linha 03 e 04 BH-Tec
     {
-      nome: "Restaurante Universitário Setorial I (Entrada Escada)",
+      nome: "Rua Prof. José Vieira Mendonça (Ida)",
       linhaAtendidas: [
-        "Linha 02 (Retorno na Área Militar) (Volta)",
-        "Linha 04 (Retorno na Área Militar) (Volta)",
+        "Linha 03 (Atendimento ao BH-Tec)",
+        "Linha 04 (Atendimento ao BH-Tec)",
       ],
-      coordinates: [-19.869980968928637, -43.96033490875403],
+      coordinates: [-19.88147964961293, -43.97753822655314],
     },
     {
-      nome: "BH-Tec",
+      nome: "BH-Tec (Ida)",
       linhaAtendidas: [
-        "Linha 03 (Atendimento ao BH-Tec) (Ida)",
-        "Linha 04 (Atendimento ao BH-Tec) (Ida)",
+        "Linha 03 (Atendimento ao BH-Tec)",
+        "Linha 04 (Atendimento ao BH-Tec)",
       ],
       coordinates: [-19.88434212304126, -43.97543339398637],
     },
