@@ -95,7 +95,7 @@ body {
 }
 
 #menu-lateral header img {
-  width: 70%;
+  width: 60%;
   margin: 0 auto;
 }
 
@@ -142,7 +142,7 @@ body {
   width: 100%;
 
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 
   margin: 0.5rem 0 0.1rem;
   padding: 0.4rem;
@@ -157,19 +157,19 @@ body {
 }
 
 .linha > button > p {
-  font-weight: 500;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 /* Cada linha conta com uma cor diferente */
 
 .linha#linha-um > button {
-  background: #b52c64;
+  background: #4B0082;
   color: var(--secondary-color);
 }
 
 .linha#linha-dois > button {
-  background: #ed1c24;
+  background: #d9383e;
   color: var(--secondary-color);
 }
 
@@ -193,7 +193,7 @@ body {
 }
 
 .linha#linha-dois-ferias > button {
-  background: #820d97;
+  background: #a321b6 ;
   color: var(--secondary-color);
 }
 
@@ -231,12 +231,13 @@ body {
 .horario-atual > .anterior > p:nth-child(2),
 .horario-atual > .proximo > p:nth-child(2) {
   font-size: 1rem;
+  font-weight: 700;
 }
 
 /* Botão de exibir mais horários */
 
 #menu-lateral main .exibir-horario button {
-  border: 1px solid var(--bg);
+  border: 2px solid var(--secondary-color);
   border-radius: 0.4rem;
 
   font-weight: 700;
@@ -247,7 +248,7 @@ body {
 
   cursor: pointer;
 
-  background: var(--primary-color);
+  background: var(--bg);
   color: var(--secondary-color);
 }
 
@@ -422,7 +423,7 @@ footer a#sobre-projeto {
   }
 
   #menu-lateral header img {
-    height: 80%;
+    height: 60%;
     margin: 0 auto;
   }
 
