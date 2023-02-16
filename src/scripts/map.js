@@ -71,7 +71,7 @@ function exibeLinha(posicao) {
 const stationIcon = L.icon({
   iconUrl: "./src/assets/marker.svg",
   iconSize: [20, 20],
-  iconAnchor: [20, 10],
+  // iconAnchor: [20, 10],
 });
 
 for (let i = 0; i < data.paradas.length; i++) {
