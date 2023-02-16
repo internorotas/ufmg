@@ -533,8 +533,8 @@ const data = {
   "sabado": [
     {
       "linha": 5,
-      "nome": "Linha 02",
-      "tipo": "dois-sabado",
+      "nome": "Linha 03",
+      "tipo": "tres-sabado",
       "sublinha": "Sábado",
       "horarios": ["11:00", "11:40", "12:20", "13:00", "13:40"],
       "itinerario": [
