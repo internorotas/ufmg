@@ -268,6 +268,8 @@ function retornaHorarioAnterior(posicao, funcaoChamada) {
     } else {
       horarioAnterior = "-";
     }
+  } else {
+    horarioAnterior = "-";
   }
 
   return horarioAnterior;
@@ -334,6 +336,8 @@ function retornaProximoHorario(posicao, funcaoChamada) {
     } else {
       proximoHorario = "-";
     }
+  } else {
+    proximoHorario = "-";
   }
 
   return proximoHorario;
@@ -362,21 +366,22 @@ function verificaDia() {
   let feriasInicio = new Date().setDate([ferias[0]]);
   let feriasFim = new Date().setDate([ferias[1]]);
 
-  if (
-    diaAtual > 0 &&
-    diaAtual < 6 &&
-    diaAtual < feriasInicio &&
-    diaAtual > feriasFim
-  ) {
-    return "util";
-  } else if (
-    diaAtual == 6 &&
-    diaAtual < 6 &&
-    diaAtual < feriasInicio &&
-    diaAtual > feriasFim
-  ) {
+  // verifica se é dia útil
+  if (diaAtual > 0 && diaAtual < 6) {
+    // verifica se está no período de férias
+    if (diaAtual < feriasInicio && diaAtual > feriasFim) {
+      return "util";
+    } else {
+      return "ferias";
+    }
+  }
+  // se for sábado e não for férias, exibe o horário
+  else if (diaAtual == 6 && diaAtual < feriasInicio && diaAtual > feriasFim) {
     return "sab";
-  } else {
-    return "ferias";
+  }
+  // se não existir horários para o dia retorna um traço para não dar erro e 
+  // nem mostrar horários incorretos
+  else {
+    return "-";
   }
 }
