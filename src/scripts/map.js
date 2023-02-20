@@ -25,16 +25,16 @@ const tiles = L.tileLayer(
 tiles.addTo(map);
 
 let coresLinhas = [
-  "#6c01d9",
+  "#cd00ff",
   "#d9383e",
   "#d9383e",
-  "#008d39",
-  "#008d39",
-  "#008d39",
-  "#3f3fd4",
-  "#3f3fd4",
-  "#3f3fd4",
-  "#3f3fd4",
+  "#008f32",
+  "#008f32",
+  "#008f32",
+  "#3b49df",
+  "#3b49df",
+  "#3b49df",
+  "#3b49df",
   "#96002d",
   "#7b118a ",
 ];
