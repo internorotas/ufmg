@@ -39,23 +39,39 @@ function imprimeLinhasDiasUteis() {
           <div class="proximo">
             <p>Próximo</p>
             <p>${retornaProximoHorario(i, "uteis")}</p>
-          </div>
-        </div>
-        <button class="mais-horarios">+ mais horários</button>
+            </div>
+            </div>
+    
+            <div class="container-buttons">
+              <button class="mostrar-itinerario">itinerário</button>
+              <button class="mais-horarios">mais horários</button>
+            </div>
+    
+            <div class="itinerario-interno">
+        `;
 
-        <div class="horarios-interno">
-    `;
-
-    for (let j = 0; j < data.diasUteis[i].horarios.length; j++) {
+    for (let j = 0; j < data.diasUteis[i].itinerario.length; j++) {
       conteudoLinhasDiasUteis += ` 
-            <li>${data.diasUteis[i].horarios[j]}</li>
-      `;
+                <li>${data.diasUteis[i].itinerario[j]}</li>
+          `;
     }
 
     conteudoLinhasDiasUteis += `
-        </div>
-      </div>
-    `;
+            </div>
+    
+              <div class="horarios-interno">
+        `;
+
+    for (let j = 0; j < data.diasUteis[i].horarios.length; j++) {
+      conteudoLinhasDiasUteis += ` 
+                <li>${data.diasUteis[i].horarios[j]}</li>
+          `;
+    }
+
+    conteudoLinhasDiasUteis += `
+            </div>
+          </div>
+        `;
   }
 
   // coloca a variável no HTML da página
@@ -99,22 +115,38 @@ function imprimeLinhasSabado() {
             <p>Próximo</p>
             <p>${retornaProximoHorario(i, "sabado")}</p>
           </div>
-        </div>
-        <button class="mais-horarios">+ mais horários</button>
+          </div>
 
-        <div class="horarios-interno">
-    `;
-
-    for (let j = 0; j < data.sabado[i].horarios.length; j++) {
-      conteudoLinhasSabado += ` 
-            <li>${data.sabado[i].horarios[j]}</li>
+          <div class="container-buttons">
+            <button class="mostrar-itinerario">itinerário</button>
+            <button class="mais-horarios">mais horários</button>
+          </div>
+  
+          <div class="itinerario-interno">
       `;
+
+    for (let j = 0; j < data.sabado[i].itinerario.length; j++) {
+      conteudoLinhasSabado += ` 
+              <li>${data.sabado[i].itinerario[j]}</li>
+        `;
     }
 
     conteudoLinhasSabado += `
+          </div>
+  
+            <div class="horarios-interno">
+      `;
+
+    for (let j = 0; j < data.sabado[i].horarios.length; j++) {
+      conteudoLinhasSabado += ` 
+              <li>${data.sabado[i].horarios[j]}</li>
+        `;
+    }
+
+    conteudoLinhasSabado += `
+          </div>
         </div>
-      </div>
-    `;
+      `;
   }
 
   // coloca a variável no HTML da página
@@ -154,9 +186,25 @@ function imprimeLinhasFeriasRecessos() {
             <p>${retornaProximoHorario(i, "ferias")}</p>
           </div>
         </div>
-        <button class="mais-horarios">+ mais horários</button>
 
-        <div class="horarios-interno">
+        <div class="container-buttons">
+          <button class="mostrar-itinerario">itinerário</button>
+          <button class="mais-horarios">mais horários</button>
+        </div>
+
+        <div class="itinerario-interno">
+    `;
+
+    for (let j = 0; j < data.feriasRecessos[i].itinerario.length; j++) {
+      conteudoLinhasFeriasRecessos += ` 
+            <li>${data.feriasRecessos[i].itinerario[j]}</li>
+      `;
+    }
+
+    conteudoLinhasFeriasRecessos += `
+        </div>
+
+          <div class="horarios-interno">
     `;
 
     for (let j = 0; j < data.feriasRecessos[i].horarios.length; j++) {
@@ -197,6 +245,29 @@ function exibeHorario(posicaoBotao) {
 
   containerHorario[posicaoBotao].style.display = "flex";
   exibeLinha(posicaoBotao);
+}
+
+// pega todos os botões da página
+let botoesItinerario = document.getElementsByClassName("mostrar-itinerario");
+
+// percorre por todos os botões da página
+for (let i = 0; i < botoesItinerario.length; i++) {
+  // adiciona um Event Listener em cada um deles
+  botoesItinerario[i].addEventListener("click", function () {
+    exibeItinerario(i);
+  });
+}
+
+// função que imprime os dados na tela
+function exibeItinerario(posicaoBotao) {
+  let containerItinerario =
+    document.getElementsByClassName("itinerario-interno");
+
+  for (let i = 0; i < containerItinerario.length; i++) {
+    containerItinerario[i].style.display = "none";
+  }
+
+  containerItinerario[posicaoBotao].style.display = "flex";
 }
 
 // pega todos os botões da página
@@ -379,7 +450,7 @@ function verificaDia() {
   else if (diaAtual == 6 && diaAtual < feriasInicio && diaAtual > feriasFim) {
     return "sab";
   }
-  // se não existir horários para o dia retorna um traço para não dar erro e 
+  // se não existir horários para o dia retorna um traço para não dar erro e
   // nem mostrar horários incorretos
   else {
     return "-";

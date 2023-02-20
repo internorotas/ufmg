@@ -234,6 +234,35 @@ body {
   font-weight: 700;
 }
 
+#menu-lateral main div.container-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.5rem;
+
+  width: 100%;
+}
+
+/* Botão de exibir itinerário da linha */
+
+#menu-lateral main .exibir-itinerario button {
+  border: 2px solid var(--secondary-color);
+  border-radius: 0.4rem;
+
+  font-weight: 700;
+  font-size: 0.9rem;
+
+  margin: 0.5rem 0;
+  padding: 0.6rem 2rem;
+
+  width: 100%;
+
+  cursor: pointer;
+
+  background: var(--bg);
+  color: var(--secondary-color);
+}
+
 /* Botão de exibir mais horários */
 
 #menu-lateral main .exibir-horario button {
@@ -241,15 +270,50 @@ body {
   border-radius: 0.4rem;
 
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
 
-  margin-top: 0.5rem;
-  padding: 0.4rem 2rem;
+  margin: 0.5rem 0;
+  padding: 0.6rem 2rem;
+
+  width: 100%;
 
   cursor: pointer;
 
   background: var(--bg);
   color: var(--secondary-color);
+}
+
+/* Box de mais horários */
+div > div.itinerario-interno {
+  background: var(--primary-color);
+  color: var(--secondary-color);
+  font-weight: 700;
+  font-size: 0.8rem;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+
+  text-align: center;
+
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+
+  border-radius: 0.4rem;
+
+  display: none;
+}
+
+div > div.itinerario-interno > li {
+  list-style: none;
+  border-radius: 0.2rem;
+
+  background-color: var(--bg);
+
+  padding: 0.5rem;
+  margin: 0.1rem;
 }
 
 /* Box de mais horários */
