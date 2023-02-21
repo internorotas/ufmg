@@ -197,6 +197,20 @@ body {
   color: var(--secondary-color);
 }
 
+.escondido {
+  display: none;
+  /* opacity: 0;
+  transition: all 0.5s ease-in-out;
+  transform: translateY(-50%); */
+}
+
+.aparecido {
+  display: flex;
+  /* opacity: 1;
+  transition: all 0.5s ease-in-out;
+  transform: translateY(0%); */
+}
+
 /* Box de Horário Anterior e Próximo */
 
 /* Container de horários e do botão */
@@ -205,7 +219,7 @@ body {
   flex-direction: column;
   align-items: flex-end;
 
-  display: none;
+  /* display: none; */
 }
 
 .exibir-horario > .horario-atual {
@@ -290,7 +304,7 @@ div > div.itinerario-interno {
   font-weight: 700;
   font-size: 0.8rem;
 
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
@@ -302,8 +316,6 @@ div > div.itinerario-interno {
   padding: 0.5rem;
 
   border-radius: 0.4rem;
-
-  display: none;
 }
 
 div > div.itinerario-interno > li {
@@ -323,7 +335,7 @@ div > div.itinerario-interno > li {
   font-weight: 700;
   font-size: 0.9rem;
 
-  display: flex;
+  /* display: flex; */
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
@@ -335,8 +347,6 @@ div > div.itinerario-interno > li {
   padding: 0.5rem;
 
   border-radius: 0.4rem;
-
-  display: none;
 }
 
 .exibir-horario > .horarios-interno > li {
