@@ -466,7 +466,7 @@ let currentY;
 let initialY;
 let yOffset = 0;
 
-let limite = -window.innerHeight + 250;
+let limite = -window.innerHeight + (window.innerHeight / 2.59);
 console.log(limite);
 
 // Adicionar um evento touchstart à alça para começar a arrastar a ActionSheet
