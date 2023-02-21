@@ -453,14 +453,21 @@ function verificaDia() {
 
 
 
+
+
+
 // Selecionar o elemento da ActionSheet e a alça (handle)
 const actionsheet = document.querySelector("#menu-lateral");
 const handle = document.querySelector("#handler-mobile");
+
 
 // Variáveis para armazenar a posição atual da ActionSheet
 let currentY;
 let initialY;
 let yOffset = 0;
+
+let limite = -window.innerHeight + 250;
+console.log(limite);
 
 // Adicionar um evento touchstart à alça para começar a arrastar a ActionSheet
 handle.addEventListener('touchstart', dragStart);
@@ -489,10 +496,12 @@ function drag(event) {
   const actionsheetRect = actionsheet.getBoundingClientRect();
 
   // Verificar se a posição atual é menor que a altura da janela menos a altura da ActionSheet
-  if (currentY > -actionsheetRect.height && currentY < windowHeight - actionsheetRect.top) {
+  if (currentY > -actionsheetRect.height && currentY < windowHeight - actionsheetRect.top && currentY > limite) {
     yOffset = currentY;
     setTranslate(currentY, actionsheet);
   }
+
+
 }
 
 // Função para definir a posição da ActionSheet
