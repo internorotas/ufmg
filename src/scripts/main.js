@@ -47,7 +47,7 @@ function imprimeLinhasDiasUteis() {
               <button class="mais-horarios">mais horários</button>
             </div>
     
-            <div class="itinerario-interno">
+            <div class="itinerario-interno escondido">
         `;
 
     for (let j = 0; j < data.diasUteis[i].itinerario.length; j++) {
@@ -59,7 +59,7 @@ function imprimeLinhasDiasUteis() {
     conteudoLinhasDiasUteis += `
             </div>
     
-              <div class="horarios-interno">
+              <div class="horarios-interno escondido">
         `;
 
     for (let j = 0; j < data.diasUteis[i].horarios.length; j++) {
@@ -122,7 +122,7 @@ function imprimeLinhasSabado() {
             <button class="mais-horarios">mais horários</button>
           </div>
   
-          <div class="itinerario-interno">
+          <div class="itinerario-interno escondido">
       `;
 
     for (let j = 0; j < data.sabado[i].itinerario.length; j++) {
@@ -134,7 +134,7 @@ function imprimeLinhasSabado() {
     conteudoLinhasSabado += `
           </div>
   
-            <div class="horarios-interno">
+            <div class="horarios-interno escondido">
       `;
 
     for (let j = 0; j < data.sabado[i].horarios.length; j++) {
@@ -192,7 +192,7 @@ function imprimeLinhasFeriasRecessos() {
           <button class="mais-horarios">mais horários</button>
         </div>
 
-        <div class="itinerario-interno">
+        <div class="itinerario-interno escondido">
     `;
 
     for (let j = 0; j < data.feriasRecessos[i].itinerario.length; j++) {
@@ -204,7 +204,7 @@ function imprimeLinhasFeriasRecessos() {
     conteudoLinhasFeriasRecessos += `
         </div>
 
-          <div class="horarios-interno">
+          <div class="horarios-interno escondido">
     `;
 
     for (let j = 0; j < data.feriasRecessos[i].horarios.length; j++) {
@@ -230,21 +230,9 @@ let botoesLinha = document.querySelectorAll(".linha");
 for (let i = 0; i < botoesLinha.length; i++) {
   // adiciona um Event Listener em cada um deles
   botoesLinha[i].addEventListener("click", function () {
-    exibeHorario(i);
+    // exibeHorario(i);
     exibeLinha(i);
   });
-}
-
-// função que imprime os dados na tela
-function exibeHorario(posicaoBotao) {
-  let containerHorario = document.getElementsByClassName("exibir-horario");
-
-  for (let i = 0; i < containerHorario.length; i++) {
-    containerHorario[i].style.display = "none";
-  }
-
-  containerHorario[posicaoBotao].style.display = "flex";
-  exibeLinha(posicaoBotao);
 }
 
 // pega todos os botões da página
@@ -263,11 +251,13 @@ function exibeItinerario(posicaoBotao) {
   let containerItinerario =
     document.getElementsByClassName("itinerario-interno");
 
-  for (let i = 0; i < containerItinerario.length; i++) {
-    containerItinerario[i].style.display = "none";
+  if (containerItinerario[posicaoBotao].classList.contains("escondido")) {
+    containerItinerario[posicaoBotao].classList.remove("escondido");
+    containerItinerario[posicaoBotao].classList.add("aparecido");
+  } else {
+    containerItinerario[posicaoBotao].classList.remove("aparecido");
+    containerItinerario[posicaoBotao].classList.add("escondido");
   }
-
-  containerItinerario[posicaoBotao].style.display = "flex";
 }
 
 // pega todos os botões da página
@@ -285,11 +275,13 @@ for (let i = 0; i < botoesHorarios.length; i++) {
 function exibeMaisHorarios(posicaoBotao) {
   let containerHorarios = document.getElementsByClassName("horarios-interno");
 
-  for (let i = 0; i < containerHorarios.length; i++) {
-    containerHorarios[i].style.display = "none";
+  if (containerHorarios[posicaoBotao].classList.contains("escondido")) {
+    containerHorarios[posicaoBotao].classList.remove("escondido");
+    containerHorarios[posicaoBotao].classList.add("aparecido");
+  } else {
+    containerHorarios[posicaoBotao].classList.remove("aparecido");
+    containerHorarios[posicaoBotao].classList.add("escondido");
   }
-
-  containerHorarios[posicaoBotao].style.display = "flex";
 }
 
 function retornaHorarioAnterior(posicao, funcaoChamada) {
