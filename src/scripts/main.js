@@ -448,3 +448,54 @@ function verificaDia() {
     return "-";
   }
 }
+
+
+
+
+
+// Selecionar o elemento da ActionSheet e a alça (handle)
+const actionsheet = document.querySelector("#menu-lateral");
+const handle = document.querySelector("#handler-mobile");
+
+// Variáveis para armazenar a posição atual da ActionSheet
+let currentY;
+let initialY;
+let yOffset = 0;
+
+// Adicionar um evento touchstart à alça para começar a arrastar a ActionSheet
+handle.addEventListener("touchstart", dragStart);
+
+// Adicionar um evento touchend à alça para parar de arrastar a ActionSheet
+handle.addEventListener("touchend", dragEnd);
+
+// Adicionar um evento touchmove à alça para mover a ActionSheet
+handle.addEventListener("touchmove", drag);
+
+// Função para começar a arrastar a ActionSheet
+function dragStart(event) {
+  initialY = event.touches[0].clientY - yOffset;
+}
+
+// Função para parar de arrastar a ActionSheet
+function dragEnd(event) {
+  initialY = currentY;
+}
+
+// Função para mover a ActionSheet
+function drag(event) {
+  currentY = event.touches[0].clientY - initialY;
+
+  const windowHeight = window.innerHeight;
+  const actionsheetHeight = actionsheet.offsetHeight;
+
+  // Verificar se a posição atual é menor que a altura da janela menos a altura da ActionSheet
+  if (currentY < windowHeight - actionsheetHeight) {
+    yOffset = currentY;
+    setTranslate(currentY, actionsheet);
+  }
+}
+
+// Função para definir a posição da ActionSheet
+function setTranslate(yPos, el) {
+  el.style.transform = `translate3d(0, ${yPos}px, 0)`;
+}

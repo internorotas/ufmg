@@ -48,6 +48,10 @@ body {
   overflow: hidden;
 }
 
+#header-mobile {
+  display: none;
+}
+
 #menu-lateral {
   height: 100vh;
   max-width: 30vw;
@@ -105,6 +109,10 @@ body {
 /* Header com dia e universidade que os dados mostram */
 #menu-lateral main {
   padding: 1rem;
+}
+
+#menu-lateral main #handler-mobile {
+  display: none;
 }
 
 #menu-lateral main section.aviso-header {
@@ -483,22 +491,34 @@ footer a#sobre-projeto {
   /* Header Menu Lateral =======================================*/
 
   #menu-lateral header {
-    height: 50px;
+    display: none;
+  }
+
+  #header-mobile {
+    display: block;
+
+    position: fixed;
+
+    z-index: 200;
+  }
+
+  #header-mobile header {
+    display: flex;
 
     background-color: var(--primary-color);
     padding: 0.5rem;
 
-    display: flex;
     align-items: center;
 
     top: 0;
     position: fixed;
 
+    height: 6vh;
     width: 100vw;
   }
 
-  #menu-lateral header img {
-    height: 60%;
+  #header-mobile > header > img {
+    height: 90%;
     margin: 0 auto;
   }
 
@@ -524,11 +544,15 @@ footer a#sobre-projeto {
 
     z-index: 100;
     top: 80vh;
+
+    /* position: fixed; */
   }
 
   /* Barra de puxar no mobile */
 
-  #menu-lateral main::before {
+  #menu-lateral main #handler-mobile {
+    display: block;
+
     content: "";
     position: absolute;
     text-align: center;
