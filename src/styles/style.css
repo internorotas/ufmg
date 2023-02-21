@@ -480,7 +480,7 @@ footer a#sobre-projeto {
 @media (max-width: 850px) {
   html,
   body {
-    height: calc(100vh + 80vh);
+    height: calc(100vh + 100vh);
   }
 
   html {
@@ -539,7 +539,7 @@ footer a#sobre-projeto {
   }
 
   #menu-lateral {
-    height: 100vh;
+    max-height: 80vh;
     max-width: 100vw;
     background-color: var(--bg);
     border-radius: 1rem 1rem 0 0;
