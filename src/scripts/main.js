@@ -463,13 +463,13 @@ let initialY;
 let yOffset = 0;
 
 // Adicionar um evento touchstart à alça para começar a arrastar a ActionSheet
-handle.addEventListener("touchstart", dragStart);
+handle.addEventListener('touchstart', dragStart);
 
 // Adicionar um evento touchend à alça para parar de arrastar a ActionSheet
-handle.addEventListener("touchend", dragEnd);
+handle.addEventListener('touchend', dragEnd);
 
 // Adicionar um evento touchmove à alça para mover a ActionSheet
-handle.addEventListener("touchmove", drag);
+handle.addEventListener('touchmove', drag);
 
 // Função para começar a arrastar a ActionSheet
 function dragStart(event) {
@@ -486,10 +486,10 @@ function drag(event) {
   currentY = event.touches[0].clientY - initialY;
 
   const windowHeight = window.innerHeight;
-  const actionsheetHeight = actionsheet.offsetHeight;
+  const actionsheetRect = actionsheet.getBoundingClientRect();
 
   // Verificar se a posição atual é menor que a altura da janela menos a altura da ActionSheet
-  if (currentY < windowHeight - actionsheetHeight) {
+  if (currentY > -actionsheetRect.height && currentY < windowHeight - actionsheetRect.top) {
     yOffset = currentY;
     setTranslate(currentY, actionsheet);
   }

@@ -485,7 +485,7 @@ footer a#sobre-projeto {
 
   html {
     font-size: 87.5%;
-    /* overflow: hidden; */
+    overflow: hidden;
   }
 
   /* Header Menu Lateral =======================================*/
@@ -513,7 +513,7 @@ footer a#sobre-projeto {
     top: 0;
     position: fixed;
 
-    height: 6vh;
+    height: 40px;
     width: 100vw;
   }
 
@@ -527,11 +527,15 @@ footer a#sobre-projeto {
   #mapa {
     position: absolute;
     width: 100vw;
-    height: 94vh;
+    height: calc(100vh - 40px);
 
     z-index: 1;
 
     margin-top: 50px;
+  }
+
+  #menu-lateral main {
+    padding: 1rem 0.2rem 1rem 1rem;
   }
 
   #menu-lateral {
@@ -540,12 +544,15 @@ footer a#sobre-projeto {
     background-color: var(--bg);
     border-radius: 1rem 1rem 0 0;
 
-    position: relative;
+    /* position: relative; */
 
-    z-index: 100;
     top: 80vh;
 
-    /* position: fixed; */
+    position: fixed;
+
+    z-index: 9999;
+
+    overflow: auto;
   }
 
   /* Barra de puxar no mobile */
@@ -553,13 +560,18 @@ footer a#sobre-projeto {
   #menu-lateral main #handler-mobile {
     display: block;
 
+    max-width: 100vw;
+    height: 20px;
+  }
+
+  main #handler-mobile #barra {
     content: "";
     position: absolute;
     text-align: center;
 
     left: calc(50% - 60px);
 
-    top: 0.8rem;
+    /* top: 0.8rem; */
 
     width: 120px;
     height: 5px;
