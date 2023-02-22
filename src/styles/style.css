@@ -354,7 +354,7 @@ div > div.itinerario-interno > li {
   margin-bottom: 0.5rem;
   padding: 0.5rem;
 
-  gap: 0.5rem;
+  gap: 0.4rem;
 
   border-radius: 0.4rem;
 }
@@ -421,6 +421,7 @@ footer a#sobre-projeto {
   width: 60%;
 
   font-size: 0.9rem;
+  font-weight: 500;
 
   margin: 0.5rem 0 0.1rem;
   padding: 0.5rem;
@@ -432,7 +433,7 @@ footer a#sobre-projeto {
 
   cursor: pointer;
 
-  background: #1e1e1e;
+  background: var(--primary-color);
   color: var(--secondary-color);
   text-decoration: none;
 }
