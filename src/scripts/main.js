@@ -451,7 +451,7 @@ function verificaDia() {
 
 // Selecionar o elemento da ActionSheet e a alça (handle)
 const actionsheet = document.querySelector("#menu-lateral");
-const handle = document.querySelector("#handler-mobile");
+const handle = document.querySelector("#menu-lateral");
 
 // Variáveis para armazenar a posição atual da ActionSheet
 let currentY;
