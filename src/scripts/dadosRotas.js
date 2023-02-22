@@ -2117,7 +2117,7 @@ const data = {
       coordinates: [-19.86634692381805, -43.97313237352062],
     },
     {
-      nome: "Veterinária (Lado de Fora) (Ida)",
+      nome: "Veterinária (Lado de Fora) - CEU  (Ida)",
       linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
       coordinates: [-19.868652895489674, -43.97225744035409],
     },
