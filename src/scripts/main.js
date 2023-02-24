@@ -449,56 +449,63 @@ function verificaDia() {
   }
 }
 
-// Selecionar o elemento da ActionSheet e a alça (handle)
-const actionsheet = document.querySelector("#menu-lateral");
-const handle = document.querySelector("#handler-mobile");
+const actionSheet = createDraggableBottomSheet();
 
-// Variáveis para armazenar a posição atual da ActionSheet
-let currentY;
-let initialY;
-let yOffset = 0;
+// Adicionar o evento de arrastar a uma outra alça
+document
+  .querySelector("#handler-mobile")
+  .addEventListener("mousedown", actionSheet.dragStart);
+document.querySelector("body").addEventListener("mouseup", actionSheet.dragEnd);
+document.querySelector("body").addEventListener("mousemove", actionSheet.drag);
 
-let limite = - window.innerHeight + (window.innerHeight / 2.5);
-console.log(limite);
+function createDraggableBottomSheet() {
+  const bottomSheet = document.querySelector("#menu-lateral");
+  const handle = document.querySelector("#handler-mobile");
+  let currentY;
+  let initialY;
+  let yOffset = 0;
+  let limite = -window.innerHeight + window.innerHeight / 2.5;
 
-// Adicionar um evento touchstart à alça para começar a arrastar a ActionSheet
-handle.addEventListener("touchstart", dragStart);
-
-// Adicionar um evento touchend à alça para parar de arrastar a ActionSheet
-handle.addEventListener("touchend", dragEnd);
-
-// Adicionar um evento touchmove à alça para mover a ActionSheet
-handle.addEventListener("touchmove", drag);
-
-// Função para começar a arrastar a ActionSheet
-function dragStart(event) {
-  initialY = event.touches[0].clientY - yOffset;
-}
-
-// Função para parar de arrastar a ActionSheet
-function dragEnd(event) {
-  initialY = currentY;
-}
-
-// Função para mover a ActionSheet
-function drag(event) {
-  currentY = event.touches[0].clientY - initialY;
-
-  const windowHeight = window.innerHeight;
-  const actionsheetRect = actionsheet.getBoundingClientRect();
-
-  // Verificar se a posição atual é menor que a altura da janela menos a altura da ActionSheet
-  if (
-    currentY > -actionsheetRect.height &&
-    currentY < windowHeight - actionsheetRect.top &&
-    currentY > limite
-  ) {
-    yOffset = currentY;
-    setTranslate(currentY, actionsheet);
+  function dragStart(event) {
+    initialY = event.touches[0].clientY - yOffset;
   }
-}
 
-// Função para definir a posição da ActionSheet
-function setTranslate(yPos, el) {
-  el.style.transform = `translate3d(0, ${yPos}px, 0)`;
+  function dragEnd() {
+    initialY = currentY;
+  }
+
+  function drag(event) {
+    currentY = event.touches[0].clientY - initialY;
+    const windowHeight = window.innerHeight;
+    const bottomSheetRect = bottomSheet.getBoundingClientRect();
+    if (
+      currentY > -bottomSheetRect.height &&
+      currentY < windowHeight - bottomSheetRect.top &&
+      currentY > limite
+    ) {
+      yOffset = currentY;
+      setTranslate(currentY, bottomSheet);
+    }
+
+    // Confere e a BottomSheet chegou no topo para habilitar scroll
+    if (currentY > limite) {
+      bottomSheet.style.overflowY = "hidden";
+    } else {
+      bottomSheet.style.overflowY = "auto";
+    }
+  }
+
+  function setTranslate(yPos, el) {
+    el.style.transform = `translate3d(0, ${yPos}px, 0)`;
+  }
+
+  handle.addEventListener("touchstart", dragStart);
+  handle.addEventListener("touchend", dragEnd);
+  handle.addEventListener("touchmove", drag);
+
+  return {
+    dragStart,
+    dragEnd,
+    drag,
+  };
 }
