@@ -41,22 +41,24 @@ Caso tenha gostado do projeto e encontrado pontos de melhorias, fique a vontade 
 
 ## Tecnologias
 
-Para o tornar o projeto real é planejado, pelo menos por enquanto, utilizar as seguintes tecnologias:
+Para tornar real o projeto foram utilizadas as seguintes tecnologias:
 
 - HTML
 - CSS
 - JavaScript
-- API de mapas (OpenStreetMap e Leaflet)
-- Moment.js
-- Axios
+- OpenStreetMap (API de mapas)
+- Leaflet (biblioteca javascript de mapeamento)
+- Leaflet Ant Path (animação da polyline)
 
 ## Acessar o projeto
 
-O projeto será acessível através de um site, hospedado no GitHub Pages e disponibilizado assim que estiver funcional.
+O projeto pode ser acessado através [deste site](https://internorotas.github.io/ufmg/), hospedado no GitHub Pages.
 
 ## Layout
 
 Seção com o layout do projeto. O layout serve para auxiliar no desenvolvimento do código, servindo como guia e economizando tempo. O layout serve apenas para se ter uma ideia e referência, não sendo necessário que seja perfeito. O design do projeto pode ser visto com mais detalhes aqui no [Figma](https://www.figma.com/file/eTM6soQcsMP2vZr4d2zGus/Interno-Rotas?node-id=0%3A1&t=np3vESaYKP8h6Bn1-1).
+
+A medida que fui desenvolvendo o código do projeto fui notando a necessidade de fazer algumas adaptações, portanto o design final está ligeiramente diferente do mostrado aqui. Por enquanto irei deixar o layout antigo aqui apenas por curiosidade, para ver quais mudanças foram feitas.
 
 ### Tela Inicial - Desktop
 
@@ -94,26 +96,24 @@ Pensando no fato de a maioria das pessoas utilizarem o celular, foi feito o layo
 
 Requisitos mínimos e importantes levantados até o momento para o desenvolvimento do site.
 
-- Mostrar mapa que tenha nome dos prédios e pontos (buscar melhor API para isso)
+- Mostrar mapa que tenha nome dos prédios e pontos
 - Menu lateral com nome das linhas
 - O usuário deve ver um traçado por onde as linhas passam, além de poder dar zoom para ver as informações
 - As linhas devem ser separadas com cores, além de representadas as suas subdivisões
-- O site deve ser completamente funcional em celulares e aparelhos com telas pequenas (trabalhar bem em responsividade)
+- O site deve ser completamente funcional em celulares e aparelhos com telas pequenas
 
 ## Funcionalidades Extras
 
 A ideia inicial é terminar primeiro o básico para ter o site funcional, com as demais funções sendo implementadas ao longo do tempo.
 
-🚧Ainda em construção🚧
-
-- [ ] Cada ponto de parada no mapa exibir quais ônibus param naquela parada
-- [ ] Mostrar horário dos ônibus de cada linha selecionada
-- [ ] Mostrar horário do ônibus anterior e do próximo ônibus
+- [x] Cada ponto de parada no mapa exibir quais ônibus param naquela parada
+- [x] Mostrar horário dos ônibus de cada linha selecionada
+- [x] Mostrar horário do ônibus anterior e do próximo ônibus
 - [ ] Criar base de comunidade para levar a aplicação para outras universidades que contam com linhas internas mas que não tenham as suas rotas.
 
 ## Licença
 
-Esse projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE.md) para mais detalhes.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE.md) para mais detalhes.
 
 <hr>
 
