@@ -6,6 +6,8 @@ const ferias = {
   fim: "March 6, 2023",
 };
 
+const bottomSheet = createDraggableBottomSheet();
+
 console.log(data);
 
 function imprimeLinhasDiasUteis() {
@@ -248,6 +250,8 @@ for (let i = 0; i < botoesItinerario.length; i++) {
 
 // função que imprime os dados na tela
 function exibeItinerario(posicaoBotao) {
+  bottomSheet().resetSheetPosition();
+
   let containerItinerario =
     document.getElementsByClassName("itinerario-interno");
 
@@ -449,14 +453,14 @@ function verificaDia() {
   }
 }
 
-const actionSheet = createDraggableBottomSheet();
+// const bottomSheet = createDraggableBottomSheet();
 
 // Adicionar o evento de arrastar a uma outra alça
 document
   .querySelector("#handler-mobile")
-  .addEventListener("mousedown", actionSheet.dragStart);
-document.querySelector("body").addEventListener("mouseup", actionSheet.dragEnd);
-document.querySelector("body").addEventListener("mousemove", actionSheet.drag);
+  .addEventListener("mousedown", bottomSheet.dragStart);
+document.querySelector("body").addEventListener("mouseup", bottomSheet.dragEnd);
+document.querySelector("body").addEventListener("mousemove", bottomSheet.drag);
 
 function createDraggableBottomSheet() {
   const bottomSheet = document.querySelector("#menu-lateral");
@@ -464,7 +468,12 @@ function createDraggableBottomSheet() {
   let currentY;
   let initialY;
   let yOffset = 0;
-  let limite = -window.innerHeight + window.innerHeight / 2.5;
+  let limite = -window.innerHeight / 2;
+
+  function resetSheetPosition() {
+    console.log("Oi");
+    setTranslate(0, bottomSheet, 0);
+  }
 
   function dragStart(event) {
     initialY = event.touches[0].clientY - yOffset;
@@ -475,6 +484,10 @@ function createDraggableBottomSheet() {
   }
 
   function drag(event) {
+    if (!event.touches || event.touches.length === 0) {
+      return;
+    }
+
     currentY = event.touches[0].clientY - initialY;
     const windowHeight = window.innerHeight;
     const bottomSheetRect = bottomSheet.getBoundingClientRect();
@@ -507,5 +520,6 @@ function createDraggableBottomSheet() {
     dragStart,
     dragEnd,
     drag,
+    resetSheetPosition,
   };
 }
