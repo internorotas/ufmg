@@ -250,8 +250,6 @@ for (let i = 0; i < botoesItinerario.length; i++) {
 
 // função que imprime os dados na tela
 function exibeItinerario(posicaoBotao) {
-  bottomSheet().resetSheetPosition();
-
   let containerItinerario =
     document.getElementsByClassName("itinerario-interno");
 
