@@ -492,8 +492,10 @@ footer a#sobre-projeto {
 @media (max-width: 850px) {
   html,
   body {
-    height: calc(100vh + 80vh);
+    height: calc(100vh + 60vh);
     font-size: 87.5%;
+    
+    overflow: hidden;
   }
 
   /* Header Menu Lateral =======================================*/
