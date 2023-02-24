@@ -5,10 +5,10 @@
   --secondary-color: #ecdcc4;
   --tertiary-color: #ffa400;
 
-  --bg: #16161a;
-  --bg-secondary: #333333;
+  --bg: #191919;
+  --bg-secondary: #242424;
 
-  transition: all 0.3s linear;
+  transition: all 0.5s ease-in-out;
 }
 
 * {
@@ -64,6 +64,7 @@ body {
   right: 0;
 
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Estilizar  o scrollbar do menu lateral */
@@ -206,16 +207,27 @@ body {
 }
 
 .escondido {
-  display: none;
+  /* display: none; */
   opacity: 0;
   transition: all 0.5s ease-in-out;
-  transform: translateY(-50%);
+
+  visibility: hidden;
+  max-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none;
+
+  transform: translateY(-5%);
 }
 
 .aparecido {
-  display: flex;
+  /* display: flex; */
   opacity: 1;
   transition: all 0.5s ease-in-out;
+
+  visibility: visible;
+  pointer-events: visible;
+
   transform: translateY(0%);
 }
 
@@ -312,7 +324,7 @@ div > div.itinerario-interno {
   font-weight: 700;
   font-size: 0.8rem;
 
-  /* display: flex; */
+  display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
@@ -343,7 +355,7 @@ div > div.itinerario-interno > li {
   font-weight: 700;
   font-size: 0.9rem;
 
-  /* display: flex; */
+  display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
