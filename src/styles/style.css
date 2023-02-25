@@ -204,9 +204,10 @@ body {
   color: var(--secondary-color);
 }
 
+/*
 .escondido {
   /* display: none; */
-  opacity: 0;
+/* opacity: 0;
   transition: all 0.5s ease-in-out;
 
   visibility: hidden;
@@ -220,13 +221,38 @@ body {
 
 .aparecido {
   /* display: flex; */
-  opacity: 1;
+/* opacity: 1;
   transition: all 0.5s ease-in-out;
 
   visibility: visible;
   pointer-events: visible;
 
   transform: translateY(0%);
+}  */
+
+.escondido {
+  opacity: 0;
+  max-height: 0;
+  transition: all 0.3s cubic-bezier(0.42, 0, 0.58, 1);
+
+  overflow: hidden;
+  pointer-events: none;
+
+  padding: 0;
+  margin: 0;
+}
+
+.aparecido {
+  opacity: 1;
+  max-height: 250vh !important;
+  transition: all 0.3s cubic-bezier(0.42, 0, 0.58, 1);
+
+  overflow: visible;
+  visibility: visible;
+  pointer-events: visible;
+
+  padding: 0.5rem;
+  margin: 0.5rem;
 }
 
 /* Box de Horário Anterior e Próximo */
@@ -330,8 +356,8 @@ div > div.itinerario-interno {
 
   text-align: center;
 
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
+  /* margin-bottom: 0.5rem; */
+  /* padding: 0.5rem; */
 
   border-radius: 0.4rem;
 }
@@ -362,8 +388,8 @@ div > div.itinerario-interno > li {
 
   text-align: center;
 
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
+  /* margin-bottom: 0.5rem; */
+  /* padding: 0.5rem; */
 
   gap: 0.4rem;
 
@@ -408,10 +434,10 @@ footer section#reportar-problema > button {
   border: 1px solid var(--bg);
   border-radius: 0.4rem;
 
-  width: 10 0%;
+  width: 80%;
 
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 400;
+  font-size: 0.9rem;
 
   margin: 1rem 0 0.1rem;
   padding: 1rem;
@@ -422,8 +448,48 @@ footer section#reportar-problema > button {
 
   cursor: pointer;
 
-  background: #dd1c1c;
+  background: #a01f1f;
   color: var(--secondary-color);
+
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+}
+
+footer #reportar-problema #container-problema-links.some {
+  opacity: 0;
+  transition: all 0.5s ease-in-out;
+
+  visibility: hidden;
+  max-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none;
+
+  transform: translateY(-5%);
+}
+
+footer #reportar-problema #container-problema-links.aparece {
+  background-color: var(--bg-secondary);
+
+  padding: 0.5rem;
+  font-size: 0.8rem;
+
+  border-radius: 0.2rem;
+
+  opacity: 1;
+  transition: all 0.5s ease-in-out;
+
+  visibility: visible;
+  pointer-events: visible;
+
+  transform: translateY(0%);
+}
+
+#container-problema-links > p > a {
+  color: var(--tertiary-color);
+  text-decoration-line: none;
+  font-weight: 700;
 }
 
 footer a#sobre-projeto {
@@ -494,7 +560,7 @@ footer a#sobre-projeto {
   body {
     height: calc(100vh + 60vh);
     font-size: 87.5%;
-    
+
     overflow: hidden;
   }
 
