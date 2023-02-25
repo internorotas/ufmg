@@ -434,13 +434,13 @@ footer section#reportar-problema > button {
   border: 1px solid var(--bg);
   border-radius: 0.4rem;
 
-  width: 80%;
+  width: 100%;
 
   font-weight: 400;
   font-size: 0.9rem;
 
-  margin: 1rem 0 0.1rem;
-  padding: 1rem;
+  margin: 0.1rem auto;
+  padding: 0.5rem;
 
   display: flex;
   justify-content: center;
@@ -450,40 +450,16 @@ footer section#reportar-problema > button {
 
   background: #a01f1f;
   color: var(--secondary-color);
-
-  justify-content: center;
-  align-items: center;
-  align-self: center;
 }
 
-footer #reportar-problema #container-problema-links.some {
-  opacity: 0;
-  transition: all 0.5s ease-in-out;
-
-  visibility: hidden;
-  max-height: 0;
-  margin: 0 !important;
-  padding: 0 !important;
-  pointer-events: none;
-
-  transform: translateY(-5%);
-}
-
-footer #reportar-problema #container-problema-links.aparece {
+footer #reportar-problema #container-problema-links {
   background-color: var(--bg-secondary);
 
-  padding: 0.5rem;
+  margin: 0;
+
   font-size: 0.8rem;
 
   border-radius: 0.2rem;
-
-  opacity: 1;
-  transition: all 0.5s ease-in-out;
-
-  visibility: visible;
-  pointer-events: visible;
-
-  transform: translateY(0%);
 }
 
 #container-problema-links > p > a {
@@ -667,6 +643,10 @@ footer a#sobre-projeto {
   }
 
   #menu-lateral > main > section.aviso {
+    text-align: center;
+  }
+
+  footer #reportar-problema #container-problema-links {
     text-align: center;
   }
 }
