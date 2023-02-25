@@ -263,6 +263,24 @@ function exibeItinerario(posicaoBotao) {
 }
 
 // pega todos os botões da página
+let botaoReportarProblema = document.getElementById("reportar-problema");
+
+// adiciona um Event Listener em cada um deles
+botaoReportarProblema.addEventListener("click", function () {
+  let containerAvisoProblema = document.getElementById(
+    "container-problema-links"
+  );
+
+  if (containerAvisoProblema.classList.contains("escondido")) {
+    containerAvisoProblema.classList.remove("escondido");
+    containerAvisoProblema.classList.add("aparecido");
+  } else {
+    containerAvisoProblema.classList.remove("aparecido");
+    containerAvisoProblema.classList.add("escondido");
+  }
+});
+
+// pega todos os botões da página
 let botoesHorarios = document.getElementsByClassName("mais-horarios");
 
 // percorre por todos os botões da página

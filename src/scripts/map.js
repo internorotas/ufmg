@@ -36,7 +36,7 @@ let coresLinhas = [
   "#3b49df",
   "#3b49df",
   "#96002d",
-  "#7b118a"
+  "#7b118a",
 ];
 
 let active_polyline = L.featureGroup().addTo(map);
