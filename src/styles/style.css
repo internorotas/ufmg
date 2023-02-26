@@ -108,6 +108,7 @@ body {
 /* Header com dia e universidade que os dados mostram */
 #menu-lateral main {
   padding: 1rem;
+  padding-bottom: 6rem;
 }
 
 #menu-lateral main #handler-mobile {
@@ -589,6 +590,7 @@ footer a#sobre-projeto {
 
   #menu-lateral main {
     padding: 0rem 0.2rem 3rem 1rem;
+    padding-bottom: 6rem;
   }
 
   #menu-lateral {
