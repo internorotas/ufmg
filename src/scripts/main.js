@@ -469,6 +469,24 @@ function verificaDia() {
   }
 }
 
+function ajustaBottomPadding() {
+  // obtém a altura da barra de navegação do dispositivo
+  let navBarHeight =
+    window.innerHeight - document.documentElement.clientHeight;
+
+  // ajusta o padding-bottom do elemento principal
+  const main = document.querySelector("main");
+
+  console.log(navBarHeight)
+
+  if (navBarHeight < 100) {
+    navBarHeight = 100;
+  }
+  main.style.paddingBottom = navBarHeight + "px";
+}
+
+ajustaBottomPadding();
+
 // const bottomSheet = createDraggableBottomSheet();
 
 // Adicionar o evento de arrastar a uma outra alça
