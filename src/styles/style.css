@@ -204,36 +204,11 @@ body {
   color: var(--secondary-color);
 }
 
-/*
-.escondido {
-  /* display: none; */
-/* opacity: 0;
-  transition: all 0.5s ease-in-out;
-
-  visibility: hidden;
-  max-height: 0;
-  margin: 0 !important;
-  padding: 0 !important;
-  pointer-events: none;
-
-  transform: translateY(-5%);
-}
-
-.aparecido {
-  /* display: flex; */
-/* opacity: 1;
-  transition: all 0.5s ease-in-out;
-
-  visibility: visible;
-  pointer-events: visible;
-
-  transform: translateY(0%);
-}  */
-
 .escondido {
   opacity: 0;
   max-height: 0;
-  transition: all 0.3s cubic-bezier(0.42, 0, 0.58, 1);
+  transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
+  scroll-behavior: smooth;
 
   overflow: hidden;
   pointer-events: none;
@@ -245,7 +220,8 @@ body {
 .aparecido {
   opacity: 1;
   max-height: 250vh !important;
-  transition: all 0.3s cubic-bezier(0.42, 0, 0.58, 1);
+  transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
+  scroll-behavior: smooth;
 
   overflow: visible;
   visibility: visible;
