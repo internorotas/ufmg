@@ -433,7 +433,7 @@ footer #reportar-problema #container-problema-links {
 
   margin: 0;
 
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 
   border-radius: 0.2rem;
 }
@@ -576,6 +576,7 @@ footer a#sobre-projeto {
     top: 80vh;
 
     position: fixed;
+    overflow: hidden;
 
     z-index: 9999;
   }
