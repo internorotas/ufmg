@@ -91,6 +91,7 @@ for (let i = 0; i < botoesLinha.length; i++) {
   botoesLinha[i].addEventListener("click", function () {
     // exibeHorario(i);
     exibeLinha(i);
+    bottomSheet.resetSheetPosition();
   });
 }
 
@@ -361,8 +362,10 @@ function createDraggableBottomSheet() {
   let limite = -window.innerHeight / 2;
 
   function resetSheetPosition() {
-    console.log("Oi");
     setTranslate(0, bottomSheet, 0);
+    currentY = 0;
+    initialY = 0;
+    yOffset = 0;
   }
 
   function dragStart(event) {
@@ -389,7 +392,10 @@ function createDraggableBottomSheet() {
       yOffset = currentY;
       setTranslate(currentY, bottomSheet);
     }
+    setScroll(currentY);
+  }
 
+  function setScroll(currentY) {
     // Confere e a BottomSheet chegou no topo para habilitar scroll
     if (currentY > limite) {
       bottomSheet.style.overflowY = "hidden";
@@ -399,6 +405,7 @@ function createDraggableBottomSheet() {
   }
 
   function setTranslate(yPos, el) {
+    el.style.transition = "transform 0.5s ease-out";
     el.style.transform = `translate3d(0, ${yPos}px, 0)`;
   }
 
