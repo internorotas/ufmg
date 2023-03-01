@@ -10,182 +10,35 @@ const bottomSheet = createDraggableBottomSheet();
 
 console.log(data);
 
-function imprimeLinhasDiasUteis() {
-  let containerLinhasDiasUteis = document.getElementById(
-    "container-linhas-dias-uteis"
-  );
-  let conteudoLinhasDiasUteis = "";
+function imprimeLinhas(data, idContainer) {
+  let containerLinhas = document.getElementById(idContainer);
+  let conteudoLinhas = "";
 
-  for (let i = 0; i < data.diasUteis.length; i++) {
-    if (data.diasUteis[i].sublinha == null) {
-      conteudoLinhasDiasUteis += `
-        <section class="linha" id="linha-${data.diasUteis[i].tipo}">
-          <Button id="linha">${data.diasUteis[i].nome}</Button>
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].sublinha == null) {
+      conteudoLinhas += `
+        <section class="linha" id="linha-${data[i].tipo}">
+          <Button id="linha">${data[i].nome}</Button>
         </section>
       `;
     } else {
-      conteudoLinhasDiasUteis += `
-        <section class="linha" id="linha-${data.diasUteis[i].tipo}">
-          <Button>${data.diasUteis[i].nome}<p>${data.diasUteis[i].sublinha}</p></Button>
+      conteudoLinhas += `
+        <section class="linha" id="linha-${data[i].tipo}">
+          <Button>${data[i].nome}<p>${data[i].sublinha}</p></Button>
         </section>
       `;
     }
 
-    conteudoLinhasDiasUteis += `
+    conteudoLinhas += `
       <div class="exibir-horario">
         <div class="horario-atual">
           <div class="anterior">
             <p>Anterior</p>
-            <p>${retornaHorarioAnterior(i, "uteis")}</p>
+            <p>${retornaHorarioAnterior(i, idContainer)}</p>
           </div>
           <div class="proximo">
             <p>Próximo</p>
-            <p>${retornaProximoHorario(i, "uteis")}</p>
-            </div>
-            </div>
-    
-            <div class="container-buttons">
-              <button class="mostrar-itinerario">itinerário</button>
-              <button class="mais-horarios">mais horários</button>
-            </div>
-    
-            <div class="itinerario-interno escondido">
-        `;
-
-    for (let j = 0; j < data.diasUteis[i].itinerario.length; j++) {
-      conteudoLinhasDiasUteis += ` 
-                <li>${data.diasUteis[i].itinerario[j]}</li>
-          `;
-    }
-
-    conteudoLinhasDiasUteis += `
-            </div>
-    
-              <div class="horarios-interno escondido">
-        `;
-
-    for (let j = 0; j < data.diasUteis[i].horarios.length; j++) {
-      conteudoLinhasDiasUteis += ` 
-                <li>${data.diasUteis[i].horarios[j]}</li>
-          `;
-    }
-
-    conteudoLinhasDiasUteis += `
-            </div>
-          </div>
-        `;
-  }
-
-  // coloca a variável no HTML da página
-  containerLinhasDiasUteis.innerHTML = conteudoLinhasDiasUteis;
-
-  imprimeLinhasSabado();
-  imprimeLinhasFeriasRecessos();
-}
-
-imprimeLinhasDiasUteis();
-
-function imprimeLinhasSabado() {
-  let containerLinhasSabado = document.getElementById(
-    "container-linhas-sabado"
-  );
-  let conteudoLinhasSabado = "";
-
-  for (let i = 0; i < data.sabado.length; i++) {
-    if (data.sabado[i].sublinha == null) {
-      conteudoLinhasSabado += `
-        <section class="linha" id="linha-${data.sabado[i].tipo}">
-          <Button id="linha">${data.sabado[i].nome}</Button>
-        </section>
-      `;
-    } else {
-      conteudoLinhasSabado += `
-        <section class="linha" id="linha-${data.sabado[i].tipo}">
-          <Button>${data.sabado[i].nome}<p>${data.sabado[i].sublinha}</p></Button>
-        </section>
-      `;
-    }
-
-    conteudoLinhasSabado += `
-      <div class="exibir-horario">
-        <div class="horario-atual">
-          <div class="anterior">
-            <p>Anterior</p>
-            <p>${retornaHorarioAnterior(i, "sabado")}</p>
-          </div>
-          <div class="proximo">
-            <p>Próximo</p>
-            <p>${retornaProximoHorario(i, "sabado")}</p>
-          </div>
-          </div>
-
-          <div class="container-buttons">
-            <button class="mostrar-itinerario">itinerário</button>
-            <button class="mais-horarios">mais horários</button>
-          </div>
-  
-          <div class="itinerario-interno escondido">
-      `;
-
-    for (let j = 0; j < data.sabado[i].itinerario.length; j++) {
-      conteudoLinhasSabado += ` 
-              <li>${data.sabado[i].itinerario[j]}</li>
-        `;
-    }
-
-    conteudoLinhasSabado += `
-          </div>
-  
-            <div class="horarios-interno escondido">
-      `;
-
-    for (let j = 0; j < data.sabado[i].horarios.length; j++) {
-      conteudoLinhasSabado += ` 
-              <li>${data.sabado[i].horarios[j]}</li>
-        `;
-    }
-
-    conteudoLinhasSabado += `
-          </div>
-        </div>
-      `;
-  }
-
-  // coloca a variável no HTML da página
-  containerLinhasSabado.innerHTML = conteudoLinhasSabado;
-}
-
-function imprimeLinhasFeriasRecessos() {
-  let containerLinhasFeriasRecessos = document.getElementById(
-    "container-linhas-ferias-recessos"
-  );
-  let conteudoLinhasFeriasRecessos = "";
-
-  for (let i = 0; i < data.feriasRecessos.length; i++) {
-    if (data.feriasRecessos[i].sublinha == null) {
-      conteudoLinhasFeriasRecessos += `
-        <section class="linha" id="linha-${data.feriasRecessos[i].tipo}">
-          <Button id="linha">${data.feriasRecessos[i].nome}</Button>
-        </section>
-      `;
-    } else {
-      conteudoLinhasFeriasRecessos += `
-        <section class="linha" id="linha-${data.feriasRecessos[i].tipo}">
-          <Button>${data.feriasRecessos[i].nome}<p>${data.feriasRecessos[i].sublinha}</p></Button>
-        </section>
-      `;
-    }
-
-    conteudoLinhasFeriasRecessos += `
-      <div class="exibir-horario">
-        <div class="horario-atual">
-          <div class="anterior">
-            <p>Anterior</p>
-            <p>${retornaHorarioAnterior(i, "ferias")}</p>
-          </div>
-          <div class="proximo">
-            <p>Próximo</p>
-            <p>${retornaProximoHorario(i, "ferias")}</p>
+            <p>${retornaProximoHorario(i, idContainer)}</p>
           </div>
         </div>
 
@@ -197,33 +50,37 @@ function imprimeLinhasFeriasRecessos() {
         <div class="itinerario-interno escondido">
     `;
 
-    for (let j = 0; j < data.feriasRecessos[i].itinerario.length; j++) {
-      conteudoLinhasFeriasRecessos += ` 
-            <li>${data.feriasRecessos[i].itinerario[j]}</li>
+    for (let j = 0; j < data[i].itinerario.length; j++) {
+      conteudoLinhas += ` 
+            <li>${data[i].itinerario[j]}</li>
       `;
     }
 
-    conteudoLinhasFeriasRecessos += `
+    conteudoLinhas += `
         </div>
 
-          <div class="horarios-interno escondido">
+        <div class="horarios-interno escondido">
     `;
 
-    for (let j = 0; j < data.feriasRecessos[i].horarios.length; j++) {
-      conteudoLinhasFeriasRecessos += ` 
-            <li>${data.feriasRecessos[i].horarios[j]}</li>
+    for (let j = 0; j < data[i].horarios.length; j++) {
+      conteudoLinhas += ` 
+            <li>${data[i].horarios[j]}</li>
       `;
     }
 
-    conteudoLinhasFeriasRecessos += `
+    conteudoLinhas += `
         </div>
       </div>
     `;
   }
 
   // coloca a variável no HTML da página
-  containerLinhasFeriasRecessos.innerHTML = conteudoLinhasFeriasRecessos;
+  containerLinhas.innerHTML = conteudoLinhas;
 }
+
+imprimeLinhas(data.diasUteis, "container-linhas-dias-uteis");
+imprimeLinhas(data.sabado, "container-linhas-sabado");
+imprimeLinhas(data.feriasRecessos, "container-linhas-ferias-recessos");
 
 // pega todos os botões da página
 let botoesLinha = document.querySelectorAll(".linha");
@@ -471,16 +328,15 @@ function verificaDia() {
 
 function ajustaBottomPadding() {
   // obtém a altura da barra de navegação do dispositivo
-  let navBarHeight =
-    window.innerHeight - document.documentElement.clientHeight;
+  let navBarHeight = window.innerHeight - document.documentElement.clientHeight;
 
   // ajusta o padding-bottom do elemento principal
   const main = document.querySelector("main");
 
-  console.log(navBarHeight)
+  console.log(navBarHeight);
 
   if (navBarHeight < 100) {
-    navBarHeight = 100;
+    navBarHeight = 120;
   }
   main.style.paddingBottom = navBarHeight + "px";
 }

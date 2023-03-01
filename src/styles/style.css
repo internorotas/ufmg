@@ -8,16 +8,18 @@
   --bg: #191919;
   --bg-secondary: #242424;
 
-  transition: all 0.5s ease-in-out;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
+  
+  /* transition: all 0.5s ease-in-out; */
+  
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
 }
 
 html {
@@ -25,6 +27,8 @@ html {
   font-family: "Poppins", sans-serif;
   color: var(--secondary-color);
   background: var(--primary-color);
+  
+  scroll-behavior: smooth;
 }
 
 html,
@@ -75,7 +79,7 @@ body {
 
 /* Works on Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
-  width: 12px;
+  width: 0.8rem;
 }
 
 *::-webkit-scrollbar-track {
@@ -84,7 +88,7 @@ body {
 
 *::-webkit-scrollbar-thumb {
   background-color: var(--bg-secondary);
-  border-radius: 20px;
+  border-radius: 1rem;
   border: 3px solid var(--bg);
 }
 
@@ -208,7 +212,6 @@ body {
   opacity: 0;
   max-height: 0;
   transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
-  scroll-behavior: smooth;
 
   overflow: hidden;
   pointer-events: none;
@@ -221,7 +224,6 @@ body {
   opacity: 1;
   max-height: 250vh !important;
   transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
-  scroll-behavior: smooth;
 
   overflow: visible;
   visibility: visible;
