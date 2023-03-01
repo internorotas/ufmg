@@ -139,12 +139,12 @@ for (let i = 0; i < botoesHorarios.length; i++) {
   });
 }
 
-function retornaHorarioAnterior(posicao, funcaoChamada) {
+function retornaHorarioAnterior(posicao, itinerarioChamado) {
   let horarioAnterior;
   let itinerario = verificaDia();
 
   if (itinerario == "util") {
-    if (funcaoChamada == "uteis") {
+    if (itinerarioChamado == "container-linhas-dias-uteis") {
       for (let i = data.diasUteis[posicao].horarios.length - 1; i >= 0; i--) {
         horarioAnterior = compararHorarioAnterior(
           data.diasUteis[posicao].horarios[i]
@@ -157,7 +157,7 @@ function retornaHorarioAnterior(posicao, funcaoChamada) {
       horarioAnterior = "-";
     }
   } else if (itinerario == "sab") {
-    if (funcaoChamada == "sabado") {
+    if (itinerarioChamado == "container-linhas-sabado") {
       for (let i = data.sabado[posicao].horarios.length - 1; i >= 0; i--) {
         horarioAnterior = compararHorarioAnterior(
           data.sabado[posicao].horarios[i]
@@ -170,7 +170,7 @@ function retornaHorarioAnterior(posicao, funcaoChamada) {
       horarioAnterior = "-";
     }
   } else if (itinerario == "ferias") {
-    if (funcaoChamada == "ferias") {
+    if (itinerarioChamado == "container-linhas-ferias-recessos") {
       for (
         let i = data.feriasRecessos[posicao].horarios.length - 1;
         i >= 0;
@@ -211,12 +211,12 @@ function compararHorarioAnterior(horario) {
   }
 }
 
-function retornaProximoHorario(posicao, funcaoChamada) {
+function retornaProximoHorario(posicao, itinerarioChamado) {
   let proximoHorario;
   let itinerario = verificaDia();
 
   if (itinerario == "util") {
-    if (funcaoChamada == "uteis") {
+    if (itinerarioChamado == "container-linhas-dias-uteis") {
       for (let i = 0; i < data.diasUteis[posicao].horarios.length; i++) {
         proximoHorario = compararProximoHorario(
           data.diasUteis[posicao].horarios[i]
@@ -229,7 +229,7 @@ function retornaProximoHorario(posicao, funcaoChamada) {
       proximoHorario = "-";
     }
   } else if (itinerario == "sab") {
-    if (funcaoChamada == "sabado") {
+    if (itinerarioChamado == "container-linhas-sabado") {
       for (let i = 0; i < data.sabado[posicao].horarios.length; i++) {
         proximoHorario = compararProximoHorario(
           data.sabado[posicao].horarios[i]
@@ -242,7 +242,7 @@ function retornaProximoHorario(posicao, funcaoChamada) {
       proximoHorario = "-";
     }
   } else if (itinerario == "ferias") {
-    if (funcaoChamada == "ferias") {
+    if (itinerarioChamado == "container-linhas-ferias-recessos") {
       for (let i = 0; i < data.feriasRecessos[posicao].horarios.length; i++) {
         proximoHorario = compararProximoHorario(
           data.feriasRecessos[posicao].horarios[i]
