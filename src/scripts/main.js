@@ -106,60 +106,37 @@ for (let i = 0; i < botoesItinerario.length; i++) {
   });
 }
 
-// função que imprime os dados na tela
-function exibeItinerario(posicaoBotao) {
-  let containerItinerario =
-    document.getElementsByClassName("itinerario-interno");
-
-  if (containerItinerario[posicaoBotao].classList.contains("escondido")) {
-    containerItinerario[posicaoBotao].classList.remove("escondido");
-    containerItinerario[posicaoBotao].classList.add("aparecido");
+function toggleVisibility(element) {
+  if (element.classList.contains("escondido")) {
+    element.classList.remove("escondido");
+    element.classList.add("aparecido");
   } else {
-    containerItinerario[posicaoBotao].classList.remove("aparecido");
-    containerItinerario[posicaoBotao].classList.add("escondido");
+    element.classList.remove("aparecido");
+    element.classList.add("escondido");
   }
 }
 
-// pega todos os botões da página
-let botaoReportarProblema = document.getElementById("reportar-problema");
+function exibeItinerario(posicaoBotao) {
+  const containerItinerario =
+    document.getElementsByClassName("itinerario-interno");
+  toggleVisibility(containerItinerario[posicaoBotao]);
+}
 
-// adiciona um Event Listener em cada um deles
+const botaoReportarProblema = document.getElementById("reportar-problema");
 botaoReportarProblema.addEventListener("click", function () {
-  let containerAvisoProblema = document.getElementById(
+  const containerAvisoProblema = document.getElementById(
     "container-problema-links"
   );
-
-  if (containerAvisoProblema.classList.contains("escondido")) {
-    containerAvisoProblema.classList.remove("escondido");
-    containerAvisoProblema.classList.add("aparecido");
-  } else {
-    containerAvisoProblema.classList.remove("aparecido");
-    containerAvisoProblema.classList.add("escondido");
-  }
+  toggleVisibility(containerAvisoProblema);
 });
 
-// pega todos os botões da página
-let botoesHorarios = document.getElementsByClassName("mais-horarios");
-
-// percorre por todos os botões da página
+const botoesHorarios = document.getElementsByClassName("mais-horarios");
 for (let i = 0; i < botoesHorarios.length; i++) {
-  // adiciona um Event Listener em cada um deles
   botoesHorarios[i].addEventListener("click", function () {
-    exibeMaisHorarios(i);
+    const containerHorarios =
+      document.getElementsByClassName("horarios-interno");
+    toggleVisibility(containerHorarios[i]);
   });
-}
-
-// função que imprime os dados na tela
-function exibeMaisHorarios(posicaoBotao) {
-  let containerHorarios = document.getElementsByClassName("horarios-interno");
-
-  if (containerHorarios[posicaoBotao].classList.contains("escondido")) {
-    containerHorarios[posicaoBotao].classList.remove("escondido");
-    containerHorarios[posicaoBotao].classList.add("aparecido");
-  } else {
-    containerHorarios[posicaoBotao].classList.remove("aparecido");
-    containerHorarios[posicaoBotao].classList.add("escondido");
-  }
 }
 
 function retornaHorarioAnterior(posicao, funcaoChamada) {
@@ -405,7 +382,7 @@ function createDraggableBottomSheet() {
   }
 
   function setTranslate(yPos, el) {
-    el.style.transition = "transform 0.5s ease-out";
+    el.style.transition = "transform 0.2s ease-out";
     el.style.transform = `translate3d(0, ${yPos}px, 0)`;
   }
 
