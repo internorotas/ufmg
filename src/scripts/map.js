@@ -4,7 +4,7 @@ import data from "./dadosRotas.js";
 console.log(data);
 
 // Abrindo o mapa com centro na UFMG e o zoom
-const map = L.map("mapa").setView([-19.868035, -43.965033], 16, {
+const map = L.map("mapa").setView([-19.870553062661006, -43.96775991703787], 15, {
   maxZoom: 21,
   zoomControl: true,
 });

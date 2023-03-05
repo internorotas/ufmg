@@ -2232,11 +2232,11 @@ const data = {
       coordinates: [-19.862868916085574, -43.96100450532476],
     },
     // Continuando com o Linha 01
-    {
-      nome: "ICEX - FACE (Volta)",
-      linhaAtendidas: ["Linha 01"],
-      coordinates: [-19.868409927713813, -43.96352635935817],
-    },
+    // {
+    //   nome: "ICEX - FACE (Volta)",
+    //   linhaAtendidas: ["Linha 01"],
+    //   coordinates: [-19.868409927713813, -43.96352635935817],
+    // },
     {
       nome: "CAD 2 - Letras - Ciência da Informação - FAFICH (Volta)",
       linhaAtendidas: ["Linha 01", "Linha 03 (Todas)"],
@@ -2264,9 +2264,13 @@ const data = {
       coordinates: [-19.86859335063858, -43.9630303217288],
     },
     {
-      nome: "ICEX - FACE (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.868216229056493, -43.96368612183323],
+      nome: "ICEX - FACE",
+      linhaAtendidas: [
+        "Linha 03 (Todas) (Ida)",
+        "Linha 04 (Todas) (Ida)",
+        "Linha 01 (Volta)",
+      ],
+      coordinates: [-19.8682506314667, -43.96359821849866],
     },
     {
       nome: "CAD 1 - ICB (Ida)",
