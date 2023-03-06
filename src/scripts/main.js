@@ -280,21 +280,22 @@ function compararProximoHorario(horario) {
 }
 
 function verificaDia() {
-  let diaAtual = new Date();
+  let dataAtual = new Date();
+  let diaSemana = dataAtual.getDay()
   let feriasInicio = new Date().setDate([ferias[0]]);
   let feriasFim = new Date().setDate([ferias[1]]);
 
   // verifica se é dia útil
-  if (diaAtual.getDay() > 0 && diaAtual.getDay() < 6) {
+  if (diaSemana > 0 && diaSemana < 6) {
     // verifica se está no período de férias
-    if (feriassInicio > diaaAtual && diaAtual > feriasFim) {
+    if (feriasInicio > dataAtual && dataAtual > feriasFim) {
       return "util";
     } else {
       return "ferias";
     }
   }
   // se for sábado e não for férias, exibe o horário
-  else if (diaAtual.getDay() == 6 && diaAtual < feriasInicio && diaAtual > feriasFim) {
+  else if (diaSemana == 6 && dataAtual < feriasInicio && dataAtual > feriasFim) {
     return "sab";
   }
   // se não existir horários para o dia retorna um traço para não dar erro e
