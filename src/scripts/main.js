@@ -215,7 +215,7 @@ function retornaProximoHorario(posicao, itinerarioChamado) {
   let proximoHorario;
   let itinerario = verificaDia();
 
-  if (itinerario == "util") {
+  if (itinerario == "util) {
     if (itinerarioChamado == "container-linhas-dias-uteis") {
       for (let i = 0; i < data.diasUteis[posicao].horarios.length; i++) {
         proximoHorario = compararProximoHorario(
@@ -288,7 +288,7 @@ function verificaDia() {
   // verifica se é dia útil
   if (diaSemana > 0 && diaSemana < 6) {
     // verifica se está no período de férias
-    if (feriasInicio > dataAtual && dataAtual > feriasFim) {
+    if (dataAtual > feriasFim) {
       return "util";
     } else {
       return "ferias";
