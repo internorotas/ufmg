@@ -287,7 +287,7 @@ function verificaDia() {
   // verifica se é dia útil
   if (diaAtual > 0 && diaAtual < 6) {
     // verifica se está no período de férias
-    if (diaAtual < feriasInicio && diaAtual > feriasFim) {
+    if (diaAtual > feriasFim) {
       return "util";
     } else {
       return "ferias";
