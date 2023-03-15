@@ -295,8 +295,11 @@ function verificaDia() {
     }
   }
   // se for sábado e não for férias, exibe o horário
-  else if (diaSemana == 6 && dataAtual < feriasInicio && dataAtual > feriasFim) {
-    return "sab";
+  else if (diaSemana == 5) {
+    // verifica se está no período de férias
+    if (dataAtual > feriasFim) {
+      return "sab";
+    }
   }
   // se não existir horários para o dia retorna um traço para não dar erro e
   // nem mostrar horários incorretos

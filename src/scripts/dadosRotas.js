@@ -2258,11 +2258,11 @@ const data = {
       linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
       coordinates: [-19.868837316782614, -43.96027282842894],
     },
-    {
-      nome: "Geociências (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.86859335063858, -43.9630303217288],
-    },
+    // {
+    //   nome: "Geociências (Ida)",
+    //   linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+    //   coordinates: [-19.86859335063858, -43.9630303217288],
+    // },
     {
       nome: "ICEX - FACE",
       linhaAtendidas: [
@@ -2313,11 +2313,11 @@ const data = {
       linhaAtendidas: ["Linha 03 (Todas)"],
       coordinates: [-19.86967940665683, -43.9723549563709],
     },
-    {
-      nome: "Avenida C (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)"],
-      coordinates: [-19.864246036343225, -43.969652967111415],
-    },
+    // {
+    //   nome: "Avenida C (Ida)",
+    //   linhaAtendidas: ["Linha 03 (Todas)"],
+    //   coordinates: [-19.864246036343225, -43.969652967111415],
+    // },
     {
       nome: "Av. Antônio Abrahão Caram (em frente ao Restaurante Farroupilha) (Ida)",
       linhaAtendidas: ["Linha 03 (Todas)"],
@@ -2357,14 +2357,14 @@ const data = {
       coordinates: [-19.870083909625748, -43.95992714744056],
     },
     // Linha 03 e 04 BH-Tec
-    {
-      nome: "Rua Prof. José Vieira Mendonça (Ida)",
-      linhaAtendidas: [
-        "Linha 03 (Atendimento ao BH-Tec)",
-        "Linha 04 (Atendimento ao BH-Tec)",
-      ],
-      coordinates: [-19.88147964961293, -43.97753822655314],
-    },
+    // {
+    //   nome: "Rua Prof. José Vieira Mendonça (Ida)",
+    //   linhaAtendidas: [
+    //     "Linha 03 (Atendimento ao BH-Tec)",
+    //     "Linha 04 (Atendimento ao BH-Tec)",
+    //   ],
+    //   coordinates: [-19.88147964961293, -43.97753822655314],
+    // },
     {
       nome: "BH-Tec (Ida)",
       linhaAtendidas: [
