@@ -70,8 +70,8 @@ function exibeLinha(posicao) {
 // Configurações dos ícones de marcadores das paradas de ônibus
 const stationIcon = L.icon({
   iconUrl: "./src/assets/marker.svg",
-  iconSize: [20, 20],
-  // iconAnchor: [20, 10],
+  iconSize: [30, 30],
+  iconAnchor: [20, 20]
 });
 
 for (let i = 0; i < data.paradas.length; i++) {
