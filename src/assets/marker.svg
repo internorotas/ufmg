@@ -1,17 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+<svg xmlns="http://www.w3.org/2000/svg" width="879.44" height="1254.29" viewBox="0 0 879.44 1254.29">
   <title>logo</title>
-  <g id="bd56e4dd-9894-4db3-a05e-648f2426f801" data-name="Elementos">
+  <g id="bd06e6bb-940b-4768-bda9-37d531f3c500" data-name="Elementos">
+    <path d="M879.44,99.3V786.05c0,64-31.93,95-94.92,95H94.83c-63,0-94.83-32.65-94.83-95V99.3C0,32.71,35.45.09,98.49.09c-.26-.2,684,0,684,0C847.51.09,879.44,34.35,879.44,99.3Z" fill="#2c0eeb"/>
+    <rect x="381.22" y="948.5" width="117" height="305.79" fill="#888"/>
+    <rect x="381.22" y="881" width="117" height="85.5" fill="#494949"/>
     <g>
-      <path d="M1067,131.08V954.14c0,76.64-38.27,113.8-113.76,113.8H126.65C51.16,1067.94,13,1028.81,13,954.14V131.08C13,51.27,55.48,12.17,131,12.17c-.31-.24,819.78,0,819.78,0C1028.73,12.17,1067,53.24,1067,131.08Z" fill="#2c0eeb"/>
+      <path d="M767.14,186.44V697.8c0,47.61-23.77,70.7-70.68,70.7H182.91c-46.9,0-70.61-24.31-70.61-70.7V186.44c0-49.58,26.39-73.87,73.34-73.87-.19-.15,509.32,0,509.32,0C743.37,112.57,767.14,138.08,767.14,186.44Z" fill="#ecdcc4"/>
       <g>
-        <circle cx="912.96" cy="239.37" r="31.66" fill="none" stroke="#ecdcc4" stroke-linecap="round" stroke-linejoin="round" stroke-width="27.65"/>
-        <circle cx="912.96" cy="461.53" r="50.36" fill="none" stroke="#ecdcc4" stroke-linecap="round" stroke-linejoin="round" stroke-width="27.65"/>
-        <line x1="912.96" y1="411.12" x2="912.96" y2="270.98" fill="none" stroke="#ecdcc4" stroke-linecap="round" stroke-linejoin="round" stroke-width="27.65"/>
-        <line x1="912.96" y1="736.09" x2="912.96" y2="664.49" fill="none" stroke="#ecdcc4" stroke-linecap="round" stroke-linejoin="round" stroke-width="27.65"/>
-        <line x1="912.96" y1="599.9" x2="912.96" y2="511.85" fill="none" stroke="#ecdcc4" stroke-linecap="round" stroke-linejoin="round" stroke-width="27.65"/>
-        <line x1="912.96" y1="872.28" x2="912.96" y2="800.68" fill="none" stroke="#ecdcc4" stroke-linecap="round" stroke-linejoin="round" stroke-width="27.65"/>
+        <circle cx="671.44" cy="253.72" r="19.67" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="17.18"/>
+        <circle cx="671.44" cy="391.75" r="31.29" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="17.18"/>
+        <line x1="671.44" y1="360.43" x2="671.44" y2="273.36" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="17.18"/>
+        <line x1="671.44" y1="562.33" x2="671.44" y2="517.84" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="17.18"/>
+        <line x1="671.44" y1="477.72" x2="671.44" y2="423.01" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="17.18"/>
+        <line x1="671.44" y1="646.94" x2="671.44" y2="602.46" fill="none" stroke="#2c0eeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="17.18"/>
       </g>
-      <path d="M625.55,153.2H303.7A163.67,163.67,0,0,0,140,316.87V740.38a86,86,0,0,0,81.5,85.83V881.9a44.94,44.94,0,0,0,89.88,0V826.31h306.5V881.9a44.92,44.92,0,0,0,89.83,0V826.21a86,86,0,0,0,81.48-85.83V316.87A163.65,163.65,0,0,0,625.55,153.2ZM331.07,192.64h267.1a19.74,19.74,0,0,1,0,39.48H331.07a19.74,19.74,0,0,1,0-39.48ZM266.44,746a44.92,44.92,0,1,1,44.9-44.9A44.93,44.93,0,0,1,266.44,746Zm396.37,0a44.92,44.92,0,1,1,44.93-44.9A44.92,44.92,0,0,1,662.81,746Zm70.13-269.66A40.9,40.9,0,0,1,692,517.19H237.26a40.9,40.9,0,0,1-40.93-40.9V312.79a40.92,40.92,0,0,1,40.93-40.92H692a40.92,40.92,0,0,1,40.92,40.92Z" fill="#ecdcc4"/>
+      <path d="M492.87,200.19h-200A101.69,101.69,0,0,0,191.22,301.87V565a53.41,53.41,0,0,0,50.64,53.33v34.6a27.92,27.92,0,0,0,55.84,0V618.38H488.12v34.54a27.91,27.91,0,0,0,55.82,0v-34.6A53.41,53.41,0,0,0,594.56,565V301.87A101.68,101.68,0,0,0,492.87,200.19Zm-182.95,24.5H475.86a12.27,12.27,0,0,1,0,24.53H309.92a12.27,12.27,0,0,1,0-24.53ZM269.76,568.45a27.91,27.91,0,1,1,27.89-27.89A27.91,27.91,0,0,1,269.76,568.45Zm246.26,0a27.91,27.91,0,1,1,27.92-27.89A27.91,27.91,0,0,1,516,568.45Zm43.57-167.53a25.4,25.4,0,0,1-25.42,25.41H251.63a25.41,25.41,0,0,1-25.43-25.41V299.34a25.43,25.43,0,0,1,25.43-25.43H534.17a25.42,25.42,0,0,1,25.42,25.43Z" fill="#2c0eeb"/>
     </g>
   </g>
 </svg>
