@@ -308,24 +308,24 @@ function verificaDia() {
   }
 }
 
-function ajustaBottomPadding() {
-  // obtém a altura da barra de navegação do dispositivo
-  let navBarHeight = window.innerHeight - document.documentElement.clientHeight;
+// function ajustaBottomPadding() {
+//   // obtém a altura da barra de navegação do dispositivo
+//   let navBarHeight = window.innerHeight - document.documentElement.clientHeight;
 
-  // ajusta o padding-bottom do elemento principal
-  const main = document.querySelector("main");
+//   // ajusta o padding-bottom do elemento principal
+//   const main = document.querySelector("main");
 
-  console.log(navBarHeight);
+//   console.log(navBarHeight);
 
-  if (navBarHeight < 100) {
-    navBarHeight = 120;
-  }
-  main.style.paddingBottom = navBarHeight + "px";
-}
+//   if (navBarHeight < 100) {
+//     navBarHeight = 120;
+//   }
+//   main.style.paddingBottom = navBarHeight + "px";
+// }
 
-ajustaBottomPadding();
+// ajustaBottomPadding();
 
-// const bottomSheet = createDraggableBottomSheet();
+// // const bottomSheet = createDraggableBottomSheet();
 
 // Adicionar o evento de arrastar a uma outra alça
 document
