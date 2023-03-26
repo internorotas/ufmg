@@ -573,12 +573,13 @@ footer a#sobre-projeto {
   }
 
   #menu-lateral {
-    height: 70vh;
+    height: 80vh;
     height: 80svh;
     max-width: 100vw;
     background-color: var(--bg);
     border-radius: 1rem 1rem 0 0;
 
+    top: 70vh;
     top: 70svh;
 
     position: fixed;
