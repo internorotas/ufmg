@@ -283,7 +283,7 @@ function verificaDia() {
   let dataAtual = new Date();
   let diaSemana = dataAtual.getDay();
   let feriasInicio = new Date().setDate([ferias[0]]);
-  let feriasFim = new Date().setDate([ferias[1]]);
+  let feriasFim = new Date().setDate(ferias[1]);
 
   // verifica se é dia útil
   if (diaSemana > 0 && diaSemana < 6) {
