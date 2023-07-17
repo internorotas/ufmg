@@ -2,8 +2,8 @@ import data from "./dadosLinhas.js";
 import exibeLinha from "./map.js";
 
 const ferias = {
-  inicio: "December 23, 2022",
-  fim: "March 5, 2023",
+  inicio: "July 15, 2023",
+  fim: "August 11, 2023",
 };
 
 const bottomSheet = createDraggableBottomSheet();
