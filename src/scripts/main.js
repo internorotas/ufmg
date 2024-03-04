@@ -3,7 +3,7 @@ import exibeLinha from "./map.js";
 
 const ferias = {
   inicio: "December 16, 2023",
-  fim: "March 10, 2024",
+  fim: "March 05, 2024",
 };
 
 const bottomSheet = createDraggableBottomSheet();
@@ -287,7 +287,7 @@ function verificaDia() {
   // verifica se é dia útil
   if (diaSemana > 0 && diaSemana < 6) {
     // verifica se está no período de férias
-    if (dataAtual < feriasInicio) {
+    if (dataAtual > feriasInicio) {
       return "util";
     } else {
       return "ferias";
