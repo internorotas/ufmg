@@ -6,8 +6,6 @@ const ferias = {
   fim: "March 05, 2024",
 };
 
-// const bottomSheet = createDraggableBottomSheet();
-
 console.log(data);
 
 function imprimeLinhas(data, idContainer) {
@@ -308,76 +306,34 @@ function verificaDia() {
 }
 
 // Adicionar o evento de arrastar a uma outra alça
-document
-  .querySelector("#handler-mobile")
-  .addEventListener("mousedown", bottomSheet.dragStart);
-document.querySelector("body").addEventListener("mouseup", bottomSheet.dragEnd);
-document.querySelector("body").addEventListener("mousemove", bottomSheet.drag);
 
-function createDraggableBottomSheet() {
-  const bottomSheet = document.querySelector("#menu-lateral");
-  const handle = document.querySelector("#handler-mobile");
-  let currentY;
-  let initialY;
-  let yOffset = 0;
-  let limite = -window.innerHeight / 2;
+document.getElementById('ver-linhas-horarios').addEventListener('click', function() {
+  let menu = document.getElementById('menu-lateral');
+  let headerMenu = document.getElementById('header-menu-mobile');
+  
+  menu.classList.toggle('show');
+  headerMenu.classList.toggle('show');
+  menu.classList.remove('hidden'); // Certifica-se de que o menu não esteja escondido
+});
 
-  function resetSheetPosition() {
-    setTranslate(0, bottomSheet, 0);
-    currentY = 0;
-    initialY = 0;
-    yOffset = 0;
-  }
+document.getElementById('fechar-linhas-horarios').addEventListener('click', function() {
+  let menu = document.getElementById('menu-lateral');
+  let headerMenu = document.getElementById('header-menu-mobile');
+  
+  menu.classList.remove('show');
+  headerMenu.classList.remove('show');
+  setTimeout(() => {
+      menu.classList.add('hidden'); // Esconde o menu após a transição
+  }, 300); // O tempo deve coincidir com a transição CSS
+});
 
-  function dragStart(event) {
-    initialY = event.touches[0].clientY - yOffset;
-  }
-
-  function dragEnd() {
-    initialY = currentY;
-  }
-
-  function drag(event) {
-    if (!event.touches || event.touches.length === 0) {
-      return;
-    }
-
-    currentY = event.touches[0].clientY - initialY;
-    const windowHeight = window.innerHeight;
-    const bottomSheetRect = bottomSheet.getBoundingClientRect();
-    if (
-      currentY > -bottomSheetRect.height &&
-      currentY < windowHeight - bottomSheetRect.top &&
-      currentY > limite
-    ) {
-      yOffset = currentY;
-      setTranslate(currentY, bottomSheet);
-    }
-    setScroll(currentY);
-  }
-
-  function setScroll(currentY) {
-    // Confere e a BottomSheet chegou no topo para habilitar scroll
-    if (currentY > limite) {
-      bottomSheet.style.overflowY = "hidden";
-    } else {
-      bottomSheet.style.overflowY = "auto";
-    }
-  }
-
-  function setTranslate(yPos, el) {
-    el.style.transition = "transform 0.2s ease-out";
-    el.style.transform = `translate3d(0, ${yPos}px, 0)`;
-  }
-
-  handle.addEventListener("touchstart", dragStart);
-  handle.addEventListener("touchend", dragEnd);
-  handle.addEventListener("touchmove", drag);
-
-  return {
-    dragStart,
-    dragEnd,
-    drag,
-    resetSheetPosition,
-  };
-}
+document.getElementById('fechar-linhas-horarios').addEventListener('click', function() {
+  let menu = document.getElementById('menu-lateral');
+  let headerMenu = document.getElementById('header-menu-mobile');
+  
+  menu.classList.remove('show');
+  headerMenu.classList.remove('show');
+  setTimeout(() => {
+      menu.classList.add('hidden'); // Esconde o menu após a transição
+  }, 300); // O tempo deve coincidir com a transição CSS
+});
