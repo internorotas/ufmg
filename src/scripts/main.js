@@ -16,13 +16,24 @@ function imprimeLinhas(data, idContainer) {
     if (data[i].sublinha == null) {
       conteudoLinhas += `
         <section class="linha" id="linha-${data[i].tipo}">
-          <Button id="linha">${data[i].nome}</Button>
+          <button id="linha">
+            <div id="info-linha">
+              <h1>${data[i].nome}</h1>
+            </div>
+            <img src="./src/assets/arrow-icon.svg" alt="Seta para direita">
+          </button>
         </section>
       `;
     } else {
       conteudoLinhas += `
         <section class="linha" id="linha-${data[i].tipo}">
-          <Button>${data[i].nome}<p>${data[i].sublinha}</p></Button>
+          <button id="linha">
+            <div id="info-linha">
+              <h1>${data[i].nome}</h1>
+                <p>${data[i].sublinha}</p>
+            </div>
+            <img src="./src/assets/arrow-icon.svg" alt="Seta para direita">
+          </button>
         </section>
       `;
     }
@@ -89,7 +100,7 @@ for (let i = 0; i < botoesLinha.length; i++) {
   botoesLinha[i].addEventListener("click", function () {
     // exibeHorario(i);
     exibeLinha(i);
-    bottomSheet.resetSheetPosition();
+    hideMenu();
   });
 }
 
@@ -306,34 +317,43 @@ function verificaDia() {
 }
 
 // Adicionar o evento de arrastar a uma outra alça
+function showMenu() {
+  let menu = document.getElementById("menu-lateral");
+  let headerMenu = document.getElementById("header-menu-mobile");
 
-document.getElementById('ver-linhas-horarios').addEventListener('click', function() {
-  let menu = document.getElementById('menu-lateral');
-  let headerMenu = document.getElementById('header-menu-mobile');
-  
-  menu.classList.toggle('show');
-  headerMenu.classList.toggle('show');
-  menu.classList.remove('hidden'); // Certifica-se de que o menu não esteja escondido
-});
+  if (menu && headerMenu) {
+    menu.classList.add("show");
+    headerMenu.classList.add("show");
+    menu.classList.remove("hidden"); // Ensure the menu is not hidden
+  }
+}
 
-document.getElementById('fechar-linhas-horarios').addEventListener('click', function() {
-  let menu = document.getElementById('menu-lateral');
-  let headerMenu = document.getElementById('header-menu-mobile');
-  
-  menu.classList.remove('show');
-  headerMenu.classList.remove('show');
-  setTimeout(() => {
-      menu.classList.add('hidden'); // Esconde o menu após a transição
-  }, 300); // O tempo deve coincidir com a transição CSS
-});
+function hideMenu() {
+  let menu = document.getElementById("menu-lateral");
+  let headerMenu = document.getElementById("header-menu-mobile");
 
-document.getElementById('fechar-linhas-horarios').addEventListener('click', function() {
-  let menu = document.getElementById('menu-lateral');
-  let headerMenu = document.getElementById('header-menu-mobile');
-  
-  menu.classList.remove('show');
-  headerMenu.classList.remove('show');
-  setTimeout(() => {
-      menu.classList.add('hidden'); // Esconde o menu após a transição
-  }, 300); // O tempo deve coincidir com a transição CSS
-});
+  if (menu && headerMenu) {
+    menu.classList.remove("show");
+    headerMenu.classList.remove("show");
+    setTimeout(() => {
+      menu.classList.add("hidden"); // Hide the menu after transition
+    }, 300); // Delay should match CSS transition duration
+  }
+}
+
+function handleMenu() {
+  let verLinhasHorariosButton = document.getElementById("ver-linhas-horarios");
+  let fecharLinhasHorariosButton = document.getElementById("fechar-linhas-horarios");
+
+  if (verLinhasHorariosButton) {
+    verLinhasHorariosButton.addEventListener("click", showMenu);
+  }
+
+  if (fecharLinhasHorariosButton) {
+    fecharLinhasHorariosButton.addEventListener("click", hideMenu);
+  }
+}
+
+// Call the function to encapsulate the functionality
+handleMenu();
+
