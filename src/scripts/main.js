@@ -18,7 +18,9 @@ function imprimeLinhas(data, idContainer) {
   const containerLinhas = document.getElementById(idContainer);
   if (!containerLinhas) return;
 
-  const conteudoLinhas = data.map((linha, index) => criarHTMLLinha(linha, index, idContainer)).join("");
+  const conteudoLinhas = data
+    .map((linha, index) => criarHTMLLinha(linha, index, idContainer))
+    .join("");
   containerLinhas.innerHTML = conteudoLinhas;
 }
 
@@ -42,8 +44,10 @@ function criarHTMLLinha(linha, index, idContainer) {
 
 // Função para criar o HTML dos horários e botões adicionais
 function criarHTMLHorario(index, idContainer, linha) {
-  const itinerario = linha.itinerario.map(item => `<li>${item}</li>`).join("");
-  const horarios = linha.horarios.map(item => `<li>${item}</li>`).join("");
+  const itinerario = linha.itinerario
+    .map((item) => `<li>${item}</li>`)
+    .join("");
+  const horarios = linha.horarios.map((item) => `<li>${item}</li>`).join("");
 
   return `
     <div class="exibir-horario">
@@ -82,13 +86,17 @@ function configurarEventosBotoes() {
 
   document.querySelectorAll(".mostrar-itinerario").forEach((botao, index) => {
     botao.addEventListener("click", () => {
-      toggleVisibility(document.getElementsByClassName("itinerario-interno")[index]);
+      toggleVisibility(
+        document.getElementsByClassName("itinerario-interno")[index]
+      );
     });
   });
 
   document.querySelectorAll(".mais-horarios").forEach((botao, index) => {
     botao.addEventListener("click", () => {
-      toggleVisibility(document.getElementsByClassName("horarios-interno")[index]);
+      toggleVisibility(
+        document.getElementsByClassName("horarios-interno")[index]
+      );
     });
   });
 
@@ -118,17 +126,29 @@ function calculaHorario(posicao, itinerarioChamado, tipo) {
   const itinerario = verificaDia();
   let horarios = [];
 
-  if (itinerario === "util" && itinerarioChamado === "container-linhas-dias-uteis") {
+  if (
+    itinerario === "util" &&
+    itinerarioChamado === "container-linhas-dias-uteis"
+  ) {
     horarios = data.diasUteis[posicao].horarios;
-  } else if (itinerario === "sab" && itinerarioChamado === "container-linhas-sabado") {
+  } else if (
+    itinerario === "sab" &&
+    itinerarioChamado === "container-linhas-sabado"
+  ) {
     horarios = data.sabado[posicao].horarios;
-  } else if (itinerario === "ferias" && itinerarioChamado === "container-linhas-ferias-recessos") {
+  } else if (
+    itinerario === "ferias" &&
+    itinerarioChamado === "container-linhas-ferias-recessos"
+  ) {
     horarios = data.feriasRecessos[posicao].horarios;
   }
 
   return tipo === "anterior"
-    ? horarios.slice().reverse().find(horario => compararHorario(horario, tipo)) || "-"
-    : horarios.find(horario => compararHorario(horario, tipo)) || "-";
+    ? horarios
+        .slice()
+        .reverse()
+        .find((horario) => compararHorario(horario, tipo)) || "-"
+    : horarios.find((horario) => compararHorario(horario, tipo)) || "-";
 }
 
 // Função para comparar os horários
@@ -175,11 +195,14 @@ function alterarVisibilidadeMenu(acao) {
   }
 }
 
-
 // Configuração dos eventos do menu
 function configurarEventosMenu() {
-  document.getElementById("ver-linhas-horarios")?.addEventListener("click", showMenu);
-  document.getElementById("fechar-linhas-horarios")?.addEventListener("click", hideMenu);
+  document
+    .getElementById("ver-linhas-horarios")
+    ?.addEventListener("click", showMenu);
+  document
+    .getElementById("fechar-linhas-horarios")
+    ?.addEventListener("click", hideMenu);
 }
 
 // Inicializa o aplicativo

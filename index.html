@@ -4,53 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    <link rel="icon" href="./src/assets/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2C0EEB">
 
-    <meta property="title" content="Interno Rotas 🚌">
-    <meta property="site_name" content="Interno Rotas 🚌">
-    <meta property="url" content="https://internorotas.github.io/ufmg/">
-    <meta property="description" content="Veja rotas e horários das linhas de ônibus internas do
-        Campus Pampulha da UFMG">
-    <meta property="type" content="website">
-    <meta property="image" content="https://raw.githubusercontent.com/internorotas/ufmg/main/github/logo_Capa.png" />
+    <title>Interno Rotas 🚌</title>
+    <meta name="description" content="Veja rotas e horários das linhas de ônibus internas do Campus Pampulha da UFMG">
+    <link rel="icon" href="./src/assets/favicon.png">
 
-    <!-- Facebook, LinkedIn -->
-    <meta property="og:url" content="https://internorotas.github.io/ufmg/" />
+    <!-- Meta tags para redes sociais -->
     <meta property="og:title" content="Interno Rotas 🚌" />
-    <meta property="og:description" content="Veja rotas e horários das linhas de ônibus internas do
-        Campus Pampulha da UFMG" />
-    <meta property="og:site_name" content="Interno Rotas 🚌" />
+    <meta property="og:description"
+        content="Veja rotas e horários das linhas de ônibus internas do Campus Pampulha da UFMG" />
+    <meta property="og:url" content="https://internorotas.github.io/ufmg/" />
     <meta property="og:image" content="https://raw.githubusercontent.com/internorotas/ufmg/main/github/logo_Capa.png" />
+    <meta property="og:site_name" content="Interno Rotas 🚌" />
+    <meta property="og:type" content="website" />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="Veja rotas e horários das linhas de ônibus internas do
-        Campus Pampulha da UFMG">
-    <meta property="twitter:url" content="https://internorotas.github.io/ufmg/">
+    <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="Interno Rotas 🚌">
-    <meta property="twitter:description" content="Veja rotas e horários das linhas de ônibus internas do
-        Campus Pampulha da UFMG">
+    <meta property="twitter:description"
+        content="Veja rotas e horários das linhas de ônibus internas do Campus Pampulha da UFMG">
     <meta property="twitter:image"
         content="https://raw.githubusercontent.com/internorotas/ufmg/main/github/logo_Capa.png">
 
-    <meta name="theme-color" content="#2C0EEB">
-
+    <!-- Estilos e fontes -->
     <link rel="stylesheet" href="./src/styles/style.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
 
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="anonymous" />
 
+    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
-
-    <script src="https://unpkg.com/leaflet-ant-path" type="text/javascript"></script>
-
-    <title>Interno Rotas 🚌</title>
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/leaflet-ant-path"></script>
 </head>
 
 <body>
@@ -58,22 +48,22 @@
 
     <div id="header-mobile">
         <header>
-            <img src="./src/assets/logo-horizontal-transparente.svg" alt="Logo Interno Rotas"></img>
+            <img src="./src/assets/logo-horizontal-transparente.svg" alt="Logo Interno Rotas">
         </header>
         <section id="header-menu-mobile">
-            <button id="fechar-linhas-horarios">
+            <button id="fechar-linhas-horarios" aria-label="Fechar Linhas e Horários">
                 <div>
-                    <p>voltar ao mapa </p>
-                    <img src="./src/assets/close-icon.svg" alt="Seta para direita">
+                    <p>voltar ao mapa</p>
+                    <img src="./src/assets/close-icon.svg" alt="Ícone de fechar">
                 </div>
             </button>
         </section>
     </div>
 
     <div id="botao-mobile">
-        <button id="ver-linhas-horarios">
+        <button id="ver-linhas-horarios" aria-label="Ver Linhas e Horários">
             <div>
-                <p>ver rotas e horários </p>
+                <p>ver rotas e horários</p>
                 <img src="./src/assets/arrow-icon.svg" alt="Seta para direita">
             </div>
         </button>
@@ -81,17 +71,10 @@
 
     <div id="menu-lateral">
         <header>
-            <img src="./src/assets/logo-horizontal-transparente.svg" alt="Logo Interno Rotas"></img>
+            <img src="./src/assets/logo-horizontal-transparente.svg" alt="Logo Interno Rotas">
         </header>
 
         <main>
-            <!-- <section class="aviso-header">
-                <p><strong>Mudança de rota! </strong>Devido às obras para a Stock Car, as rotas dos ônibus foram
-                    alteradas. Podem ocorrer atrasos devido
-                    ao trânsito e aos desvios, que estão sendo realizados pela orla da lagoa da Pampulha.
-                </p>
-            </section> -->
-
             <section class="dia-itinerario">
                 <p>Dias Úteis</p>
                 <p><strong>UFMG</strong></p>
@@ -109,40 +92,34 @@
             </section>
             <section id="container-linhas-ferias-recessos"></section>
 
-
             <section class="aviso">
-                <p>Informações extraídas do <a target="_blank" href="https://ufmg.br/servicos/onibus">site da UFMG</a>.
+                <p>Informações extraídas do <a href="https://ufmg.br/servicos/onibus" target="_blank">site da UFMG</a>.
                 </p>
                 <p>Podem haver mudanças de itinerário e horários sem prévio aviso. Para informações, reclamações,
-                    dúvidas e sugestões entre em contato com a <strong>Divisão de Transportes</strong>.</p>
-                <p>
-                    Telefones: <a href="tel:03134094601">3409–4601</a> ou <a href="tel:03134094606">3409–4606</a>
-                </p>
-                <p>
-                    E-mail: <a href="mailto:sfrota@dsg.ufmg.br">sfrota@dsg.ufmg.br</a>
-                </p>
+                    dúvidas e sugestões, entre em contato com a <strong>Divisão de Transportes</strong>.</p>
+                <p>Telefones: <a href="tel:03134094601">3409–4601</a> ou <a href="tel:03134094606">3409–4606</a></p>
+                <p>E-mail: <a href="mailto:sfrota@dsg.ufmg.br">sfrota@dsg.ufmg.br</a></p>
             </section>
 
             <footer>
                 <section id="reportar-problema">
-                    <Button>Encontrou algum problema?</Button>
+                    <button>Encontrou algum problema?</button>
                     <div id="container-problema-links" class="escondido">
-                        <p>
-                            Por gentileza, envie um email para <a href="mailto:igor44@ufmg.br">igor44@ufmg.br</a> ou me
+                        <p>Por gentileza, envie um email para <a href="mailto:igor44@ufmg.br">igor44@ufmg.br</a> ou me
                             chame no <a href="https://www.instagram.com/titan.css/" target="_blank">Instagram</a>
-                            descrevendo o problema que irei corrigir o mais rápido possível!
-                        </p>
+                            descrevendo o problema que irei corrigir o mais rápido possível!</p>
                     </div>
                 </section>
-                <a target="_blank" id="sobre-projeto" href="https://github.com/internorotas/ufmg">Sobre o Projeto <img
+                <a id="sobre-projeto" href="https://github.com/internorotas/ufmg" target="_blank">Sobre o Projeto <img
                         src="./src/assets/external-link.svg" alt="Link Externo"></a>
 
                 <a id="creditos" href="https://github.com/igormartins4" target="_blank">Desenvolvido com 💙 por Igor
                     Martins</a>
             </footer>
-
         </main>
     </div>
+
+    <!-- Scripts -->
     <script src="./src/scripts/main.js" type="module"></script>
     <script src="./src/scripts/map.js" type="module"></script>
 </body>
