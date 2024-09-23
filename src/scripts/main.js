@@ -1,163 +1,288 @@
 import data from "./dadosLinhas.js";
 import exibeLinha from "./map.js";
 
-const periodoFerias = true;
+const periodoFerias = false;
 
-// Função principal para inicializar o aplicativo
-function init() {
-  imprimeLinhas(data.diasUteis, "container-linhas-dias-uteis");
-  imprimeLinhas(data.sabado, "container-linhas-sabado");
-  imprimeLinhas(data.feriasRecessos, "container-linhas-ferias-recessos");
+console.log(data);
 
-  configurarEventosBotoes();
-  configurarEventosMenu();
-}
-
-// Função para exibir as linhas no container especificado
 function imprimeLinhas(data, idContainer) {
-  const containerLinhas = document.getElementById(idContainer);
-  if (!containerLinhas) return;
+  let containerLinhas = document.getElementById(idContainer);
+  let conteudoLinhas = "";
 
-  const conteudoLinhas = data
-    .map((linha, index) => criarHTMLLinha(linha, index, idContainer))
-    .join("");
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].sublinha == null) {
+      conteudoLinhas += `
+        <section class="linha" id="linha-${data[i].tipo}">
+          <button id="linha">
+            <div id="info-linha">
+              <h1>${data[i].nome}</h1>
+            </div>
+            <img src="./src/assets/arrow-icon.svg" alt="Seta para direita">
+          </button>
+        </section>
+      `;
+    } else {
+      conteudoLinhas += `
+        <section class="linha" id="linha-${data[i].tipo}">
+          <button id="linha">
+            <div id="info-linha">
+              <h1>${data[i].nome}</h1>
+                <p>${data[i].sublinha}</p>
+            </div>
+            <img src="./src/assets/arrow-icon.svg" alt="Seta para direita">
+          </button>
+        </section>
+      `;
+    }
+
+    conteudoLinhas += `
+      <div class="exibir-horario">
+        <div class="horario-atual">
+          <div class="anterior">
+            <p>Anterior</p>
+            <p>${retornaHorarioAnterior(i, idContainer)}</p>
+          </div>
+          <div class="proximo">
+            <p>Próximo</p>
+            <p>${retornaProximoHorario(i, idContainer)}</p>
+          </div>
+        </div>
+
+        <div class="container-buttons">
+          <button class="mostrar-itinerario">itinerário</button>
+          <button class="mais-horarios">mais horários</button>
+        </div>
+
+        <div class="itinerario-interno escondido">
+    `;
+
+    for (let j = 0; j < data[i].itinerario.length; j++) {
+      conteudoLinhas += ` 
+            <li>${data[i].itinerario[j]}</li>
+      `;
+    }
+
+    conteudoLinhas += `
+        </div>
+
+        <div class="horarios-interno escondido">
+    `;
+
+    for (let j = 0; j < data[i].horarios.length; j++) {
+      conteudoLinhas += ` 
+            <li>${data[i].horarios[j]}</li>
+      `;
+    }
+
+    conteudoLinhas += `
+        </div>
+      </div>
+    `;
+  }
+
+  // coloca a variável no HTML da página
   containerLinhas.innerHTML = conteudoLinhas;
 }
 
-// Função para criar o HTML de cada linha
-function criarHTMLLinha(linha, index, idContainer) {
-  const sublinhaInfo = linha.sublinha ? `<p>${linha.sublinha}</p>` : "";
+imprimeLinhas(data.diasUteis, "container-linhas-dias-uteis");
+imprimeLinhas(data.sabado, "container-linhas-sabado");
+imprimeLinhas(data.feriasRecessos, "container-linhas-ferias-recessos");
 
-  return `
-    <section class="linha" id="linha-${linha.tipo}">
-      <button id="linha">
-        <div id="info-linha">
-          <h1>${linha.nome}</h1>
-          ${sublinhaInfo}
-        </div>
-        <img src="./src/assets/arrow-icon.svg" alt="Seta para direita">
-      </button>
-      ${criarHTMLHorario(index, idContainer, linha)}
-    </section>
-  `;
-}
+// pega todos os botões da página
+let botoesLinha = document.querySelectorAll(".linha");
 
-// Função para criar o HTML dos horários e botões adicionais
-function criarHTMLHorario(index, idContainer, linha) {
-  const itinerario = linha.itinerario
-    .map((item) => `<li>${item}</li>`)
-    .join("");
-  const horarios = linha.horarios.map((item) => `<li>${item}</li>`).join("");
-
-  return `
-    <div class="exibir-horario">
-      <div class="horario-atual">
-        <div class="anterior">
-          <p>Anterior</p>
-          <p>${retornaHorarioAnterior(index, idContainer)}</p>
-        </div>
-        <div class="proximo">
-          <p>Próximo</p>
-          <p>${retornaProximoHorario(index, idContainer)}</p>
-        </div>
-      </div>
-      <div class="container-buttons">
-        <button class="mostrar-itinerario">Itinerário</button>
-        <button class="mais-horarios">Mais horários</button>
-      </div>
-      <div class="itinerario-interno escondido">
-        ${itinerario}
-      </div>
-      <div class="horarios-interno escondido">
-        ${horarios}
-      </div>
-    </div>
-  `;
-}
-
-// Configuração dos eventos para os botões das linhas e itinerários
-function configurarEventosBotoes() {
-  document.querySelectorAll(".linha").forEach((botao, index) => {
-    botao.addEventListener("click", () => {
-      exibeLinha(index);
-      hideMenu();
-    });
-  });
-
-  document.querySelectorAll(".mostrar-itinerario").forEach((botao, index) => {
-    botao.addEventListener("click", () => {
-      toggleVisibility(
-        document.getElementsByClassName("itinerario-interno")[index]
-      );
-    });
-  });
-
-  document.querySelectorAll(".mais-horarios").forEach((botao, index) => {
-    botao.addEventListener("click", () => {
-      toggleVisibility(
-        document.getElementsByClassName("horarios-interno")[index]
-      );
-    });
-  });
-
-  const botaoReportarProblema = document.getElementById("reportar-problema");
-  botaoReportarProblema?.addEventListener("click", () => {
-    toggleVisibility(document.getElementById("container-problema-links"));
+// percorre por todos os botões da página
+for (let i = 0; i < botoesLinha.length; i++) {
+  // adiciona um Event Listener em cada um deles
+  botoesLinha[i].addEventListener("click", function () {
+    // exibeHorario(i);
+    exibeLinha(i);
+    hideMenu();
   });
 }
 
-// Função para alternar a visibilidade dos elementos
+// pega todos os botões da página
+let botoesItinerario = document.getElementsByClassName("mostrar-itinerario");
+
+// percorre por todos os botões da página
+for (let i = 0; i < botoesItinerario.length; i++) {
+  // adiciona um Event Listener em cada um deles
+  botoesItinerario[i].addEventListener("click", function () {
+    exibeItinerario(i);
+  });
+}
+
 function toggleVisibility(element) {
-  element.classList.toggle("escondido");
-  element.classList.toggle("aparecido");
+  if (element.classList.contains("escondido")) {
+    element.classList.remove("escondido");
+    element.classList.add("aparecido");
+  } else {
+    element.classList.remove("aparecido");
+    element.classList.add("escondido");
+  }
 }
 
-// Funções de cálculo dos horários anteriores e próximos
+function exibeItinerario(posicaoBotao) {
+  const containerItinerario =
+    document.getElementsByClassName("itinerario-interno");
+  toggleVisibility(containerItinerario[posicaoBotao]);
+}
+
+const botaoReportarProblema = document.getElementById("reportar-problema");
+botaoReportarProblema.addEventListener("click", function () {
+  const containerAvisoProblema = document.getElementById(
+    "container-problema-links"
+  );
+  toggleVisibility(containerAvisoProblema);
+});
+
+const botoesHorarios = document.getElementsByClassName("mais-horarios");
+for (let i = 0; i < botoesHorarios.length; i++) {
+  botoesHorarios[i].addEventListener("click", function () {
+    const containerHorarios =
+      document.getElementsByClassName("horarios-interno");
+    toggleVisibility(containerHorarios[i]);
+  });
+}
+
 function retornaHorarioAnterior(posicao, itinerarioChamado) {
-  return calculaHorario(posicao, itinerarioChamado, "anterior");
+  let horarioAnterior;
+  let itinerario = verificaDia();
+
+  if (itinerario == "util") {
+    if (itinerarioChamado == "container-linhas-dias-uteis") {
+      for (let i = data.diasUteis[posicao].horarios.length - 1; i >= 0; i--) {
+        horarioAnterior = compararHorarioAnterior(
+          data.diasUteis[posicao].horarios[i]
+        );
+        if (horarioAnterior != "-") {
+          break;
+        }
+      }
+    } else {
+      horarioAnterior = "-";
+    }
+  } else if (itinerario == "sab") {
+    if (itinerarioChamado == "container-linhas-sabado") {
+      for (let i = data.sabado[posicao].horarios.length - 1; i >= 0; i--) {
+        horarioAnterior = compararHorarioAnterior(
+          data.sabado[posicao].horarios[i]
+        );
+        if (horarioAnterior != "-") {
+          break;
+        }
+      }
+    } else {
+      horarioAnterior = "-";
+    }
+  } else if (itinerario == "ferias") {
+    if (itinerarioChamado == "container-linhas-ferias-recessos") {
+      for (
+        let i = data.feriasRecessos[posicao].horarios.length - 1;
+        i >= 0;
+        i--
+      ) {
+        horarioAnterior = compararHorarioAnterior(
+          data.feriasRecessos[posicao].horarios[i]
+        );
+        if (horarioAnterior != "-") {
+          break;
+        }
+      }
+    } else {
+      horarioAnterior = "-";
+    }
+  } else {
+    horarioAnterior = "-";
+  }
+
+  return horarioAnterior;
+}
+
+// Verifica se o horário passado por parâmetro é o do próximo ônibus
+function compararHorarioAnterior(horario) {
+  let horas = horario.split(":");
+
+  let agora = new Date();
+
+  let comparado = new Date();
+
+  comparado.setHours(horas[0]);
+  comparado.setMinutes(horas[1]);
+
+  if (comparado < agora) {
+    return horario;
+  } else {
+    return "-";
+  }
 }
 
 function retornaProximoHorario(posicao, itinerarioChamado) {
-  return calculaHorario(posicao, itinerarioChamado, "proximo");
-}
+  let proximoHorario;
+  let itinerario = verificaDia();
 
-// Função genérica para calcular horários anteriores ou próximos
-function calculaHorario(posicao, itinerarioChamado, tipo) {
-  const itinerario = verificaDia();
-  let horarios = [];
-
-  if (
-    itinerario === "util" &&
-    itinerarioChamado === "container-linhas-dias-uteis"
-  ) {
-    horarios = data.diasUteis[posicao].horarios;
-  } else if (
-    itinerario === "sab" &&
-    itinerarioChamado === "container-linhas-sabado"
-  ) {
-    horarios = data.sabado[posicao].horarios;
-  } else if (
-    itinerario === "ferias" &&
-    itinerarioChamado === "container-linhas-ferias-recessos"
-  ) {
-    horarios = data.feriasRecessos[posicao].horarios;
+  if (itinerario == "util") {
+    if (itinerarioChamado == "container-linhas-dias-uteis") {
+      for (let i = 0; i < data.diasUteis[posicao].horarios.length; i++) {
+        proximoHorario = compararProximoHorario(
+          data.diasUteis[posicao].horarios[i]
+        );
+        if (proximoHorario != "-") {
+          break;
+        }
+      }
+    } else {
+      proximoHorario = "-";
+    }
+  } else if (itinerario == "sab") {
+    if (itinerarioChamado == "container-linhas-sabado") {
+      for (let i = 0; i < data.sabado[posicao].horarios.length; i++) {
+        proximoHorario = compararProximoHorario(
+          data.sabado[posicao].horarios[i]
+        );
+        if (proximoHorario != "-") {
+          break;
+        }
+      }
+    } else {
+      proximoHorario = "-";
+    }
+  } else if (itinerario == "ferias") {
+    if (itinerarioChamado == "container-linhas-ferias-recessos") {
+      for (let i = 0; i < data.feriasRecessos[posicao].horarios.length; i++) {
+        proximoHorario = compararProximoHorario(
+          data.feriasRecessos[posicao].horarios[i]
+        );
+        if (proximoHorario != "-") {
+          break;
+        }
+      }
+    } else {
+      proximoHorario = "-";
+    }
+  } else {
+    proximoHorario = "-";
   }
 
-  return tipo === "anterior"
-    ? horarios
-        .slice()
-        .reverse()
-        .find((horario) => compararHorario(horario, tipo)) || "-"
-    : horarios.find((horario) => compararHorario(horario, tipo)) || "-";
+  return proximoHorario;
 }
 
-// Função para comparar os horários
-function compararHorario(horario, tipo) {
-  const [horas, minutos] = horario.split(":").map(Number);
-  const comparado = new Date();
-  comparado.setHours(horas, minutos, 0);
+// Verifica se o horário passado por parâmetro é o do próximo ônibus
+function compararProximoHorario(horario) {
+  let horas = horario.split(":");
 
-  return tipo === "anterior" ? comparado < new Date() : comparado > new Date();
+  let agora = new Date();
+
+  let comparado = new Date();
+
+  comparado.setHours(horas[0]);
+  comparado.setMinutes(horas[1]);
+
+  if (comparado > agora) {
+    return horario;
+  } else {
+    return "-";
+  }
 }
 
 // Função para verificar o dia da semana e período
@@ -167,43 +292,43 @@ function verificaDia() {
   return diaSemana === 6 ? "sab" : "-";
 }
 
-// Funções para mostrar e esconder o menu
+// Adicionar o evento de arrastar a uma outra alça
 function showMenu() {
-  alterarVisibilidadeMenu("show");
+  let menu = document.getElementById("menu-lateral");
+  let headerMenu = document.getElementById("header-menu-mobile");
+
+  if (menu && headerMenu) {
+    menu.classList.add("show");
+    headerMenu.classList.add("show");
+    menu.classList.remove("hidden"); // Ensure the menu is not hidden
+  }
 }
 
 function hideMenu() {
-  alterarVisibilidadeMenu("hide");
-}
+  let menu = document.getElementById("menu-lateral");
+  let headerMenu = document.getElementById("header-menu-mobile");
 
-// Função genérica para alterar a visibilidade do menu
-function alterarVisibilidadeMenu(acao) {
-  const menu = document.getElementById("menu-lateral");
-  const headerMenu = document.getElementById("header-menu-mobile");
-  if (!menu || !headerMenu) return;
-
-  if (acao === "show") {
-    menu.classList.add("show");
-    headerMenu.classList.add("show");
-    menu.classList.remove("hidden");
-  } else if (acao === "hide") {
+  if (menu && headerMenu) {
     menu.classList.remove("show");
     headerMenu.classList.remove("show");
     setTimeout(() => {
-      menu.classList.add("hidden");
+      menu.classList.add("hidden"); // Hide the menu after transition
     }, 300); // Delay should match CSS transition duration
   }
 }
 
-// Configuração dos eventos do menu
-function configurarEventosMenu() {
-  document
-    .getElementById("ver-linhas-horarios")
-    ?.addEventListener("click", showMenu);
-  document
-    .getElementById("fechar-linhas-horarios")
-    ?.addEventListener("click", hideMenu);
+function handleMenu() {
+  let verLinhasHorariosButton = document.getElementById("ver-linhas-horarios");
+  let fecharLinhasHorariosButton = document.getElementById("fechar-linhas-horarios");
+
+  if (verLinhasHorariosButton) {
+    verLinhasHorariosButton.addEventListener("click", showMenu);
+  }
+
+  if (fecharLinhasHorariosButton) {
+    fecharLinhasHorariosButton.addEventListener("click", hideMenu);
+  }
 }
 
-// Inicializa o aplicativo
-init();
+// Call the function to encapsulate the functionality
+handleMenu();
