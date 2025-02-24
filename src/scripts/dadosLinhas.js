@@ -1,11 +1,11 @@
 const data = {
-  "diasUteis": [
+  diasUteis: [
     {
-      "linha": 1,
-      "nome": "Linha 01",
-      "tipo": "um",
-      "sublinha": null,
-      "horarios": [
+      linha: 1,
+      nome: "Linha 01",
+      tipo: "um",
+      sublinha: null,
+      horarios: [
         "06:10",
         "06:50",
         "07:30",
@@ -22,9 +22,9 @@ const data = {
         "17:10",
         "17:55",
         "18:50",
-        "19:40"
+        "19:40",
       ],
-      "itinerario": [
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CAD 2 - CENTRO DE ATIVIDADES DIDÁTICAS 2",
@@ -60,15 +60,15 @@ const data = {
         "FALE - FACULDADE DE LETRAS",
         "CAD 2 - CENTRO DE ATIVIDADES DIDÁTICAS 2",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
+        "ESCOLA DE MÚSICA",
+      ],
     },
     {
-      "linha": 2,
-      "nome": "Linha 02",
-      "tipo": "dois",
-      "sublinha": null,
-      "horarios": [
+      linha: 2,
+      nome: "Linha 02",
+      tipo: "dois",
+      sublinha: null,
+      horarios: [
         "05:55",
         "06:30",
         "07:10",
@@ -83,9 +83,9 @@ const data = {
         "20:00",
         "20:50",
         "21:35",
-        "22:30"
+        "22:30",
       ],
-      "itinerario": [
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CAD 2 - CENTRO DE ATIVIDADES DIDÁTICAS 2",
@@ -122,16 +122,16 @@ const data = {
         "CENTRO PEDAGÓGICO",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
+        "ESCOLA DE MÚSICA",
+      ],
     },
     {
-      "linha": 2,
-      "nome": "Linha 02",
-      "tipo": "dois",
-      "sublinha": "Retorno na Área Militar",
-      "horarios": ["11:30", "12:10", "12:50", "13:45", "17:30", "18:20"],
-      "itinerario": [
+      linha: 2,
+      nome: "Linha 02",
+      tipo: "dois",
+      sublinha: "Retorno na Área Militar",
+      horarios: ["11:30", "12:10", "12:50", "13:45", "17:30", "18:20"],
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CAD 2 - CENTRO DE ATIVIDADES DIDÁTICAS 2",
@@ -168,15 +168,15 @@ const data = {
         "CENTRO PEDAGÓGICO",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
+        "ESCOLA DE MÚSICA",
+      ],
     },
     {
-      "linha": 3,
-      "nome": "Linha 03",
-      "tipo": "tres",
-      "sublinha": null,
-      "horarios": [
+      linha: 3,
+      nome: "Linha 03",
+      tipo: "tres",
+      sublinha: null,
+      horarios: [
         "05:40",
         "06:20",
         "07:00",
@@ -192,9 +192,9 @@ const data = {
         "20:30",
         "21:10",
         "21:50",
-        "22:10"
+        "22:10",
       ],
-      "itinerario": [
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
@@ -226,24 +226,16 @@ const data = {
         "ECI - ESCOLA DE CIÊNCIAS DA INFORMAÇÃO",
         "FALE - FACULDADE DE LETRAS",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
+        "ESCOLA DE MÚSICA",
+      ],
     },
     {
-      "linha": 3,
-      "nome": "Linha 03",
-      "tipo": "tres",
-      "sublinha": "Retorno na Área Militar",
-      "horarios": [
-        "11:20",
-        "12:00",
-        "12:40",
-        "13:30",
-        "17:20",
-        "18:10",
-        "22:50"
-      ],
-      "itinerario": [
+      linha: 3,
+      nome: "Linha 03",
+      tipo: "tres",
+      sublinha: "Retorno na Área Militar",
+      horarios: ["11:20", "12:00", "12:40", "13:30", "17:20", "18:10", "22:50"],
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
@@ -275,16 +267,16 @@ const data = {
         "ECI - ESCOLA DE CIÊNCIAS DA INFORMAÇÃO",
         "FALE - FACULDADE DE LETRAS",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
+        "ESCOLA DE MÚSICA",
+      ],
     },
     {
-      "linha": 3,
-      "nome": "Linha 03",
-      "tipo": "tres",
-      "sublinha": "Atendimento ao BH-Tec",
-      "horarios": ["07:40", "17:20"],
-      "itinerario": [
+      linha: 3,
+      nome: "Linha 03",
+      tipo: "tres",
+      sublinha: "Atendimento ao BH-Tec",
+      horarios: ["07:40", "17:20"],
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
@@ -319,24 +311,16 @@ const data = {
         "ECI - ESCOLA DE CIÊNCIAS DA INFORMAÇÃO",
         "FALE - FACULDADE DE LETRAS",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
+        "ESCOLA DE MÚSICA",
+      ],
     },
     {
-      "linha": 4,
-      "nome": "Linha 04",
-      "tipo": "quatro",
-      "sublinha": null,
-      "horarios": [
-        "06:00",
-        "08:05",
-        "08:50",
-        "14:45",
-        "15:40",
-        "16:20",
-        "20:15"
-      ],
-      "itinerario": [
+      linha: 4,
+      nome: "Linha 04",
+      tipo: "quatro",
+      sublinha: null,
+      horarios: ["06:00", "08:05", "08:50", "14:45", "15:40", "16:20", "20:15"],
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
@@ -371,15 +355,15 @@ const data = {
         "CENTRO PEDAGÓGICO",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
+        "ESCOLA DE MÚSICA",
+      ],
     },
     {
-      "linha": 4,
-      "nome": "Linha 04",
-      "tipo": "quatro",
-      "sublinha": "Retorno na Área Militar",
-      "horarios": [
+      linha: 4,
+      nome: "Linha 04",
+      tipo: "quatro",
+      sublinha: "Retorno na Área Militar",
+      horarios: [
         "11:00",
         "11:40",
         "12:20",
@@ -387,9 +371,9 @@ const data = {
         "13:55",
         "17:00",
         "17:40",
-        "18:35"
+        "18:35",
       ],
-      "itinerario": [
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
@@ -424,15 +408,15 @@ const data = {
         "CENTRO PEDAGÓGICO",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
+        "ESCOLA DE MÚSICA",
+      ],
     },
     {
-      "linha": 4,
-      "nome": "Linha 04",
-      "tipo": "quatro",
-      "sublinha": "Atendimento ao Ponto McDonald's",
-      "horarios": [
+      linha: 4,
+      nome: "Linha 04",
+      tipo: "quatro",
+      sublinha: "Atendimento ao Ponto McDonald's",
+      horarios: [
         "06:40",
         "07:20",
         "11:00",
@@ -441,9 +425,9 @@ const data = {
         "13:05",
         "13:55",
         "17:00",
-        "17:40"
+        "17:40",
       ],
-      "itinerario": [
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
@@ -479,16 +463,16 @@ const data = {
         "CENTRO PEDAGÓGICO",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
+        "ESCOLA DE MÚSICA",
+      ],
     },
     {
-      "linha": 4,
-      "nome": "Linha 04",
-      "tipo": "quatro",
-      "sublinha": "Atendimento ao BH-Tec e McDonald's",
-      "horarios": ["07:20", "12:20", "17:00"],
-      "itinerario": [
+      linha: 4,
+      nome: "Linha 04",
+      tipo: "quatro",
+      sublinha: "Atendimento ao BH-Tec e McDonald's",
+      horarios: ["07:20", "12:20", "17:00"],
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
@@ -526,18 +510,18 @@ const data = {
         "CENTRO PEDAGÓGICO",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
-    }
+        "ESCOLA DE MÚSICA",
+      ],
+    },
   ],
-  "sabado": [
+  sabado: [
     {
-      "linha": 5,
-      "nome": "Linha 03",
-      "tipo": "tres-sabado",
-      "sublinha": "Sábado",
-      "horarios": ["11:00", "11:40", "12:20", "13:00", "13:40"],
-      "itinerario": [
+      linha: 5,
+      nome: "Linha 03",
+      tipo: "tres-sabado",
+      sublinha: "Sábado",
+      horarios: ["11:00", "11:40", "12:20", "13:00", "13:40"],
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CAD 2 - CENTRO DE ATIVIDADES DIDÁTICAS 2",
@@ -574,37 +558,36 @@ const data = {
         "CENTRO PEDAGÓGICO",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
-    }
+        "ESCOLA DE MÚSICA",
+      ],
+    },
   ],
-  "feriasRecessos": [
+  feriasRecessos: [
     {
-      "linha": 6,
-      "nome": "Linha 02",
-      "tipo": "dois-ferias",
-      "sublinha": "Férias e Recessos",
-      "horarios": [
+      linha: 6,
+      nome: "Linha 02",
+      tipo: "dois-ferias",
+      sublinha: "Férias e Recessos",
+      horarios: [
         "05:55",
-        "06:40",
-        "07:20",
-        "08:05",
-        "09:10",
-        "10:40",
+        "06:30",
+        "07:10",
+        "07:50",
+        "09:05",
+        "10:20",
         "11:30",
         "12:10",
         "12:50",
-        "13:50",
-        "14:40",
+        "13:45",
+        "14:30",
         "15:30",
         "16:10",
         "16:50",
         "17:30",
         "18:20",
         "19:20",
-        "20:00"
       ],
-      "itinerario": [
+      itinerario: [
         "ESCOLA DE MÚSICA",
         "EBA - ESCOLA DE BELAS ARTES",
         "CAD 2 - CENTRO DE ATIVIDADES DIDÁTICAS 2",
@@ -641,10 +624,75 @@ const data = {
         "CENTRO PEDAGÓGICO",
         "CRECHE - EMEI ALAÍDE DE LISBOA",
         "EBA - ESCOLA DE BELAS ARTES",
-        "ESCOLA DE MÚSICA"
-      ]
-    }
-  ]
-}
+        "ESCOLA DE MÚSICA",
+      ],
+    },
+    {
+      linha: 8,
+      nome: "Linha 03",
+      tipo: "tres-ferias",
+      sublinha: "Férias e Recessos",
+      horarios: [
+        "05:40",
+        "06:20",
+        "07:00",
+        "07:40",
+        "08:20",
+        "09:20",
+        "10:00",
+        "10:40",
+        "11:20",
+        "12:00",
+        "12:40",
+        "13:30",
+        "14:55",
+        "16:00",
+        "16:40",
+        "17:20",
+        "18:10",
+        "19:05"
+      ],
+      itinerario: [
+        "ESCOLA DE MÚSICA",
+        "EBA - ESCOLA DE BELAS ARTES",
+        "CAD 2 - CENTRO DE ATIVIDADES DIDÁTICAS 2",
+        "FALE - FACULDADE DE LETRAS",
+        "ECI - ESCOLA DE CIÊNCIAS DA INFORMAÇÃO",
+        "FAFICH - FACULDADE DE FILOSOFIA E CIÊNCIAS HUMANAS",
+        "FACE - FACULDADE DE CIÊNCIAS ECONÔMICAS",
+        "REITORIA",
+        "PRAÇA DE SERVIÇOS",
+        "BIBLIOTECA CENTRAL UNIVERSITÁRIA",
+        "REITORIA",
+        "UNIDADE ADMINISTRATIVA III (DAP/DRCA/DRH/COPEVE/PROJETO MANUELZÃO/EDUCAÇÃO A DISTÂNCIA/ESTUDOS TRANSCIPLINARES/ESTUDOS DE CRIMINALIDADE E SEGURANÇA/ESTUDOS SOBRE ENSINO SUPERIOR E POLITICAS PÚBLICAS)",
+        "UNIDADE ADMINISTRATIVA II (DAST/FUNDEP)",
+        "AV. ANTÔNIO ABRAHÃO CARAM (EM FRENTE AO RESTAURANTE FARROUPILHA)",
+        "CEU - CENTRO ESPORTIVO UNIVERSITÁRIO",
+        "ESCOLA DE VETERINÁRIA",
+        "AV. PRESIDENTE CARLOS LUZ (EM FRENTE AO MCDONALD'S)",
+        "EEFFTO - ESCOLA DE EDUCAÇÃO FÍSICA, FISIOTERAPIA E TERAPIA OCUPACIONAL",
+        "FACULDADE DE ODONTOLOGIA",
+        "ESTAÇÃO ECOLOGICA",
+        "ESCOLA DE VETERINÁRIA",
+        "FACULDADE DE FARMÁCIA",
+        "RESTAURANTE UNIVERSITÁRIO SETORIAL II",
+        "DEPARTAMENTO DE FÍSICA",
+        "ENG. ELÉTRICA (CPDE)",
+        "CDTN/CNEN - CENTRO DE DESENVOLVIMENTO DA TECNOLOGIA NUCLEAR",
+        "COLTEC - COLÉGIO TÉCNICO DA UFMG",
+        "DEPARTAMENTO DE QUÍMICA",
+        "ICEX - INSTITUTO DE CIÊNCIAS EXATAS",
+        "ESCOLA DE ENGENHARIA",
+        "IGC - INSTITUTO DE GEOCIÊNCIAS",
+        "RESTAURANTE UNIVERSITÁRIO SETORIAL I",
+        "FAE - FACULDADE DE EDUCAÇÃO",
+        "CENTRO PEDAGÓGICO",
+        "CRECHE - EMEI ALAÍDE DE LISBOA",
+        "EBA - ESCOLA DE BELAS ARTES",
+        "ESCOLA DE MÚSICA",
+      ],
+    },
+  ],
+};
 
 export default data;

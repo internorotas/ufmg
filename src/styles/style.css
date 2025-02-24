@@ -1,25 +1,23 @@
 /* Global ====================================================================*/
 
 :root {
-  --primary-color: #2c0eeb;
+  --primary-color: #2C0EEB;
   --secondary-color: #ecdcc4;
   --tertiary-color: #ffa400;
 
   --bg: #1a1819;
   --bg-secondary: #3a3b3c;
-
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  
+
   /* transition: all 0.5s ease-in-out; */
-  
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
 }
 
 html {
@@ -27,7 +25,7 @@ html {
   font-family: "Poppins", sans-serif;
   color: var(--secondary-color);
   background: var(--primary-color);
-  
+
   scroll-behavior: smooth;
 }
 
@@ -50,7 +48,8 @@ body {
   right: 0;
 }
 
-#header-mobile {
+#header-mobile,
+#botao-mobile {
   display: none;
 }
 
@@ -124,16 +123,15 @@ body {
   font-weight: 500;
   text-align: center;
 
-  border: 1px solid var(--bg);
+  border: 1px solid var(--tertiary-color);
   border-radius: 0.4rem;
   width: 100%;
 
   margin: 0.5rem 0;
   padding: 1rem;
 
-  /* background: #1e1e1e; */
-  background: var(--bg-secondary);
-  color: var(--secondary-color);
+  background: var(--tertiary-color);
+  color: var(--bg);
 }
 
 #menu-lateral main section.dia-itinerario {
@@ -149,6 +147,11 @@ body {
 
 /* Classe de todos os botões das linhas de ônibus */
 
+.linha button p {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 #menu-lateral section.linha button {
   border: 1px solid var(--bg);
   border-radius: 0.4rem;
@@ -156,56 +159,71 @@ body {
 
   font-weight: 700;
   font-size: 1.2rem;
+  font-family: "Poppins", sans-serif;
 
   margin: 0.1rem 0;
-  padding: 0.4rem;
+  padding: 0.5rem 2rem;
 
   display: flex;
-  justify-content: center;
   align-items: center;
-  flex-direction: column;
-
+  flex-direction: row;
   cursor: pointer;
+  justify-content: center;
+
+  transition: opacity 0.05s ease-in-out;
+  opacity: 1;
 }
 
-.linha > button > p {
-  font-weight: 500;
-  font-size: 0.9rem;
+button#linha:hover {
+  opacity: 0.8;
+}
+
+#info-linha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
 }
 
 /* Cada linha conta com uma cor diferente */
 
+.linha > button {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Adiciona profundidade */
+  border: 2px solid rgba(255,255,255,0.2); /* Borda de contraste */
+}
+
 .linha#linha-um > button {
-  background: #cd00ff;
-  color: var(--secondary-color);
+  background: #8A2BE2; /* Roxo mais profundo (original: #cd00ff) */
+  color: var(--secondary-color); 
 }
 
 .linha#linha-dois > button {
-  background: #d9383e;
+  background: #B22222; /* Vermelho terroso (original: #d9383e) */
   color: var(--secondary-color);
 }
 
 .linha#linha-tres > button {
-  background: #008f32;
+  background: #006400; /* Verde floresta (original: #008f32) */
   color: var(--secondary-color);
 }
 
 .linha#linha-quatro > button {
-  background: #3b49df;
+  background: #00008B; /* Azul marinho (original: #3b49df) */
   color: var(--secondary-color);
 }
 
 .linha#linha-tres-sabado > button {
-  background: #96002d;
+  background: #800020; /* Borgonha intenso (original: #96002d) */
   color: var(--secondary-color);
 }
 
-#menu-lateral section.linha button {
-  padding: 0.5rem;
+.linha#linha-dois-ferias > button {
+  background: #4B0082; /* Índigo (original: #7b118a) */
+  color: var(--secondary-color);
 }
 
-.linha#linha-dois-ferias > button {
-  background: #7b118a;
+.linha#linha-tres-ferias > button {
+  background: #D2691E; /* Índigo (original: #7b118a) */
   color: var(--secondary-color);
 }
 
@@ -231,7 +249,6 @@ body {
   pointer-events: visible;
 
   padding: 0.5rem;
-  margin: 0.5rem;
 }
 
 /* Box de Horário Anterior e Próximo */
@@ -367,9 +384,6 @@ div > div.itinerario-interno > li {
 
   text-align: center;
 
-  /* margin-bottom: 0.5rem; */
-  /* padding: 0.5rem; */
-
   gap: 0.4rem;
 
   border-radius: 0.4rem;
@@ -415,8 +429,9 @@ footer section#reportar-problema > button {
 
   width: 100%;
 
-  font-weight: 400;
+  font-weight: 700;
   font-size: 0.9rem;
+  font-family: "Poppins", sans-serif;
 
   margin: 0.1rem auto;
   padding: 0.5rem;
@@ -454,6 +469,7 @@ footer a#sobre-projeto {
 
   font-size: 0.9rem;
   font-weight: 500;
+  font-family: "Poppins", sans-serif;
 
   margin: 0.5rem 0 0.1rem;
   padding: 0.5rem;
@@ -483,6 +499,8 @@ footer a#sobre-projeto {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   font-size: 0.8rem;
+
+  margin-bottom: 4rem;
 }
 
 /* Personalizar o popup do Leaflet */
@@ -508,7 +526,7 @@ footer a#sobre-projeto {
   margin: 0.2rem 0;
 }
 
-/* Responsivo ================================================================*/
+/* Responsivo ========================================================================================================*/
 
 @media (max-width: 850px) {
   html,
@@ -518,6 +536,60 @@ footer a#sobre-projeto {
     font-size: 87.5%;
 
     overflow: hidden;
+  }
+
+  /* Botão Ver Linhas e Horários =============================================*/
+  #botao-mobile {
+    display: block;
+
+    position: fixed;
+    bottom: 3rem;
+
+    text-align: center;
+    padding: 1rem;
+
+    width: 100%;
+
+    cursor: pointer;
+
+    z-index: 1;
+
+    display: flex;
+    justify-content: center;
+  }
+
+  #ver-linhas-horarios > div {
+    display: flex;
+    gap: 0 2rem;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  #ver-linhas-horarios {
+    background-color: var(--bg);
+    color: var(--secondary-color);
+    padding: 1rem 4rem;
+
+    border: 1px solid var(--bg);
+    border-radius: 10px;
+
+    font-weight: 700;
+    font-size: 1.2rem;
+    font-family: Poppins, sans-serif;
+
+    width: 50%;
+
+    margin: 0.5rem 0px 0.1rem;
+    padding: 0.5rem;
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+  }
+
+  #ver-linhas-horarios > div > img {
+    height: 1.5rem;
   }
 
   /* Header Menu Lateral =======================================*/
@@ -554,6 +626,60 @@ footer a#sobre-projeto {
     margin: 0 auto;
   }
 
+  #header-menu-mobile {
+    top: 40px;
+    position: fixed;
+
+    height: 40px;
+    width: 100vw;
+
+    text-align: center;
+
+    cursor: pointer;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--primary-color);
+  }
+
+  #header-menu-mobile.show {
+    display: flex;
+  }
+
+  #fechar-linhas-horarios > div {
+    display: flex;
+    gap: 0 2rem;
+    align-items: center;
+  }
+
+  #fechar-linhas-horarios {
+    background-color: var(--bg);
+    color: var(--secondary-color);
+    padding: 1rem 4rem;
+
+    border: 1px solid var(--bg);
+    border-radius: 10px;
+
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: Poppins, sans-serif;
+
+    width: 70%;
+
+    padding: 0.3rem;
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+  }
+
+  #fechar-linhas-horarios > div > img {
+    height: 0.9rem;
+  }
+
   /* Mapa e Menu Lateral =======================================*/
 
   #mapa {
@@ -569,61 +695,38 @@ footer a#sobre-projeto {
   }
 
   #menu-lateral main {
-    padding: 0rem 0.2rem 6rem 1rem;
+    padding: 0 1rem 1rem 1rem;
   }
 
   #menu-lateral {
-    height: 80vh;
-    height: 80svh;
+    height: 0;
+    width: 100%;
     max-width: 100vw;
     background-color: var(--bg);
-    border-radius: 1rem 1rem 0 0;
-
-    top: 70vh;
-    top: 70svh;
 
     position: fixed;
-    overflow: hidden;
+    bottom: 0;
+    left: 0;
 
-    z-index: 9999;
+    z-index: 1000;
+
+    padding: 0 1rem 1rem 1rem;
+
+    overflow-y: auto;
+
+    transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
+    transform: translateY(100%);
+
+    display: none;
   }
 
-  /* Barra de puxar no mobile */
+  #menu-lateral.show {
+    height: calc(100vh - 80px);
+    top: 80px;
 
-  #menu-lateral main #handler-mobile {
+    transform: translateY(0);
+
     display: flex;
-    align-items: stretch;
-
-    padding-top: 2rem;
-
-    max-width: 100vw;
-    height: 100%;
-
-    position: sticky;
-    top: 0;
-
-    background-color: var(--bg);
-  }
-
-  main #handler-mobile #barra {
-    content: "";
-    position: absolute;
-    text-align: center;
-
-    left: calc(50% - 60px);
-
-    width: 120px;
-    height: 5px;
-
-    background-color: var(--secondary-color);
-    border-radius: 2rem;
-  }
-
-  main #handler-mobile hr {
-    border-bottom: 1px solid var(--bg-secondary);
-    width: 100vw;
-
-    margin: 20px 0 5px 0;
   }
 
   #menu-lateral > main > section.aviso {
