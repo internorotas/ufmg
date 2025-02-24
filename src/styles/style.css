@@ -187,33 +187,43 @@ button#linha:hover {
 
 /* Cada linha conta com uma cor diferente */
 
+.linha > button {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Adiciona profundidade */
+  border: 2px solid rgba(255,255,255,0.2); /* Borda de contraste */
+}
+
 .linha#linha-um > button {
-  background: #cd00ff;
-  color: var(--secondary-color);
+  background: #8A2BE2; /* Roxo mais profundo (original: #cd00ff) */
+  color: var(--secondary-color); 
 }
 
 .linha#linha-dois > button {
-  background: #d9383e;
+  background: #B22222; /* Vermelho terroso (original: #d9383e) */
   color: var(--secondary-color);
 }
 
 .linha#linha-tres > button {
-  background: #008f32;
+  background: #006400; /* Verde floresta (original: #008f32) */
   color: var(--secondary-color);
 }
 
 .linha#linha-quatro > button {
-  background: #3b49df;
+  background: #00008B; /* Azul marinho (original: #3b49df) */
   color: var(--secondary-color);
 }
 
 .linha#linha-tres-sabado > button {
-  background: #96002d;
+  background: #800020; /* Borgonha intenso (original: #96002d) */
   color: var(--secondary-color);
 }
 
 .linha#linha-dois-ferias > button {
-  background: #7b118a;
+  background: #4B0082; /* Índigo (original: #7b118a) */
+  color: var(--secondary-color);
+}
+
+.linha#linha-tres-ferias > button {
+  background: #D2691E; /* Índigo (original: #7b118a) */
   color: var(--secondary-color);
 }
 

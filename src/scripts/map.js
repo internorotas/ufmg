@@ -25,18 +25,19 @@ const tiles = L.tileLayer(
 tiles.addTo(map);
 
 let coresLinhas = [
-  "#cd00ff",
-  "#d9383e",
-  "#d9383e",
-  "#008f32",
-  "#008f32",
-  "#008f32",
-  "#3b49df",
-  "#3b49df",
-  "#3b49df",
-  "#3b49df",
-  "#96002d",
-  "#7b118a",
+  "#8A2BE2",
+  "#B22222",
+  "#B22222",
+  "#006400",
+  "#006400",
+  "#006400",
+  "#00008B",
+  "#00008B",
+  "#00008B",
+  "#00008B",
+  "#800020",
+  "#4B0082",
+  "#D2691E"
 ];
 
 let active_polyline = L.featureGroup().addTo(map);
