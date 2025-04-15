@@ -10,6 +10,10 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="theme-color" content="#2C0EEB" />
 
+        {/* Mobile Friendly */}
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/icon-192.png" />
+
         <title>Interno Rotas 🚌</title>
         <meta
           name="description"
