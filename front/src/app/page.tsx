@@ -1,103 +1,173 @@
+import Head from "next/head";
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <Head>
+        <meta charSet="UTF-8" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#2C0EEB" />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+        <title>Interno Rotas 🚌</title>
+        <meta
+          name="description"
+          content="Veja rotas e horários das linhas de ônibus internas do Campus Pampulha da UFMG"
+        />
+        <link rel="icon" href="/favicon.png" />
+
+        {/* Meta tags para redes sociais */}
+        <meta property="og:title" content="Interno Rotas 🚌" />
+        <meta
+          property="og:description"
+          content="Veja rotas e horários das linhas de ônibus internas do Campus Pampulha da UFMG"
+        />
+        <meta property="og:url" content="https://internorotas.github.io/ufmg/" />
+        <meta
+          property="og:image"
+          content="https://raw.githubusercontent.com/internorotas/ufmg/main/github/logo_Capa.svg"
+        />
+        <meta property="og:site_name" content="Interno Rotas 🚌" />
+        <meta property="og:type" content="website" />
+
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:title" content="Interno Rotas 🚌" />
+        <meta
+          property="twitter:description"
+          content="Veja rotas e horários das linhas de ônibus internas do Campus Pampulha da UFMG"
+        />
+        <meta
+          property="twitter:image"
+          content="https://raw.githubusercontent.com/internorotas/ufmg/main/github/logo_Capa.svg"
+        />
+
+        {/* Estilos e fontes */}
+        <link rel="stylesheet" href="/styles/style.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap"
+          rel="stylesheet"
+        />
+
+        {/* Leaflet CSS */}
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+          integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+          crossOrigin="anonymous"
+        />
+      </Head>
+      <main>
+        <div id="mapa"></div>
+
+        <div id="header-mobile">
+          <header>
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/logo-horizontal-transparente.svg"
+              alt="Logo Interno Rotas"
+              width={200}
+              height={50}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </header>
+          <section id="header-menu-mobile">
+            <button id="fechar-linhas-horarios" aria-label="Fechar Linhas e Horários">
+              <div>
+                <p>voltar ao mapa</p>
+                <Image src="/close-icon.svg" alt="Ícone de fechar" width={20} height={20} />
+              </div>
+            </button>
+          </section>
+        </div>
+
+        <div id="botao-mobile">
+          <button id="ver-linhas-horarios" aria-label="Ver Linhas e Horários">
+            <div>
+              <p>ver rotas e horários</p>
+              <Image src="/arrow-icon.svg" alt="Seta para direita" width={20} height={20} />
+            </div>
+          </button>
+        </div>
+
+        <div id="menu-lateral">
+          <header>
+            <Image
+              src="/logo-horizontal-transparente.svg"
+              alt="Logo Interno Rotas"
+              width={200}
+              height={50}
+            />
+          </header>
+
+          <main>
+            <section className="dia-itinerario">
+              <p>Dias Úteis</p>
+              <p>
+                <strong>UFMG</strong>
+              </p>
+            </section>
+
+            <section id="container-linhas-dias-uteis"></section>
+
+            <section className="dia-itinerario">
+              <p>Linha Sábado</p>
+            </section>
+            <section id="container-linhas-sabado"></section>
+
+            <section className="dia-itinerario">
+              <p>Linha Férias e Recessos</p>
+            </section>
+            <section id="container-linhas-ferias-recessos"></section>
+
+            <section className="aviso">
+              <p>
+                Informações extraídas do{" "}
+                <a href="https://ufmg.br/servicos/onibus" target="_blank">
+                  site da UFMG
+                </a>
+                .
+              </p>
+              <p>
+                Podem haver mudanças de itinerário e horários sem prévio aviso. Para informações,
+                reclamações, dúvidas e sugestões, entre em contato com a{" "}
+                <strong>Divisão de Transportes</strong>.
+              </p>
+              <p>
+                Telefones: <a href="tel:03134094601">3409–4601</a> ou{" "}
+                <a href="tel:03134094606">3409–4606</a>
+              </p>
+              <p>
+                E-mail: <a href="mailto:sfrota@dsg.ufmg.br">sfrota@dsg.ufmg.br</a>
+              </p>
+            </section>
+
+            <footer>
+              <section id="reportar-problema">
+                <button>Encontrou algum problema?</button>
+                <div id="container-problema-links" className="escondido">
+                  <p>
+                    Por gentileza, envie um email para{" "}
+                    <a href="mailto:igor44@ufmg.br">igor44@ufmg.br</a> ou me chame no{" "}
+                    <a href="https://www.instagram.com/titan.css/" target="_blank">
+                      Instagram
+                    </a>{" "}
+                    descrevendo o problema que irei corrigir o mais rápido possível!
+                  </p>
+                </div>
+              </section>
+              <a id="sobre-projeto" href="https://github.com/internorotas/ufmg" target="_blank">
+                Sobre o Projeto{" "}
+                <Image src="/external-link.svg" alt="Link Externo" width={16} height={16} />
+              </a>
+
+              <a id="creditos" href="https://github.com/igormartins4" target="_blank">
+                Desenvolvido com 💙 por Igor Martins
+              </a>
+            </footer>
+          </main>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    </>
   );
 }
