@@ -15,22 +15,28 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Interno Rotas 🚌",
   description:
-    "Veja rotas e horários das linhas de ônibus internos do Campus Pampulha da UFMG",
+    "Veja rotas e horários das linhas de ônibus internas do Campus Pampulha da UFMG",
+
+  metadataBase: new URL("https://internorotas.github.io/ufmg/"),
+  alternates: {
+    canonical: "https://internorotas.github.io/ufmg/",
+  },
 
   keywords: [
     "ônibus UFMG",
-    "rotas internos",
+    "rotas internas",
     "Campus Pampulha",
     "horários ônibus UFMG",
     "transporte universitário",
+    "mapa UFMG",
+    "ônibus interno",
+    "horário ônibus UFMG",
+    "restaurante universitário ufmg",
   ],
 
   authors: [{ name: "Igor Martins", url: "https://github.com/igormartins4" }],
-
   creator: "Igor Martins",
   publisher: "Igor Martins",
-
-  metadataBase: new URL("https://internorotas.github.io/ufmg/"),
 
   openGraph: {
     title: "Interno Rotas 🚌 - UFMG",
@@ -38,16 +44,16 @@ export const metadata: Metadata = {
       "Descubra as rotas e horários das linhas internas de ônibus no Campus Pampulha da UFMG.",
     url: "https://internorotas.github.io/ufmg/",
     siteName: "Interno Rotas",
+    locale: "pt_BR",
+    type: "website",
     images: [
       {
-        url: "https://internorotas.ufmg.br/og-image.png", // imagem de preview
+        url: "https://internorotas.github.io/ufmg/logo_Capa.png", // coloque essa imagem na pasta public/
         width: 1200,
         height: 630,
         alt: "Mapa de rotas internas da UFMG",
       },
     ],
-    locale: "pt_BR",
-    type: "website",
   },
 
   twitter: {
@@ -55,13 +61,38 @@ export const metadata: Metadata = {
     title: "Interno Rotas 🚌 - UFMG",
     description:
       "Veja horários e rotas dos ônibus internos do Campus Pampulha.",
-    site: "@ufmg",
+    site: "@titanmpolo",
     creator: "@internorotas",
-    images: ["https://internorotas.ufmg.br/og-image.png"],
+    images: ["https://internorotas.github.io/ufmg/logo_Capa.png"], // mesma imagem para Twitter
   },
 
-  themeColor: "#2C0EEB", // cor base da identidade visual (pode mudar)
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+    },
+  },
 
+  appleWebApp: {
+    title: "Interno Rotas",
+    capable: true,
+    statusBarStyle: "default",
+  },
+
+  // formatDetection: {
+  //   telephone: false,
+  //   email: false,
+  //   address: false,
+  // },
+
+  themeColor: "#2C0EEB",
+  applicationName: "Interno Rotas UFMG",
+  generator: "Next.js",
+  referrer: "origin-when-cross-origin",
+  category: "transportation",
   viewport: "width=device-width, initial-scale=1.0",
 };
 
