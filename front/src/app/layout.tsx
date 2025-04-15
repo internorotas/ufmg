@@ -94,6 +94,12 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   category: "transportation",
   viewport: "width=device-width, initial-scale=1.0",
+
+  // Adicionando manifest e favicon diretamente dentro do metadata
+  // other: [
+  //   <link rel="manifest" href="/manifest.json" />,
+  //   <link rel="icon" href="/icon-192.png" />,
+  // ],
 };
 
 export default function RootLayout({
