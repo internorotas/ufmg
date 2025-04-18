@@ -1,10 +1,10 @@
-// import Menu from "@/components/Menu/Menu";
-import Mapa from "@/components/Mapa";
+import Sidebar from "@/components/Sidebar/Sidebar";
+import Mapa from "@/components/Mapa/Mapa";
 
 export default function Home() {
   return (
     <>
-      {/* <Menu /> */}
+      <Sidebar />
       <Mapa />
     </>
   );
