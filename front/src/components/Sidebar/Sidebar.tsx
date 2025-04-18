@@ -189,7 +189,7 @@ export default function Sidebar() {
         </ul>
       </nav>
       <footer className="absolute bottom-0 w-full p-4 border-t border-gray-700">
-        <p className="text-sm text-gray-400">© 2023 Your Company</p>
+        <p className="text-sm text-gray-400">© 2025 - Interno Rotas</p>
       </footer>
     </div>
   );
