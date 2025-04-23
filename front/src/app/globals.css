@@ -2,7 +2,7 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --primary-color: #2C0EEB;
+  --primary-color: #2c0eeb;
   --secondary-color: #ecdcc4;
   --tertiary-color: #ffa400;
 
@@ -13,7 +13,7 @@
 @theme inline {
   --color-background: var(--primary-color);
   --color-foreground: var(--secondary-color);
-  
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

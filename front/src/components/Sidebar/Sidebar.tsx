@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function Sidebar() {
   return (
-    <div className="fixed top-4 left-4 h-[calc(100%-2rem)] w-[20%] bg-primary-color text-white shadow-lg z-50 rounded-lg flex flex-col">
+    <div className="fixed top-4 left-4 h-[calc(100%-2rem)] w-[20%] bg-internoRotasAzulRealeza text-white shadow-lg z-50 rounded-lg flex flex-col">
       {/* Header */}
       <header className="p-4 border-b border-gray-700 flex justify-center">
         <Image
