@@ -1,5 +1,16 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+
+// layout.tsx ou page.tsx (App Router)
+import { type Viewport } from 'next'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#2C0EEB',
+}
+
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -88,13 +99,11 @@ export const metadata: Metadata = {
   //   address: false,
   // },
 
-  themeColor: "#2C0EEB",
   applicationName: "Interno Rotas UFMG",
   generator: "Next.js",
   referrer: "origin-when-cross-origin",
   category: "transportation",
-  viewport: "width=device-width, initial-scale=1.0",
-
+  
   // Adicionando manifest e favicon diretamente dentro do metadata
   // other: [
   //   <link rel="manifest" href="/manifest.json" />,
