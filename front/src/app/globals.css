@@ -16,6 +16,13 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-internoRotas-azul-eletrico: #2c0eeb; /* Azul Elétrico */
+  --color-internoRotas-bege-areia: #ecdcc4; /* Bege Areia */
+  --color-internoRotas-laranja-ambar: #ffa400; /* Laranja Âmbar */
+
+  --color-internoRotas-preto-carvao: #1a1819; /* Preto Carvão */
+  --color-internoRotas-cinza-grafite: #3a3b3c; /* Cinza Grafite */
 }
 
 /* @media (prefers-color-scheme: dark) {
