@@ -3,9 +3,9 @@ import Image from "next/image";
 
 export default function Sidebar() {
   return (
-    <div className="fixed top-4 left-4 h-[calc(100%-2rem)] w-[20%] bg-internoRotasAzulRealeza text-white shadow-lg z-50 rounded-lg flex flex-col">
+    <div className="fixed top-4 left-4 h-[calc(100%-2rem)] w-[25%] bg-internoRotas-preto-carvao text-internoRotas-bege-areia shadow-lg z-50 rounded-2xl flex flex-col">
       {/* Header */}
-      <header className="p-4 border-b border-gray-700 flex justify-center">
+      <header className="p-4 bg-internoRotas-azul-eletrico flex justify-center rounded-tl-2xl rounded-tr-2xl shadow-md">
         <Image
           src="/logo-horizontal-transparente.svg"
           alt="Logo do Interno Rotas"
