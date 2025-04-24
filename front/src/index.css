@@ -72,39 +72,20 @@ button:focus-visible {
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-:root {
-  --primary-color: #2c0eeb;
-  --secondary-color: #ecdcc4;
-  --tertiary-color: #ffa400;
-
-  --bg: #1a1819;
-  --bg-secondary: #3a3b3c;
-}
-
 @theme inline {
-  --color-background: var(--primary-color);
-  --color-foreground: var(--secondary-color);
-
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-internoRotas-azul-eletrico: #2c0eeb; /* Azul Elétrico */
-  --color-internoRotas-bege-areia: #ecdcc4; /* Bege Areia */
-  --color-internoRotas-laranja-ambar: #ffa400; /* Laranja Âmbar */
+  --color-internoRotas-azul-eletrico: #2c0eeb;
+  --color-internoRotas-bege-areia: #ecdcc4;
+  --color-internoRotas-laranja-ambar: #ffa400;
 
-  --color-internoRotas-preto-carvao: #1a1819; /* Preto Carvão */
-  --color-internoRotas-cinza-grafite: #3a3b3c; /* Cinza Grafite */
+  --color-internoRotas-preto-carvao: #1a1819;
+  --color-internoRotas-cinza-grafite: #3a3b3c;
 }
-
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --primary-color: #0a0a0a;
-    --secondary-color: #ededed;
-  }
-} */
-
+/* 
 body {
   background: var(--primary-color);
   color: var(--secondary-color);
   font-family: Arial, Helvetica, sans-serif;
-}
+} */
