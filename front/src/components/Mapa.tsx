@@ -1,11 +1,15 @@
 import { MapContainer, TileLayer } from "react-leaflet";
+import { LatLngExpression } from "leaflet";
+
 import "leaflet/dist/leaflet.css";
 
 export default function Mapa() {
+  const center: LatLngExpression = [-19.870553062661006, -43.96775991703787];
+
   return (
     <MapContainer
-      center={[-19.9, -43.9]}
-      zoom={13}
+      center={center}
+      zoom={15}
       scrollWheelZoom={true}
       className="h-full w-full"
     >
