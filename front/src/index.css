@@ -12,9 +12,9 @@
   --color-internoRotas-preto-carvao: #1a1819;
   --color-internoRotas-cinza-grafite: #3a3b3c;
 }
-/* 
+
 body {
   background: var(--primary-color);
   color: var(--secondary-color);
-  font-family: Arial, Helvetica, sans-serif;
-} */
+  font-family: 'Poppins', sans-serif;
+}
