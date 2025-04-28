@@ -1,13 +1,13 @@
 export default function Sidebar() {
   return (
-     <div className="fixed top-4 left-4 h-[calc(100%-2rem)] w-[25%] bg-internoRotas-preto-carvao text-white shadow-lg z-50 rounded-lg flex flex-col">
+    <div className="fixed top-4 left-4 h-[calc(100%-2rem)] w-[25%] bg-internoRotas-preto-carvao text-white shadow-lg z-50 rounded-lg flex flex-col">
       {/* Header */}
-      <header className="p-4 border-b border-gray-700 flex justify-center">
+      <header className="p-4 flex justify-center bg-internoRotas-azul-eletrico rounded-l-2xl">
         <img
           src="src/assets/logo-horizontal-transparente.svg"
           alt="Logo do Interno Rotas"
-          width={150}
-          height={50}
+          width={200}
+          height={60}
         />
       </header>
 
@@ -41,6 +41,546 @@ export default function Sidebar() {
               Section 3
             </a>
           </li>
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
+          <li>
+            <a
+              href="#section4"
+              className="block hover:text-gray-300"
+              aria-label="Ir para a seção 4"
+            >
+              Section 4
+            </a>
+          </li>{" "}
           <li>
             <a
               href="#section4"
