@@ -1,15 +1,22 @@
 export default function Linha() {
   return (
-    <ul className="space-y-4">
-      <li>
-        <a
-          href="#section1"
-          className="block hover:text-gray-300"
-          aria-label="Ir para a seção 1"
-        >
-          Section 1
-        </a>
-      </li>
-    </ul>
+    <div>
+      <div>
+        <div>
+          <p>Anterior</p>
+          <p>20:00</p>
+        </div>
+        <div>
+          <p>Próximo</p>
+          <p>20:40</p>
+        </div>
+      </div>
+      <div>
+        <button>Itinerário</button>
+        <button>Mais horários</button>
+      </div>
+      <div>itinerario</div>
+      <div>horarios</div>
+    </div>
   );
 }

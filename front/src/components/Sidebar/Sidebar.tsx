@@ -19,15 +19,15 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <footer className="p-4 border-t border-gray-700 text-center not-italic">
+      <footer className="p-4 border-t border-gray-700 text-center">
         <a
           href="https://github.com/igormartins4"
           target="_blank"
           rel="noopener noreferrer"
           className="text-internoRotas-bege-areia"
         >
-          <p className="text-sm font-bold text-internoRotas-bege-areia ">
-           Desenvolvido com 💙 por Igor Martins
+          <p className="text-sm font-[600] text-internoRotas-bege-areia">
+            Desenvolvido com 💙 por Igor Martins
           </p>
         </a>
       </footer>
