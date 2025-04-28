@@ -11,6 +11,7 @@
     "deploy": "vite build && vite gh-pages"
   },
   "dependencies": {
+    "@fontsource/poppins": "^5.2.5",
     "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
