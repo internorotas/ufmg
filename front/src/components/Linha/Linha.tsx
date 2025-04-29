@@ -2,6 +2,10 @@ interface LinhaProps {
   numeroLinha: number;
 }
 
+interface CardComunicadoProps {
+  item: ComunicadoItem;
+}
+
 export default function Linha(data:LinhaProps, props: any) {
   // Aqui você pode usar o número da linha passado como prop  
   const numeroLinha = 1;
