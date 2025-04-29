@@ -14,7 +14,10 @@ export default function Sidebar() {
       </header>
 
       {/* Navigation */}
-      <nav className="p-4 flex-1 overflow-y-auto">
+      <nav className="py-4 flex-1 overflow-y-auto">
+        <Linha />
+        <Linha />
+        <Linha />
         <Linha />
       </nav>
 
