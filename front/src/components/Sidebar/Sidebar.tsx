@@ -15,10 +15,9 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="py-4 flex-1 overflow-y-auto">
-        <Linha />
-        <Linha />
-        <Linha />
-        <Linha />
+        <div>
+          <Linha key={1} codigo={1} />
+        </div>
       </nav>
 
       {/* Footer */}
