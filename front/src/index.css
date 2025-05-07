@@ -19,4 +19,5 @@ body {
   background: var(--primary-color);
   color: var(--secondary-color);
   font-family: 'Poppins', sans-serif;
+  font-display: swap; /* Evita FOIT */
 }
