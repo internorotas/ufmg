@@ -1,14 +1,13 @@
-// interface LinhaProps {
-//   numeroLinha: number;
-// }
+interface LinhaProps {
+  numeroLinha: number;
+}
 
-export default function Linha() {
-  
-  const numeroLinha = 1;
-
+export default function Linha({ numeroLinha }: LinhaProps) {
   return (
     <div className="flex flex-col text-center m-4 p-4">
-      <button className="text-2xl font-bold p-6 bg-amber-700 w-full rounded-4xl">Linha {numeroLinha}</button>
+      <button className="text-2xl font-bold p-6 bg-amber-700 w-full rounded-4xl">
+        Linha {numeroLinha}
+      </button>
 
       <div className="text-base flex justify-between items-center px-10">
         <div className="text-center">
@@ -20,7 +19,7 @@ export default function Linha() {
           <p>20:40</p>
         </div>
       </div>
-     
+
       <div>
         <button>Mais horários</button>
       </div>
