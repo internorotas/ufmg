@@ -2,8 +2,8 @@ import Linha from "../Linha/Linha";
 
 export default function Sidebar() {
   return (
-    <div className="fixed top-0 left-0 h-full w-72 bg-internoRotas-preto-carvao text-white shadow-lg z-50 rounded-r-4xl flex flex-col overflow-hidden">
-      <header className="w-full bg-internoRotas-azul-eletrico rounded-tr-2xl p-4 shadow-lg text-center flex justify-center items-center">
+    <div className="h-full w-full bg-internoRotas-preto-carvao text-white shadow-lg z-50 flex flex-col overflow-hidden">
+      <header className="w-full bg-internoRotas-azul-eletrico p-4 text-center flex justify-center items-center">
         <img
           src="src/assets/logo-horizontal-transparente.svg"
           alt="Logo do Interno Rotas"
@@ -27,7 +27,7 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      <footer className="w-full bg-internoRotas-preto-carvao text-internoRotas-bege-areia p-4 rounded-br-2xl shadow-lg text-center">
+      <footer className="w-full bg-internoRotas-preto-carvao text-internoRotas-bege-areia p-2 text-center">
         <a
           href="https://github.com/igormartins4"
           target="_blank"
