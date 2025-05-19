@@ -35,6 +35,18 @@ function criarHorarioHTML(index, idContainer, linha) {
   const itinerario = linha.itinerario.map(item => `<li>${item}</li>`).join("");
   const horarios = linha.horarios.map(item => `<li>${item}</li>`).join("");
 
+  // Verifica se a linha possui horários
+  if (!linha.horarios || linha.horarios.length === 0) {
+    return `
+      <div class="exibir-horario">
+        <div class="container-buttons">
+          <button class="mostrar-itinerario">Itinerário</button>
+        </div>
+        <div class="itinerario-interno escondido">${itinerario}</div>
+      </div>
+    `;
+  }
+
   return `
     <div class="exibir-horario">
       <div class="horario-atual">
