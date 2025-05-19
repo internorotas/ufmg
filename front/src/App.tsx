@@ -5,12 +5,12 @@ import Sidebar from "./components/Sidebar/Sidebar";
 
 function App() {
   return (
-    <div>
-      <div className="absolute inset-0 z-0">
-        <Mapa />
+    <div className="flex h-screen">
+      <div className="w-[30%] h-full">
+      <Sidebar />
       </div>
-      <div className="z-10 items-center justify-center">
-        <Sidebar />
+      <div className="w-[70%] h-full">
+      <Mapa />
       </div>
     </div>
   );
