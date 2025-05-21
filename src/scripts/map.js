@@ -4,10 +4,14 @@ import data from "./dadosRotas.js";
 console.log(data);
 
 // Abrindo o mapa com centro na UFMG e o zoom
-const map = L.map("mapa").setView([-19.870553062661006, -43.96775991703787], 15, {
-  maxZoom: 21,
-  zoomControl: true,
-});
+const map = L.map("mapa").setView(
+  [-19.870553062661006, -43.96775991703787],
+  15,
+  {
+    maxZoom: 21,
+    zoomControl: true,
+  }
+);
 
 // Atribuição requerida pelo OPSM para usar o seu mapa, é obrigatório pela licença
 const attribution =
@@ -37,7 +41,11 @@ let coresLinhas = [
   "#00008B",
   "#800020",
   "#4B0082",
-  "#D2691E"
+  "#D2691E",
+
+  "#228B22",
+  "#C00000",
+  "#3b49df",
 ];
 
 let active_polyline = L.featureGroup().addTo(map);
@@ -73,7 +81,7 @@ const stationIcon = L.icon({
   iconUrl: "./src/assets/marker.svg",
   iconSize: [30, 30],
   iconAnchor: [20, 20],
-  popupAnchor: [-5, -18]
+  popupAnchor: [-5, -18],
 });
 
 for (let i = 0; i < data.paradas.length; i++) {
