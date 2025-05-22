@@ -182,6 +182,7 @@ function configurarEventosMenu() {
 }
 
 // Inicializa o aplicativo
+imprimeLinhas(data.mostraSuaUfmg, "container-rotas-mostra-ufmg");
 imprimeLinhas(data.diasUteis, "container-linhas-dias-uteis");
 imprimeLinhas(data.sabado, "container-linhas-sabado");
 imprimeLinhas(data.feriasRecessos, "container-linhas-ferias-recessos");
