@@ -29,9 +29,9 @@ const tiles = L.tileLayer(
 tiles.addTo(map);
 
 let coresLinhas = [
-  "#228B22",
-  "#C00000",
-  "#3b49df",
+  // "#228B22",
+  // "#C00000",
+  // "#3b49df",
 
   "#8A2BE2",
   "#B22222",
