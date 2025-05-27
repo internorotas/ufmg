@@ -18,6 +18,48 @@
 body {
   background: var(--primary-color);
   color: var(--secondary-color);
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-display: swap; /* Evita FOIT */
+}
+
+/* Animação para o leaflet-ant-path */
+@keyframes leaflet-ant-path-animation {
+  from {
+    stroke-dashoffset: 100%;
+  }
+  to {
+    stroke-dashoffset: 0%;
+  }
+}
+
+path.leaflet-ant-path {
+  fill: none;
+  animation: linear infinite leaflet-ant-path-animation;
+}
+
+path.leaflet-ant-path__hardware-acceleration {
+  transform: translateZ(0);
+}
+
+path.leaflet-ant-path__reverse {
+  animation-direction: reverse;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background-color: var(--color-internoRotas-preto-carvao) !important;
+  color: var(--color-internoRotas-bege-areia) !important;
+  font-family: "Poppins", sans-serif;
+  border-radius: 8px;
+}
+
+.leaflet-popup-content h4 {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.leaflet-popup-content p {
+  font-size: 0.9rem;
+  margin: 2px 0;
 }
