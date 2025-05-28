@@ -14,12 +14,20 @@
 
   --font-poppins: Poppins, sans-serif;
 }
+* {
+  font-family: var(--font-poppins);
+  font-display: swap;
+}
+
+html,
+body {
+  font-family: var(--font-poppins);
+  font-display: swap;
+}
 
 body {
   background: var(--primary-color);
   color: var(--secondary-color);
-  font-family: "Poppins", sans-serif;
-  font-display: swap; /* Evita FOIT */
 }
 
 /* Animação para o leaflet-ant-path */
@@ -49,7 +57,7 @@ path.leaflet-ant-path__reverse {
 .leaflet-popup-tip {
   background-color: var(--color-internoRotas-preto-carvao) !important;
   color: var(--color-internoRotas-bege-areia) !important;
-  font-family: "Poppins", sans-serif;
+  font-family: var(--font-poppins);
   border-radius: 8px;
 }
 
