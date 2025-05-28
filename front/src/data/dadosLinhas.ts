@@ -1,4 +1,4 @@
-import { DadosLinhas } from '../interfaces/data.types';
+import { DadosLinhas } from '../types/data.types';
 
 const data: DadosLinhas = {
   diasUteis: [
