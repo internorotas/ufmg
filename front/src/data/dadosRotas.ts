@@ -1,4 +1,4 @@
-import { DadosRotas } from '../interfaces/data.types';
+import { DadosRotas } from '../types/data.types';
 
 const data: DadosRotas = {
   rotas: [
