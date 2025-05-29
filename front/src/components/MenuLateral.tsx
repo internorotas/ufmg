@@ -33,7 +33,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
       <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[1001]">
         <button
           onClick={() => setMenuVisible(true)}
-          className="bg-[#1a1819] text-gray-200 py-3 px-6 rounded-lg shadow-lg flex items-center gap-4 font-bold border-2 border-gray-700"
+          className="bg-internoRotas-preto-carvao text-internoRotas-bege-areia py-3 px-6 rounded-lg shadow-lg flex items-center gap-4 font-bold border-2 border-internoRotas-cinza-grafite"
         >
           Ver Rotas e Horários <img src={arrowIcon} alt="->" className="h-4" />
         </button>
@@ -41,20 +41,20 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
       {isMenuVisible && (
         <div
           onClick={() => setMenuVisible(false)}
-          className="md:hidden fixed inset-0 bg-black/60 z-[1002]"
+          className="md:hidden fixed inset-0 bg-internoRotas-preto-carvao/60 z-[1002]"
         ></div>
       )}
       <div
-        className={`fixed md:relative top-0 left-0 h-full w-4/5 max-w-sm md:w-96 bg-[#1a1819] text-gray-200 z-[1003] transform transition-transform duration-300 ${
+        className={`fixed md:relative top-0 left-0 h-full w-4/5 max-w-sm md:w-96 bg-internoRotas-preto-carvao text-internoRotas-bege-areia z-[1003] transform transition-transform duration-300 ${
           isMenuVisible ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
-        <header className="bg-[#2c0eeb] p-3 flex justify-center items-center h-14">
+        <header className="bg-internoRotas-azul-eletrico p-3 flex justify-center items-center h-14">
           <img src={logo} alt="Logo Interno Rotas" className="h-8" />
         </header>
         <button
           onClick={() => setMenuVisible(false)}
-          className="md:hidden absolute top-3 right-3 text-white p-1"
+          className="md:hidden absolute top-3 right-3 text-internoRotas-bege-areia p-1"
         >
           <img src={closeIcon} alt="Fechar" className="h-6 w-6" />
         </button>
@@ -70,7 +70,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
               key={`uteis-${index}`}
               linha={linha}
               onLinhaClick={() => handleLinhaClickAndCloseMenu(index, linha)}
-              bgColor={colorMap[linha.tipo] || "bg-gray-500"}
+              bgColor={colorMap[linha.tipo] || "bg-internoRotas-cinza-grafite"}
             />
           ))}
           <section className="dia-itinerario flex justify-between font-medium text-lg mt-4 mb-2 px-1">
@@ -86,7 +86,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
                   linha
                 )
               }
-              bgColor={colorMap[linha.tipo] || "bg-gray-500"}
+              bgColor={colorMap[linha.tipo] || "bg-internoRotas-cinza-grafite"}
             />
           ))}
           <section className="dia-itinerario flex justify-between font-medium text-lg mt-4 mb-2 px-1">
@@ -104,7 +104,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
                   linha
                 )
               }
-              bgColor={colorMap[linha.tipo] || "bg-gray-500"}
+              bgColor={colorMap[linha.tipo] || "bg-internoRotas-cinza-grafite"}
             />
           ))}
         </main>
