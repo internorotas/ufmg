@@ -33,7 +33,7 @@ export function LinhaOnibus({
     <div className="mb-2">
       <button
         onClick={onLinhaClick}
-        className={`w-full p-2 rounded-lg text-white font-bold flex justify-between items-center transition-colors shadow-md ${bgColor}`}
+        className={`w-full p-2 rounded-t-lg text-white font-bold flex justify-between items-center transition-colors shadow-md ${bgColor}`}
       >
         <div
           className="text-left"
@@ -43,47 +43,51 @@ export function LinhaOnibus({
         />
       </button>
 
-      <div className="py-2 px-1">
+      <div className="py-2 px-1 bg-internoRotas-cinza-grafite rounded-b-lg">
         <div className="flex space-x-2 mb-2">
           <button
-        onClick={handleItinerarioToggle}
-        className="text-sm bg-gray-700 hover:bg-gray-600 text-internoRotas-bege-areia px-3 py-1 rounded-md transition-colors"
+            onClick={handleItinerarioToggle}
+            className="text-sm bg-internoRotas-preto-carvao hover:bg-gray-600 text-internoRotas-bege-areia px-3 py-1 rounded-md transition-colors"
           >
-        {isItinerarioVisible ? "Esconder" : "Ver"} Itinerário
+            {isItinerarioVisible ? "Esconder" : "Ver"} Itinerário
           </button>
           <button
-        onClick={handleHorariosToggle}
-        className="text-sm bg-gray-700 hover:bg-gray-600 text-internoRotas-bege-areia px-3 py-1 rounded-md transition-colors"
+            onClick={handleHorariosToggle}
+            className="text-sm bg-internoRotas-preto-carvao hover:bg-gray-600 text-internoRotas-bege-areia px-3 py-1 rounded-md transition-colors"
           >
-        {isHorariosVisible ? "Esconder" : "Ver"} Horários
+            {isHorariosVisible ? "Esconder" : "Ver"} Horários
           </button>
         </div>
 
         <div
           className={`transition-all duration-700 ease-out overflow-hidden ${
-        isItinerarioVisible ? "max-h-screen opacity-100 mt-2" : "max-h-0 opacity-0"
+            isItinerarioVisible
+              ? "max-h-screen opacity-100 mt-2"
+              : "max-h-0 opacity-0"
           }`}
         >
           {isItinerarioVisible && (
-        <ul className="bg-gray-800 p-4 rounded-md text-sm list-disc list-inside space-y-1">
-          {linha.itinerario.map((item, index) => (
-        <li key={index}>{item}</li>
-          ))}
-        </ul>
+            <ul className="bg-gray-800 p-4 rounded-md text-sm list-disc list-inside space-y-1">
+              {linha.itinerario.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
           )}
         </div>
 
         <div
           className={`transition-all duration-700 ease-out overflow-hidden ${
-        isHorariosVisible ? "max-h-screen opacity-100 mt-2" : "max-h-0 opacity-0"
+            isHorariosVisible
+              ? "max-h-screen opacity-100 mt-2"
+              : "max-h-0 opacity-0"
           }`}
         >
           {isHorariosVisible && (
-        <ul className="bg-gray-800 p-4 rounded-md text-sm list-disc list-inside space-y-1">
-          {linha.horarios.map((item, index) => (
-        <li key={index}>{item}</li>
-          ))}
-        </ul>
+            <ul className="bg-gray-800 p-4 rounded-md text-sm list-disc list-inside space-y-1">
+              {linha.horarios.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
           )}
         </div>
       </div>
