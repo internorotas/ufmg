@@ -19,17 +19,17 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
   };
 
   const colorMap: { [key: string]: string } = {
-    "um": "bg-violet-600 hover:bg-violet-700",
-    "dois": "bg-red-700 hover:bg-red-800",
-    "tres": "bg-green-800 hover:bg-green-900",
-    "quatro": "bg-blue-800 hover:bg-blue-900",
+    um: "bg-violet-600 hover:bg-violet-700",
+    dois: "bg-red-700 hover:bg-red-800",
+    tres: "bg-green-800 hover:bg-green-900",
+    quatro: "bg-blue-800 hover:bg-blue-900",
     "tres-sabado": "bg-red-900 hover:bg-red-950",
     "dois-ferias": "bg-indigo-800 hover:bg-indigo-900",
     "tres-ferias": "bg-orange-700 hover:bg-orange-800",
   };
 
   return (
-    <>
+    <div>
       <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[1001]">
         <button
           onClick={() => setMenuVisible(true)}
@@ -109,6 +109,6 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
           ))}
         </main>
       </div>
-    </>
+    </div>
   );
 }
