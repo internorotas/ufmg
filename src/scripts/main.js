@@ -1,7 +1,7 @@
 import data from "./dadosLinhas.js";
 import exibeLinha from "./map.js";
 
-const periodoFerias = false;
+const periodoFerias = true;
 
 console.log(data);
 
