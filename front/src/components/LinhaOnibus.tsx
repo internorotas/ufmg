@@ -44,19 +44,28 @@ export function LinhaOnibus({
       </button>
 
       <div className="py-2 px-1 bg-internoRotas-cinza-grafite rounded-b-lg">
-        <div className="flex space-x-2 mb-2">
-          <button
-            onClick={handleItinerarioToggle}
-            className="text-sm bg-internoRotas-preto-carvao hover:bg-gray-600 text-internoRotas-bege-areia px-3 py-1 rounded-md transition-colors"
-          >
-            {isItinerarioVisible ? "Esconder" : "Ver"} Itinerário
-          </button>
-          <button
-            onClick={handleHorariosToggle}
-            className="text-sm bg-internoRotas-preto-carvao hover:bg-gray-600 text-internoRotas-bege-areia px-3 py-1 rounded-md transition-colors"
-          >
-            {isHorariosVisible ? "Esconder" : "Ver"} Horários
-          </button>
+        <div className="p-4 bg-internoRotas-cinza-grafite text-white">
+          <div className="flex justify-between text-center mb-4">
+            <div>
+              <p className="text-sm text-gray-400">Anterior</p>
+              <p className="text-2xl font-bold">00:00</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">Próximo</p>
+              <p className="text-2xl font-bold">00:00</p>
+            </div>
+          </div>
+          <div className="flex justify-between space-x-2">
+            <button
+              onClick={onLinhaClick}
+              className="flex-1 text-sm bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors"
+            >
+              Itinerário
+            </button>
+            <button className="flex-1 text-sm bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors">
+              Mais horários
+            </button>
+          </div>
         </div>
 
         <div
