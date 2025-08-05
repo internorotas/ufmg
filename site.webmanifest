@@ -1,0 +1,21 @@
+{
+  "name": "Interno Rotas - UFMG",
+  "short_name": "Interno Rotas",
+  "start_url": "/ufmg/",
+  "display": "standalone",
+  "background_color": "#2c0eeb",
+  "theme_color": "#2c0eeb",
+  "description": "Planeje seus trajetos no campus Pampulha da UFMG com o Interno Rotas. Acesse um mapa interativo com as rotas e os horários em tempo real dos ônibus internos para otimizar seu tempo.",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/internorotas/ufmg/main/src/assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/internorotas/ufmg/main/src/assets/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
