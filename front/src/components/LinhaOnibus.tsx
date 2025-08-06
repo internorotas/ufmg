@@ -57,12 +57,15 @@ export function LinhaOnibus({
           </div>
           <div className="flex justify-between space-x-2">
             <button
-              onClick={onLinhaClick}
+              onClick={handleItinerarioToggle}
               className="flex-1 text-sm bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors"
             >
               Itinerário
             </button>
-            <button className="flex-1 text-sm bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors">
+            <button
+              onClick={handleHorariosToggle}
+              className="flex-1 text-sm bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors"
+            >
               Mais horários
             </button>
           </div>
