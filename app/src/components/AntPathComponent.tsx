@@ -3,8 +3,9 @@ import { useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-ant-path";
 
+import { LatLngExpression } from "leaflet";
 interface AntPathProps {
-  coordinates: [number, number][];
+  coordinates: LatLngExpression[];
   options: L.PathOptions & { delay?: number; use?: string | boolean };
 }
 

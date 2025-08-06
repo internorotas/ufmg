@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { LinhaOnibus } from "./LinhaOnibus";
-import { DadosLinhas, Linha } from "../types/data.types";
+import { Linha, DadosLinhas } from "../types/data.types";
 import logo from "../assets/logo-horizontal-transparente.svg";
 import arrowIcon from "../assets/arrow-icon.svg";
 import closeIcon from "../assets/close-icon.svg";
@@ -65,7 +65,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
               <strong>UFMG</strong>
             </p>
           </section>
-          {linhasData.diasUteis.map((linha, index) => (
+          {linhasData.diasUteis.map((linha: Linha, index: number) => (
             <LinhaOnibus
               key={`uteis-${index}`}
               linha={linha}
@@ -76,7 +76,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
           <section className="dia-itinerario flex justify-between font-medium text-lg mt-4 mb-2 px-1">
             <p>Linha Sábado</p>
           </section>
-          {linhasData.sabado.map((linha, index) => (
+          {linhasData.sabado.map((linha: Linha, index: number) => (
             <LinhaOnibus
               key={`sabado-${index}`}
               linha={linha}
@@ -92,7 +92,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
           <section className="dia-itinerario flex justify-between font-medium text-lg mt-4 mb-2 px-1">
             <p>Férias e Recessos</p>
           </section>
-          {linhasData.feriasRecessos.map((linha, index) => (
+          {linhasData.feriasRecessos.map((linha: Linha, index: number) => (
             <LinhaOnibus
               key={`ferias-${index}`}
               linha={linha}
