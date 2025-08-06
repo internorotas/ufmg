@@ -9,7 +9,7 @@ import "@fontsource/poppins/700.css"; // bold
 
 import "./index.css";
 
-import { App } from "./App.tsx";
+import { App } from "./App";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -1,4 +1,5 @@
-import { DadosRotas } from '../types/data.types';
+
+import { DadosRotas } from "../types/data.types";
 
 const data: DadosRotas = {
   rotas: [
@@ -188,6 +189,7 @@ const data: DadosRotas = {
     {
       linha: 1,
       sublinha: null,
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -354,6 +356,7 @@ const data: DadosRotas = {
     {
       linha: 2,
       sublinha: null,
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -530,6 +533,7 @@ const data: DadosRotas = {
     {
       linha: 2,
       sublinha: "Retorno na Área Militar",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -725,6 +729,7 @@ const data: DadosRotas = {
     {
       linha: 3,
       sublinha: "Férias e Recessos",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -867,6 +872,7 @@ const data: DadosRotas = {
     {
       linha: 3,
       sublinha: "Retorno na Área Militar",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -1028,6 +1034,7 @@ const data: DadosRotas = {
     {
       linha: 3,
       sublinha: "Atendimento ao BH-Tec",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -1230,6 +1237,7 @@ const data: DadosRotas = {
     {
       linha: 4,
       sublinha: null,
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -1358,6 +1366,7 @@ const data: DadosRotas = {
     {
       linha: 4,
       sublinha: "Retorno na Área Militar",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -1523,6 +1532,7 @@ const data: DadosRotas = {
     {
       linha: 4,
       sublinha: "Atendimento ao Ponto McDonald's",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -1717,6 +1727,7 @@ const data: DadosRotas = {
     {
       linha: 4,
       sublinha: "Atendimento ao BH-Tec e McDonald's",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -1921,6 +1932,7 @@ const data: DadosRotas = {
     {
       linha: 3,
       sublinha: "Sábado",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -2062,6 +2074,7 @@ const data: DadosRotas = {
     {
       linha: 2,
       sublinha: "Férias e Recessos",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -2237,6 +2250,7 @@ const data: DadosRotas = {
     {
       linha: 3,
       sublinha: "Sábado",
+      cor: "",
       coordinates: [
         [-19.86203, -43.96243],
         [-19.86177, -43.96209],
@@ -2376,330 +2390,7 @@ const data: DadosRotas = {
       ],
     },
   ],
-  paradas: [
-    // Começando pela Linha 02
-    {
-      nome: "Escola de Música (Ida)",
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)",
-        "Linha 03 (Todas)",
-        "Linha 04 (Todas)",
-      ],
-      coordinates: [-19.86287799458614, -43.961197296562915],
-    },
-    {
-      nome: "Belas Artes (Ida)",
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)",
-        "Linha 03 (Todas)",
-        "Linha 04 (Todas)",
-      ],
-      coordinates: [-19.864005462253772, -43.96029825730666],
-    },
-    {
-      nome: "CAD 2 - Letras - Ciência da Informação - FAFICH (Ida)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.865026983179526, -43.961424437234214],
-    },
-    {
-      nome: "Reitoria - FACE (Ida)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.866801812650163, -43.963722425199386],
-    },
-    {
-      nome: "Praça de Serviços – Biblioteca Universitária – Reitoria (Ida)",
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)",
-        "Linha 03 (Todas)",
-        "Linha 04 (Todas)",
-      ],
-      coordinates: [-19.866306847634856, -43.9652399167434],
-    },
-    {
-      nome: "Unidade Administrativa III",
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)",
-        "Linha 03 (Todas) (Volta)",
-      ],
-      coordinates: [-19.862289079650914, -43.96406056180162],
-    },
-    {
-      nome: "Unidade Administrativa II (Ida)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.862539674966527, -43.96713237253709],
-    },
-    {
-      nome: "Av. Antônio Abrahão Caram (em frente ao Restaurante Farroupilha) (Ida)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.8626495277957, -43.96993297019641],
-    },
-    {
-      nome: "Centro Esportivo Universitário - CEU (Ida)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.86634692381805, -43.97313237352062],
-    },
-    {
-      nome: "Veterinária (Lado de Fora) - CEU  (Ida)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.868652895489674, -43.97225744035409],
-    },
-    {
-      nome: "Centro de Treinamento Esportivo - CTE (Ida)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.869852627120906, -43.97545081272303],
-    },
-    {
-      nome: "Av.Presidente Carlos Luz (em frente McDonald's) (Ida)",
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)",
-        "Linha 04 (Atendimento ao ponto McDonald's e/ou BH-Tec)",
-      ],
-      coordinates: [-19.87334489433249, -43.97710039322493],
-    },
-    {
-      nome: "EEFFTO (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.876632574930333, -43.97571363916382],
-    },
-    {
-      nome: "Odontologia (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.87328246300903, -43.97348575014181],
-    },
-    {
-      nome: "Veterinária - Estação Ecológica (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.871816972689945, -43.97046642831759],
-    },
-    {
-      nome: "Farmácia (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.87024439190227, -43.96839369702036],
-    },
-    {
-      nome: "Restaurante Universitário Setorial II (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.869982361625382, -43.96667044024115],
-    },
-    {
-      nome: "Física – Engenharia Elétrica (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.870752293238624, -43.96531645193499],
-    },
-    {
-      nome: "CNEN / CDTN (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.873184994054483, -43.966534085339894],
-    },
-    {
-      nome: "Centro de Pesquisa e Recursos Hídricos (CPH) - Túnel de Vento (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.874441354711273, -43.967735795957495],
-    },
-    {
-      nome: "CNEN / CDTN - Final da Linha 9502 (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.87318008718384, -43.96626798814181],
-    },
-    {
-      nome: "CAD 3 - Química - Colégio Técnico (COLTEC) (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)"],
-      coordinates: [-19.870788120876036, -43.9650737061928],
-    },
-    {
-      nome: "ICEX - Engenharia (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.869555795528473, -43.963949680063905],
-    },
-    {
-      nome: "Geociências (Volta)",
-      linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.86872536254893, -43.96290638484716],
-    },
-    {
-      nome: "Restaurante Universitário Setorial I (Entrada Rampa) (Volta)",
-      linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.8689961617339, -43.960109940258924],
-    },
-    {
-      nome: "FAE - Centro Pedagógico (Volta)",
-      linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.867834336840456, -43.958552358960816],
-    },
-    {
-      nome: "Creche da UFMG (Volta)",
-      linhaAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.864795131981317, -43.95928985684761],
-    },
-    {
-      nome: "Belas Artes (Volta)",
-
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)",
-        "Linha 03 (Todas)",
-        "Linha 04 (Todas)",
-      ],
-      coordinates: [-19.863942344424277, -43.9600520561966],
-    },
-    {
-      nome: "Escola de Música (Volta)",
-      linhaAtendidas: [
-        "Linha 01",
-        "Linha 02 (Todas)",
-        "Linha 03 (Todas)",
-        "Linha 04 (Todas)",
-      ],
-      coordinates: [-19.862868916085574, -43.96100450532476],
-    },
-    // Continuando com o Linha 01
-    // {
-    //   nome: "ICEX - FACE (Volta)",
-    //   linhaAtendidas: ["Linha 01"],
-    //   coordinates: [-19.868409927713813, -43.96352635935817],
-    // },
-    {
-      nome: "CAD 2 - Letras - Ciência da Informação - FAFICH (Volta)",
-      linhaAtendidas: ["Linha 01", "Linha 03 (Todas)"],
-      coordinates: [-19.865724373667415, -43.961750820377226],
-    },
-    // Continuando com o Linha 03
-    {
-      nome: "Creche da UFMG (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.86519700179325, -43.95928709454078],
-    },
-    {
-      nome: "FAE - Centro Pedagógico (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.867799194741085, -43.958920546798744],
-    },
-    {
-      nome: "Restaurante Universitário Setorial I (Entrada Rampa) (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.868837316782614, -43.96027282842894],
-    },
-    // {
-    //   nome: "Geociências (Ida)",
-    //   linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-    //   coordinates: [-19.86859335063858, -43.9630303217288],
-    // },
-    {
-      nome: "ICEX - FACE",
-      linhaAtendidas: [
-        "Linha 03 (Todas) (Ida)",
-        "Linha 04 (Todas) (Ida)",
-        "Linha 01 (Volta)",
-      ],
-      coordinates: [-19.8682506314667, -43.96359821849866],
-    },
-    {
-      nome: "CAD 1 - ICB (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.86720214489026, -43.96725778862436],
-    },
-    {
-      nome: "Biotério Central - ICB (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.86854229636154, -43.967920147732734],
-    },
-    {
-      nome: "Farmácia (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.870043672302177, -43.968596159091305],
-    },
-    {
-      nome: "Veterinária - Estação Ecológica (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.871481650764963, -43.970445558741844],
-    },
-    {
-      nome: "Odontologia (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.87283785450227, -43.97344409249714],
-    },
-    {
-      nome: "EEFFTO (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
-      coordinates: [-19.876394774914708, -43.97594804676533],
-    },
-    {
-      nome: "Av.Presidente Carlos Luz (em frente McDonald's) (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)"],
-      coordinates: [-19.87339309568137, -43.976607144376736],
-    },
-
-    {
-      nome: "CEU - Veterinária (Lado de Fora) (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)"],
-      coordinates: [-19.86967940665683, -43.9723549563709],
-    },
-    // {
-    //   nome: "Avenida C (Ida)",
-    //   linhaAtendidas: ["Linha 03 (Todas)"],
-    //   coordinates: [-19.864246036343225, -43.969652967111415],
-    // },
-    {
-      nome: "Av. Antônio Abrahão Caram (em frente ao Restaurante Farroupilha) (Ida)",
-      linhaAtendidas: ["Linha 03 (Todas)"],
-      coordinates: [-19.862973316654763, -43.96959700070347],
-    },
-    {
-      nome: "Unidade Administrativa II (Volta)",
-      linhaAtendidas: ["Linha 03 (Todas)"],
-      coordinates: [-19.862750703381952, -43.96736279706283],
-    },
-    {
-      nome: "Reitoria (Volta)",
-      linhaAtendidas: ["Linha 03 (Todas)"],
-      coordinates: [-19.86534055790254, -43.96384762039304],
-    },
-    {
-      nome: "Rua Prof. Eduardo M. Guimarães - Reitoria (Volta)",
-      linhaAtendidas: ["Linha 03 (Todas)"],
-      coordinates: [-19.865614864852443, -43.96243719367546],
-    },
-    // Linha 02, 03 e 04 com retorno na área militar
-    {
-      nome: "Restaurante Universitário Setorial I (Entrada Escada)",
-      linhaAtendidas: [
-        "Linha 02 (Retorno na Área Militar) (Volta)",
-        "Linha 04 (Retorno na Área Militar) (Volta)",
-      ],
-      coordinates: [-19.869980968928637, -43.96033490875403],
-    },
-    {
-      nome: "Restaurante Universitário Setorial I - Portaria Área Militar",
-      linhaAtendidas: [
-        "Linha 02 (Retorno na Área Militar) (Volta)",
-        "Linha 03 (Retorno na Área Militar) (Ida)",
-        "Linha 04 (Retorno na Área Militar) (Volta)",
-      ],
-      coordinates: [-19.870083909625748, -43.95992714744056],
-    },
-    // Linha 03 e 04 BH-Tec
-    // {
-    //   nome: "Rua Prof. José Vieira Mendonça (Ida)",
-    //   linhaAtendidas: [
-    //     "Linha 03 (Atendimento ao BH-Tec)",
-    //     "Linha 04 (Atendimento ao BH-Tec)",
-    //   ],
-    //   coordinates: [-19.88147964961293, -43.97753822655314],
-    // },
-    {
-      nome: "BH-Tec (Ida)",
-      linhaAtendidas: [
-        "Linha 03 (Atendimento ao BH-Tec)",
-        "Linha 04 (Atendimento ao BH-Tec)",
-      ],
-      coordinates: [-19.88434212304126, -43.97543339398637],
-    },
-  ],
+  // bloco de paradas removido completamente
 };
 
 export default data;

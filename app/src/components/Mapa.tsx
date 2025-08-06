@@ -1,13 +1,13 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
-import { AntPathComponent } from "./AntPathComponent.tsx";
-import { Rota, Parada } from "../types/data.types.ts";
+import { AntPathComponent } from "./AntPathComponent";
+import { Rota, Parada } from "../types/data.types";
 import { useEffect } from "react";
 
 interface MapaProps {
   paradas: Parada[];
   rotaSelecionada: Rota | null;
-  coresLinhas: string[];
+  coresLinhas?: string[];
 }
 
 const stationIcon = L.icon({
@@ -64,12 +64,12 @@ export function Mapa({ paradas, rotaSelecionada, coresLinhas }: MapaProps) {
       {rotaSelecionada && (
         <AntPathComponent
           key={rotaSelecionada.linha + (rotaSelecionada.sublinha || "")}
-          coordinates={rotaSelecionada.coordinates}
+          coordinates={rotaSelecionada.coordinates as [number, number][]}
           options={{
             delay: 600,
             dashArray: [20, 100],
             weight: 8,
-            color: coresLinhas[rotaSelecionada.linha - 1] || "#FF0000",
+            color: (coresLinhas && coresLinhas[rotaSelecionada.linha - 1]) || "#FF0000",
           }}
         />
       )}

@@ -1,5 +1,6 @@
-import { DadosLinhas } from '../types/data.types';
+// import removido, tipo não existe
 
+import { DadosLinhas } from "../types/data.types";
 const data: DadosLinhas = {
   diasUteis: [
     {

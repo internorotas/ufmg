@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "npm install && npm run build",
+			"label": "Corrigir e construir o projeto",
+			"group": "build",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"args": []
+		}
+	]
+}
