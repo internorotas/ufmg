@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Linha } from "../types/data.types";
 
 interface LinhaOnibusProps {
@@ -7,6 +7,61 @@ interface LinhaOnibusProps {
   bgColor: string;
 }
 
+// Função para converter horário "HH:MM" em minutos desde meia-noite
+const timeToMinutes = (time: string): number => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+// Função para converter minutos de volta para "HH:MM"
+const minutesToTime = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+};
+
+// Função para calcular próximo e anterior horário
+const calculateNextAndPreviousSchedule = (horarios: string[]) => {
+  if (!horarios || horarios.length === 0) {
+    return { nextSchedule: "--:--", previousSchedule: "--:--" };
+  }
+
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  
+  const schedulesInMinutes = horarios
+    .filter(time => time && time.includes(':')) // Filtrar horários válidos
+    .map(timeToMinutes)
+    .sort((a, b) => a - b);
+  
+  if (schedulesInMinutes.length === 0) {
+    return { nextSchedule: "--:--", previousSchedule: "--:--" };
+  }
+  
+  let nextSchedule = "--:--";
+  let previousSchedule = "--:--";
+  
+  // Encontrar próximo horário
+  const next = schedulesInMinutes.find(schedule => schedule > currentMinutes);
+  if (next !== undefined) {
+    nextSchedule = minutesToTime(next);
+  } else if (schedulesInMinutes.length > 0) {
+    // Se não há mais horários hoje, o próximo é o primeiro de amanhã
+    nextSchedule = minutesToTime(schedulesInMinutes[0]);
+  }
+  
+  // Encontrar horário anterior
+  const previousSchedules = schedulesInMinutes.filter(schedule => schedule < currentMinutes);
+  if (previousSchedules.length > 0) {
+    previousSchedule = minutesToTime(Math.max(...previousSchedules));
+  } else if (schedulesInMinutes.length > 0) {
+    // Se não há horários anteriores hoje, o anterior é o último de ontem
+    previousSchedule = minutesToTime(schedulesInMinutes[schedulesInMinutes.length - 1]);
+  }
+  
+  return { nextSchedule, previousSchedule };
+};
+
 export function LinhaOnibus({
   linha,
   onLinhaClick,
@@ -14,6 +69,12 @@ export function LinhaOnibus({
 }: LinhaOnibusProps) {
   const [isItinerarioVisible, setItinerarioVisible] = useState(false);
   const [isHorariosVisible, setHorariosVisible] = useState(false);
+
+  // Calcular horários anterior e próximo
+  const { nextSchedule, previousSchedule } = useMemo(() => 
+    calculateNextAndPreviousSchedule(linha.horarios), 
+    [linha.horarios]
+  );
 
   const sublinha = linha.sublinha
     ? `<p class="text-xs font-normal">${linha.sublinha}</p>`
@@ -48,11 +109,11 @@ export function LinhaOnibus({
           <div className="flex justify-between text-center mb-4">
             <div>
               <p className="text-sm text-gray-400">Anterior</p>
-              <p className="text-2xl font-bold">00:00</p>
+              <p className="text-2xl font-bold">{previousSchedule}</p>
             </div>
             <div>
               <p className="text-sm text-gray-400">Próximo</p>
-              <p className="text-2xl font-bold">00:00</p>
+              <p className="text-2xl font-bold">{nextSchedule}</p>
             </div>
           </div>
           <div className="flex justify-between space-x-2">
