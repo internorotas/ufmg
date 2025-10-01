@@ -12,6 +12,7 @@ interface MenuLateralProps {
 
 export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
   const [isMenuVisible, setMenuVisible] = useState(false);
+  console.log('MenuLateral renderizado com dados:', linhasData);
 
   const handleLinhaClickAndCloseMenu = (index: number, linha: Linha) => {
     onLinhaClick(index, linha);

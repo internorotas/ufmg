@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
 import ReactGA from "react-ga4";
-// import { MenuLateral } from "./components/MenuLateral";
+import { MenuLateral } from "./components/MenuLateral";
 import { Mapa } from "./components/Mapa";
 
-// Importa os ficheiros GeoJSON
-import paradasGeojson from "./data/paradas.geojson";
-import rotasGeojson from "./data/rotas.geojson";
+// Importa os ficheiros JSON
+import paradasGeojson from "./data/paradas.json";
+import rotasGeojson from "./data/rotas.json";
+import dadosLinhas from "./data/dadosLinhas";
 
-import { Rota, Parada, RotaFeature, ParadaFeature, FeatureCollection } from "./types/data.types";
+import { Rota, Parada, RotaFeature, ParadaFeature, FeatureCollection, Linha } from "./types/data.types";
 
 
 // Lê a ID de Medição a partir das variáveis de ambiente
@@ -37,30 +38,40 @@ export function App() {
   // , []);
   console.log('paradasGeojson:', paradasGeojson);
   console.log('rotasGeojson:', rotasGeojson);
-  const paradasData: Parada[] = useMemo(() =>
-    (paradasGeojson as FeatureCollection<ParadaFeature>).features.map((feature) => ({
+  
+  const paradasData: Parada[] = useMemo(() => {
+    if (!paradasGeojson?.features) {
+      console.warn('paradasGeojson não tem features:', paradasGeojson);
+      return [];
+    }
+    return (paradasGeojson as FeatureCollection<ParadaFeature>).features.map((feature) => ({
       // Mapeia as propriedades do GeoJSON para a nossa interface 'Parada'
       idParada: feature.properties.id_parada,
       nome: feature.properties.nome,
       linhaAtendidas: feature.properties.linhasAtendidasNomes,
       // INVERTE as coordenadas de [longitude, latitude] para [latitude, longitude]
       coordinates: [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
-    }))
-  , []);
-  const rotasParaMapa: Rota[] = useMemo(() =>
-    (rotasGeojson as FeatureCollection<RotaFeature>).features.map((feature) => ({
+    }));
+  }, []);
+  
+  const rotasParaMapa: Rota[] = useMemo(() => {
+    if (!rotasGeojson?.features) {
+      console.warn('rotasGeojson não tem features:', rotasGeojson);
+      return [];
+    }
+    return (rotasGeojson as FeatureCollection<RotaFeature>).features.map((feature) => ({
       // Cria a estrutura de dados específica para o componente do Mapa
       linha: feature.properties.id_rota,
       sublinha: feature.properties.variante_nome || null,
       cor: feature.properties.cor_hex_leaflet,
       // INVERTE cada par de coordenadas no traçado da rota
       coordinates: feature.geometry.coordinates.map(coord => [coord[1], coord[0]]),
-    }))
-  , []);
+    }));
+  }, []);
 
   // --- ESTADO DO COMPONENTE ---
   // Seleciona a primeira rota por padrão, se houver
-  const [rotaSelecionada] = useState<number | null>(rotasParaMapa.length > 0 ? 0 : null);
+  const [rotaSelecionada, setRotaSelecionada] = useState<number | null>(rotasParaMapa.length > 0 ? 0 : null);
 
   useEffect(() => {
     // Envia um evento de pageview quando a aplicação carrega
@@ -71,17 +82,18 @@ export function App() {
     });
   }, []);
 
-  // const handleLinhaClick = (index: number) => {
-  //   setRotaSelecionada(index);
-  //
-  //   // Usa a informação da rota clicada para o evento do Analytics
-  //   const linhaInfo = rotasData[index];
-  //   ReactGA.event({
-  //     category: "Mapa",
-  //     action: "Ver Rota",
-  //     label: `${linhaInfo.nome} - ${linhaInfo.sublinha || "Principal"}`,
-  //   });
-  // };
+  const handleLinhaClick = (_index: number, linhaInfo: Linha) => {
+    // Encontrar a rota correspondente no rotasParaMapa baseado na linha
+    const rotaIndex = rotasParaMapa.findIndex(rota => rota.linha === linhaInfo.idRota?.toString());
+    setRotaSelecionada(rotaIndex >= 0 ? rotaIndex : null);
+
+    // Usa a informação da rota clicada para o evento do Analytics
+    ReactGA.event({
+      category: "Mapa",
+      action: "Ver Rota",
+      label: `${linhaInfo.nome} - ${linhaInfo.sublinha || "Principal"}`,
+    });
+  };
 
   if (!paradasData.length || !rotasParaMapa.length) {
     return (
@@ -96,6 +108,7 @@ export function App() {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden flex flex-col md:flex-row font-['Poppins',_sans-serif]">
+      <MenuLateral linhasData={dadosLinhas} onLinhaClick={handleLinhaClick} />
       <div className="flex-grow h-full w-full">
         <Mapa
           paradas={paradasData}

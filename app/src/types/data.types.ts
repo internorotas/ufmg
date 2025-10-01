@@ -10,7 +10,7 @@ export interface DadosRotas {
 }
 // Tipos para os dados das linhas, usados no Menu Lateral
 export interface Linha {
-  idRota?: number;
+  idRota?: string;
   linha?: number;
   nome: string;
   tipo: string;
@@ -19,12 +19,12 @@ export interface Linha {
   idCor?: string;
   corHex?: string;
   horarios: string[];
-  itinerario: (string | number)[];
+  itinerario: string[];
 }
 
 // Tipos para os dados das rotas, usados para desenhar no Mapa
 export interface Rota {
-  linha: number;
+  linha: string;
   sublinha: string | null;
   cor: string;
   coordinates: number[][];
@@ -32,7 +32,7 @@ export interface Rota {
 
 // Tipos para os dados das paradas, usados para os marcadores no Mapa
 export interface Parada {
-  idParada?: number;
+  idParada?: string;
   nome: string;
   linhaAtendidas: string[];
   coordinates: [number, number];
@@ -53,18 +53,18 @@ interface LineStringGeometry {
 
 // Tipos para as propriedades específicas de cada GeoJSON
 interface RotaProperties {
-  id_rota: number;
+  id_rota: string;
   nome_display: string;
   variante_nome: string | null;
   categoria: string;
   identificador_cor_tema: string;
   cor_hex_leaflet: string;
   horarios: string[];
-  itinerario_paradas_ids: (string | number)[];
+  itinerario_paradas_ids: string[];
 }
 
 interface ParadaProperties {
-  id_parada: number;
+  id_parada: string;
   nome: string;
   linhasAtendidasNomes: string[];
 }
