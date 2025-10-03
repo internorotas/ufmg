@@ -1,0 +1,545 @@
+{
+  "type": "FeatureCollection",
+  "name": "Paradas UFMG",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P01",
+        "nome": "ESCOLA DE MÚSICA",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Ponto de Origem/Destino"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.961197, -19.862878]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P02",
+        "nome": "EBA - ESCOLA DE BELAS ARTES",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.960298, -19.864005]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P03",
+        "nome": "CAD 2 - CENTRO DE ATIVIDADES DIDÁTICAS 2",
+        "linhas_atendidas": ["Linha 01", "Linha 02"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.961424, -19.865027]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P04",
+        "nome": "FALE - FACULDADE DE LETRAS",
+        "linhas_atendidas": ["Linha 01", "Linha 02"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.961424, -19.865027]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P05",
+        "nome": "ECI - ESCOLA DE CIÊNCIAS DA INFORMAÇÃO",
+        "linhas_atendidas": ["Linha 01", "Linha 02"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.961424, -19.865027]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P06",
+        "nome": "FAFICH - FACULDADE DE FILOSOFIA E CIÊNCIAS HUMANAS",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.962741, -19.866895]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P07",
+        "nome": "FACE - FACULDADE DE CIÊNCIAS ECONÔMICAS",
+        "linhas_atendidas": ["Linha 01", "Linha 02"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.963695, -19.867452]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P08",
+        "nome": "REITORIA",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Importante"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.964425, -19.867454]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P09",
+        "nome": "PRAÇA DE SERVIÇOS",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Importante"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.965421, -19.866279]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P10",
+        "nome": "BIBLIOTECA CENTRAL UNIVERSITÁRIA",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Importante"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.965542, -19.866174]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P11",
+        "nome": "UNIDADE ADMINISTRATIVA III",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.967613, -19.862186]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P12",
+        "nome": "UNIDADE ADMINISTRATIVA II",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.967025, -19.862939]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P13",
+        "nome": "AV. ANTONIO ABRAHÃO CARAM (EM FRENTE AO RESTAURANTE FARROUPILHA)",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.964441, -19.863284]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P14",
+        "nome": "CEU - CENTRO ESPORTIVO UNIVERSITÁRIO",
+        "linhas_atendidas": ["Linha 01", "Linha 02"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.964597, -19.865271]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P15",
+        "nome": "ESCOLA DE VETERINÁRIA",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Importante"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.965755, -19.866155]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P16",
+        "nome": "AV. PRESIDENTE CARLOS LUZ (EM FRENTE AO MCDONALD'S)",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Importante"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.966637, -19.86686]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P17",
+        "nome": "EEFFTO - ESCOLA DE EDUCAÇÃO FÍSICA, FISIOTERAPIA E TERAPIA OCUPACIONAL",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.967701, -19.867674]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P18",
+        "nome": "FACULDADE DE ODONTOLOGIA",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.967867, -19.868886]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P19",
+        "nome": "ESTAÇÃO ECOLÓGICA",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.967946, -19.869469]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P20",
+        "nome": "FACULDADE DE FARMÁCIA",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.968394, -19.870005]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P21",
+        "nome": "RESTAURANTE UNIVERSITÁRIO SETORIAL II",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Importante"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.968973, -19.870484]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P22",
+        "nome": "DEPARTAMENTO DE FÍSICA",
+        "linhas_atendidas": ["Linha 01", "Linha 02"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.970612, -19.87174]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P23",
+        "nome": "ENGENHARIA ELÉTRICA",
+        "linhas_atendidas": ["Linha 01", "Linha 02"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.97109, -19.872128]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P24",
+        "nome": "CDTN/CNEN - CENTRO DE DESENVOLVIMENTO DA TECNOLOGIA NUCLEAR",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.971829, -19.872514]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P25",
+        "nome": "COLTEC - COLÉGIO TÉCNICO DA UFMG",
+        "linhas_atendidas": ["Linha 01", "Linha 02"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.972646, -19.872449]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P26",
+        "nome": "DEPARTAMENTO DE QUÍMICA",
+        "linhas_atendidas": ["Linha 01", "Linha 02"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.973137, -19.872771]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P27",
+        "nome": "ICEX - INSTITUTO DE CIÊNCIAS EXATAS",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 04"],
+        "categoria": "Parada Importante"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.974018, -19.873438]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P28",
+        "nome": "ESCOLA DE ENGENHARIA",
+        "linhas_atendidas": ["Linha 01", "Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Importante"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.974445, -19.873994]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P29",
+        "nome": "IGC - INSTITUTO DE GEOCIÊNCIAS",
+        "linhas_atendidas": ["Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.974996, -19.875587]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P30",
+        "nome": "RESTAURANTE UNIVERSITÁRIO SETORIAL I",
+        "linhas_atendidas": ["Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Importante"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.975656, -19.876243]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P31",
+        "nome": "FAE - FACULDADE DE EDUCAÇÃO",
+        "linhas_atendidas": ["Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.975927, -19.876479]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P32",
+        "nome": "CENTRO PEDAGÓGICO",
+        "linhas_atendidas": ["Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.976613, -19.877004]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P33",
+        "nome": "CRECHE - EMEI ALAÍDE DE LISBOA",
+        "linhas_atendidas": ["Linha 02", "Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.976618, -19.877008]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P34",
+        "nome": "CAD 1 - CENTRO DE ATIVIDADES DIDÁTICAS 1",
+        "linhas_atendidas": ["Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.964425, -19.867454]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P35",
+        "nome": "ICB - INSTITUTO DE CIÊNCIAS BIOLÓGICAS",
+        "linhas_atendidas": ["Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.964751, -19.865387]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P36",
+        "nome": "BIOTÉRIO CENTRAL",
+        "linhas_atendidas": ["Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.965099, -19.865664]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P37",
+        "nome": "AVENIDA C",
+        "linhas_atendidas": ["Linha 03"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.966637, -19.86686]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P38",
+        "nome": "RUA PROF. EDUARDO M. GUIMARÃES",
+        "linhas_atendidas": ["Linha 03"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.964425, -19.867454]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P39",
+        "nome": "USIMINAS",
+        "linhas_atendidas": ["Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.967701, -19.867674]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P40",
+        "nome": "RUA PROF. JOSÉ VIEIRA MENDONÇA",
+        "linhas_atendidas": ["Linha 03", "Linha 04"],
+        "categoria": "Parada Regular"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.968394, -19.870005]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id_parada": "P41",
+        "nome": "BH-TEC - PARQUE TECNOLÓGICO DE BELO HORIZONTE",
+        "linhas_atendidas": ["Linha 03", "Linha 04"],
+        "categoria": "Parada Especial"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-43.970612, -19.87174]
+      }
+    }
+  ]
+}
