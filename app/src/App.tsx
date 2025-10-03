@@ -4,8 +4,8 @@ import { MenuLateral } from "./components/MenuLateral";
 import { Mapa } from "./components/Mapa";
 
 // Importa os ficheiros JSON
-import paradasGeojson from "./data/paradas.json";
-import rotasGeojson from "./data/rotas.json";
+import paradasGeojson from "./data/paradas-old.json";
+import rotasGeojson from "./data/rotas-old.json";
 import dadosLinhas from "./data/dadosLinhas";
 
 import { Rota, Parada, RotaFeature, ParadaFeature, FeatureCollection, Linha } from "./types/data.types";
@@ -59,14 +59,39 @@ export function App() {
       console.warn('rotasGeojson não tem features:', rotasGeojson);
       return [];
     }
-    return (rotasGeojson as FeatureCollection<RotaFeature>).features.map((feature) => ({
-      // Cria a estrutura de dados específica para o componente do Mapa
-      linha: feature.properties.id_rota,
-      sublinha: feature.properties.variante_nome || null,
-      cor: feature.properties.cor_hex_leaflet,
-      // INVERTE cada par de coordenadas no traçado da rota
-      coordinates: feature.geometry.coordinates.map(coord => [coord[1], coord[0]]),
-    }));
+    
+    // Função para validar e corrigir coordenadas
+    const isValidCoordinate = (coord: number[]): boolean => {
+      const [lng, lat] = coord;
+      // Para Belo Horizonte: longitude ~-43.9, latitude ~-19.8
+      return lng >= -44.5 && lng <= -43.0 && lat >= -20.5 && lat <= -19.0;
+    };
+    
+    return (rotasGeojson as FeatureCollection<RotaFeature>).features
+      .filter((feature) => {
+        const coords = feature.geometry.coordinates;
+        if (!coords || coords.length === 0) return false;
+        
+        // Verificar se pelo menos algumas coordenadas são válidas
+        const validCoords = coords.filter(isValidCoordinate);
+        const isValid = validCoords.length > coords.length * 0.1; // Pelo menos 10% das coordenadas devem ser válidas
+        
+        if (!isValid) {
+          console.warn(`Rota ${feature.properties.id_rota} tem coordenadas inválidas, pulando...`);
+        }
+        
+        return isValid;
+      })
+      .map((feature) => ({
+        // Cria a estrutura de dados específica para o componente do Mapa
+        linha: feature.properties.id_rota,
+        sublinha: feature.properties.variante_nome || null,
+        cor: feature.properties.cor_hex_leaflet,
+        // Filtrar coordenadas válidas e INVERTER para [latitude, longitude]
+        coordinates: feature.geometry.coordinates
+          .filter(isValidCoordinate)
+          .map(coord => [coord[1], coord[0]]),
+      }));
   }, []);
 
   // --- ESTADO DO COMPONENTE ---
@@ -83,8 +108,39 @@ export function App() {
   }, []);
 
   const handleLinhaClick = (_index: number, linhaInfo: Linha) => {
-    // Encontrar a rota correspondente no rotasParaMapa baseado na linha
-    const rotaIndex = rotasParaMapa.findIndex(rota => rota.linha === linhaInfo.idRota?.toString());
+    // Mapear linha para id_rota baseado no padrão dos dados
+    let targetRouteId = '';
+    
+    if (linhaInfo.linha) {
+      switch (linhaInfo.linha) {
+        case 1: // Linha 01 - Dias Úteis ✅ VÁLIDA
+          targetRouteId = 'DU_1_0';
+          break;
+        case 2: // Linha 02 - Dias Úteis ❌ CORROMPIDA
+          console.warn('Linha 2 temporariamente desabilitada - coordenadas corrompidas');
+          return;
+        case 3: // Linha 03 - Dias Úteis ✅ VÁLIDA
+          targetRouteId = 'DU_3_null_3';
+          break;
+        case 4: // Linha 04 - Dias Úteis ❌ CORROMPIDA
+          console.warn('Linha 4 temporariamente desabilitada - coordenadas corrompidas');
+          return;
+        case 5: // Linha 03 - Sábado ❌ CORROMPIDA
+          console.warn('Linha Sábado temporariamente desabilitada - coordenadas corrompidas');
+          return;
+        case 6: // Linha 02 - Férias ❌ CORROMPIDA
+          console.warn('Linha Férias 2 temporariamente desabilitada - coordenadas corrompidas');
+          return;
+        case 7: // Linha 03 - Férias ❌ CORROMPIDA
+          console.warn('Linha Férias 3 temporariamente desabilitada - coordenadas corrompidas');
+          return;
+        default:
+          console.warn('ID da linha não mapeado:', linhaInfo.linha);
+      }
+    }
+    
+    // Encontrar a rota correspondente no rotasParaMapa
+    const rotaIndex = rotasParaMapa.findIndex(rota => rota.linha === targetRouteId);
     setRotaSelecionada(rotaIndex >= 0 ? rotaIndex : null);
 
     // Usa a informação da rota clicada para o evento do Analytics
