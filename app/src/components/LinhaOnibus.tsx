@@ -141,7 +141,7 @@ export function LinhaOnibus({
         >
           {isItinerarioVisible && (
             <ul className="bg-gray-800 p-4 rounded-md text-sm list-disc list-inside space-y-1">
-              {linha.itinerario.map((item, index) => (
+              {linha.itinerarioParadasIds.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
