@@ -12,7 +12,7 @@ interface MenuLateralProps {
 
 export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
   const [isMenuVisible, setMenuVisible] = useState(false);
-  console.log('MenuLateral renderizado com dados:', linhasData);
+  console.log("MenuLateral renderizado com dados:", linhasData);
 
   const handleLinhaClickAndCloseMenu = (index: number, linha: Linha) => {
     onLinhaClick(index, linha);
@@ -66,7 +66,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
               <strong>UFMG</strong>
             </p>
           </section>
-          {linhasData.diasUteis.map((linha: Linha, index: number) => (
+          {linhasData.diasUteis?.map((linha: Linha, index: number) => (
             <LinhaOnibus
               key={`uteis-${index}`}
               linha={linha}
@@ -77,7 +77,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
           <section className="dia-itinerario flex justify-between font-medium text-lg mt-4 mb-2 px-1">
             <p>Linha Sábado</p>
           </section>
-          {linhasData.sabado.map((linha: Linha, index: number) => (
+          {/* {linhasData.sabado.map((linha: Linha, index: number) => (
             <LinhaOnibus
               key={`sabado-${index}`}
               linha={linha}
@@ -89,11 +89,11 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
               }
               bgColor={colorMap[linha.tipo] || "bg-internoRotas-cinza-grafite"}
             />
-          ))}
+          ))} */}
           <section className="dia-itinerario flex justify-between font-medium text-lg mt-4 mb-2 px-1">
             <p>Férias e Recessos</p>
           </section>
-          {linhasData.feriasRecessos.map((linha: Linha, index: number) => (
+          {/* {linhasData.feriasRecessos.map((linha: Linha, index: number) => (
             <LinhaOnibus
               key={`ferias-${index}`}
               linha={linha}
@@ -107,7 +107,7 @@ export function MenuLateral({ linhasData, onLinhaClick }: MenuLateralProps) {
               }
               bgColor={colorMap[linha.tipo] || "bg-internoRotas-cinza-grafite"}
             />
-          ))}
+          ))} */}
         </main>
       </div>
     </div>

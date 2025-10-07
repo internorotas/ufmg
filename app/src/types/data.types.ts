@@ -1,88 +1,42 @@
 // Tipos auxiliares para os dados completos
 export interface DadosLinhas {
-  diasUteis: Linha[];
-  sabado: Linha[];
-  feriasRecessos: Linha[];
+  diasUteis?: Linha[];
+  sabado?: Linha[];
+  feriasRecessos?: Linha[];
 }
 
 export interface DadosRotas {
-  rotas: Rota[];
+  rotas: Trajeto[];
 }
 // Tipos para os dados das linhas, usados no Menu Lateral
 export interface Linha {
-  idRota?: string;
-  linha?: number;
+  idRota: string;
+  linha: number;
   nome: string;
   tipo: string;
   sublinha: string | null;
-  categoriaDia?: string;
-  idCor?: string;
-  corHex?: string;
+  categoriaDia: string;
+  corHex: string;
+  descricao: string;
   horarios: string[];
-  itinerario: string[];
+  itinerarioParadasIds: string[];
+  coordenadasTrajeto: [number, number][];
 }
 
 // Tipos para os dados das rotas, usados para desenhar no Mapa
-export interface Rota {
+export interface Trajeto {
   linha: string;
   sublinha: string | null;
   cor: string;
-  coordinates: number[][];
+  coordenadas: number[][];
 }
 
 // Tipos para os dados das paradas, usados para os marcadores no Mapa
 export interface Parada {
-  idParada?: string;
+  idParada: string;
   nome: string;
-  linhaAtendidas: string[];
-  coordinates: [number, number];
-}
-
-// --- TIPOS CORRIGIDOS PARA O GEOJSON (SEM 'ANY') ---
-
-// Tipos para as geometrias específicas que usamos
-interface PointGeometry {
-  type: "Point";
-  coordinates: [number, number]; // Um par de [longitude, latitude]
-}
-
-interface LineStringGeometry {
-  type: "LineString";
-  coordinates: [number, number][]; // Uma lista de pares [longitude, latitude]
-}
-
-// Tipos para as propriedades específicas de cada GeoJSON
-interface RotaProperties {
-  id_rota: string;
-  nome_display: string;
-  variante_nome: string | null;
+  linhasAtendidas: string[];
   categoria: string;
-  identificador_cor_tema: string;
-  cor_hex_leaflet: string;
-  horarios: string[];
-  itinerario_paradas_ids: string[];
-}
-
-interface ParadaProperties {
-  id_parada: string;
-  nome: string;
-  linhasAtendidasNomes: string[];
-}
-
-// Tipos específicos para as features de Rotas e Paradas, com a geometria correta
-export interface RotaFeature {
-  type: "Feature";
-  properties: RotaProperties;
-  geometry: LineStringGeometry; // Usa a geometria de Linha
-}
-
-export interface ParadaFeature {
-  type: "Feature";
-  properties: ParadaProperties;
-  geometry: PointGeometry; // Usa a geometria de Ponto
-}
-
-export interface FeatureCollection<T> {
-  type: "FeatureCollection";
-  features: T[];
+  descricao: string;
+  coordenadas: [number, number];
 }
