@@ -1,8 +1,14 @@
 // Tipos auxiliares para os dados completos
 export interface DadosLinhas {
-  diasUteis?: Linha[];
-  sabado?: Linha[];
-  feriasRecessos?: Linha[];
+  id: number;
+  categoriaDia: string;
+  displayName: string;
+  exibir?: boolean;
+  linhas: Linha[];
+}
+
+export interface CategoriaLinhas {
+  categoriasDias: DadosLinhas[];
 }
 
 export interface DadosRotas {
