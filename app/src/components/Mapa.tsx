@@ -1,6 +1,7 @@
-import { MapContainer, TileLayer, Marker, useMap, Polyline } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import { PopupCustomizado } from "./PopupCustomizado";
+import { AntPathComponent } from "./AntPathComponent";
 import { Parada, Linha } from "../types/data.types";
 import { useEffect, useImperativeHandle, forwardRef, useRef, useState, useMemo } from "react";
 
@@ -107,28 +108,21 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
         <ChangeView bounds={bounds} />
         <CenterOnParada parada={paradaSelecionada} />
 
-        {/* Desenhar rota da linha selecionada com contorno branco e cor dinâmica */}
+        {/* Desenhar rota animada da linha selecionada com AntPath */}
         {linhaSelecionada && linhaSelecionada.coordenadasTrajeto.length > 0 && (
-          <>
-            {/* Contorno branco (camada de baixo) */}
-            <Polyline
-              positions={linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]}
-              pathOptions={{
-                color: '#FFFFFF',
-                weight: 8,
-                opacity: 1,
-              }}
-            />
-            {/* Linha colorida (camada de cima) */}
-            <Polyline
-              positions={linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]}
-              pathOptions={{
-                color: linhaSelecionada.corHex,
-                weight: 5,
-                opacity: 1,
-              }}
-            />
-          </>
+          <AntPathComponent
+            coordinates={linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]}
+            options={{
+              delay: 600,
+              dashArray: [20, 100],
+              weight: 8,
+              color: linhaSelecionada.corHex,
+              pulseColor: linhaSelecionada.corHex,
+              paused: false,
+              reverse: false,
+              hardwareAccelerated: true,
+            }}
+          />
         )}
 
         {/* Renderizar apenas paradas da linha selecionada */}
