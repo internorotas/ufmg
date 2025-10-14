@@ -76,21 +76,40 @@ path.leaflet-ant-path__reverse {
 
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  background-color: var(--color-internoRotas-preto-carvao) !important;
-  color: var(--color-internoRotas-bege-areia) !important;
+  background-color: var(--card-background) !important;
+  color: var(--text-primary) !important;
   font-family: var(--font-poppins);
-  border-radius: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background-color: var(--card-background) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+
+.leaflet-popup-content-wrapper {
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  padding: 16px !important;
 }
 
 .leaflet-popup-content h4 {
   font-weight: 700;
   font-size: 0.9rem;
   margin-bottom: 4px;
+  color: var(--text-primary);
 }
 
 .leaflet-popup-content p {
   font-size: 0.9rem;
   margin: 2px 0;
+  color: var(--text-secondary);
 }
 
 /* Animações personalizadas */
