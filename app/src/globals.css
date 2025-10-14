@@ -1,7 +1,31 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-/* Variáveis de Tema */
+/* Configuração do Tailwind CSS v4 */
+@theme {
+  /* Cores de Tema */
+  --color-background: #FFFFFF;
+  --color-background-secondary: #F9FAFB;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-card: #FFFFFF;
+  --color-card-hover: #F9FAFB;
+  --color-card-border: #E5E7EB;
+  --color-sidebar: #F3F4F6;
+  --color-modal: #FFFFFF;
+  --color-input: #F9FAFB;
+  
+  /* Cores da Marca */
+  --color-internoRotas-azul-eletrico: #2c0eeb;
+  --color-internoRotas-bege-areia: #ecdcc4;
+  --color-internoRotas-laranja-ambar: #ffa400;
+  --color-internoRotas-preto-carvao: #1a1819;
+  --color-internoRotas-cinza-grafite: #3a3b3c;
+  
+  --font-poppins: Poppins, sans-serif;
+}
+
+/* Variáveis CSS para uso direto */
 :root {
   /* Light Mode */
   --background: #FFFFFF;
@@ -13,15 +37,6 @@
   --sidebar-background: #F3F4F6;
   --modal-background: #FFFFFF;
   --input-background: #F9FAFB;
-  
-  /* Cores fixas da marca */
-  --color-internoRotas-azul-eletrico: #2c0eeb;
-  --color-internoRotas-bege-areia: #ecdcc4;
-  --color-internoRotas-laranja-ambar: #ffa400;
-  --color-internoRotas-preto-carvao: #1a1819;
-  --color-internoRotas-cinza-grafite: #3a3b3c;
-  
-  --font-poppins: Poppins, sans-serif;
 }
 
 .dark {
@@ -35,6 +50,18 @@
   --sidebar-background: #1a1819;
   --modal-background: #1F2937;
   --input-background: #374151;
+  
+  /* Atualizar cores do Tailwind para dark mode */
+  --color-background: #111827;
+  --color-background-secondary: #1F2937;
+  --color-text-primary: #F9FAFB;
+  --color-text-secondary: #9CA3AF;
+  --color-card: #1F2937;
+  --color-card-hover: #374151;
+  --color-card-border: #374151;
+  --color-sidebar: #1a1819;
+  --color-modal: #1F2937;
+  --color-input: #374151;
 }
 
 * {
