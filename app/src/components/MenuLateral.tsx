@@ -14,11 +14,19 @@ interface MenuLateralProps {
   linhaSelecionada: Linha | null;
 }
 
-export function MenuLateral({ linhasData, todasParadas, onLinhaSelect, onParadaClick, linhaSelecionada }: MenuLateralProps) {
+export function MenuLateral({
+  linhasData,
+  todasParadas,
+  onLinhaSelect,
+  onParadaClick,
+  linhaSelecionada,
+}: MenuLateralProps) {
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [categoriaAtiva, setCategoriaAtiva] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
+  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
+    null
+  );
 
   const handleCardClick = (linha: Linha) => {
     // Clique no card: seleciona a linha e mostra no mapa
@@ -36,11 +44,14 @@ export function MenuLateral({ linhasData, todasParadas, onLinhaSelect, onParadaC
 
   // Obter linhas da categoria ativa
   const categoriaAtual = linhasData.categoriasDias[categoriaAtiva];
-  const linhasFiltradas = categoriaAtual?.linhas.filter((linha) =>
-    linha.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (linha.sublinha && linha.sublinha.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    linha.descricao.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const linhasFiltradas =
+    categoriaAtual?.linhas.filter(
+      (linha) =>
+        linha.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (linha.sublinha &&
+          linha.sublinha.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        linha.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
 
   return (
     <>
@@ -65,18 +76,22 @@ export function MenuLateral({ linhasData, todasParadas, onLinhaSelect, onParadaC
 
       {/* Sidebar */}
       <div
-        className={`fixed md:relative top-0 left-0 h-full w-full max-w-md md:w-[420px] bg-background text-text-primary z-[1003] transform transition-transform duration-300 ${
+        className={`fixed md:relative top-0 left-0 h-full w-full max-w-md md:w-1/2 bg-background text-text-primary z-[1003] transform transition-transform duration-300 ${
           isMenuVisible ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 flex flex-col border-r border-card-border`}
       >
         {/* Header */}
-        <header className="bg-internoRotas-azul-eletrico p-4 flex justify-between items-center flex-shrink-0">
-          <img src={logo} alt="Logo Interno Rotas" className="h-10" />
-          
+        <header className="bg-internoRotas-azul-eletrico p-2 flex justify-between items-center flex-shrink-0">
+
+            <div className="flex items-center justify-center flex-1">
+            <img src={logo} alt="Logo Interno Rotas" className="h-6" />
+            </div>
+
           <div className="flex items-center gap-2">
             {/* Toggle de Tema */}
+
             <ThemeToggle />
-            
+
             {/* Botão Fechar Mobile */}
             <button
               onClick={() => setMenuVisible(false)}
@@ -90,7 +105,10 @@ export function MenuLateral({ linhasData, todasParadas, onLinhaSelect, onParadaC
         {/* Barra de Pesquisa */}
         <div className="p-4 bg-background-secondary flex-shrink-0 border-b border-card-border">
           <div className="relative">
-            <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={20} />
+            <IoSearch
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary"
+              size={20}
+            />
             <input
               type="text"
               placeholder="Pesquisar linha..."
@@ -102,7 +120,7 @@ export function MenuLateral({ linhasData, todasParadas, onLinhaSelect, onParadaC
         </div>
 
         {/* Tabs de Categoria */}
-        <div className="flex gap-2 px-4 py-4 bg-background-secondary flex-shrink-0 border-b border-card-border">
+        <div className="flex gap-2 px-2 py-2 bg-background-secondary flex-shrink-0 border-b border-card-border">
           {linhasData.categoriasDias.map((categoria, index) => (
             <button
               key={categoria.id}
