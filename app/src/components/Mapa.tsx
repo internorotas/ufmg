@@ -1,20 +1,32 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, Polyline } from "react-leaflet";
 import L from "leaflet";
-import { AntPathComponent } from "./AntPathComponent";
-import { Rota, Parada } from "../types/data.types";
-import { useEffect } from "react";
+import { PopupCustomizado } from "./PopupCustomizado";
+import { Parada, Linha } from "../types/data.types";
+import { useEffect, useImperativeHandle, forwardRef, useRef, useState, useMemo } from "react";
 
 interface MapaProps {
-  paradas: Parada[];
-  rotaSelecionada: Rota | null;
-  coresLinhas?: string[];
+  todasParadas: Parada[];
+  linhaSelecionada: Linha | null;
+  paradaSelecionada: Parada | null;
+}
+
+export interface MapaRef {
+  centralizarParada: (parada: Parada) => void;
 }
 
 const stationIcon = L.icon({
   iconUrl: "./marker.svg",
   iconSize: [30, 30],
-  iconAnchor: [20, 20],
-  popupAnchor: [-5, -18],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30],
+});
+
+const highlightedIcon = L.icon({
+  iconUrl: "./marker.svg",
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+  className: "marker-highlighted",
 });
 
 // Componente para ajustar o mapa quando uma rota é selecionada
@@ -22,57 +34,112 @@ const ChangeView = ({ bounds }: { bounds: L.LatLngBounds | null }) => {
   const map = useMap();
   useEffect(() => {
     if (bounds) {
-      map.fitBounds(bounds, { padding: [30, 30] });
+      map.fitBounds(bounds, { padding: [50, 50] });
     }
   }, [bounds, map]);
   return null;
 };
 
-export function Mapa({ paradas, rotaSelecionada, coresLinhas }: MapaProps) {
-  const bounds = rotaSelecionada
-    ? L.latLngBounds(rotaSelecionada.coordinates as L.LatLngExpression[])
-    : null;
+// Componente para centralizar em uma parada
+const CenterOnParada = ({ parada }: { parada: Parada | null }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (parada) {
+      map.setView(parada.coordenadas, 17, { animate: true, duration: 1 });
+    }
+  }, [parada, map]);
+  return null;
+};
 
-  return (
-    <MapContainer
-      center={[-19.87055, -43.96775]}
-      zoom={15}
-      className="h-full w-full"
-      zoomControl={true}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
+export const Mapa = forwardRef<MapaRef, MapaProps>(
+  ({ todasParadas, linhaSelecionada, paradaSelecionada }, ref) => {
+    const markersRef = useRef<{ [key: string]: L.Marker }>({});
+    const [paradaDestacada, setParadaDestacada] = useState<string | null>(null);
 
-      <ChangeView bounds={bounds} />
+    useImperativeHandle(ref, () => ({
+      centralizarParada: (parada: Parada) => {
+        setParadaDestacada(parada.idParada);
+        
+        // Abrir popup do marcador
+        const marker = markersRef.current[parada.idParada];
+        if (marker) {
+          marker.openPopup();
+        }
 
-      {paradas.map((parada, index) => (
-        <Marker key={index} position={parada.coordinates} icon={stationIcon}>
-          <Popup>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: `<h4>${parada.nome}</h4>${parada.linhaAtendidas
-                  .map((l) => `<p>${l}</p>`)
-                  .join("")}`,
-              }}
-            />
-          </Popup>
-        </Marker>
-      ))}
+        // Resetar destaque após 3 segundos
+        setTimeout(() => {
+          setParadaDestacada(null);
+        }, 3000);
+      },
+    }));
 
-      {rotaSelecionada && (
-        <AntPathComponent
-          key={rotaSelecionada.linha + (rotaSelecionada.sublinha || "")}
-          coordinates={rotaSelecionada.coordinates as [number, number][]}
-          options={{
-            delay: 600,
-            dashArray: [20, 100],
-            weight: 8,
-            color: (coresLinhas && coresLinhas[rotaSelecionada.linha - 1]) || "#FF0000",
-          }}
+    // Filtrar paradas da linha selecionada dinamicamente usando os IDs
+    const paradasVisiveis = useMemo(() => {
+      if (!linhaSelecionada) {
+        return todasParadas; // Mostrar todas se nenhuma linha selecionada
+      }
+      
+      return linhaSelecionada.itinerarioParadasIds
+        .map((idParada) => todasParadas.find((p) => p.idParada === idParada))
+        .filter((p): p is Parada => p !== undefined);
+    }, [linhaSelecionada, todasParadas]);
+
+    // Calcular bounds baseado nas coordenadas do trajeto da linha
+    const bounds = useMemo(() => {
+      if (linhaSelecionada && linhaSelecionada.coordenadasTrajeto.length > 0) {
+        return L.latLngBounds(linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]);
+      }
+      return null;
+    }, [linhaSelecionada]);
+
+    return (
+      <MapContainer
+        center={[-19.87055, -43.96775]}
+        zoom={15}
+        className="h-full w-full"
+        zoomControl={true}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-      )}
-    </MapContainer>
-  );
-}
+
+        <ChangeView bounds={bounds} />
+        <CenterOnParada parada={paradaSelecionada} />
+
+        {/* Desenhar rota da linha selecionada com a cor dinâmica */}
+        {linhaSelecionada && linhaSelecionada.coordenadasTrajeto.length > 0 && (
+          <Polyline
+            positions={linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]}
+            pathOptions={{
+              color: linhaSelecionada.corHex,
+              weight: 5,
+              opacity: 0.8,
+            }}
+          />
+        )}
+
+        {/* Renderizar apenas paradas da linha selecionada */}
+        {paradasVisiveis.map((parada) => {
+          const isDestacada = paradaDestacada === parada.idParada;
+          return (
+            <Marker
+              key={parada.idParada}
+              position={parada.coordenadas}
+              icon={isDestacada ? highlightedIcon : stationIcon}
+              ref={(markerRef) => {
+                if (markerRef) {
+                  markersRef.current[parada.idParada] = markerRef;
+                }
+              }}
+            >
+              <PopupCustomizado parada={parada} />
+            </Marker>
+          );
+        })}
+      </MapContainer>
+    );
+  }
+);
+
+Mapa.displayName = "Mapa";
