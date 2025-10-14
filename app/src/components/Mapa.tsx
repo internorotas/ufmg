@@ -107,16 +107,28 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
         <ChangeView bounds={bounds} />
         <CenterOnParada parada={paradaSelecionada} />
 
-        {/* Desenhar rota da linha selecionada com a cor dinâmica */}
+        {/* Desenhar rota da linha selecionada com contorno branco e cor dinâmica */}
         {linhaSelecionada && linhaSelecionada.coordenadasTrajeto.length > 0 && (
-          <Polyline
-            positions={linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]}
-            pathOptions={{
-              color: linhaSelecionada.corHex,
-              weight: 5,
-              opacity: 0.8,
-            }}
-          />
+          <>
+            {/* Contorno branco (camada de baixo) */}
+            <Polyline
+              positions={linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]}
+              pathOptions={{
+                color: '#FFFFFF',
+                weight: 8,
+                opacity: 1,
+              }}
+            />
+            {/* Linha colorida (camada de cima) */}
+            <Polyline
+              positions={linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]}
+              pathOptions={{
+                color: linhaSelecionada.corHex,
+                weight: 5,
+                opacity: 1,
+              }}
+            />
+          </>
         )}
 
         {/* Renderizar apenas paradas da linha selecionada */}
