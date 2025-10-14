@@ -7,12 +7,15 @@ import "@fontsource/poppins/500.css"; // medium
 import "@fontsource/poppins/600.css"; // semi-bold
 import "@fontsource/poppins/700.css"; // bold
 
-import "./index.css";
+import "./globals.css";
 
 import { App } from "./App";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </StrictMode>
 );
