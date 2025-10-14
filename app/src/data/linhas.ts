@@ -14,7 +14,7 @@ const data: CategoriaLinhas = {
           tipo: "um",
           sublinha: null,
           categoriaDia: "diasUteis",
-          corHex: "#FF0000",
+          corHex: "#E5007A",
           descricao: "Descrição da Linha 01",
           horarios: [
             "06:10",
@@ -82,7 +82,7 @@ const data: CategoriaLinhas = {
           tipo: "dois",
           sublinha: null,
           categoriaDia: "diasUteis",
-          corHex: "#00FF00",
+          corHex: "#E63946",
           descricao: "Descrição da Linha 02",
           horarios: [
             "05:55",
@@ -180,7 +180,7 @@ const data: CategoriaLinhas = {
           tipo: "dois",
           sublinha: "Retorno na Área Militar",
           categoriaDia: "diasUteis",
-          corHex: "#00FF00",
+          corHex: "#E63946",
           descricao: "Descrição da Linha 02 Retorno na Área Militar",
           horarios: ["11:30", "12:10", "12:50", "13:45", "17:30", "18:20"],
           itinerarioParadasIds: [
@@ -231,7 +231,7 @@ const data: CategoriaLinhas = {
           tipo: "tres",
           sublinha: null,
           categoriaDia: "diasUteis",
-          corHex: "#0000FF",
+          corHex: "#00A896",
           descricao: "Descrição da Linha 03",
           horarios: [
             "05:40",
@@ -294,7 +294,7 @@ const data: CategoriaLinhas = {
           tipo: "tres",
           sublinha: "Retorno na Área Militar",
           categoriaDia: "diasUteis",
-          corHex: "#0000FF",
+          corHex: "#00A896",
           descricao: "Descrição da Linha 03 Retorno na Área Militar",
           horarios: [
             "11:20",
@@ -348,7 +348,7 @@ const data: CategoriaLinhas = {
           tipo: "tres",
           sublinha: "Atendimento ao BH-Tec",
           categoriaDia: "diasUteis",
-          corHex: "#0000FF",
+          corHex: "#00A896",
           descricao: "Descrição da Linha 03 Atendimento ao BH-Tec",
           horarios: ["07:40", "17:20"],
           itinerarioParadasIds: [
@@ -397,7 +397,7 @@ const data: CategoriaLinhas = {
           tipo: "quatro",
           sublinha: null,
           categoriaDia: "diasUteis",
-          corHex: "#FFFF00",
+          corHex: "#0077B6",
           descricao: "Descrição da Linha 04",
           horarios: [
             "06:00",
@@ -454,7 +454,7 @@ const data: CategoriaLinhas = {
           tipo: "quatro",
           sublinha: "Retorno na Área Militar",
           categoriaDia: "diasUteis",
-          corHex: "#FFFF00",
+          corHex: "#0077B6",
           descricao: "Descrição da Linha 04 Retorno na Área Militar",
           horarios: [
             "11:00",
@@ -512,7 +512,7 @@ const data: CategoriaLinhas = {
           tipo: "quatro",
           sublinha: "Atendimento ao Ponto McDonald's",
           categoriaDia: "diasUteis",
-          corHex: "#FFFF00",
+          corHex: "#0077B6",
           descricao: "Descrição da Linha 04 Atendimento ao Ponto McDonald's",
           horarios: [
             "06:40",
@@ -572,7 +572,7 @@ const data: CategoriaLinhas = {
           tipo: "quatro",
           sublinha: "Atendimento ao BH-Tec e McDonald's",
           categoriaDia: "diasUteis",
-          corHex: "#FFFF00",
+          corHex: "#0077B6",
           descricao: "Descrição da Linha 04 Atendimento ao BH-Tec e McDonald's",
           horarios: ["07:20", "12:20", "17:00"],
           itinerarioParadasIds: [
@@ -631,7 +631,7 @@ const data: CategoriaLinhas = {
           tipo: "tres-sabado",
           sublinha: "Sábado",
           categoriaDia: "sabado",
-          corHex: "#0000FF",
+          corHex: "#00A896",
           descricao: "Descrição da Linha 03 Sábado",
           horarios: ["11:00", "11:40", "12:20", "13:00", "13:40"],
           itinerarioParadasIds: [
@@ -689,7 +689,7 @@ const data: CategoriaLinhas = {
           tipo: "dois-ferias",
           sublinha: "Férias e Recessos",
           categoriaDia: "feriasRecessos",
-          corHex: "#00FF00",
+          corHex: "#E63946",
           descricao: "Descrição da Linha 02 Férias e Recessos",
           horarios: [
             "05:55",
@@ -757,7 +757,7 @@ const data: CategoriaLinhas = {
           tipo: "tres-ferias",
           sublinha: "Férias e Recessos",
           categoriaDia: "feriasRecessos",
-          corHex: "#0000FF",
+          corHex: "#00A896",
           descricao: "Descrição da Linha 03 Férias e Recessos",
           horarios: [
             "05:40",
