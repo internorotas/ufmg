@@ -4,63 +4,63 @@
 /* Configuração do Tailwind CSS v4 */
 @theme {
   /* Cores de Tema */
-  --color-background: #FFFFFF;
-  --color-background-secondary: #F9FAFB;
+  --color-background: #ffffff;
+  --color-background-secondary: #f9fafb;
   --color-text-primary: #111827;
-  --color-text-secondary: #6B7280;
-  --color-card: #FFFFFF;
-  --color-card-hover: #F9FAFB;
-  --color-card-border: #E5E7EB;
-  --color-sidebar: #F3F4F6;
-  --color-modal: #FFFFFF;
-  --color-input: #F9FAFB;
-  
+  --color-text-secondary: #6b7280;
+  --color-card: #ffffff;
+  --color-card-hover: #f9fafb;
+  --color-card-border: #e5e7eb;
+  --color-sidebar: #f3f4f6;
+  --color-modal: #ffffff;
+  --color-input: #f9fafb;
+
   /* Cores da Marca */
   --color-internoRotas-azul-eletrico: #2c0eeb;
   --color-internoRotas-bege-areia: #ecdcc4;
   --color-internoRotas-laranja-ambar: #ffa400;
   --color-internoRotas-preto-carvao: #1a1819;
   --color-internoRotas-cinza-grafite: #3a3b3c;
-  
+
   --font-poppins: Poppins, sans-serif;
 }
 
 /* Variáveis CSS para uso direto */
 :root {
   /* Light Mode */
-  --background: #FFFFFF;
-  --background-secondary: #F9FAFB;
+  --background: #ffffff;
+  --background-secondary: #f9fafb;
   --text-primary: #111827;
-  --text-secondary: #6B7280;
-  --card-background: #FFFFFF;
-  --card-border: #E5E7EB;
-  --sidebar-background: #F3F4F6;
-  --modal-background: #FFFFFF;
-  --input-background: #F9FAFB;
+  --text-secondary: #6b7280;
+  --card-background: #ffffff;
+  --card-border: #e5e7eb;
+  --sidebar-background: #f3f4f6;
+  --modal-background: #ffffff;
+  --input-background: #f9fafb;
 }
 
 .dark {
   /* Dark Mode */
   --background: #111827;
-  --background-secondary: #1F2937;
-  --text-primary: #F9FAFB;
-  --text-secondary: #9CA3AF;
-  --card-background: #1F2937;
+  --background-secondary: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --card-background: #1f2937;
   --card-border: #374151;
   --sidebar-background: #1a1819;
-  --modal-background: #1F2937;
+  --modal-background: #1f2937;
   --input-background: #374151;
-  
+
   /* Atualizar cores do Tailwind para dark mode */
   --color-background: #111827;
-  --color-background-secondary: #1F2937;
-  --color-text-primary: #F9FAFB;
-  --color-text-secondary: #9CA3AF;
-  --color-card: #1F2937;
+  --color-background-secondary: #1f2937;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-card: #1f2937;
   --color-card-hover: #374151;
   --color-card-border: #374151;
   --color-sidebar: #1a1819;
-  --color-modal: #1F2937;
+  --color-modal: #1f2937;
   --color-input: #374151;
 }
 
@@ -182,4 +182,27 @@ path.leaflet-ant-path__reverse {
   50% {
     transform: scale(1.1);
   }
+}
+
+/* Estilizar  o scrollbar do menu lateral */
+
+/* Works on Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-background-secondary) var(--color-background);
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 0.8rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-background-secondary);
+  border-radius: 1rem;
+  border: 3px solid var(--color-background);
 }
