@@ -4,9 +4,21 @@ import L from "leaflet";
 import "leaflet-ant-path";
 
 import { LatLngExpression } from "leaflet";
+
+interface AntPathOptions {
+  delay?: number;
+  dashArray?: number[];
+  weight?: number;
+  color?: string;
+  pulseColor?: string;
+  paused?: boolean;
+  reverse?: boolean;
+  hardwareAccelerated?: boolean;
+}
+
 interface AntPathProps {
   coordinates: LatLngExpression[];
-  options: L.PathOptions & { delay?: number; use?: string | boolean };
+  options: AntPathOptions;
 }
 
 export function AntPathComponent({ coordinates, options }: AntPathProps) {
