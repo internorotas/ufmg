@@ -42,6 +42,15 @@ export function MenuLateral({
     setLinhaDetalhesAberta(linha);
   };
 
+  const handleParadaClickWrapper = (parada: Parada) => {
+    // Chama a função original de clique na parada
+    onParadaClick(parada);
+    // Fecha o menu no mobile
+    if (window.innerWidth < 768) {
+      setMenuVisible(false);
+    }
+  };
+
   // Obter linhas da categoria ativa
   const categoriaAtual = linhasData.categoriasDias[categoriaAtiva];
   const linhasFiltradas =
@@ -164,7 +173,7 @@ export function MenuLateral({
           onClose={() => setLinhaDetalhesAberta(null)}
           linha={linhaDetalhesAberta}
           todasParadas={todasParadas}
-          onParadaClick={onParadaClick}
+          onParadaClick={handleParadaClickWrapper}
         />
       )}
     </>
