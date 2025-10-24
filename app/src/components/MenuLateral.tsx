@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
 import { ThemeToggle } from "./ThemeToggle";
+import { DisclaimerBanner } from "./DisclaimerBanner";
+import { MenuFooter } from "./MenuFooter";
 import { Linha, CategoriaLinhas, Parada } from "../types/data.types";
 import logo from "../assets/logo-horizontal-transparente.svg";
 import { IoSearch, IoMenu, IoClose } from "react-icons/io5";
@@ -163,7 +165,13 @@ export function MenuLateral({
               <p className="text-sm mt-2">Tente ajustar sua pesquisa</p>
             </div>
           )}
+          
+          {/* Banner de Aviso */}
+          <DisclaimerBanner />
         </main>
+
+        {/* Footer */}
+        <MenuFooter />
       </div>
 
       {/* Modal de Detalhes da Linha */}
