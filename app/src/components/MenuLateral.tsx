@@ -120,15 +120,15 @@ export function MenuLateral({
         </div>
 
         {/* Tabs de Categoria */}
-        <div className="flex gap-2 px-2 py-2 bg-background-secondary flex-shrink-0 border-b border-card-border">
+        <div className="flex gap-2 px-4 py-3 bg-background flex-shrink-0">
           {linhasData.categoriasDias.map((categoria, index) => (
             <button
               key={categoria.id}
               onClick={() => setCategoriaAtiva(index)}
-              className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all ${
+              className={`flex-1 py-2.5 px-2.5 rounded-md text-xs font-medium transition-all ${
                 categoriaAtiva === index
-                  ? "bg-internoRotas-azul-eletrico text-white shadow-md"
-                  : "bg-card text-text-secondary hover:bg-card-hover hover:text-text-primary border border-card-border"
+                  ? "bg-internoRotas-azul-eletrico text-white"
+                  : "bg-card text-text-secondary hover:bg-card-hover hover:text-text-primary"
               }`}
             >
               {categoria.displayName}
