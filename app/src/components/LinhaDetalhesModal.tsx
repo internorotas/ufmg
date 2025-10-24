@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal } from "./Modal";
 import { Linha, Parada } from "../types/data.types";
 import { IoTimeOutline, IoLocationSharp, IoMapOutline } from "react-icons/io5";
+import { buscarParadasPorIds, timeToMinutes } from "../../lib/utils";
 
 interface LinhaDetalhesModalProps {
   isOpen: boolean;
@@ -23,18 +24,11 @@ export function LinhaDetalhesModal({
   const [tabAtiva, setTabAtiva] = useState<TabType>("itinerario");
 
   // Buscar paradas do itinerário dinamicamente usando os IDs
-  const paradasDoItinerario = linha.itinerarioParadasIds
-    .map((idParada) => todasParadas.find((p) => p.idParada === idParada))
-    .filter((p): p is Parada => p !== undefined);
+  const paradasDoItinerario = buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
 
   // Calcular horários passados e futuros
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const timeToMinutes = (time: string): number => {
-    const [hours, minutes] = time.split(":").map(Number);
-    return hours * 60 + minutes;
-  };
 
   const horariosOrganizados = linha.horarios
     .filter((h) => h && h.includes(":"))

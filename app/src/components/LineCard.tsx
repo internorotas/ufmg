@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Linha } from "../types/data.types";
 import { IoTimeOutline, IoBusOutline } from "react-icons/io5";
+import { timeToMinutes, minutesToTime } from "../../lib/utils";
 
 interface LineCardProps {
   linha: Linha;
@@ -8,19 +9,6 @@ interface LineCardProps {
   onDetailsClick: () => void;
   isSelected?: boolean;
 }
-
-// Função para converter horário "HH:MM" em minutos desde meia-noite
-const timeToMinutes = (time: string): number => {
-  const [hours, minutes] = time.split(":").map(Number);
-  return hours * 60 + minutes;
-};
-
-// Função para converter minutos de volta para "HH:MM"
-const minutesToTime = (minutes: number): string => {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
-};
 
 // Função para calcular próximo e anterior horário (REGRA DE NEGÓCIO CORRETA)
 const calculateSchedules = (horarios: string[]) => {
