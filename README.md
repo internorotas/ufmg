@@ -2,7 +2,7 @@
 
 # Interno Rotas - UFMG 🚌
 
-![Logo Interno Rotas](./.github/README/branding/capa-mapa.png)
+![Logo Interno Rotas](.github/README/branding/capa-mapa.png)
 
 ### Navegue pelo Campus Pampulha com facilidade
 
@@ -70,7 +70,7 @@ O Interno Rotas oferece:
 
 Interface com menu lateral mostrando todas as linhas disponíveis e mapa interativo
 
-![Tela Inicial Desktop](./.github/README/screenshots/desktop/inicial.png)
+![Tela Inicial Desktop](.github/README/screenshots/desktop/inicial.png)
 
 ---
 
@@ -78,7 +78,7 @@ Interface com menu lateral mostrando todas as linhas disponíveis e mapa interat
 
 Ao selecionar uma linha, veja a rota no mapa e os próximos horários
 
-![Escolher Linha Desktop](./.github/README/screenshots/desktop/escolher-linha.png)
+![Escolher Linha Desktop](.github/README/screenshots/desktop/escolher-linha.png)
 
 ---
 
@@ -86,7 +86,7 @@ Ao selecionar uma linha, veja a rota no mapa e os próximos horários
 
 Visualize todos os horários do dia com destaque para os próximos
 
-![Horários Desktop](./.github/README/screenshots/desktop/exibir-horarios.png)
+![Horários Desktop](.github/README/screenshots/desktop/exibir-horarios.png)
 
 </div>
 
@@ -96,7 +96,7 @@ Visualize todos os horários do dia com destaque para os próximos
 
 | Tela Inicial | Escolher Linha | Horários |
 |:---:|:---:|:---:|
-| ![Mobile Inicial](./.github/README/screenshots/mobile/inicial.png) | ![Mobile Escolher Linha](./.github/README/screenshots/mobile/escolher-linha.png) | ![Mobile Horários](./.github/README/screenshots/mobile/exibir-horarios.png) |
+| ![Mobile Inicial](.github/README/screenshots/mobile/inicial.png) | ![Mobile Escolher Linha](.github/README/screenshots/mobile/escolher-linha.png) | ![Mobile Horários](.github/README/screenshots/mobile/exibir-horarios.png) |
 
 *Interface totalmente responsiva e otimizada para dispositivos móveis*
 
