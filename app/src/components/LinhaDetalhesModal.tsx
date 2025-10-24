@@ -88,7 +88,7 @@ export function LinhaDetalhesModal({
           {paradasDoItinerario.length > 0 ? (
             paradasDoItinerario.map((parada, index) => (
               <button
-                key={parada.idParada}
+                key={`${parada.idParada}-${index}`}
                 onClick={() => handleParadaClick(parada)}
                 className="w-full text-left p-4 bg-card hover:bg-card-hover rounded-lg transition-all flex items-start gap-3 group border border-card-border"
                 style={{
@@ -146,9 +146,9 @@ export function LinhaDetalhesModal({
                 Próximos Horários ({proximos.length})
               </h3>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                {proximos.map(({ horario }, index) => (
+                {proximos.map(({ horario, minutos }, index) => (
                   <div
-                    key={`proximo-${index}`}
+                    key={`proximo-${minutos}-${index}`}
                     className="border-2 rounded-lg p-3 text-center hover:bg-opacity-10 transition-colors"
                     style={{
                       borderColor: linha.corHex,
@@ -172,9 +172,9 @@ export function LinhaDetalhesModal({
                 Horários Passados ({passados.length})
               </h3>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                {passados.map(({ horario }, index) => (
+                {passados.map(({ horario, minutos }, index) => (
                   <div
-                    key={`passado-${index}`}
+                    key={`passado-${minutos}-${index}`}
                     className="bg-card border border-card-border rounded-lg p-3 text-center opacity-50"
                   >
                     <p className="text-lg font-semibold text-text-secondary">{horario}</p>
