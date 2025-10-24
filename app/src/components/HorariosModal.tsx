@@ -2,18 +2,13 @@ import { useMemo } from "react";
 import { Modal } from "./Modal";
 import { IoTimeOutline, IoCheckmarkCircle } from "react-icons/io5";
 import { Linha } from "../types/data.types";
+import { timeToMinutes } from "../../lib/utils";
 
 interface HorariosModalProps {
   isOpen: boolean;
   onClose: () => void;
   linha: Linha;
 }
-
-// Função para converter horário "HH:MM" em minutos desde meia-noite
-const timeToMinutes = (time: string): number => {
-  const [hours, minutes] = time.split(":").map(Number);
-  return hours * 60 + minutes;
-};
 
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const now = new Date();

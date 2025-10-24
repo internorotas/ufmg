@@ -4,6 +4,7 @@ import { PopupCustomizado } from "./PopupCustomizado";
 import { AntPathComponent } from "./AntPathComponent";
 import { Parada, Linha } from "../types/data.types";
 import { useEffect, useImperativeHandle, forwardRef, useRef, useState, useMemo } from "react";
+import { buscarParadasPorIds } from "../../lib/utils";
 
 interface MapaProps {
   todasParadas: Parada[];
@@ -80,9 +81,7 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
         return todasParadas; // Mostrar todas se nenhuma linha selecionada
       }
       
-      return linhaSelecionada.itinerarioParadasIds
-        .map((idParada) => todasParadas.find((p) => p.idParada === idParada))
-        .filter((p): p is Parada => p !== undefined);
+      return buscarParadasPorIds(linhaSelecionada.itinerarioParadasIds, todasParadas);
     }, [linhaSelecionada, todasParadas]);
 
     // Calcular bounds baseado nas coordenadas do trajeto da linha

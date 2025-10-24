@@ -1,6 +1,7 @@
 import { Modal } from "./Modal";
 import { IoLocationSharp } from "react-icons/io5";
 import { Linha, Parada } from "../types/data.types";
+import { buscarParadasPorIds } from "../../lib/utils";
 
 interface ItinerarioModalProps {
   isOpen: boolean;
@@ -18,9 +19,7 @@ export function ItinerarioModal({
   onParadaClick,
 }: ItinerarioModalProps) {
   // Buscar paradas do itinerário
-  const paradasDoItinerario = linha.itinerarioParadasIds
-    .map((idParada) => paradas.find((p) => p.idParada === idParada))
-    .filter((p): p is Parada => p !== undefined);
+  const paradasDoItinerario = buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
 
   const handleParadaClick = (parada: Parada) => {
     onParadaClick(parada);

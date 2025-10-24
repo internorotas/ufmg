@@ -772,3 +772,89 @@ export function cleanHtmlForMarkdown(input: string) {
     },
   });
 }
+
+/**
+ * Converte horário no formato "HH:MM" em minutos desde meia-noite
+ * @param time Horário no formato "HH:MM"
+ * @returns Número de minutos desde meia-noite
+ */
+export function timeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+/**
+ * Converte minutos desde meia-noite de volta para formato "HH:MM"
+ * @param minutes Número de minutos desde meia-noite
+ * @returns Horário no formato "HH:MM"
+ */
+export function minutesToTime(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Calcula o próximo e o anterior horário com base no horário atual
+ * @param horarios Array de horários no formato "HH:MM"
+ * @returns Objeto com nextSchedule e previousSchedule
+ */
+export function calculateNextAndPreviousSchedule(horarios: string[]) {
+  if (!horarios || horarios.length === 0) {
+    return { nextSchedule: '--:--', previousSchedule: '--:--' };
+  }
+
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const schedulesInMinutes = horarios
+    .filter((time) => time && time.includes(':')) // Filtrar horários válidos
+    .map(timeToMinutes)
+    .sort((a, b) => a - b);
+
+  if (schedulesInMinutes.length === 0) {
+    return { nextSchedule: '--:--', previousSchedule: '--:--' };
+  }
+
+  let nextSchedule = '--:--';
+  let previousSchedule = '--:--';
+
+  // Encontrar próximo horário
+  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
+  if (next !== undefined) {
+    nextSchedule = minutesToTime(next);
+  } else if (schedulesInMinutes.length > 0) {
+    // Se não há mais horários hoje, o próximo é o primeiro de amanhã
+    nextSchedule = minutesToTime(schedulesInMinutes[0]);
+  }
+
+  // Encontrar horário anterior
+  const previousSchedules = schedulesInMinutes.filter(
+    (schedule) => schedule < currentMinutes,
+  );
+  if (previousSchedules.length > 0) {
+    previousSchedule = minutesToTime(Math.max(...previousSchedules));
+  } else if (schedulesInMinutes.length > 0) {
+    // Se não há horários anteriores hoje, o anterior é o último de ontem
+    previousSchedule = minutesToTime(
+      schedulesInMinutes[schedulesInMinutes.length - 1],
+    );
+  }
+
+  return { nextSchedule, previousSchedule };
+}
+
+/**
+ * Busca paradas do itinerário usando os IDs fornecidos
+ * @param itinerarioParadasIds Array de IDs de paradas
+ * @param todasParadas Array com todas as paradas disponíveis
+ * @returns Array de paradas encontradas
+ */
+export function buscarParadasPorIds<T extends { idParada: string }>(
+  itinerarioParadasIds: string[],
+  todasParadas: T[],
+): T[] {
+  return itinerarioParadasIds
+    .map((idParada) => todasParadas.find((p) => p.idParada === idParada))
+    .filter((p): p is T => p !== undefined);
+}
