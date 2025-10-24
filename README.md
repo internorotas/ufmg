@@ -1,7 +1,7 @@
 # Interno Rotas - UFMG 🚌
 
 <h1 align="center">
-  <img alt="Logo Interno Rotas" title="Interno Rotas" src="./github/Capa-mapa.png"/>
+  <img alt="Logo Interno Rotas" title="Interno Rotas" src="./.github/README/branding/capa-mapa.png"/>
 </h1>
 
 <p align="center">
@@ -64,33 +64,33 @@ A medida que fui desenvolvendo o código do projeto fui notando a necessidade de
 
 Tela inicial em que o usuário consegue ver o mapa ao fundo, com as linhas internas em uma painel lateral. Cada linha tem sua cor única, para facilitar sua identificação. Na tela não é possível ver, mas o menu lateral conta com scroll para ver mais linhas e um botão de reportar problemas e outro para exibir informações sobre o projeto.
 
-![Tela Inicial no Desktop](/github/Desktop%20-%20Inicial.png)
+![Tela Inicial no Desktop](./.github/README/screenshots/desktop/inicial.png)
 
 ### Escolher Linha - Desktop
 
 Tela em que o usuário escolhe uma linha específica. Com isso, é exibida o horário anterior e o próximo horário daquele interno. O usuário também pode escolher se deseja ver mais horários daquela linha.
 
-![Escolher Linha no Desktop](/github/Desktop%20-%20Escolher%20Linha.png)
+![Escolher Linha no Desktop](./.github/README/screenshots/desktop/escolher-linha.png)
 
 ### Exibir Horários - Desktop
 
 Nesta tela são mostrados todos os horários em que aquela linha roda.
 
-![Exibir Horários no Desktop](/github/Desktop%20-%20Exibir%20Hor%C3%A1rios.png)
+![Exibir Horários no Desktop](./.github/README/screenshots/desktop/exibir-horarios.png)
 
 ### Tela Inicial - Mobile
 
 Pensando no fato de a maioria das pessoas utilizarem o celular, foi feito o layout com as mesmas funções, porém adaptado para as telas de celulares e outros dispositivos com telas pequenas. A responsividade deve ser trabalhada nesse projeto para melhorar a acessibilidade.
 
-![Tela Inicial no Mobile](/github/Mobile%20-%20Inicial.png)
+![Tela Inicial no Mobile](./.github/README/screenshots/mobile/inicial.png)
 
 ### Escolher Linha - Mobile
 
-![Escolher Linha no Mobile](/github/Mobile%20-%20Escolher%20Linha.png)
+![Escolher Linha no Mobile](./.github/README/screenshots/mobile/escolher-linha.png)
 
 ### Exibir Horários - Mobile
 
-![Exibir Horários no Mobile](/github/Mobile%20-%20Exibir%20Hor%C3%A1rios.png)
+![Exibir Horários no Mobile](./.github/README/screenshots/mobile/exibir-horarios.png)
 
 ## Requisitos
 
