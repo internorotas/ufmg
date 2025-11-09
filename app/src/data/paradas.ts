@@ -1,5 +1,16 @@
 import { Parada } from "../types/data.types";
 
+/**
+ * Um objeto que contém todos os dados das paradas de ônibus.
+ *
+ * @property {Parada[]} paradas - Um array de objetos, onde cada objeto representa uma parada de ônibus.
+ * @property {string} paradas[].idParada - O identificador único da parada.
+ * @property {string} paradas[].nome - O nome da parada.
+ * @property {string[]} paradas[].linhasAtendidas - Um array com os nomes das linhas que atendem a essa parada.
+ * @property {[number, number]} paradas[].coordenadas - As coordenadas de latitude e longitude da parada.
+ * @property {string} paradas[].categoria - A categoria da parada (ex: "Ponto de Origem/Destino", "Parada Regular").
+ * @property {string} paradas[].descricao - Uma descrição mais detalhada da localização da parada.
+ */
 const dataParadas: { paradas: Parada[] } = {
   paradas: [
     {

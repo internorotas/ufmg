@@ -12,6 +12,9 @@ import "./globals.css";
 import { App } from "./App";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
+/**
+ * O ponto de entrada da aplicação. Renderiza o componente principal (`App`) dentro do `StrictMode` e do `ThemeProvider`.
+ */
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>

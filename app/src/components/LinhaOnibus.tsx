@@ -13,6 +13,17 @@ interface LinhaOnibusProps {
   onParadaClick: (parada: Parada) => void;
 }
 
+/**
+ * Renderiza um componente que exibe informações sobre uma linha de ônibus e fornece acesso ao seu itinerário e horários.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {Linha} props.linha - Um objeto contendo os dados da linha de ônibus.
+ * @param {() => void} props.onLinhaClick - Uma função para lidar com cliques na linha.
+ * @param {string} props.bgColor - A cor de fundo para o cabeçalho da linha.
+ * @param {Parada[]} props.paradas - Um array com todas as paradas de ônibus disponíveis.
+ * @param {(parada: Parada) => void} props.onParadaClick - Uma função para lidar com cliques em uma parada de ônibus.
+ * @returns {JSX.Element} O componente de linha de ônibus renderizado.
+ */
 export function LinhaOnibus({
   linha,
   onLinhaClick,
