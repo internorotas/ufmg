@@ -9,6 +9,17 @@ interface ModalProps {
   maxWidth?: string;
 }
 
+/**
+ * Renderiza um componente de modal genérico.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {boolean} props.isOpen - Um booleano que indica se o modal está aberto.
+ * @param {() => void} props.onClose - Uma função para fechar o modal.
+ * @param {string} props.title - O título do modal.
+ * @param {ReactNode} props.children - O conteúdo a ser exibido dentro do modal.
+ * @param {string} [props.maxWidth="max-w-2xl"] - A largura máxima do modal.
+ * @returns {JSX.Element | null} O componente de modal renderizado, ou nulo se não estiver aberto.
+ */
 export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-2xl" }: ModalProps) {
   // Fechar modal com ESC
   useEffect(() => {

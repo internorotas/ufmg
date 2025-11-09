@@ -1,5 +1,10 @@
 import { IoWarningOutline, IoMailOutline, IoCallOutline } from "react-icons/io5";
 
+/**
+ * Renderiza um banner de aviso com informações de contato da Divisão de Transportes.
+ *
+ * @returns {JSX.Element} O componente de banner de aviso renderizado.
+ */
 export function DisclaimerBanner() {
   return (
     <div className="mx-3 mb-3 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@fontsource/poppins": "^5.2.5",
+    "@playwright/test": "^1.56.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "leaflet": "^1.9.4",

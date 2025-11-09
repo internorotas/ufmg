@@ -1,5 +1,14 @@
 import { CategoriaLinhas } from "../types/data.types";
 
+/**
+ * Um objeto que contém todos os dados das linhas de ônibus, categorizados por tipo de dia.
+ *
+ * @property {object[]} categoriasDias - Um array de categorias de tipo de dia.
+ * @property {number} categoriasDias[].id - O identificador único para o tipo de dia.
+ * @property {string} categoriasDias[].categoriaDia - O nome da categoria do tipo de dia (ex: "diasUteis").
+ * @property {string} categoriasDias[].displayName - O nome de exibição para o tipo de dia (ex: "Dias Úteis").
+ * @property {Linha[]} categoriasDias[].linhas - Um array de linhas de ônibus para esse tipo de dia.
+ */
 const data: CategoriaLinhas = {
   categoriasDias: [
     {

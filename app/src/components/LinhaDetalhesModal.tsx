@@ -14,6 +14,17 @@ interface LinhaDetalhesModalProps {
 
 type TabType = "itinerario" | "horarios";
 
+/**
+ * Renderiza um modal que exibe informações detalhadas sobre uma linha de ônibus, incluindo seu itinerário e horários.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {boolean} props.isOpen - Um booleano que indica se o modal está aberto.
+ * @param {() => void} props.onClose - Uma função para fechar o modal.
+ * @param {Linha} props.linha - Um objeto contendo os dados da linha de ônibus.
+ * @param {Parada[]} props.todasParadas - Um array com todas as paradas de ônibus disponíveis.
+ * @param {(parada: Parada) => void} props.onParadaClick - Uma função para lidar com cliques em uma parada de ônibus.
+ * @returns {JSX.Element} O componente de modal de detalhes da linha renderizado.
+ */
 export function LinhaDetalhesModal({
   isOpen,
   onClose,

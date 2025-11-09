@@ -53,6 +53,16 @@ const CenterOnParada = ({ parada }: { parada: Parada | null }) => {
   return null;
 };
 
+/**
+ * Renderiza um mapa interativo com as paradas e rotas de ônibus.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {Parada[]} props.todasParadas - Um array com todas as paradas de ônibus disponíveis.
+ * @param {Linha | null} props.linhaSelecionada - A linha de ônibus atualmente selecionada, ou nulo se nenhuma estiver selecionada.
+ * @param {Parada | null} props.paradaSelecionada - A parada de ônibus atualmente selecionada, ou nulo se nenhuma estiver selecionada.
+ * @param {React.Ref<MapaRef>} ref - Uma ref para expor o método `centralizarParada`.
+ * @returns {JSX.Element} O componente de mapa renderizado.
+ */
 export const Mapa = forwardRef<MapaRef, MapaProps>(
   ({ todasParadas, linhaSelecionada, paradaSelecionada }, ref) => {
     const markersRef = useRef<{ [key: string]: L.Marker }>({});
