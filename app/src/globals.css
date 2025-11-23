@@ -15,6 +15,12 @@
   --color-modal: #ffffff;
   --color-input: #f9fafb;
 
+  /* Cores de Alerta (Warning) */
+  --color-warning-bg: #fef3c7;
+  --color-warning-border: #fde047;
+  --color-warning-text: #78350f;
+  --color-warning-icon: #ca8a04;
+
   /* Cores da Marca */
   --color-internoRotas-azul-eletrico: #2c0eeb;
   --color-internoRotas-bege-areia: #ecdcc4;
@@ -37,6 +43,12 @@
   --sidebar-background: #f3f4f6;
   --modal-background: #ffffff;
   --input-background: #f9fafb;
+
+  /* Warning */
+  --warning-bg: #fef3c7;
+  --warning-border: #fde047;
+  --warning-text: #78350f;
+  --warning-icon: #ca8a04;
 }
 
 .dark {
@@ -51,6 +63,12 @@
   --modal-background: #1f2937;
   --input-background: #374151;
 
+  /* Warning (Dark Mode) */
+  --warning-bg: #422006;
+  --warning-border: #78350f;
+  --warning-text: #fef3c7;
+  --warning-icon: #fbbf24;
+
   /* Atualizar cores do Tailwind para dark mode */
   --color-background: #111827;
   --color-background-secondary: #1f2937;
@@ -62,6 +80,12 @@
   --color-sidebar: #1a1819;
   --color-modal: #1f2937;
   --color-input: #374151;
+
+  /* Cores de Alerta (Warning) - Dark Mode */
+  --color-warning-bg: #422006;
+  --color-warning-border: #78350f;
+  --color-warning-text: #fef3c7;
+  --color-warning-icon: #fbbf24;
 }
 
 * {

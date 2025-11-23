@@ -2,51 +2,75 @@ import { IoWarningOutline, IoMailOutline, IoCallOutline } from "react-icons/io5"
 
 export function DisclaimerBanner() {
   return (
-    <div className="mx-3 mb-3 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+    <div 
+      className="mx-3 mb-3 p-3 rounded-lg border"
+      style={{
+        backgroundColor: 'var(--warning-bg)',
+        borderColor: 'var(--warning-border)',
+      }}
+    >
       <div className="flex items-start gap-2">
         <IoWarningOutline 
-          className="text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" 
-          size={18} 
+          className="flex-shrink-0 mt-0.5" 
+          size={18}
+          style={{ color: 'var(--warning-icon)' }}
         />
         <div className="flex-1">
-          <p className="text-xs text-yellow-900 dark:text-yellow-100 leading-relaxed mb-2">
+          <p 
+            className="text-xs leading-relaxed mb-2"
+            style={{ color: 'var(--warning-text)' }}
+          >
             Informações extraídas do{" "}
             <a 
-              href="https://ufmg.br/servicos/onibus" 
+              href="https://www.ufmg.br/transporte/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="font-semibold underline hover:no-underline"
+              style={{ color: 'var(--warning-text)' }}
             >
               site da UFMG
             </a>.
           </p>
-          <p className="text-xs text-yellow-900 dark:text-yellow-100 leading-relaxed mb-2">
+          <p 
+            className="text-xs leading-relaxed mb-2"
+            style={{ color: 'var(--warning-text)' }}
+          >
             Podem haver mudanças de itinerário e horários sem prévio aviso. Para informações, reclamações, dúvidas e sugestões, entre em contato com a{" "}
             <strong>Divisão de Transportes</strong>.
           </p>
           
-          <div className="mt-2 pt-2 border-t border-yellow-200 dark:border-yellow-700 space-y-1.5">
-            <div className="flex items-center gap-2 text-xs text-yellow-900 dark:text-yellow-100">
-              <IoCallOutline size={14} className="flex-shrink-0" />
-              <span>
-                Telefones:{" "}
-                <a href="tel:3409-4601" className="font-semibold hover:underline">3409-4601</a>
-                {" "}ou{" "}
-                <a href="tel:3409-4606" className="font-semibold hover:underline">3409-4606</a>
+          <div 
+            className="mt-2 pt-2 border-t grid grid-cols-1 sm:grid-cols-2 gap-2"
+            style={{ borderColor: 'var(--warning-border)' }}
+          >
+            <a
+              href="tel:3409-4601"
+              className="flex items-center justify-center gap-2 text-xs py-2 px-3 rounded-lg border transition-opacity hover:opacity-80"
+              style={{
+                color: 'var(--warning-text)',
+                borderColor: 'var(--warning-border)',
+                backgroundColor: 'var(--warning-bg)',
+              }}
+            >
+              <IoCallOutline size={16} className="flex-shrink-0" />
+              <span className="font-semibold">
+                3409-4601 / 4606
               </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-yellow-900 dark:text-yellow-100">
-              <IoMailOutline size={14} className="flex-shrink-0" />
-              <span>
-                E-mail:{" "}
-                <a 
-                  href="mailto:sfrota@dsg.ufmg.br" 
-                  className="font-semibold hover:underline"
-                >
-                  sfrota@dsg.ufmg.br
-                </a>
+            </a>
+            <a
+              href="mailto:sfrota@dsg.ufmg.br"
+              className="flex items-center justify-center gap-2 text-xs py-2 px-3 rounded-lg border transition-opacity hover:opacity-80"
+              style={{
+                color: 'var(--warning-text)',
+                borderColor: 'var(--warning-border)',
+                backgroundColor: 'var(--warning-bg)',
+              }}
+            >
+              <IoMailOutline size={16} className="flex-shrink-0" />
+              <span className="font-semibold">
+                sfrota@dsg.ufmg.br
               </span>
-            </div>
+            </a>
           </div>
         </div>
       </div>
