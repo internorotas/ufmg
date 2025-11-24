@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Modal } from "./Modal";
 import { Linha, Parada } from "../types/data.types";
-import { IoTimeOutline, IoLocationSharp, IoMapOutline } from "react-icons/io5";
+import { IoTimeOutline, IoMapOutline, IoLocationOutline } from "react-icons/io5";
 import { buscarParadasPorIds, timeToMinutes } from "../../lib/utils";
 
 interface LinhaDetalhesModalProps {
@@ -84,43 +84,74 @@ export function LinhaDetalhesModal({
 
       {/* Conteúdo das Tabs */}
       {tabAtiva === "itinerario" ? (
-        <div className="space-y-2">
+        <div className="relative">
           {paradasDoItinerario.length > 0 ? (
-            paradasDoItinerario.map((parada, index) => (
-              <button
-                key={`${parada.idParada}-${index}`}
-                onClick={() => handleParadaClick(parada)}
-                className="w-full text-left p-4 bg-card hover:bg-card-hover rounded-lg transition-all flex items-start gap-3 group border border-card-border"
-                style={{
-                  borderLeft: `4px solid ${linha.corHex}`,
-                }}
-              >
-                <div className="flex-shrink-0 mt-1">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white"
-                    style={{ backgroundColor: linha.corHex }}
-                  >
-                    {index + 1}
+            <div className="relative">
+              {paradasDoItinerario.map((parada, index) => {
+                const isFirst = index === 0;
+                const isLast = index === paradasDoItinerario.length - 1;
+                
+                return (
+                  <div key={`${parada.idParada}-${index}`} className="relative flex">
+                    {/* Linha conectora vertical tracejada */}
+                    {!isLast && (
+                      <div 
+                        className="absolute left-[11px] top-[28px] w-[2px] h-full"
+                        style={{ 
+                          backgroundColor: `${linha.corHex}40`,
+                          backgroundImage: `repeating-linear-gradient(0deg, ${linha.corHex}40, ${linha.corHex}40 6px, transparent 6px, transparent 12px)`
+                        }}
+                      />
+                    )}
+                    
+                    <button
+                      onClick={() => handleParadaClick(parada)}
+                      className="w-full text-left py-2 flex items-start gap-3 group"
+                    >
+                      {/* Ícone de localização com círculo */}
+                      <div className="flex-shrink-0 relative z-10 mt-0.5">
+                        <div 
+                          className="w-6 h-6 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: `${linha.corHex}20` }}
+                        >
+                          <IoLocationOutline 
+                            size={18}
+                            style={{ color: linha.corHex }}
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Conteúdo da parada */}
+                      <div className="flex-1 min-w-0 pt-0.5">
+                        <h4 className="font-semibold text-[15px] text-text-primary leading-snug group-hover:underline">
+                          {parada.nome}
+                        </h4>
+                        
+                        {isFirst && (
+                          <p className="text-xs text-text-secondary mt-0.5">
+                            Ponto de Origem/Destino
+                          </p>
+                        )}
+                        {!isFirst && !isLast && (
+                          <p className="text-xs text-text-secondary mt-0.5">
+                            Parada Regular
+                          </p>
+                        )}
+                        
+                        {isFirst && (
+                          <span 
+                            className="inline-block text-xs font-semibold mt-1 px-0"
+                            style={{ color: linha.corHex }}
+                          >
+                            Partida
+                          </span>
+                        )}
+                      </div>
+                    </button>
                   </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-start gap-2">
-                    <IoLocationSharp
-                      className="mt-1 flex-shrink-0"
-                      style={{ color: linha.corHex }}
-                      size={18}
-                    />
-                    <div>
-                      <h4 className="font-semibold text-base text-text-primary">{parada.nome}</h4>
-                      <p className="text-sm text-text-secondary mt-1">
-                        {parada.categoria} • {parada.linhasAtendidas.length} linha
-                        {parada.linhasAtendidas.length !== 1 ? "s" : ""}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-            ))
+                );
+              })}
+            </div>
           ) : (
             <div className="text-center py-8 text-text-secondary">
               <p>Nenhuma parada encontrada para este itinerário.</p>

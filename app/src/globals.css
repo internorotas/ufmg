@@ -21,6 +21,18 @@
   --color-warning-text: #78350f;
   --color-warning-icon: #ca8a04;
 
+  /* Cores de Informação (Info) */
+  --color-info-bg: #dbeafe;
+  --color-info-border: #60a5fa;
+  --color-info-text: #1e3a8a;
+  --color-info-icon: #2563eb;
+
+  /* Cores de Sucesso (Success) */
+  --color-success-bg: #d1fae5;
+  --color-success-border: #34d399;
+  --color-success-text: #065f46;
+  --color-success-icon: #059669;
+
   /* Cores da Marca */
   --color-internoRotas-azul-eletrico: #2c0eeb;
   --color-internoRotas-bege-areia: #ecdcc4;
@@ -49,6 +61,18 @@
   --warning-border: #fde047;
   --warning-text: #78350f;
   --warning-icon: #ca8a04;
+
+  /* Info */
+  --info-bg: #dbeafe;
+  --info-border: #60a5fa;
+  --info-text: #1e3a8a;
+  --info-icon: #2563eb;
+
+  /* Success */
+  --success-bg: #d1fae5;
+  --success-border: #34d399;
+  --success-text: #065f46;
+  --success-icon: #059669;
 }
 
 .dark {
@@ -69,6 +93,18 @@
   --warning-text: #fef3c7;
   --warning-icon: #fbbf24;
 
+  /* Info (Dark Mode) */
+  --info-bg: #1e3a8a;
+  --info-border: #3b82f6;
+  --info-text: #dbeafe;
+  --info-icon: #60a5fa;
+
+  /* Success (Dark Mode) */
+  --success-bg: #064e3b;
+  --success-border: #059669;
+  --success-text: #d1fae5;
+  --success-icon: #34d399;
+
   /* Atualizar cores do Tailwind para dark mode */
   --color-background: #111827;
   --color-background-secondary: #1f2937;
@@ -86,6 +122,18 @@
   --color-warning-border: #78350f;
   --color-warning-text: #fef3c7;
   --color-warning-icon: #fbbf24;
+
+  /* Cores de Informação (Info) - Dark Mode */
+  --color-info-bg: #1e3a8a;
+  --color-info-border: #3b82f6;
+  --color-info-text: #dbeafe;
+  --color-info-icon: #60a5fa;
+
+  /* Cores de Sucesso (Success) - Dark Mode */
+  --color-success-bg: #064e3b;
+  --color-success-border: #059669;
+  --color-success-text: #d1fae5;
+  --color-success-icon: #34d399;
 }
 
 * {

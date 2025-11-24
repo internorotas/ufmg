@@ -1,7 +1,7 @@
 import { Modal } from "./Modal";
-import { IoLocationSharp } from "react-icons/io5";
 import { Linha, Parada } from "../types/data.types";
 import { buscarParadasPorIds } from "../../lib/utils";
+import { IoLocationOutline } from "react-icons/io5";
 
 interface ItinerarioModalProps {
   isOpen: boolean;
@@ -33,32 +33,74 @@ export function ItinerarioModal({
       title={`Itinerário - ${linha.nome}`}
       maxWidth="max-w-lg"
     >
-      <div className="space-y-2">
+      <div className="relative">
         {paradasDoItinerario.length > 0 ? (
-          paradasDoItinerario.map((parada, index) => (
-            <button
-              key={parada.idParada}
-              onClick={() => handleParadaClick(parada)}
-              className="w-full text-left p-4 bg-internoRotas-cinza-grafite hover:bg-internoRotas-azul-eletrico rounded-lg transition-all flex items-start gap-3 group"
-            >
-              <div className="flex-shrink-0 mt-1">
-                <div className="w-8 h-8 rounded-full bg-internoRotas-azul-eletrico group-hover:bg-white flex items-center justify-center font-bold text-sm">
-                  {index + 1}
+          <div className="relative">
+            {paradasDoItinerario.map((parada, index) => {
+              const isFirst = index === 0;
+              const isLast = index === paradasDoItinerario.length - 1;
+              
+              return (
+                <div key={parada.idParada} className="relative flex">
+                  {/* Linha conectora vertical tracejada */}
+                  {!isLast && (
+                    <div 
+                      className="absolute left-[11px] top-[28px] w-[2px] h-full"
+                      style={{ 
+                        backgroundColor: `${linha.corHex}40`,
+                        backgroundImage: `repeating-linear-gradient(0deg, ${linha.corHex}40, ${linha.corHex}40 6px, transparent 6px, transparent 12px)`
+                      }}
+                    />
+                  )}
+                  
+                  <button
+                    onClick={() => handleParadaClick(parada)}
+                    className="w-full text-left py-2 flex items-start gap-3 group"
+                  >
+                    {/* Ícone de localização com círculo */}
+                    <div className="flex-shrink-0 relative z-10 mt-0.5">
+                      <div 
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: `${linha.corHex}20` }}
+                      >
+                        <IoLocationOutline 
+                          size={18}
+                          style={{ color: linha.corHex }}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Conteúdo da parada */}
+                    <div className="flex-1 min-w-0 pt-0.5">
+                      <h4 className="font-semibold text-[15px] text-text-primary leading-snug group-hover:underline">
+                        {parada.nome}
+                      </h4>
+                      
+                      {isFirst && (
+                        <p className="text-xs text-text-secondary mt-0.5">
+                          Ponto de Origem/Destino
+                        </p>
+                      )}
+                      {!isFirst && !isLast && (
+                        <p className="text-xs text-text-secondary mt-0.5">
+                          Parada Regular
+                        </p>
+                      )}
+                      
+                      {isFirst && (
+                        <span 
+                          className="inline-block text-xs font-semibold mt-1 px-0"
+                          style={{ color: linha.corHex }}
+                        >
+                          Partida
+                        </span>
+                      )}
+                    </div>
+                  </button>
                 </div>
-              </div>
-              <div className="flex-1">
-                <div className="flex items-start gap-2">
-                  <IoLocationSharp className="text-internoRotas-laranja-ambar mt-1 flex-shrink-0" size={18} />
-                  <div>
-                    <h4 className="font-semibold text-base">{parada.nome}</h4>
-                    <p className="text-sm text-gray-400 mt-1">
-                      {parada.linhasAtendidas.length} linha{parada.linhasAtendidas.length !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </button>
-          ))
+              );
+            })}
+          </div>
         ) : (
           <div className="text-center py-8 text-gray-400">
             <p>Nenhuma parada encontrada para este itinerário.</p>
@@ -66,9 +108,9 @@ export function ItinerarioModal({
         )}
       </div>
 
-      <div className="mt-6 bg-internoRotas-cinza-grafite rounded-lg p-4 text-sm text-center">
-        <p className="text-gray-300">
-          Clique em uma parada para visualizá-la no mapa
+      <div className="mt-6 bg-card rounded-lg p-4 text-sm text-center border border-card-border">
+        <p className="text-text-secondary">
+          💡 Clique em uma parada para visualizá-la no mapa
         </p>
       </div>
     </Modal>
