@@ -40,7 +40,7 @@ export function DisclaimerBanner() {
           </p>
           
           <div 
-            className="mt-2 pt-2 border-t grid grid-cols-1 sm:grid-cols-2 gap-2"
+            className="mt-2 pt-2 border-t grid grid-cols-2 gap-2"
             style={{ borderColor: 'var(--warning-border)' }}
           >
             <a
