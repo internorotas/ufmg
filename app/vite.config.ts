@@ -6,4 +6,6 @@ import { ghPages } from 'vite-plugin-gh-pages';
 export default defineConfig({
   plugins: [react(), tailwindcss(), ghPages()],
   base: '/',
+  // Removed manualChunks as it seems to be causing timeouts in this environment.
+  // Vite's default chunking strategy is often sufficient.
 });
