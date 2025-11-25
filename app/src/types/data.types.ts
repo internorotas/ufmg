@@ -26,6 +26,7 @@ export interface Linha {
   descricao: string;
   horarios: string[];
   itinerarioParadasIds: string[];
+  // Coordenadas devem ser sempre tuplas de [latitude, longitude]
   coordenadasTrajeto: [number, number][];
 }
 
@@ -34,7 +35,8 @@ export interface Trajeto {
   linha: string;
   sublinha: string | null;
   cor: string;
-  coordenadas: number[][];
+  // Corrigido: Leaflet espera [lat, lng], não number[][] genérico
+  coordenadas: [number, number][];
 }
 
 // Tipos para os dados das paradas, usados para os marcadores no Mapa
@@ -44,5 +46,6 @@ export interface Parada {
   linhasAtendidas: string[];
   categoria: string;
   descricao: string;
+  // Corrigido: Tupla explícita
   coordenadas: [number, number];
 }
