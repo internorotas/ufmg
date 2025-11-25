@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import ReactGA from "react-ga4";
+import { useDebounce } from "use-debounce";
 import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
 import { ThemeToggle } from "./ThemeToggle";
 import { DisclaimerBanner } from "./DisclaimerBanner";
@@ -7,6 +9,8 @@ import { Linha, CategoriaLinhas, Parada } from "../types/data.types";
 import logo from "../assets/logo-horizontal-transparente.svg";
 import { IoSearch, IoMenu, IoClose } from "react-icons/io5";
 import { LineCard } from "./LineCard";
+
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 interface MenuLateralProps {
   linhasData: CategoriaLinhas;
@@ -37,9 +41,20 @@ export function MenuLateral({
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [categoriaAtiva, setCategoriaAtiva] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 1500);
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
     null
   );
+
+  useEffect(() => {
+    if (GA_MEASUREMENT_ID && debouncedSearchTerm) {
+      ReactGA.event({
+        category: "Busca",
+        action: "Termo Pesquisado",
+        label: debouncedSearchTerm,
+      });
+    }
+  }, [debouncedSearchTerm]);
 
   const handleCardClick = (linha: Linha) => {
     // Clique no card: seleciona a linha e mostra no mapa
@@ -74,6 +89,30 @@ export function MenuLateral({
           linha.sublinha.toLowerCase().includes(searchTerm.toLowerCase())) ||
         linha.descricao.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
+
+  useEffect(() => {
+    if (searchTerm && linhasFiltradas.length === 0) {
+      if (GA_MEASUREMENT_ID) {
+        ReactGA.event({
+          category: "Busca",
+          action: "Busca Sem Resultados",
+          label: searchTerm,
+        });
+      }
+    }
+  }, [searchTerm, linhasFiltradas.length]);
+
+  const handleCategoriaClick = (index: number) => {
+    const categoria = linhasData.categoriasDias[index];
+    if (GA_MEASUREMENT_ID && categoria) {
+      ReactGA.event({
+        category: "Navegação Principal",
+        action: "Selecionar Categoria Dia",
+        label: categoria.displayName,
+      });
+    }
+    setCategoriaAtiva(index);
+  };
 
   return (
     <>
@@ -146,7 +185,7 @@ export function MenuLateral({
           {linhasData.categoriasDias.map((categoria, index) => (
             <button
               key={categoria.id}
-              onClick={() => setCategoriaAtiva(index)}
+              onClick={() => handleCategoriaClick(index)}
               className={`flex-1 py-2.5 px-2.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
                 categoriaAtiva === index
                   ? "bg-brand-primary text-white shadow-sm"
