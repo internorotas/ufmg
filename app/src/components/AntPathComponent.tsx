@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-ant-path";
@@ -31,16 +31,38 @@ interface AntPathProps {
  */
 export function AntPathComponent({ coordinates, options }: AntPathProps) {
   const map = useMap();
+  const antPathRef = useRef<L.Polyline | null>(null);
 
   useEffect(() => {
-    const antPath = new L.Polyline.AntPath(coordinates, options);
-    map.addLayer(antPath);
-    map.fitBounds(antPath.getBounds(), { padding: [50, 50] });
+    // Se não houver coordenadas, não faz nada
+    if (!coordinates || coordinates.length === 0) return;
 
+    // Remove camada anterior se existir (para evitar duplicação em re-renders rápidos)
+    if (antPathRef.current) {
+      map.removeLayer(antPathRef.current);
+    }
+
+    // Cria nova instância
+    // @ts-ignore - leaflet-ant-path extends L.Polyline but types might not be fully merged
+    const antPath = new L.Polyline.AntPath(coordinates, options);
+
+    antPathRef.current = antPath;
+    map.addLayer(antPath);
+
+    try {
+      map.fitBounds(antPath.getBounds(), { padding: [50, 50] });
+    } catch (e) {
+      console.warn("Could not fit bounds for AntPath", e);
+    }
+
+    // Cleanup function: remove a layer quando o componente desmonta ou muda
     return () => {
-      map.removeLayer(antPath);
+      if (antPathRef.current) {
+        map.removeLayer(antPathRef.current);
+        antPathRef.current = null;
+      }
     };
-  }, [coordinates, options, map]);
+  }, [coordinates, options, map]); // Recria apenas se coordenadas ou opções mudarem
 
   return null;
 }

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://internorotas.github.io/ufmg/sitemap.xml

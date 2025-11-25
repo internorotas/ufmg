@@ -81,7 +81,8 @@ export function MenuLateral({
       <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[1001]">
         <button
           onClick={() => setMenuVisible(true)}
-          className="bg-internoRotas-azul-eletrico text-white py-3 px-6 rounded-full shadow-lg flex items-center gap-3 font-bold hover:bg-blue-700 transition-colors"
+          className="bg-brand-primary text-white py-3 px-6 rounded-full shadow-lg flex items-center gap-3 font-bold hover:bg-blue-700 transition-colors cursor-pointer active:scale-95"
+          aria-label="Abrir menu de linhas"
         >
           <IoMenu size={24} />
           Ver Linhas
@@ -92,18 +93,18 @@ export function MenuLateral({
       {isMenuVisible && (
         <div
           onClick={() => setMenuVisible(false)}
-          className="md:hidden fixed inset-0 bg-black/70 z-[1002] animate-fade-in"
+          className="md:hidden fixed inset-0 bg-backdrop z-[1002] animate-fade-in backdrop-blur-sm"
         ></div>
       )}
 
       {/* Sidebar */}
-      <div
-        className={`fixed md:relative inset-y-0 left-0 max-w-md md:w-1/2 bg-background text-text-primary z-[1003] transform transition-transform duration-300 ${
+      <aside
+        className={`fixed md:relative inset-y-0 left-0 w-[85vw] max-w-md md:w-1/2 bg-sidebar text-text-primary z-[1003] transform transition-transform duration-300 ${
           isMenuVisible ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 flex flex-col border-r border-card-border`}
+        } md:translate-x-0 flex flex-col border-r border-card-border shadow-2xl md:shadow-none`}
       >
         {/* Header */}
-        <header className="bg-internoRotas-azul-eletrico p-2 flex justify-between items-center flex-shrink-0">
+        <header className="bg-brand-primary p-2 flex justify-between items-center flex-shrink-0 shadow-sm">
 
             <div className="flex items-center justify-center flex-1">
             <img src={logo} alt="Logo Interno Rotas" className="h-6" />
@@ -117,7 +118,8 @@ export function MenuLateral({
             {/* Botão Fechar Mobile */}
             <button
               onClick={() => setMenuVisible(false)}
-              className="md:hidden text-white p-2 hover:bg-white/20 rounded-lg transition-colors"
+              className="md:hidden text-white p-2 hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
+              aria-label="Fechar menu"
             >
               <IoClose size={24} />
             </button>
@@ -136,30 +138,31 @@ export function MenuLateral({
               placeholder="Pesquisar linha..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-input border border-card-border text-text-primary rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-internoRotas-azul-eletrico focus:border-transparent transition-all"
+              className="w-full bg-input border border-input-border text-text-primary rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all placeholder:text-text-tertiary"
+              aria-label="Pesquisar linha de ônibus"
             />
           </div>
         </div>
 
         {/* Tabs de Categoria */}
-        <div className="flex gap-2 px-4 py-3 bg-background flex-shrink-0">
+        <nav className="flex gap-2 px-4 py-3 bg-background flex-shrink-0 border-b border-card-border md:border-none">
           {linhasData.categoriasDias.map((categoria, index) => (
             <button
               key={categoria.id}
               onClick={() => setCategoriaAtiva(index)}
-              className={`flex-1 py-2.5 px-2.5 rounded-md text-xs font-medium transition-all ${
+              className={`flex-1 py-2.5 px-2.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
                 categoriaAtiva === index
-                  ? "bg-internoRotas-azul-eletrico text-white"
-                  : "bg-card text-text-secondary hover:bg-card-hover hover:text-text-primary"
+                  ? "bg-brand-primary text-white shadow-sm"
+                  : "bg-card text-text-secondary hover:bg-card-hover hover:text-text-primary border border-transparent hover:border-card-border"
               }`}
             >
               {categoria.displayName}
             </button>
           ))}
-        </div>
+        </nav>
 
         {/* Lista de Linhas */}
-        <main className="p-4 overflow-y-auto flex-1 bg-background">
+        <section className="p-4 overflow-y-auto flex-1 bg-background">
           {linhasFiltradas.length > 0 ? (
             linhasFiltradas.map((linha: Linha) => (
               <LineCard
@@ -171,19 +174,20 @@ export function MenuLateral({
               />
             ))
           ) : (
-            <div className="text-center py-12 text-text-secondary">
+            <div className="text-center py-12 text-text-secondary flex flex-col items-center justify-center h-full">
+              <IoSearch size={48} className="text-text-tertiary mb-4 opacity-20" />
               <p className="text-lg font-medium">Nenhuma linha encontrada</p>
-              <p className="text-sm mt-2">Tente ajustar sua pesquisa</p>
+              <p className="text-sm mt-2 text-text-tertiary">Tente ajustar sua pesquisa</p>
             </div>
           )}
           
           {/* Banner de Aviso */}
           <DisclaimerBanner />
-        </main>
+        </section>
 
         {/* Footer */}
         <MenuFooter />
-      </div>
+      </aside>
 
       {/* Modal de Detalhes da Linha */}
       {linhaDetalhesAberta && (
