@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import ReactGA from "react-ga4";
 import { MenuLateral } from "./components/MenuLateral";
 import { Mapa, MapaRef } from "./components/Mapa";
@@ -28,7 +28,8 @@ export function App() {
   const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(null);
   const mapaRef = useRef<MapaRef>(null);
 
-  const handleLinhaSelect = (linha: Linha) => {
+  // Otimização: useCallback para evitar recriação da função em cada render
+  const handleLinhaSelect = useCallback((linha: Linha) => {
     setLinhaSelecionada(linha);
 
     if (GA_MEASUREMENT_ID) {
@@ -38,9 +39,10 @@ export function App() {
         label: `${linha.nome} - ${linha.sublinha || "Principal"}`,
       });
     }
-  };
+  }, []);
 
-  const handleParadaClick = (parada: Parada) => {
+  // Otimização: useCallback para evitar recriação da função em cada render
+  const handleParadaClick = useCallback((parada: Parada) => {
     setParadaSelecionada(parada);
     mapaRef.current?.centralizarParada(parada);
 
@@ -51,15 +53,38 @@ export function App() {
         label: parada.nome,
       });
     }
-  };
+  }, []);
 
-  // Validação dos dados
-  if (!paradasData.paradas || paradasData.paradas.length === 0) {
+  // Memoização dos dados de paradas para garantir estabilidade referencial
+  const todasParadas = useMemo(() => paradasData?.paradas || [], []);
+
+  // Validação Crítica dos dados
+  // Verificamos tanto linhasData quanto paradasData para evitar quebrar a aplicação
+  if (!todasParadas || todasParadas.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen w-screen bg-gray-100 text-gray-800">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">⚠️ Dados não encontrados</h2>
-          <p>Verifique se os arquivos na pasta <code>/data</code> estão corretos.</p>
+        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
+          <h2 className="text-2xl font-bold mb-2 text-red-600">⚠️ Dados não encontrados</h2>
+          <p className="text-gray-600">
+            Não foi possível carregar os dados de paradas.
+            <br />
+            Verifique a integridade dos arquivos em <code>/src/data/paradas.ts</code>.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!linhasData || !linhasData.categoriasDias) {
+     return (
+      <div className="flex items-center justify-center h-screen w-screen bg-gray-100 text-gray-800">
+        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
+          <h2 className="text-2xl font-bold mb-2 text-red-600">⚠️ Erro nos Dados de Linhas</h2>
+          <p className="text-gray-600">
+             Não foi possível carregar os dados das linhas.
+            <br />
+             Verifique a integridade dos arquivos em <code>/src/data/linhas.ts</code>.
+          </p>
         </div>
       </div>
     );
@@ -70,7 +95,7 @@ export function App() {
       <div className="relative h-screen w-screen overflow-hidden flex flex-col md:flex-row font-['Poppins',_sans-serif] bg-background">
         <MenuLateral
           linhasData={linhasData}
-          todasParadas={paradasData.paradas}
+          todasParadas={todasParadas}
           onLinhaSelect={handleLinhaSelect}
           onParadaClick={handleParadaClick}
           linhaSelecionada={linhaSelecionada}
@@ -78,7 +103,7 @@ export function App() {
         <div className="flex-grow h-full w-full">
           <Mapa
             ref={mapaRef}
-            todasParadas={paradasData.paradas}
+            todasParadas={todasParadas}
             linhaSelecionada={linhaSelecionada}
             paradaSelecionada={paradaSelecionada}
           />
