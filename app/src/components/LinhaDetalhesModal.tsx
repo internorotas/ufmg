@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactGA from "react-ga4";
 import { Modal } from "./Modal";
 import { Linha, Parada } from "../types/data.types";
 import { IoTimeOutline, IoMapOutline, IoLocationOutline } from "react-icons/io5";
@@ -34,8 +35,13 @@ export function LinhaDetalhesModal({
 }: LinhaDetalhesModalProps) {
   const [tabAtiva, setTabAtiva] = useState<TabType>("itinerario");
 
+  const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+
   // Buscar paradas do itinerário dinamicamente usando os IDs
-  const paradasDoItinerario = buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
+  const paradasDoItinerario = buscarParadasPorIds(
+    linha.itinerarioParadasIds,
+    todasParadas
+  );
 
   // Calcular horários passados e futuros
   const now = new Date();
@@ -53,7 +59,37 @@ export function LinhaDetalhesModal({
   const proximos = horariosOrganizados.filter((h) => !h.passou);
   const passados = horariosOrganizados.filter((h) => h.passou);
 
+  const handleTabChange = (tab: TabType) => {
+    if (GA_MEASUREMENT_ID) {
+      ReactGA.event({
+        category: "Navegação Detalhes",
+        action: "Visualizar Aba",
+        label: `${tab === "itinerario" ? "Itinerário" : "Todos os Horários"} - ${
+          linha.nome
+        }`,
+      });
+    }
+    setTabAtiva(tab);
+  };
+
+  const handleHorarioClick = (horario: string) => {
+    if (GA_MEASUREMENT_ID) {
+      ReactGA.event({
+        category: "Horarios",
+        action: "Clique Horario Especifico",
+        label: `${horario} - ${linha.nome}`,
+      });
+    }
+  };
+
   const handleParadaClick = (parada: Parada) => {
+    if (GA_MEASUREMENT_ID) {
+      ReactGA.event({
+        category: "Engajamento Detalhes",
+        action: "Selecionar Parada Itinerario",
+        label: `${parada.nome} - ${linha.nome}`,
+      });
+    }
     onParadaClick(parada);
     onClose();
   };
@@ -68,7 +104,7 @@ export function LinhaDetalhesModal({
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-card-border">
         <button
-          onClick={() => setTabAtiva("itinerario")}
+          onClick={() => handleTabChange("itinerario")}
           className={`flex items-center gap-2 px-4 py-3 font-semibold transition-all ${
             tabAtiva === "itinerario"
               ? "text-text-primary border-b-2"
@@ -80,7 +116,7 @@ export function LinhaDetalhesModal({
           Itinerário
         </button>
         <button
-          onClick={() => setTabAtiva("horarios")}
+          onClick={() => handleTabChange("horarios")}
           className={`flex items-center gap-2 px-4 py-3 font-semibold transition-all ${
             tabAtiva === "horarios"
               ? "text-text-primary border-b-2"
@@ -191,6 +227,7 @@ export function LinhaDetalhesModal({
                 {proximos.map(({ horario, minutos }, index) => (
                   <div
                     key={`proximo-${minutos}-${index}`}
+                    onClick={() => handleHorarioClick(horario)}
                     className="border-2 rounded-lg p-3 text-center hover:bg-opacity-10 transition-colors"
                     style={{
                       borderColor: linha.corHex,
@@ -217,6 +254,7 @@ export function LinhaDetalhesModal({
                 {passados.map(({ horario, minutos }, index) => (
                   <div
                     key={`passado-${minutos}-${index}`}
+                    onClick={() => handleHorarioClick(horario)}
                     className="bg-card border border-card-border rounded-lg p-3 text-center opacity-50"
                   >
                     <p className="text-lg font-semibold text-text-secondary">{horario}</p>

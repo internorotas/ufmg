@@ -44,9 +44,9 @@ export function App() {
 
     if (GA_MEASUREMENT_ID) {
       ReactGA.event({
-        category: "Mapa",
-        action: "Ver Linha",
-        label: `${linha.nome} - ${linha.sublinha || "Principal"}`,
+        category: "Engajamento",
+        action: "Selecionar Linha",
+        label: linha.nome,
       });
     }
   }, []);
@@ -58,8 +58,8 @@ export function App() {
 
     if (GA_MEASUREMENT_ID) {
       ReactGA.event({
-        category: "Mapa",
-        action: "Ver Parada",
+        category: "Engajamento",
+        action: "Selecionar Parada",
         label: parada.nome,
       });
     }
