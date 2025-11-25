@@ -1,6 +1,11 @@
 import { useTheme } from "../contexts/ThemeContext";
 import { IoMoon, IoSunny } from "react-icons/io5";
 
+/**
+ * Renderiza um botão que permite ao usuário alternar entre os temas claro and escuro.
+ *
+ * @returns {JSX.Element} O botão de alternância de tema renderizado.
+ */
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
 

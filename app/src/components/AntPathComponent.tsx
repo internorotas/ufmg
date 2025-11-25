@@ -21,6 +21,14 @@ interface AntPathProps {
   options: AntPathOptions;
 }
 
+/**
+ * Renderiza uma polilinha animada (ant-path) em um mapa Leaflet.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {LatLngExpression[]} props.coordinates - Um array de coordenadas de latitude e longitude que definem o caminho.
+ * @param {AntPathOptions} props.options - Um objeto com opções para customizar a aparência e o comportamento do ant-path.
+ * @returns {null} Este componente não renderiza nenhum elemento visível.
+ */
 export function AntPathComponent({ coordinates, options }: AntPathProps) {
   const map = useMap();
 

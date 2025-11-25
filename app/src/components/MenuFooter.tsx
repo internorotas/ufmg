@@ -1,5 +1,10 @@
 import { IoWarningOutline, IoLogoGithub, IoHeart } from "react-icons/io5";
 
+/**
+ * Renderiza o menu de rodapé com links para reportar problemas, ver o projeto no GitHub e creditar o desenvolvedor.
+ *
+ * @returns {JSX.Element} O componente de menu de rodapé renderizado.
+ */
 export function MenuFooter() {
   return (
     <div className="flex-shrink-0 p-3 bg-background-secondary border-t border-card-border space-y-2">
