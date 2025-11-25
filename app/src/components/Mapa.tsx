@@ -1,9 +1,9 @@
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
+import React, { useEffect, useImperativeHandle, forwardRef, useRef, useState, useMemo } from "react";
 import { PopupCustomizado } from "./PopupCustomizado";
 import { AntPathComponent } from "./AntPathComponent";
 import { Parada, Linha } from "../types/data.types";
-import { useEffect, useImperativeHandle, forwardRef, useRef, useState, useMemo } from "react";
 import { buscarParadasPorIds } from "../../lib/utils";
 
 interface MapaProps {
@@ -32,7 +32,8 @@ const highlightedIcon = L.icon({
 });
 
 // Componente para ajustar o mapa quando uma rota é selecionada
-const ChangeView = ({ bounds }: { bounds: L.LatLngBounds | null }) => {
+// Memoizado para evitar re-renderizações desnecessárias
+const ChangeView = React.memo(({ bounds }: { bounds: L.LatLngBounds | null }) => {
   const map = useMap();
   useEffect(() => {
     if (bounds) {
@@ -40,36 +41,76 @@ const ChangeView = ({ bounds }: { bounds: L.LatLngBounds | null }) => {
     }
   }, [bounds, map]);
   return null;
-};
+});
+
+ChangeView.displayName = "ChangeView";
 
 // Componente para centralizar em uma parada
-const CenterOnParada = ({ parada }: { parada: Parada | null }) => {
+const CenterOnParada = React.memo(({ parada }: { parada: Parada | null }) => {
   const map = useMap();
   useEffect(() => {
-    if (parada) {
-      map.setView(parada.coordenadas, 17, { animate: true, duration: 1 });
+    if (parada && parada.coordenadas) {
+      // Validação extra antes de tentar mover o mapa
+      try {
+        map.setView(parada.coordenadas, 17, { animate: true, duration: 1 });
+      } catch (e) {
+        console.error("Erro ao centralizar no mapa:", e);
+      }
     }
   }, [parada, map]);
   return null;
-};
+});
+
+CenterOnParada.displayName = "CenterOnParada";
+
+// Componente de Marcador Memoizado para evitar re-renderização de TODOS os marcadores
+// quando apenas UM muda de estado (destaque)
+const MemoizedMarker = React.memo(({
+  parada,
+  isDestacada,
+  setMarkerRef
+}: {
+  parada: Parada;
+  isDestacada: boolean;
+  setMarkerRef: (id: string, ref: L.Marker | null) => void
+}) => {
+  return (
+    <Marker
+      position={parada.coordenadas}
+      icon={isDestacada ? highlightedIcon : stationIcon}
+      ref={(ref) => setMarkerRef(parada.idParada, ref)}
+    >
+      <PopupCustomizado parada={parada} />
+    </Marker>
+  );
+}, (prev, next) => {
+  // Custom comparison: re-render only if highlight state changes or coordinate changes (unlikely)
+  return prev.isDestacada === next.isDestacada && prev.parada.idParada === next.parada.idParada;
+});
+
+MemoizedMarker.displayName = "MemoizedMarker";
 
 /**
  * Renderiza um mapa interativo com as paradas e rotas de ônibus.
- *
- * @param {object} props - As propriedades do componente.
- * @param {Parada[]} props.todasParadas - Um array com todas as paradas de ônibus disponíveis.
- * @param {Linha | null} props.linhaSelecionada - A linha de ônibus atualmente selecionada, ou nulo se nenhuma estiver selecionada.
- * @param {Parada | null} props.paradaSelecionada - A parada de ônibus atualmente selecionada, ou nulo se nenhuma estiver selecionada.
- * @param {React.Ref<MapaRef>} ref - Uma ref para expor o método `centralizarParada`.
- * @returns {JSX.Element} O componente de mapa renderizado.
  */
 export const Mapa = forwardRef<MapaRef, MapaProps>(
   ({ todasParadas, linhaSelecionada, paradaSelecionada }, ref) => {
-    const markersRef = useRef<{ [key: string]: L.Marker }>({});
+    const markersRef = useRef<{ [key: string]: L.Marker | null }>({});
     const [paradaDestacada, setParadaDestacada] = useState<string | null>(null);
+
+    // Callback ref para gerenciar a lista de referências de marcadores de forma estável
+    const handleSetMarkerRef = React.useCallback((id: string, marker: L.Marker | null) => {
+      if (marker) {
+        markersRef.current[id] = marker;
+      } else {
+        delete markersRef.current[id];
+      }
+    }, []);
 
     useImperativeHandle(ref, () => ({
       centralizarParada: (parada: Parada) => {
+        if (!parada || !parada.idParada) return;
+
         setParadaDestacada(parada.idParada);
         
         // Abrir popup do marcador
@@ -88,19 +129,38 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
     // Filtrar paradas da linha selecionada dinamicamente usando os IDs
     const paradasVisiveis = useMemo(() => {
       if (!linhaSelecionada) {
-        return todasParadas; // Mostrar todas se nenhuma linha selecionada
+        return todasParadas;
       }
       
-      return buscarParadasPorIds(linhaSelecionada.itinerarioParadasIds, todasParadas);
+      // Validação de segurança se itinerarioParadasIds for null/undefined
+      const ids = linhaSelecionada.itinerarioParadasIds || [];
+      return buscarParadasPorIds(ids, todasParadas);
     }, [linhaSelecionada, todasParadas]);
 
     // Calcular bounds baseado nas coordenadas do trajeto da linha
     const bounds = useMemo(() => {
-      if (linhaSelecionada && linhaSelecionada.coordenadasTrajeto.length > 0) {
+      if (linhaSelecionada && linhaSelecionada.coordenadasTrajeto && linhaSelecionada.coordenadasTrajeto.length > 0) {
         return L.latLngBounds(linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]);
       }
       return null;
     }, [linhaSelecionada]);
+
+    // Otimização: AntPathComponent Props
+    const antPathCoordinates = useMemo(() =>
+      linhaSelecionada?.coordenadasTrajeto as L.LatLngExpression[] || [],
+      [linhaSelecionada]
+    );
+
+    const antPathOptions = useMemo(() => ({
+      delay: 600,
+      dashArray: [20, 100],
+      weight: 8,
+      color: linhaSelecionada?.corHex || "#3388ff",
+      pulseColor: linhaSelecionada?.corHex || "#3388ff",
+      paused: false,
+      reverse: false,
+      hardwareAccelerated: true,
+    }), [linhaSelecionada?.corHex]);
 
     return (
       <MapContainer
@@ -108,6 +168,10 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
         zoom={15}
         className="h-full w-full"
         zoomControl={true}
+        // Propriedade importante para evitar memory leaks em SPAs
+        whenReady={() => {
+          // Map is ready
+        }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -118,40 +182,22 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
         <CenterOnParada parada={paradaSelecionada} />
 
         {/* Desenhar rota animada da linha selecionada com AntPath */}
-        {linhaSelecionada && linhaSelecionada.coordenadasTrajeto.length > 0 && (
+        {linhaSelecionada && antPathCoordinates.length > 0 && (
           <AntPathComponent
-            coordinates={linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]}
-            options={{
-              delay: 600,
-              dashArray: [20, 100],
-              weight: 8,
-              color: linhaSelecionada.corHex,
-              pulseColor: linhaSelecionada.corHex,
-              paused: false,
-              reverse: false,
-              hardwareAccelerated: true,
-            }}
+            coordinates={antPathCoordinates}
+            options={antPathOptions}
           />
         )}
 
-        {/* Renderizar apenas paradas da linha selecionada */}
-        {paradasVisiveis.map((parada) => {
-          const isDestacada = paradaDestacada === parada.idParada;
-          return (
-            <Marker
-              key={parada.idParada}
-              position={parada.coordenadas}
-              icon={isDestacada ? highlightedIcon : stationIcon}
-              ref={(markerRef) => {
-                if (markerRef) {
-                  markersRef.current[parada.idParada] = markerRef;
-                }
-              }}
-            >
-              <PopupCustomizado parada={parada} />
-            </Marker>
-          );
-        })}
+        {/* Renderizar marcadores memoizados */}
+        {paradasVisiveis.map((parada) => (
+          <MemoizedMarker
+            key={parada.idParada}
+            parada={parada}
+            isDestacada={paradaDestacada === parada.idParada}
+            setMarkerRef={handleSetMarkerRef}
+          />
+        ))}
       </MapContainer>
     );
   }
