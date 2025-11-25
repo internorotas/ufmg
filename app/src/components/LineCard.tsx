@@ -80,9 +80,12 @@ export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }:
 
   // Definir cor do badge baseado no status
   const getBadgeColor = () => {
-    if (status.includes("Próximo")) return "bg-green-500/20 text-green-400 border-green-500/50";
-    if (status === "Circulando") return "bg-blue-500/20 text-blue-400 border-blue-500/50";
-    return "bg-gray-500/20 text-gray-400 border-gray-500/50";
+    // "Próximo" -> Success (Urgência positiva)
+    if (status.includes("Próximo")) return "bg-success-bg text-success-text border-success-border";
+    // "Circulando" -> Info (Informativo)
+    if (status === "Circulando") return "bg-info-bg text-info-text border-info-border";
+    // Default/Encerrado -> Neutral
+    return "bg-neutral-bg text-neutral-text border-neutral-border";
   };
 
   const handleDetailsClick = (e: React.MouseEvent) => {
@@ -93,10 +96,10 @@ export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }:
   return (
     <div 
       onClick={onClick}
-      className={`bg-card rounded-xl shadow-md hover:shadow-lg transition-all mb-3 overflow-hidden border cursor-pointer ${
+      className={`bg-card rounded-xl shadow-sm hover:shadow-md transition-all mb-3 overflow-hidden border cursor-pointer ${
         isSelected 
-          ? 'border-2 border-blue-500 shadow-xl ring-2 ring-blue-200' 
-          : 'border-card-border hover:border-blue-300'
+          ? 'border-2 border-brand-primary shadow-lg ring-1 ring-brand-primary/20'
+          : 'border-card-border hover:border-info-border'
       }`}
     >
       {/* Header com Badge */}
@@ -104,22 +107,22 @@ export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }:
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-3 flex-1">
             <div
-              className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+              className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm"
               style={{ backgroundColor: linha.corHex }}
             >
-              <IoBusOutline size={24} className="text-white" />
+              <IoBusOutline size={24} className="text-white drop-shadow-sm" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-base font-bold text-text-primary truncate">
+              <h3 className="text-sm md:text-base font-bold text-text-primary truncate leading-tight">
                 {linha.nome}
               </h3>
               {linha.sublinha && (
-                <p className="text-sm text-text-secondary mt-0.5">{linha.sublinha}</p>
+                <p className="text-xs md:text-sm text-text-secondary mt-0.5 line-clamp-1">{linha.sublinha}</p>
               )}
             </div>
           </div>
           <span
-            className={`text-xs px-2.5 py-1 rounded-full border font-medium whitespace-nowrap ${getBadgeColor()}`}
+            className={`text-[10px] md:text-xs px-2.5 py-1 rounded-full border font-medium whitespace-nowrap ${getBadgeColor()}`}
           >
             {status}
           </span>
@@ -129,26 +132,26 @@ export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }:
       {/* Corpo - Horários */}
       <div className="px-4 pb-4">
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="text-center">
-            <p className="text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
+          <div className="text-center p-2 rounded-lg bg-background-secondary/50">
+            <p className="text-[10px] md:text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
               <IoTimeOutline size={14} />
               Último Partiu
             </p>
-            <p className="text-lg font-bold text-text-primary">{previousSchedule}</p>
+            <p className="text-base md:text-lg font-bold text-text-primary">{previousSchedule}</p>
           </div>
-          <div className="text-center">
-            <p className="text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
+          <div className="text-center p-2 rounded-lg bg-background-secondary/50">
+            <p className="text-[10px] md:text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
               <IoTimeOutline size={14} />
               Próximo
             </p>
-            <p className="text-lg font-bold text-green-500">{nextSchedule}</p>
+            <p className="text-base md:text-lg font-bold text-success-text">{nextSchedule}</p>
           </div>
         </div>
 
         {/* Botão Ver Detalhes */}
         <button
           onClick={handleDetailsClick}
-          className="w-full py-2.5 rounded-lg text-white font-semibold text-sm hover:opacity-90 transition-opacity"
+          className="w-full py-2.5 rounded-lg text-white font-semibold text-xs md:text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-sm"
           style={{ backgroundColor: linha.corHex }}
         >
           Ver Detalhes
