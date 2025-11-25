@@ -6,6 +6,13 @@ interface PopupCustomizadoProps {
   parada: Parada;
 }
 
+/**
+ * Renderiza um popup customizado para um marcador de parada de ônibus no mapa.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {Parada} props.parada - Um objeto contendo os dados da parada de ônibus.
+ * @returns {JSX.Element} O componente de popup customizado renderizado.
+ */
 export function PopupCustomizado({ parada }: PopupCustomizadoProps) {
   return (
     <Popup className="popup-customizado" minWidth={220}>

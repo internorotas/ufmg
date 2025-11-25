@@ -16,6 +16,17 @@ interface MenuLateralProps {
   linhaSelecionada: Linha | null;
 }
 
+/**
+ * Renderiza o menu lateral, que exibe uma lista de linhas de ônibus, uma barra de pesquisa e abas de categorias.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {CategoriaLinhas} props.linhasData - Um objeto contendo os dados das linhas de ônibus, categorizados por tipo de dia.
+ * @param {Parada[]} props.todasParadas - Um array com todas as paradas de ônibus disponíveis.
+ * @param {(linha: Linha) => void} props.onLinhaSelect - Uma função para lidar com a seleção de uma linha de ônibus.
+ * @param {(parada: Parada) => void} props.onParadaClick - Uma função para lidar com cliques em uma parada de ônibus.
+ * @param {Linha | null} props.linhaSelecionada - A linha de ônibus atualmente selecionada, ou nulo se nenhuma estiver selecionada.
+ * @returns {JSX.Element} O componente de menu lateral renderizado.
+ */
 export function MenuLateral({
   linhasData,
   todasParadas,
@@ -87,7 +98,7 @@ export function MenuLateral({
 
       {/* Sidebar */}
       <div
-        className={`fixed md:relative top-0 left-0 h-full w-full max-w-md md:w-1/2 bg-background text-text-primary z-[1003] transform transition-transform duration-300 ${
+        className={`fixed md:relative inset-y-0 left-0 max-w-md md:w-1/2 bg-background text-text-primary z-[1003] transform transition-transform duration-300 ${
           isMenuVisible ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 flex flex-col border-r border-card-border`}
       >

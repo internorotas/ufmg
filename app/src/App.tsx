@@ -18,6 +18,11 @@ if (GA_MEASUREMENT_ID) {
   ReactGA.initialize(GA_MEASUREMENT_ID);
 }
 
+/**
+ * O componente principal da aplicação. Gerencia o estado da linha e parada selecionadas e renderiza o layout principal com o menu lateral e o mapa.
+ *
+ * @returns {JSX.Element} O componente principal da aplicação renderizado.
+ */
 export function App() {
   const [linhaSelecionada, setLinhaSelecionada] = useState<Linha | null>(null);
   const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(null);

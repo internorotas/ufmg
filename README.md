@@ -137,18 +137,15 @@ Acesse o projeto em produção através do link:
 git clone https://github.com/internorotas/ufmg.git
 
 # Entre na pasta do projeto
-cd ufmg
+cd ufmg/app
 
-# Abra o arquivo index.html no seu navegador
-# Ou use um servidor local (recomendado)
+# Instale as dependências
+npm install
 
-# Com Python 3
-python -m http.server 8000
+# Inicie o servidor de desenvolvimento
+npm run dev
 
-# Com Node.js (http-server)
-npx http-server
-
-# Acesse http://localhost:8000
+# Acesse http://localhost:5173
 ```
 
 ## 🤝 Contribuir

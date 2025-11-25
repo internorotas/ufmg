@@ -10,6 +10,15 @@ interface HorariosModalProps {
   linha: Linha;
 }
 
+/**
+ * Renderiza um modal que exibe os horários de uma linha de ônibus específica, separando os horários futuros e os que já passaram.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {boolean} props.isOpen - Um booleano que indica se o modal está aberto.
+ * @param {() => void} props.onClose - Uma função para fechar o modal.
+ * @param {Linha} props.linha - Um objeto contendo os dados da linha de ônibus.
+ * @returns {JSX.Element} O componente de modal de horários renderizado.
+ */
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();

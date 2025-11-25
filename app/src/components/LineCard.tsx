@@ -62,6 +62,16 @@ const calculateSchedules = (horarios: string[]) => {
   return { nextSchedule, previousSchedule, status };
 };
 
+/**
+ * Renderiza um card que exibe informações sobre uma linha de ônibus, incluindo seu nome, horários e status.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {Linha} props.linha - Um objeto contendo os dados da linha de ônibus.
+ * @param {() => void} props.onClick - Uma função para lidar com cliques no card.
+ * @param {() => void} props.onDetailsClick - Uma função para lidar com cliques no botão "Ver Detalhes".
+ * @param {boolean} [props.isSelected=false] - Um booleano que indica se o card está selecionado.
+ * @returns {JSX.Element} O componente de card de linha renderizado.
+ */
 export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }: LineCardProps) {
   const { nextSchedule, previousSchedule, status } = useMemo(
     () => calculateSchedules(linha.horarios),

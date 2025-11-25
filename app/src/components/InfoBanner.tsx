@@ -1,5 +1,10 @@
 import { IoInformationCircleOutline } from "react-icons/io5";
 
+/**
+ * Renderiza um banner informativo com uma mensagem pré-definida.
+ *
+ * @returns {JSX.Element} O componente de banner informativo renderizado.
+ */
 export function InfoBanner() {
   return (
     <div 

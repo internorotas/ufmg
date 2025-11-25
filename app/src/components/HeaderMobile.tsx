@@ -7,6 +7,14 @@ interface HeaderMobileProps {
   toggleMenu: () => void;
 }
 
+/**
+ * Renderiza o cabeçalho para dispositivos móveis com o logo e um botão para abrir/fechar o menu.
+ *
+ * @param {object} props - As propriedades do componente.
+ * @param {boolean} props.isMenuOpen - Um booleano que indica se o menu está aberto.
+ * @param {() => void} props.toggleMenu - Uma função para alternar a visibilidade do menu.
+ * @returns {JSX.Element} O componente de cabeçalho móvel renderizado.
+ */
 export const HeaderMobile: React.FC<HeaderMobileProps> = ({ isMenuOpen, toggleMenu }) => {
   return (
     // O header é fixo no topo, com z-index alto e visível apenas em ecrãs pequenos (md:hidden)
