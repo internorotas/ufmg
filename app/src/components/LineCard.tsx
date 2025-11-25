@@ -1,7 +1,10 @@
 import { useMemo } from "react";
+import ReactGA from "react-ga4";
 import { Linha } from "../types/data.types";
 import { IoTimeOutline, IoBusOutline } from "react-icons/io5";
 import { timeToMinutes, minutesToTime } from "../../lib/utils";
+
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 interface LineCardProps {
   linha: Linha;
@@ -90,6 +93,13 @@ export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }:
 
   const handleDetailsClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Impede que o clique propague para o card
+    if (GA_MEASUREMENT_ID) {
+      ReactGA.event({
+        category: "Engajamento",
+        action: "Abrir Card Detalhes",
+        label: linha.nome,
+      });
+    }
     onDetailsClick();
   };
 
