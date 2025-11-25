@@ -1,7 +1,7 @@
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, lazy, Suspense } from "react";
 import ReactGA from "react-ga4";
 import { MenuLateral } from "./components/MenuLateral";
-import { Mapa, MapaRef } from "./components/Mapa";
+import type { MapaRef } from "./components/Mapa";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
 // Importa os dados da pasta /data
@@ -9,6 +9,16 @@ import linhasData from "./data/linhas";
 import paradasData from "./data/paradas";
 
 import { Linha, Parada } from "./types/data.types";
+
+// Carregamento preguiçoso do Mapa para melhorar a performance inicial
+const Mapa = lazy(() => import("./components/Mapa").then(module => ({ default: module.Mapa })));
+
+// Componente simples de Loading
+const LoadingMap = () => (
+  <div className="flex items-center justify-center h-full w-full bg-gray-100">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
+  </div>
+);
 
 // Lê a ID de Medição a partir das variáveis de ambiente
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
@@ -100,14 +110,16 @@ export function App() {
           onParadaClick={handleParadaClick}
           linhaSelecionada={linhaSelecionada}
         />
-        <div className="flex-grow h-full w-full">
-          <Mapa
-            ref={mapaRef}
-            todasParadas={todasParadas}
-            linhaSelecionada={linhaSelecionada}
-            paradaSelecionada={paradaSelecionada}
-          />
-        </div>
+        <main role="main" className="flex-grow h-full w-full">
+          <Suspense fallback={<LoadingMap />}>
+            <Mapa
+              ref={mapaRef}
+              todasParadas={todasParadas}
+              linhaSelecionada={linhaSelecionada}
+              paradaSelecionada={paradaSelecionada}
+            />
+          </Suspense>
+        </main>
       </div>
     </ThemeProvider>
   );

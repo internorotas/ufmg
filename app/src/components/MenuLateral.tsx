@@ -97,7 +97,7 @@ export function MenuLateral({
       )}
 
       {/* Sidebar */}
-      <div
+      <aside
         className={`fixed md:relative inset-y-0 left-0 w-[85vw] max-w-md md:w-1/2 bg-sidebar text-text-primary z-[1003] transform transition-transform duration-300 ${
           isMenuVisible ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 flex flex-col border-r border-card-border shadow-2xl md:shadow-none`}
@@ -159,7 +159,7 @@ export function MenuLateral({
         </div>
 
         {/* Lista de Linhas */}
-        <main className="p-4 overflow-y-auto flex-1 bg-background">
+        <nav className="p-4 overflow-y-auto flex-1 bg-background" aria-label="Lista de Linhas">
           {linhasFiltradas.length > 0 ? (
             linhasFiltradas.map((linha: Linha) => (
               <LineCard
@@ -180,11 +180,11 @@ export function MenuLateral({
           
           {/* Banner de Aviso */}
           <DisclaimerBanner />
-        </main>
+        </nav>
 
         {/* Footer */}
         <MenuFooter />
-      </div>
+      </aside>
 
       {/* Modal de Detalhes da Linha */}
       {linhaDetalhesAberta && (
