@@ -42,8 +42,7 @@ export function AntPathComponent({ coordinates, options }: AntPathProps) {
       map.removeLayer(antPathRef.current);
     }
 
-    // Cria nova instância
-    // @ts-ignore - leaflet-ant-path extends L.Polyline but types might not be fully merged
+    // Cria nova instância    
     const antPath = new L.Polyline.AntPath(coordinates, options);
 
     antPathRef.current = antPath;

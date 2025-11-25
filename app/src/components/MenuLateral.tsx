@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import ReactGA from "react-ga4";
 import { useDebounce } from "use-debounce";
 import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
