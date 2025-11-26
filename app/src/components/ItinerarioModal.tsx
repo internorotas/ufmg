@@ -30,7 +30,10 @@ export function ItinerarioModal({
   onParadaClick,
 }: ItinerarioModalProps) {
   // Buscar paradas do itinerário
-  const paradasDoItinerario = buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
+  const paradasDoItinerario = buscarParadasPorIds(
+    linha.itinerarioParadasIds,
+    paradas,
+  );
 
   const handleParadaClick = (parada: Parada) => {
     onParadaClick(parada);
@@ -50,43 +53,43 @@ export function ItinerarioModal({
             {paradasDoItinerario.map((parada, index) => {
               const isFirst = index === 0;
               const isLast = index === paradasDoItinerario.length - 1;
-              
+
               return (
                 <div key={parada.idParada} className="relative flex">
                   {/* Linha conectora vertical tracejada */}
                   {!isLast && (
-                    <div 
+                    <div
                       className="absolute left-[11px] top-[28px] w-[2px] h-full"
-                      style={{ 
+                      style={{
                         backgroundColor: `${linha.corHex}40`,
-                        backgroundImage: `repeating-linear-gradient(0deg, ${linha.corHex}40, ${linha.corHex}40 6px, transparent 6px, transparent 12px)`
+                        backgroundImage: `repeating-linear-gradient(0deg, ${linha.corHex}40, ${linha.corHex}40 6px, transparent 6px, transparent 12px)`,
                       }}
                     />
                   )}
-                  
+
                   <button
                     onClick={() => handleParadaClick(parada)}
                     className="w-full text-left py-2 flex items-start gap-3 group"
                   >
                     {/* Ícone de localização com círculo */}
                     <div className="flex-shrink-0 relative z-10 mt-0.5">
-                      <div 
+                      <div
                         className="w-6 h-6 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: `${linha.corHex}20` }}
                       >
-                        <IoLocationOutline 
+                        <IoLocationOutline
                           size={18}
                           style={{ color: linha.corHex }}
                         />
                       </div>
                     </div>
-                    
+
                     {/* Conteúdo da parada */}
                     <div className="flex-1 min-w-0 pt-0.5">
                       <h4 className="font-semibold text-[15px] text-text-primary leading-snug group-hover:underline">
                         {parada.nome}
                       </h4>
-                      
+
                       {isFirst && (
                         <p className="text-xs text-text-secondary mt-0.5">
                           Ponto de Origem/Destino
@@ -97,9 +100,9 @@ export function ItinerarioModal({
                           Parada Regular
                         </p>
                       )}
-                      
+
                       {isFirst && (
-                        <span 
+                        <span
                           className="inline-block text-xs font-semibold mt-1 px-0"
                           style={{ color: linha.corHex }}
                         >

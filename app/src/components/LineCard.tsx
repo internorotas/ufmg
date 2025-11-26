@@ -16,7 +16,11 @@ interface LineCardProps {
 // Função para calcular próximo e anterior horário (REGRA DE NEGÓCIO CORRETA)
 const calculateSchedules = (horarios: string[]) => {
   if (!horarios || horarios.length === 0) {
-    return { nextSchedule: "--:--", previousSchedule: "--:--", status: "Sem Horários" };
+    return {
+      nextSchedule: "--:--",
+      previousSchedule: "--:--",
+      status: "Sem Horários",
+    };
   }
 
   const now = new Date();
@@ -28,7 +32,11 @@ const calculateSchedules = (horarios: string[]) => {
     .sort((a, b) => a - b);
 
   if (schedulesInMinutes.length === 0) {
-    return { nextSchedule: "--:--", previousSchedule: "--:--", status: "Sem Horários" };
+    return {
+      nextSchedule: "--:--",
+      previousSchedule: "--:--",
+      status: "Sem Horários",
+    };
   }
 
   let nextSchedule = "--:--";
@@ -53,7 +61,7 @@ const calculateSchedules = (horarios: string[]) => {
 
   // ÚLTIMO PARTIU: Último horário anterior ou igual à hora atual
   const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule <= currentMinutes
+    (schedule) => schedule <= currentMinutes,
   );
   if (previousSchedules.length > 0) {
     previousSchedule = minutesToTime(Math.max(...previousSchedules));
@@ -75,18 +83,25 @@ const calculateSchedules = (horarios: string[]) => {
  * @param {boolean} [props.isSelected=false] - Um booleano que indica se o card está selecionado.
  * @returns {JSX.Element} O componente de card de linha renderizado.
  */
-export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }: LineCardProps) {
+export function LineCard({
+  linha,
+  onClick,
+  onDetailsClick,
+  isSelected = false,
+}: LineCardProps) {
   const { nextSchedule, previousSchedule, status } = useMemo(
     () => calculateSchedules(linha.horarios),
-    [linha.horarios]
+    [linha.horarios],
   );
 
   // Definir cor do badge baseado no status
   const getBadgeColor = () => {
     // "Próximo" -> Success (Urgência positiva)
-    if (status.includes("Próximo")) return "bg-success-bg text-success-text border-success-border";
+    if (status.includes("Próximo"))
+      return "bg-success-bg text-success-text border-success-border";
     // "Circulando" -> Info (Informativo)
-    if (status === "Circulando") return "bg-info-bg text-info-text border-info-border";
+    if (status === "Circulando")
+      return "bg-info-bg text-info-text border-info-border";
     // Default/Encerrado -> Neutral
     return "bg-neutral-bg text-neutral-text border-neutral-border";
   };
@@ -104,12 +119,12 @@ export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }:
   };
 
   return (
-    <div 
+    <div
       onClick={onClick}
       className={`bg-card rounded-xl shadow-sm hover:shadow-md transition-all mb-3 overflow-hidden border cursor-pointer ${
-        isSelected 
-          ? 'border-2 border-brand-primary shadow-lg ring-1 ring-brand-primary/20'
-          : 'border-card-border hover:border-info-border'
+        isSelected
+          ? "border-2 border-brand-primary shadow-lg ring-1 ring-brand-primary/20"
+          : "border-card-border hover:border-info-border"
       }`}
     >
       {/* Header com Badge */}
@@ -127,7 +142,9 @@ export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }:
                 {linha.nome}
               </h3>
               {linha.sublinha && (
-                <p className="text-xs md:text-sm text-text-secondary mt-0.5 line-clamp-1">{linha.sublinha}</p>
+                <p className="text-xs md:text-sm text-text-secondary mt-0.5 line-clamp-1">
+                  {linha.sublinha}
+                </p>
               )}
             </div>
           </div>
@@ -147,14 +164,18 @@ export function LineCard({ linha, onClick, onDetailsClick, isSelected = false }:
               <IoTimeOutline size={14} />
               Último Partiu
             </p>
-            <p className="text-base md:text-lg font-bold text-text-primary">{previousSchedule}</p>
+            <p className="text-base md:text-lg font-bold text-text-primary">
+              {previousSchedule}
+            </p>
           </div>
           <div className="text-center p-2 rounded-lg bg-background-secondary/50">
             <p className="text-[10px] md:text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
               <IoTimeOutline size={14} />
               Próximo
             </p>
-            <p className="text-base md:text-lg font-bold text-success-text">{nextSchedule}</p>
+            <p className="text-base md:text-lg font-bold text-success-text">
+              {nextSchedule}
+            </p>
           </div>
         </div>
 

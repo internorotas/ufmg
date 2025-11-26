@@ -303,14 +303,14 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
 
   // Encontrar horário anterior
   const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule < currentMinutes
+    (schedule) => schedule < currentMinutes,
   );
   if (previousSchedules.length > 0) {
     previousSchedule = minutesToTime(Math.max(...previousSchedules));
   } else if (schedulesInMinutes.length > 0) {
     // Se não há horários anteriores hoje, o anterior é o último de ontem
     previousSchedule = minutesToTime(
-      schedulesInMinutes[schedulesInMinutes.length - 1]
+      schedulesInMinutes[schedulesInMinutes.length - 1],
     );
   }
 
@@ -325,7 +325,7 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
  */
 export function buscarParadasPorIds<T extends { idParada: string }>(
   itinerarioParadasIds: string[],
-  todasParadas: T[]
+  todasParadas: T[],
 ): T[] {
   return itinerarioParadasIds
     .map((idParada) => todasParadas.find((p) => p.idParada === idParada))
@@ -430,7 +430,7 @@ export function objectToQueryString(obj: Record<string, unknown>): string {
     .flatMap(([key, value]) => {
       if (Array.isArray(value)) {
         return value.map(
-          (v) => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`
+          (v) => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`,
         );
       }
       return `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`;

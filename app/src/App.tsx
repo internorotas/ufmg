@@ -1,4 +1,12 @@
-import { useState, useRef, useCallback, useMemo, lazy, Suspense } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+  lazy,
+  Suspense,
+  useEffect,
+} from "react";
 import ReactGA from "react-ga4";
 import { MenuLateral } from "./components/MenuLateral";
 import type { MapaRef } from "./components/Mapa";
@@ -11,7 +19,9 @@ import paradasData from "./data/paradas";
 import { Linha, Parada } from "./types/data.types";
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
-const Mapa = lazy(() => import("./components/Mapa").then(module => ({ default: module.Mapa })));
+const Mapa = lazy(() =>
+  import("./components/Mapa").then((module) => ({ default: module.Mapa })),
+);
 
 // Componente simples de Loading
 const LoadingMap = () => (
@@ -35,8 +45,16 @@ if (GA_MEASUREMENT_ID) {
  */
 export function App() {
   const [linhaSelecionada, setLinhaSelecionada] = useState<Linha | null>(null);
-  const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(null);
+  const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(
+    null,
+  );
   const mapaRef = useRef<MapaRef>(null);
+
+  useEffect(() => {
+    if (GA_MEASUREMENT_ID) {
+      ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+    }
+  }, []);
 
   // Otimização: useCallback para evitar recriação da função em cada render
   const handleLinhaSelect = useCallback((linha: Linha) => {
@@ -74,11 +92,14 @@ export function App() {
     return (
       <div className="flex items-center justify-center h-screen w-screen bg-gray-100 text-gray-800">
         <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-red-600">⚠️ Dados não encontrados</h2>
+          <h2 className="text-2xl font-bold mb-2 text-red-600">
+            ⚠️ Dados não encontrados
+          </h2>
           <p className="text-gray-600">
             Não foi possível carregar os dados de paradas.
             <br />
-            Verifique a integridade dos arquivos em <code>/src/data/paradas.ts</code>.
+            Verifique a integridade dos arquivos em{" "}
+            <code>/src/data/paradas.ts</code>.
           </p>
         </div>
       </div>
@@ -86,14 +107,17 @@ export function App() {
   }
 
   if (!linhasData || !linhasData.categoriasDias) {
-     return (
+    return (
       <div className="flex items-center justify-center h-screen w-screen bg-gray-100 text-gray-800">
         <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-red-600">⚠️ Erro nos Dados de Linhas</h2>
+          <h2 className="text-2xl font-bold mb-2 text-red-600">
+            ⚠️ Erro nos Dados de Linhas
+          </h2>
           <p className="text-gray-600">
-             Não foi possível carregar os dados das linhas.
+            Não foi possível carregar os dados das linhas.
             <br />
-             Verifique a integridade dos arquivos em <code>/src/data/linhas.ts</code>.
+            Verifique a integridade dos arquivos em{" "}
+            <code>/src/data/linhas.ts</code>.
           </p>
         </div>
       </div>

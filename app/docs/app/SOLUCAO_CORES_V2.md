@@ -18,18 +18,18 @@ O projeto usa **Tailwind CSS v4**, que tem uma abordagem completamente diferente
   --color-internoRotas-laranja-ambar: #ffa400;
   --color-internoRotas-preto-carvao: #1a1819;
   --color-internoRotas-cinza-grafite: #3a3b3c;
-  
+
   /* Cores de tema */
-  --color-background: #FFFFFF;
+  --color-background: #ffffff;
   --color-text-primary: #111827;
-  --color-card: #FFFFFF;
+  --color-card: #ffffff;
 }
 
 /* Dark mode sobrescreve as cores */
 .dark {
   --color-background: #111827;
-  --color-text-primary: #F9FAFB;
-  --color-card: #1F2937;
+  --color-text-primary: #f9fafb;
+  --color-card: #1f2937;
 }
 ```
 
@@ -44,15 +44,16 @@ O projeto usa **Tailwind CSS v4**, que tem uma abordagem completamente diferente
 
 ## 🚀 O Que Mudou
 
-| Antes | Depois |
-|-------|--------|
-| Variáveis em `:root` | Variáveis em `@theme` |
-| Tailwind não reconhecia | Tailwind reconhece automaticamente |
-| `tailwind.config.ts` necessário | Não precisa de config! |
+| Antes                           | Depois                             |
+| ------------------------------- | ---------------------------------- |
+| Variáveis em `:root`            | Variáveis em `@theme`              |
+| Tailwind não reconhecia         | Tailwind reconhece automaticamente |
+| `tailwind.config.ts` necessário | Não precisa de config!             |
 
 ## 📋 Cores Disponíveis Agora
 
 ### Cores da Marca
+
 - `bg-internoRotas-azul-eletrico` → #2c0eeb
 - `bg-internoRotas-bege-areia` → #ecdcc4
 - `bg-internoRotas-laranja-ambar` → #ffa400
@@ -60,6 +61,7 @@ O projeto usa **Tailwind CSS v4**, que tem uma abordagem completamente diferente
 - `bg-internoRotas-cinza-grafite` → #3a3b3c
 
 ### Cores de Tema (Dinâmicas)
+
 - `bg-background` / `text-text-primary`
 - `bg-card` / `border-card-border`
 - `bg-modal` / `bg-input`
@@ -75,6 +77,7 @@ npm run dev
 ```
 
 **Limpe o cache do navegador:**
+
 - **Chrome/Edge:** Ctrl+Shift+R (Windows) / Cmd+Shift+R (Mac)
 - **Firefox:** Ctrl+F5 (Windows) / Cmd+Shift+R (Mac)
 

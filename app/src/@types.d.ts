@@ -1,4 +1,8 @@
-import { FeatureCollection, RotaFeature, ParadaFeature } from './types/data.types';
+import {
+  FeatureCollection,
+  RotaFeature,
+  ParadaFeature,
+} from "./types/data.types";
 
 declare module "*.geojson" {
   const value: FeatureCollection<RotaFeature | ParadaFeature>;

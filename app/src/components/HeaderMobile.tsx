@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 // Importa o logo da pasta de assets
-import logo from '../assets/logo-horizontal-transparente.svg';
+import logo from "../assets/logo-horizontal-transparente.svg";
 
 interface HeaderMobileProps {
   isMenuOpen: boolean;
@@ -15,7 +15,10 @@ interface HeaderMobileProps {
  * @param {() => void} props.toggleMenu - Uma função para alternar a visibilidade do menu.
  * @returns {JSX.Element} O componente de cabeçalho móvel renderizado.
  */
-export const HeaderMobile: React.FC<HeaderMobileProps> = ({ isMenuOpen, toggleMenu }) => {
+export const HeaderMobile: React.FC<HeaderMobileProps> = ({
+  isMenuOpen,
+  toggleMenu,
+}) => {
   return (
     // O header é fixo no topo, com z-index alto e visível apenas em ecrãs pequenos (md:hidden)
     <header className="md:hidden fixed top-0 left-0 right-0 z-[1005] bg-interno-rotas-primaria h-14 flex items-center justify-between px-4 shadow-lg">
@@ -31,17 +34,38 @@ export const HeaderMobile: React.FC<HeaderMobileProps> = ({ isMenuOpen, toggleMe
         {/* Usamos SVGs inline para os ícones de "hamburger" e "X" para simplicidade */}
         {isMenuOpen ? (
           // Ícone "X" (Fechar)
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-7 h-7"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         ) : (
           // Ícone "Hamburger" (Menu)
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-7 h-7"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
           </svg>
         )}
       </button>
     </header>
   );
 };
-

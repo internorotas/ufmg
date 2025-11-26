@@ -37,7 +37,8 @@ export function MenuFooter() {
         rel="noopener noreferrer"
         className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-text-secondary hover:text-text-primary transition-colors"
       >
-        Desenvolvido com <IoHeart size={14} className="text-blue-500" /> por Igor Martins
+        Desenvolvido com <IoHeart size={14} className="text-blue-500" /> por
+        Igor Martins
       </a>
     </div>
   );

@@ -2,7 +2,11 @@ import { useState } from "react";
 import ReactGA from "react-ga4";
 import { Modal } from "./Modal";
 import { Linha, Parada } from "../types/data.types";
-import { IoTimeOutline, IoMapOutline, IoLocationOutline } from "react-icons/io5";
+import {
+  IoTimeOutline,
+  IoMapOutline,
+  IoLocationOutline,
+} from "react-icons/io5";
 import { buscarParadasPorIds, timeToMinutes } from "../../lib/utils";
 
 interface LinhaDetalhesModalProps {
@@ -40,7 +44,7 @@ export function LinhaDetalhesModal({
   // Buscar paradas do itinerário dinamicamente usando os IDs
   const paradasDoItinerario = buscarParadasPorIds(
     linha.itinerarioParadasIds,
-    todasParadas
+    todasParadas,
   );
 
   // Calcular horários passados e futuros
@@ -95,10 +99,17 @@ export function LinhaDetalhesModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={linha.nome} maxWidth="max-w-2xl">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={linha.nome}
+      maxWidth="max-w-2xl"
+    >
       {/* Subtítulo */}
       {linha.sublinha && (
-        <p className="text-text-secondary text-sm -mt-2 mb-4">{linha.sublinha}</p>
+        <p className="text-text-secondary text-sm -mt-2 mb-4">
+          {linha.sublinha}
+        </p>
       )}
 
       {/* Tabs */}
@@ -137,43 +148,46 @@ export function LinhaDetalhesModal({
               {paradasDoItinerario.map((parada, index) => {
                 const isFirst = index === 0;
                 const isLast = index === paradasDoItinerario.length - 1;
-                
+
                 return (
-                  <div key={`${parada.idParada}-${index}`} className="relative flex">
+                  <div
+                    key={`${parada.idParada}-${index}`}
+                    className="relative flex"
+                  >
                     {/* Linha conectora vertical tracejada */}
                     {!isLast && (
-                      <div 
+                      <div
                         className="absolute left-[11px] top-[28px] w-[2px] h-full"
-                        style={{ 
+                        style={{
                           backgroundColor: `${linha.corHex}40`,
-                          backgroundImage: `repeating-linear-gradient(0deg, ${linha.corHex}40, ${linha.corHex}40 6px, transparent 6px, transparent 12px)`
+                          backgroundImage: `repeating-linear-gradient(0deg, ${linha.corHex}40, ${linha.corHex}40 6px, transparent 6px, transparent 12px)`,
                         }}
                       />
                     )}
-                    
+
                     <button
                       onClick={() => handleParadaClick(parada)}
                       className="w-full text-left py-2 flex items-start gap-3 group"
                     >
                       {/* Ícone de localização com círculo */}
                       <div className="flex-shrink-0 relative z-10 mt-0.5">
-                        <div 
+                        <div
                           className="w-6 h-6 rounded-full flex items-center justify-center"
                           style={{ backgroundColor: `${linha.corHex}20` }}
                         >
-                          <IoLocationOutline 
+                          <IoLocationOutline
                             size={18}
                             style={{ color: linha.corHex }}
                           />
                         </div>
                       </div>
-                      
+
                       {/* Conteúdo da parada */}
                       <div className="flex-1 min-w-0 pt-0.5">
                         <h4 className="font-semibold text-[15px] text-text-primary leading-snug group-hover:underline">
                           {parada.nome}
                         </h4>
-                        
+
                         {isFirst && (
                           <p className="text-xs text-text-secondary mt-0.5">
                             Ponto de Origem/Destino
@@ -184,9 +198,9 @@ export function LinhaDetalhesModal({
                             Parada Regular
                           </p>
                         )}
-                        
+
                         {isFirst && (
-                          <span 
+                          <span
                             className="inline-block text-xs font-semibold mt-1 px-0"
                             style={{ color: linha.corHex }}
                           >
@@ -234,7 +248,10 @@ export function LinhaDetalhesModal({
                       backgroundColor: `${linha.corHex}20`,
                     }}
                   >
-                    <p className="text-xl font-bold" style={{ color: linha.corHex }}>
+                    <p
+                      className="text-xl font-bold"
+                      style={{ color: linha.corHex }}
+                    >
                       {horario}
                     </p>
                   </div>
@@ -257,7 +274,9 @@ export function LinhaDetalhesModal({
                     onClick={() => handleHorarioClick(horario)}
                     className="bg-card border border-card-border rounded-lg p-3 text-center opacity-50"
                   >
-                    <p className="text-lg font-semibold text-text-secondary">{horario}</p>
+                    <p className="text-lg font-semibold text-text-secondary">
+                      {horario}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -268,7 +287,9 @@ export function LinhaDetalhesModal({
           <div className="bg-card rounded-lg p-4 text-sm border border-card-border">
             <p className="text-center text-text-secondary">
               Total de {horariosOrganizados.length} horários •{" "}
-              <span style={{ color: linha.corHex }}>{proximos.length} restantes</span>
+              <span style={{ color: linha.corHex }}>
+                {proximos.length} restantes
+              </span>
             </p>
           </div>
         </div>
