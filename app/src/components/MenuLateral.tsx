@@ -4,6 +4,7 @@ import { useDebounce } from "use-debounce";
 import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
 import { ThemeToggle } from "./ThemeToggle";
 import { DisclaimerBanner } from "./DisclaimerBanner";
+import { InfoBanner } from "./InfoBanner";
 import { MenuFooter } from "./MenuFooter";
 import { Linha, CategoriaLinhas, Parada } from "../types/data.types";
 import logo from "../assets/logo-horizontal-transparente.svg";
@@ -201,6 +202,9 @@ export function MenuLateral({
           className="p-4 overflow-y-auto flex-1 bg-background"
           aria-label="Lista de Linhas"
         >
+          {/* Banner Informativo */}
+          <InfoBanner />
+
           {linhasFiltradas.length > 0 ? (
             linhasFiltradas.map((linha: Linha) => (
               <LineCard
