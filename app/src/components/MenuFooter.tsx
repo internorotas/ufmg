@@ -30,6 +30,16 @@ export function MenuFooter() {
         Sobre o Projeto
       </a>
 
+      {/* Botão Usar antiga versão */}
+      <a
+        href="https://ufmg-pi.vercel.app/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-full flex items-center justify-center py-2 px-3 rounded-lg bg-card hover:bg-card-hover text-text-secondary hover:text-text-primary border border-card-border font-semibold text-xs transition-colors"
+      >
+        Usar antiga versão
+      </a>
+
       {/* Desenvolvido por */}
       <a
         href="https://github.com/igormartins44"
