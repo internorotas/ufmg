@@ -6,6 +6,7 @@ import {
   IoTimeOutline,
   IoMapOutline,
   IoLocationOutline,
+  IoBusOutline,
 } from "react-icons/io5";
 import { buscarParadasPorIds, timeToMinutes } from "../../lib/utils";
 
@@ -102,16 +103,28 @@ export function LinhaDetalhesModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={linha.nome}
+      title={
+        <div className="flex items-center gap-3">
+          <div
+            className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm"
+            style={{ backgroundColor: linha.corHex }}
+          >
+            <IoBusOutline size={24} className="text-white drop-shadow-sm" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold text-text-primary truncate leading-tight">
+              {linha.nome}
+            </h2>
+            {linha.sublinha && (
+              <p className="text-xs text-text-secondary mt-0.5 truncate">
+                {linha.sublinha}
+              </p>
+            )}
+          </div>
+        </div>
+      }
       maxWidth="max-w-2xl"
     >
-      {/* Subtítulo */}
-      {linha.sublinha && (
-        <p className="text-text-secondary text-sm -mt-2 mb-4">
-          {linha.sublinha}
-        </p>
-      )}
-
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-card-border">
         <button
