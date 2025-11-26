@@ -25,28 +25,28 @@ app/src/globals.css
 ```css
 :root {
   /* 🌞 TEMA CLARO */
-  --background: #FFFFFF;              /* Cor de fundo principal */
-  --background-secondary: #F9FAFB;    /* Cor de fundo secundária */
-  --text-primary: #111827;            /* Cor do texto principal */
-  --text-secondary: #6B7280;          /* Cor do texto secundário */
-  --card-background: #FFFFFF;         /* Cor de fundo dos cards */
-  --card-border: #E5E7EB;             /* Cor da borda dos cards */
-  --sidebar-background: #F3F4F6;      /* Cor de fundo da sidebar */
-  --modal-background: #FFFFFF;        /* Cor de fundo dos modais */
-  --input-background: #F9FAFB;        /* Cor de fundo dos inputs */
+  --background: #ffffff; /* Cor de fundo principal */
+  --background-secondary: #f9fafb; /* Cor de fundo secundária */
+  --text-primary: #111827; /* Cor do texto principal */
+  --text-secondary: #6b7280; /* Cor do texto secundário */
+  --card-background: #ffffff; /* Cor de fundo dos cards */
+  --card-border: #e5e7eb; /* Cor da borda dos cards */
+  --sidebar-background: #f3f4f6; /* Cor de fundo da sidebar */
+  --modal-background: #ffffff; /* Cor de fundo dos modais */
+  --input-background: #f9fafb; /* Cor de fundo dos inputs */
 }
 
 .dark {
   /* 🌙 TEMA ESCURO */
-  --background: #111827;              /* Cor de fundo principal */
-  --background-secondary: #1F2937;    /* Cor de fundo secundária */
-  --text-primary: #F9FAFB;            /* Cor do texto principal */
-  --text-secondary: #9CA3AF;          /* Cor do texto secundário */
-  --card-background: #1F2937;         /* Cor de fundo dos cards */
-  --card-border: #374151;             /* Cor da borda dos cards */
-  --sidebar-background: #1a1819;      /* Cor de fundo da sidebar */
-  --modal-background: #1F2937;        /* Cor de fundo dos modais */
-  --input-background: #374151;        /* Cor de fundo dos inputs */
+  --background: #111827; /* Cor de fundo principal */
+  --background-secondary: #1f2937; /* Cor de fundo secundária */
+  --text-primary: #f9fafb; /* Cor do texto principal */
+  --text-secondary: #9ca3af; /* Cor do texto secundário */
+  --card-background: #1f2937; /* Cor de fundo dos cards */
+  --card-border: #374151; /* Cor da borda dos cards */
+  --sidebar-background: #1a1819; /* Cor de fundo da sidebar */
+  --modal-background: #1f2937; /* Cor de fundo dos modais */
+  --input-background: #374151; /* Cor de fundo dos inputs */
 }
 ```
 
@@ -60,7 +60,7 @@ app/src/globals.css
 
 ```css
 .dark {
-  --background: #0D1117;  /* Novo tom de preto mais escuro */
+  --background: #0d1117; /* Novo tom de preto mais escuro */
   /* ... demais variáveis ... */
 }
 ```
@@ -137,11 +137,11 @@ app/
 
 ```css
 :root {
-  --minha-nova-cor: #FF5733;
+  --minha-nova-cor: #ff5733;
 }
 
 .dark {
-  --minha-nova-cor: #C70039;
+  --minha-nova-cor: #c70039;
 }
 ```
 
@@ -152,19 +152,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        'minha-cor': 'var(--minha-nova-cor)',
+        "minha-cor": "var(--minha-nova-cor)",
       },
     },
   },
-}
+};
 ```
 
 ### 3. Usar no Componente
 
 ```jsx
-<div className="bg-[var(--minha-nova-cor)]">
-  Teste
-</div>
+<div className="bg-[var(--minha-nova-cor)]">Teste</div>
 ```
 
 ---

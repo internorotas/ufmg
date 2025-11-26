@@ -68,13 +68,13 @@ Agora você pode usar essas cores em qualquer componente:
 
 ## 📋 **Cores Disponíveis**
 
-| Classe Tailwind | Valor Hexadecimal | Uso |
-|----------------|-------------------|-----|
-| `internoRotas-azul-eletrico` | `#2c0eeb` | Cor principal (header, botões) |
-| `internoRotas-bege-areia` | `#ecdcc4` | Cor secundária |
-| `internoRotas-laranja-ambar` | `#ffa400` | Destaque (ícones, badges) |
-| `internoRotas-preto-carvao` | `#1a1819` | Fundo escuro |
-| `internoRotas-cinza-grafite` | `#3a3b3c` | Elementos secundários |
+| Classe Tailwind              | Valor Hexadecimal | Uso                            |
+| ---------------------------- | ----------------- | ------------------------------ |
+| `internoRotas-azul-eletrico` | `#2c0eeb`         | Cor principal (header, botões) |
+| `internoRotas-bege-areia`    | `#ecdcc4`         | Cor secundária                 |
+| `internoRotas-laranja-ambar` | `#ffa400`         | Destaque (ícones, badges)      |
+| `internoRotas-preto-carvao`  | `#1a1819`         | Fundo escuro                   |
+| `internoRotas-cinza-grafite` | `#3a3b3c`         | Elementos secundários          |
 
 ---
 

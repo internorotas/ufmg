@@ -35,9 +35,9 @@ export function LinhaOnibus({
   const [isHorariosVisible, setHorariosVisible] = useState(false);
 
   // Calcular horários anterior e próximo
-  const { nextSchedule, previousSchedule } = useMemo(() => 
-    calculateNextAndPreviousSchedule(linha.horarios), 
-    [linha.horarios]
+  const { nextSchedule, previousSchedule } = useMemo(
+    () => calculateNextAndPreviousSchedule(linha.horarios),
+    [linha.horarios],
   );
 
   const sublinha = linha.sublinha
@@ -79,7 +79,9 @@ export function LinhaOnibus({
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1">Próximo</p>
-                <p className="text-xl font-bold text-green-400">{nextSchedule}</p>
+                <p className="text-xl font-bold text-green-400">
+                  {nextSchedule}
+                </p>
               </div>
             </div>
 

@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "vite build && vite gh-pages"
+    "deploy": "vite build && vite gh-pages",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@fontsource/poppins": "^5.2.5",
@@ -39,6 +40,7 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
     "postcss": "^8.5.3",
+    "prettier": "^3.6.2",
     "tailwindcss": "^4.1.7",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",

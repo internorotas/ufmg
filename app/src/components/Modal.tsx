@@ -20,7 +20,13 @@ interface ModalProps {
  * @param {string} [props.maxWidth="max-w-2xl"] - A largura máxima do modal.
  * @returns {JSX.Element | null} O componente de modal renderizado, ou nulo se não estiver aberto.
  */
-export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-2xl" }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  maxWidth = "max-w-2xl",
+}: ModalProps) {
   // Fechar modal com ESC
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -45,9 +51,11 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-2xl"
         onClick={onClose}
         className="absolute inset-0 bg-black/70 animate-fade-in"
       />
-      
+
       {/* Modal Content */}
-      <div className={`relative bg-modal text-text-primary rounded-2xl shadow-2xl w-full ${maxWidth} max-h-[90vh] flex flex-col animate-slide-up border border-card-border`}>
+      <div
+        className={`relative bg-modal text-text-primary rounded-2xl shadow-2xl w-full ${maxWidth} max-h-[90vh] flex flex-col animate-slide-up border border-card-border`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-card-border bg-background-secondary">
           <h2 className="text-xl font-bold">{title}</h2>
@@ -59,11 +67,9 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-2xl"
             <IoClose size={24} />
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="overflow-y-auto p-4 flex-1 bg-modal">
-          {children}
-        </div>
+        <div className="overflow-y-auto p-4 flex-1 bg-modal">{children}</div>
       </div>
     </div>
   );

@@ -15,7 +15,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    
+
     // --- ADIÇÕES IMPORTANTES ---
     "baseUrl": ".",
     "paths": {
@@ -27,8 +27,8 @@
     ]
   },
   "include": [
-    "src", 
+    "src",
     "src/@types.d.ts" // Inclui o nosso ficheiro de forma explícita
-  ],
+  ]
   // "references": [{ "path": "./tsconfig.node.json" }]
 }

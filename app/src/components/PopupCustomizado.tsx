@@ -19,10 +19,17 @@ export function PopupCustomizado({ parada }: PopupCustomizadoProps) {
       <div className="min-w-[220px]">
         {/* Cabeçalho */}
         <div className="flex items-start gap-2 mb-3">
-          <IoLocationSharp className="text-internoRotas-laranja-ambar mt-1 flex-shrink-0" size={22} />
+          <IoLocationSharp
+            className="text-internoRotas-laranja-ambar mt-1 flex-shrink-0"
+            size={22}
+          />
           <div>
-            <h3 className="font-bold text-base leading-tight text-text-primary">{parada.nome}</h3>
-            <p className="text-xs text-text-secondary mt-1">{parada.categoria}</p>
+            <h3 className="font-bold text-base leading-tight text-text-primary">
+              {parada.nome}
+            </h3>
+            <p className="text-xs text-text-secondary mt-1">
+              {parada.categoria}
+            </p>
           </div>
         </div>
 
@@ -30,9 +37,14 @@ export function PopupCustomizado({ parada }: PopupCustomizadoProps) {
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
           <div className="mt-3 pt-3 border-t border-card-border">
             <div className="flex items-center gap-2 mb-2">
-              <IoBusOutline className="text-internoRotas-azul-eletrico" size={16} />
+              <IoBusOutline
+                className="text-internoRotas-azul-eletrico"
+                size={16}
+              />
               <p className="text-xs font-semibold text-text-primary">
-                {parada.linhasAtendidas.length} linha{parada.linhasAtendidas.length !== 1 ? "s" : ""} atende{parada.linhasAtendidas.length === 1 ? "" : "m"} aqui:
+                {parada.linhasAtendidas.length} linha
+                {parada.linhasAtendidas.length !== 1 ? "s" : ""} atende
+                {parada.linhasAtendidas.length === 1 ? "" : "m"} aqui:
               </p>
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -51,7 +63,9 @@ export function PopupCustomizado({ parada }: PopupCustomizadoProps) {
         {/* Descrição */}
         {parada.descricao && parada.descricao !== parada.nome && (
           <div className="mt-3 pt-3 border-t border-card-border">
-            <p className="text-xs text-text-secondary italic">{parada.descricao}</p>
+            <p className="text-xs text-text-secondary italic">
+              {parada.descricao}
+            </p>
           </div>
         )}
       </div>

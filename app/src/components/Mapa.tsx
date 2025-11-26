@@ -1,6 +1,13 @@
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
-import React, { useEffect, useImperativeHandle, forwardRef, useRef, useState, useMemo } from "react";
+import React, {
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+  useState,
+  useMemo,
+} from "react";
 import { PopupCustomizado } from "./PopupCustomizado";
 import { AntPathComponent } from "./AntPathComponent";
 import { Parada, Linha } from "../types/data.types";
@@ -33,15 +40,17 @@ const highlightedIcon = L.icon({
 
 // Componente para ajustar o mapa quando uma rota é selecionada
 // Memoizado para evitar re-renderizações desnecessárias
-const ChangeView = React.memo(({ bounds }: { bounds: L.LatLngBounds | null }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (bounds) {
-      map.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }, [bounds, map]);
-  return null;
-});
+const ChangeView = React.memo(
+  ({ bounds }: { bounds: L.LatLngBounds | null }) => {
+    const map = useMap();
+    useEffect(() => {
+      if (bounds) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+    }, [bounds, map]);
+    return null;
+  },
+);
 
 ChangeView.displayName = "ChangeView";
 
@@ -65,28 +74,34 @@ CenterOnParada.displayName = "CenterOnParada";
 
 // Componente de Marcador Memoizado para evitar re-renderização de TODOS os marcadores
 // quando apenas UM muda de estado (destaque)
-const MemoizedMarker = React.memo(({
-  parada,
-  isDestacada,
-  setMarkerRef
-}: {
-  parada: Parada;
-  isDestacada: boolean;
-  setMarkerRef: (id: string, ref: L.Marker | null) => void
-}) => {
-  return (
-    <Marker
-      position={parada.coordenadas}
-      icon={isDestacada ? highlightedIcon : stationIcon}
-      ref={(ref) => setMarkerRef(parada.idParada, ref)}
-    >
-      <PopupCustomizado parada={parada} />
-    </Marker>
-  );
-}, (prev, next) => {
-  // Custom comparison: re-render only if highlight state changes or coordinate changes (unlikely)
-  return prev.isDestacada === next.isDestacada && prev.parada.idParada === next.parada.idParada;
-});
+const MemoizedMarker = React.memo(
+  ({
+    parada,
+    isDestacada,
+    setMarkerRef,
+  }: {
+    parada: Parada;
+    isDestacada: boolean;
+    setMarkerRef: (id: string, ref: L.Marker | null) => void;
+  }) => {
+    return (
+      <Marker
+        position={parada.coordenadas}
+        icon={isDestacada ? highlightedIcon : stationIcon}
+        ref={(ref) => setMarkerRef(parada.idParada, ref)}
+      >
+        <PopupCustomizado parada={parada} />
+      </Marker>
+    );
+  },
+  (prev, next) => {
+    // Custom comparison: re-render only if highlight state changes or coordinate changes (unlikely)
+    return (
+      prev.isDestacada === next.isDestacada &&
+      prev.parada.idParada === next.parada.idParada
+    );
+  },
+);
 
 MemoizedMarker.displayName = "MemoizedMarker";
 
@@ -99,20 +114,23 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
     const [paradaDestacada, setParadaDestacada] = useState<string | null>(null);
 
     // Callback ref para gerenciar a lista de referências de marcadores de forma estável
-    const handleSetMarkerRef = React.useCallback((id: string, marker: L.Marker | null) => {
-      if (marker) {
-        markersRef.current[id] = marker;
-      } else {
-        delete markersRef.current[id];
-      }
-    }, []);
+    const handleSetMarkerRef = React.useCallback(
+      (id: string, marker: L.Marker | null) => {
+        if (marker) {
+          markersRef.current[id] = marker;
+        } else {
+          delete markersRef.current[id];
+        }
+      },
+      [],
+    );
 
     useImperativeHandle(ref, () => ({
       centralizarParada: (parada: Parada) => {
         if (!parada || !parada.idParada) return;
 
         setParadaDestacada(parada.idParada);
-        
+
         // Abrir popup do marcador
         const marker = markersRef.current[parada.idParada];
         if (marker) {
@@ -131,7 +149,7 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
       if (!linhaSelecionada) {
         return todasParadas;
       }
-      
+
       // Validação de segurança se itinerarioParadasIds for null/undefined
       const ids = linhaSelecionada.itinerarioParadasIds || [];
       return buscarParadasPorIds(ids, todasParadas);
@@ -139,28 +157,38 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
 
     // Calcular bounds baseado nas coordenadas do trajeto da linha
     const bounds = useMemo(() => {
-      if (linhaSelecionada && linhaSelecionada.coordenadasTrajeto && linhaSelecionada.coordenadasTrajeto.length > 0) {
-        return L.latLngBounds(linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[]);
+      if (
+        linhaSelecionada &&
+        linhaSelecionada.coordenadasTrajeto &&
+        linhaSelecionada.coordenadasTrajeto.length > 0
+      ) {
+        return L.latLngBounds(
+          linhaSelecionada.coordenadasTrajeto as L.LatLngExpression[],
+        );
       }
       return null;
     }, [linhaSelecionada]);
 
     // Otimização: AntPathComponent Props
-    const antPathCoordinates = useMemo(() =>
-      linhaSelecionada?.coordenadasTrajeto as L.LatLngExpression[] || [],
-      [linhaSelecionada]
+    const antPathCoordinates = useMemo(
+      () =>
+        (linhaSelecionada?.coordenadasTrajeto as L.LatLngExpression[]) || [],
+      [linhaSelecionada],
     );
 
-    const antPathOptions = useMemo(() => ({
-      delay: 600,
-      dashArray: [20, 100],
-      weight: 8,
-      color: linhaSelecionada?.corHex || "#3388ff",
-      pulseColor: linhaSelecionada?.corHex || "#3388ff",
-      paused: false,
-      reverse: false,
-      hardwareAccelerated: true,
-    }), [linhaSelecionada?.corHex]);
+    const antPathOptions = useMemo(
+      () => ({
+        delay: 600,
+        dashArray: [20, 100],
+        weight: 8,
+        color: linhaSelecionada?.corHex || "#3388ff",
+        pulseColor: linhaSelecionada?.corHex || "#3388ff",
+        paused: false,
+        reverse: false,
+        hardwareAccelerated: true,
+      }),
+      [linhaSelecionada?.corHex],
+    );
 
     return (
       <MapContainer
@@ -200,7 +228,7 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
         ))}
       </MapContainer>
     );
-  }
+  },
 );
 
 Mapa.displayName = "Mapa";

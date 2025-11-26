@@ -3,6 +3,7 @@
 ## 📋 Resumo das Correções Implementadas
 
 ### 1. **MenuLateral** ✅
+
 - ❌ Removido: `backdrop-blur-sm` do backdrop mobile (efeito de vidro)
 - ❌ Removido: `shadow-2xl` da sidebar mobile
 - ✅ Adicionado: `bg-background` para fundo dinâmico
@@ -10,6 +11,7 @@
 - ✅ Backdrop agora usa apenas `bg-black/70` sem blur
 
 ### 2. **Modal** ✅
+
 - ❌ Removido: Cores hardcoded (`bg-internoRotas-preto-carvao`, `text-internoRotas-bege-areia`)
 - ❌ Removido: `backdrop-blur-sm` do backdrop
 - ✅ Adicionado: `bg-modal`, `text-text-primary`, `border border-card-border`
@@ -17,11 +19,13 @@
 - ✅ Conteúdo usa: `bg-modal`
 
 ### 3. **PopupCustomizado** ✅
+
 - ❌ Removido: Classes Tailwind hardcoded (`text-gray-400`, `border-gray-700`, etc.)
 - ✅ Substituído por: `text-text-secondary`, `border-card-border`, `text-text-primary`
 - ✅ Adicionado: `text-white` nos badges das linhas
 
 ### 4. **LinhaDetalhesModal** ✅
+
 - ❌ Removido: Todas as cores hardcoded (`text-gray-400`, `bg-gray-800`, `border-gray-700`, etc.)
 - ✅ Substituído por variáveis de tema:
   - `text-text-secondary` para textos secundários
@@ -31,6 +35,7 @@
   - `bg-card-hover` para hover states
 
 ### 5. **globals.css - Popup do Leaflet** ✅
+
 - ❌ Removido: Cores fixas (`bg-internoRotas-preto-carvao`)
 - ✅ Adicionado: Suporte completo a temas
   - `.leaflet-popup-content-wrapper` usa `var(--card-background)`
@@ -41,29 +46,21 @@
 ## 🎨 Variáveis de Tema Usadas
 
 ### Light Mode (Padrão quando não há `dark` class)
+
 ```css
---background: #FFFFFF
---background-secondary: #F9FAFB
---text-primary: #111827
---text-secondary: #6B7280
---card-background: #FFFFFF
---card-border: #E5E7EB
---sidebar-background: #F3F4F6
---modal-background: #FFFFFF
---input-background: #F9FAFB
+--background: #ffffff --background-secondary: #f9fafb --text-primary: #111827
+  --text-secondary: #6b7280 --card-background: #ffffff --card-border: #e5e7eb
+  --sidebar-background: #f3f4f6 --modal-background: #ffffff
+  --input-background: #f9fafb;
 ```
 
 ### Dark Mode (Com `dark` class no `<html>`)
+
 ```css
---background: #111827
---background-secondary: #1F2937
---text-primary: #F9FAFB
---text-secondary: #9CA3AF
---card-background: #1F2937
---card-border: #374151
---sidebar-background: #1a1819
---modal-background: #1F2937
---input-background: #374151
+--background: #111827 --background-secondary: #1f2937 --text-primary: #f9fafb
+  --text-secondary: #9ca3af --card-background: #1f2937 --card-border: #374151
+  --sidebar-background: #1a1819 --modal-background: #1f2937
+  --input-background: #374151;
 ```
 
 ## 🚀 Como Testar

@@ -43,7 +43,7 @@ export function MenuLateral({
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 1500);
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
-    null
+    null,
   );
 
   useEffect(() => {
@@ -87,7 +87,7 @@ export function MenuLateral({
         linha.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (linha.sublinha &&
           linha.sublinha.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        linha.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+        linha.descricao.toLowerCase().includes(searchTerm.toLowerCase()),
     ) || [];
 
   useEffect(() => {
@@ -143,10 +143,9 @@ export function MenuLateral({
       >
         {/* Header */}
         <header className="bg-brand-primary p-2 flex justify-between items-center flex-shrink-0 shadow-sm">
-
-            <div className="flex items-center justify-center flex-1">
+          <div className="flex items-center justify-center flex-1">
             <img src={logo} alt="Logo Interno Rotas" className="h-6" />
-            </div>
+          </div>
 
           <div className="flex items-center gap-2">
             {/* Toggle de Tema */}
@@ -198,7 +197,10 @@ export function MenuLateral({
         </div>
 
         {/* Lista de Linhas */}
-        <nav className="p-4 overflow-y-auto flex-1 bg-background" aria-label="Lista de Linhas">
+        <nav
+          className="p-4 overflow-y-auto flex-1 bg-background"
+          aria-label="Lista de Linhas"
+        >
           {linhasFiltradas.length > 0 ? (
             linhasFiltradas.map((linha: Linha) => (
               <LineCard
@@ -211,12 +213,17 @@ export function MenuLateral({
             ))
           ) : (
             <div className="text-center py-12 text-text-secondary flex flex-col items-center justify-center h-full">
-              <IoSearch size={48} className="text-text-tertiary mb-4 opacity-20" />
+              <IoSearch
+                size={48}
+                className="text-text-tertiary mb-4 opacity-20"
+              />
               <p className="text-lg font-medium">Nenhuma linha encontrada</p>
-              <p className="text-sm mt-2 text-text-tertiary">Tente ajustar sua pesquisa</p>
+              <p className="text-sm mt-2 text-text-tertiary">
+                Tente ajustar sua pesquisa
+              </p>
             </div>
           )}
-          
+
           {/* Banner de Aviso */}
           <DisclaimerBanner />
         </nav>

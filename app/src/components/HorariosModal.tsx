@@ -38,7 +38,12 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const passados = horariosOrganizados.filter((h) => h.passou);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Horários - ${linha.nome}`} maxWidth="max-w-md">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Horários - ${linha.nome}`}
+      maxWidth="max-w-md"
+    >
       <div className="space-y-6">
         {/* Próximos Horários */}
         {proximos.length > 0 && (
@@ -73,7 +78,9 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                   key={`passado-${index}`}
                   className="bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-center opacity-50"
                 >
-                  <p className="text-lg font-semibold text-gray-400">{horario}</p>
+                  <p className="text-lg font-semibold text-gray-400">
+                    {horario}
+                  </p>
                 </div>
               ))}
             </div>

@@ -171,7 +171,9 @@ body {
   background: var(--background);
   color: var(--text-primary);
   /* Transição suave para troca de tema */
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Scrollbar Personalizada */
@@ -212,13 +214,23 @@ body {
 
 /* Animations */
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slide-up {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .animate-fade-in {
@@ -231,8 +243,12 @@ body {
 
 /* Leaflet Ant Path Animation */
 @keyframes leaflet-ant-path-animation {
-  from { stroke-dashoffset: 100%; }
-  to { stroke-dashoffset: 0%; }
+  from {
+    stroke-dashoffset: 100%;
+  }
+  to {
+    stroke-dashoffset: 0%;
+  }
 }
 
 path.leaflet-ant-path {
