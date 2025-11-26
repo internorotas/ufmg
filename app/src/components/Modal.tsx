@@ -4,7 +4,7 @@ import { IoClose } from "react-icons/io5";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title: string | ReactNode;
   children: ReactNode;
   maxWidth?: string;
 }
@@ -54,11 +54,15 @@ export function Modal({
 
       {/* Modal Content */}
       <div
-        className={`relative bg-modal text-text-primary rounded-2xl shadow-2xl w-full ${maxWidth} max-h-[90vh] flex flex-col animate-slide-up border border-card-border`}
+        className={`relative bg-modal text-text-primary rounded-xl shadow-2xl w-full ${maxWidth} max-h-[90vh] flex flex-col animate-slide-up border border-card-border`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-card-border bg-background-secondary">
-          <h2 className="text-xl font-bold">{title}</h2>
+        <div className="flex items-center justify-between p-4 border-b border-card-border bg-background-secondary rounded-t-xl">
+          {typeof title === 'string' ? (
+            <h2 className="text-xl font-bold">{title}</h2>
+          ) : (
+            title
+          )}
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-card transition-colors"
@@ -69,7 +73,7 @@ export function Modal({
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto p-4 flex-1 bg-modal">{children}</div>
+        <div className="overflow-y-auto p-4 flex-1 bg-modal rounded-b-xl">{children}</div>
       </div>
     </div>
   );
