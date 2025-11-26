@@ -1,4 +1,4 @@
-import { IoWarningOutline, IoLogoGithub, IoHeart } from "react-icons/io5";
+import { IoHeart } from "react-icons/io5";
 
 /**
  * Renderiza o menu de rodapé com links para reportar problemas, ver o projeto no GitHub e creditar o desenvolvedor.
@@ -7,28 +7,28 @@ import { IoWarningOutline, IoLogoGithub, IoHeart } from "react-icons/io5";
  */
 export function MenuFooter() {
   return (
-    <div className="flex-shrink-0 p-3 bg-background-secondary border-t border-card-border space-y-2">
-      {/* Botão Reportar Problema */}
-      <a
-        href="https://github.com/internorotas/ufmg/issues/new"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-colors"
-      >
-        <IoWarningOutline size={16} />
-        Encontrou algum problema?
-      </a>
+    <div className="flex-shrink-0 p-2 bg-background-secondary border-t border-card-border space-y-2">
+      <div className="flex flex-row gap-2">
+        {/* Botão Reportar Problema */}
+        <a
+          href="https://forms.gle/5e9MHq9pp1p8T5Px5"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-colors"
+        >
+          Contato
+        </a>
 
-      {/* Botão Sobre o Projeto */}
-      <a
-        href="https://github.com/internorotas/ufmg"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-internoRotas-azul-eletrico hover:bg-blue-700 text-white font-bold text-xs transition-colors"
-      >
-        <IoLogoGithub size={16} />
-        Sobre o Projeto
-      </a>
+        {/* Botão Sobre o Projeto */}
+        <a
+          href="https://github.com/internorotas/ufmg"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-internoRotas-azul-eletrico hover:bg-blue-700 text-white font-bold text-xs transition-colors"
+        >
+          Sobre o Projeto
+        </a>
+      </div>
 
       {/* Botão Usar antiga versão */}
       <a
