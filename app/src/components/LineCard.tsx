@@ -138,11 +138,11 @@ export function LineCard({
               <IoBusOutline size={24} className="text-white drop-shadow-sm" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm md:text-base font-bold text-text-primary truncate leading-tight">
+              <h3 className="text-sm md:text-base font-bold text-text-primary leading-tight">
                 {linha.nome}
               </h3>
               {linha.sublinha && (
-                <p className="text-xs md:text-sm text-text-secondary mt-0.5 line-clamp-1">
+                <p className="text-xs md:text-sm text-text-secondary mt-0.5">
                   {linha.sublinha}
                 </p>
               )}
