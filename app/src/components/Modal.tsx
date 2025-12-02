@@ -58,7 +58,7 @@ export function Modal({
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-card-border bg-background-secondary rounded-t-xl">
-          {typeof title === 'string' ? (
+          {typeof title === "string" ? (
             <h2 className="text-xl font-bold">{title}</h2>
           ) : (
             title
@@ -73,7 +73,9 @@ export function Modal({
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto p-4 flex-1 bg-modal rounded-b-xl">{children}</div>
+        <div className="overflow-y-auto p-4 flex-1 bg-modal rounded-b-xl">
+          {children}
+        </div>
       </div>
     </div>
   );
