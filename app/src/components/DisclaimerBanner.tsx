@@ -12,7 +12,7 @@ import {
 export function DisclaimerBanner() {
   return (
     <div
-      className="mx-3 mb-3 p-3 rounded-lg border"
+      className="mb-3 p-3 rounded-lg border"
       style={{
         backgroundColor: "var(--warning-bg)",
         borderColor: "var(--warning-border)",
@@ -51,7 +51,7 @@ export function DisclaimerBanner() {
           </p>
 
           <div
-            className="mt-2 pt-2 border-t grid grid-cols-2 gap-2"
+            className="mt-2 pt-2 border-t flex flex-col lg:grid grid-cols-2 gap-2"
             style={{ borderColor: "var(--warning-border)" }}
           >
             <a

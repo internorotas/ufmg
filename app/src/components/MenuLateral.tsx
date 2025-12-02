@@ -186,7 +186,7 @@ export function MenuLateral({
             <button
               key={categoria.id}
               onClick={() => handleCategoriaClick(index)}
-              className={`flex-1 py-2.5 px-2.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
+              className={`flex-1 py-0.5 lg:py-2.5 px-2.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
                 categoriaAtiva === index
                   ? "bg-brand-primary text-white shadow-sm"
                   : "bg-card text-text-secondary hover:bg-card-hover hover:text-text-primary border border-transparent hover:border-card-border"

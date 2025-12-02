@@ -27,14 +27,14 @@ export function ThemeToggle() {
   return (
     <button
       onClick={handleThemeToggle}
-      className="p-1 rounded-lg transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
+      className="p-1 rounded-lg transition-colors bg-background-secondary hover:bg-card dark:bg-card dark:hover:bg-card-hover"
       aria-label={`Alternar para tema ${theme === "light" ? "escuro" : "claro"}`}
       title={`Alternar para tema ${theme === "light" ? "escuro" : "claro"}`}
     >
       {theme === "light" ? (
-        <IoMoon size={20} className="text-gray-700" />
+        <IoMoon size={20} className="text-text-primary" />
       ) : (
-        <IoSunny size={20} className="text-yellow-400" />
+        <IoSunny size={20} className="text-brand-accent" />
       )}
     </button>
   );

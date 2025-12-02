@@ -14,7 +14,7 @@ export function MenuFooter() {
           href="https://forms.gle/5e9MHq9pp1p8T5Px5"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-1 lg:py-2 px-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-colors"
         >
           Contato
         </a>
@@ -24,7 +24,7 @@ export function MenuFooter() {
           href="https://github.com/internorotas/ufmg"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-internoRotas-azul-eletrico hover:bg-blue-700 text-white font-bold text-xs transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-1 lg:py-2 px-3 rounded-lg bg-internoRotas-azul-eletrico hover:bg-blue-700 text-white font-bold text-xs transition-colors"
         >
           Sobre o Projeto
         </a>
@@ -35,7 +35,7 @@ export function MenuFooter() {
         href="https://ufmg-pi.vercel.app/"
         target="_blank"
         rel="noopener noreferrer"
-        className="w-full flex items-center justify-center py-2 px-3 rounded-lg bg-card hover:bg-card-hover text-text-secondary hover:text-text-primary border border-card-border font-semibold text-xs transition-colors"
+        className="w-full flex items-center justify-center py-1 lg:py-2 px-3 rounded-lg bg-card hover:bg-card-hover text-text-secondary hover:text-text-primary border border-card-border font-semibold text-xs transition-colors"
       >
         Usar antiga versão
       </a>
@@ -45,7 +45,7 @@ export function MenuFooter() {
         href="https://github.com/igormartins44"
         target="_blank"
         rel="noopener noreferrer"
-        className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-text-secondary hover:text-text-primary transition-colors"
+        className="w-full flex items-center justify-center gap-1.5 py-1 lg:py-2 text-xs text-text-secondary hover:text-text-primary transition-colors"
       >
         Desenvolvido com <IoHeart size={14} className="text-blue-500" /> por
         Igor Martins

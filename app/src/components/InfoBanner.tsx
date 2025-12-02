@@ -20,10 +20,10 @@ export function InfoBanner() {
         style={{ color: "var(--info-text)" }}
       />
       <p
-        className="text-sm leading-relaxed"
+        className="text-xs lg:text-sm leading-relaxed"
         style={{ color: "var(--info-text)" }}
       >
-        <strong>Atenção:</strong> Todas as rotas iniciam e terminam próximas à{" "}
+        Todas as rotas iniciam e terminam próximas à{" "}
         <strong>Escola de Música</strong>. Os horários indicam a saída
         dos ônibus deste ponto.
       </p>
