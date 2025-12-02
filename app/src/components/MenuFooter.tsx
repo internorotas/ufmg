@@ -16,7 +16,7 @@ export function MenuFooter() {
           rel="noopener noreferrer"
           className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-colors"
         >
-          Contato
+          Fale Conosco
         </a>
 
         {/* Botão Sobre o Projeto */}
