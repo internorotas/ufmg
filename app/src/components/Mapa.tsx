@@ -144,16 +144,10 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
       },
     }));
 
-    // Filtrar paradas da linha selecionada dinamicamente usando os IDs
+    // Sempre exibir todas as paradas, independente da linha selecionada
     const paradasVisiveis = useMemo(() => {
-      if (!linhaSelecionada) {
-        return todasParadas;
-      }
-
-      // Validação de segurança se itinerarioParadasIds for null/undefined
-      const ids = linhaSelecionada.itinerarioParadasIds || [];
-      return buscarParadasPorIds(ids, todasParadas);
-    }, [linhaSelecionada, todasParadas]);
+      return todasParadas;
+    }, [todasParadas]);
 
     // Calcular bounds baseado nas coordenadas do trajeto da linha
     const bounds = useMemo(() => {
