@@ -44,7 +44,7 @@ export function MenuLateral({
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 1500);
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
-    null,
+    null
   );
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export function MenuLateral({
         linha.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (linha.sublinha &&
           linha.sublinha.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        linha.descricao.toLowerCase().includes(searchTerm.toLowerCase()),
+        linha.descricao.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
   useEffect(() => {
@@ -164,7 +164,7 @@ export function MenuLateral({
         </header>
 
         {/* Barra de Pesquisa */}
-        <div className="p-4 bg-background-secondary flex-shrink-0 border-b border-card-border">
+        <div className="p-2 lg:p-4 bg-background-secondary flex-shrink-0 border-b border-card-border">
           <div className="relative">
             <IoSearch
               className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary"
@@ -175,7 +175,7 @@ export function MenuLateral({
               placeholder="Pesquisar linha..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-input border border-input-border text-text-primary rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all placeholder:text-text-tertiary"
+              className="w-full bg-input border border-input-border text-text-primary rounded-lg pl-10 pr-4 py-1 lg:py-3 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all placeholder:text-text-tertiary"
             />
           </div>
         </div>
