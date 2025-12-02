@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import ReactGA from "react-ga4";
 import { Linha } from "../types/data.types";
-import { IoTimeOutline, IoBusOutline } from "react-icons/io5";
+import { IoTimeOutline, IoBusOutline, IoChevronForward } from "react-icons/io5";
 import { timeToMinutes, minutesToTime } from "../../lib/utils";
 
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
@@ -148,11 +148,14 @@ export function LineCard({
               )}
             </div>
           </div>
-          <span
-            className={`text-[10px] md:text-xs px-2.5 py-1 rounded-full border font-medium whitespace-nowrap ${getBadgeColor()}`}
-          >
-            {status}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-[10px] md:text-xs px-2.5 py-1 rounded-full border font-medium whitespace-nowrap ${getBadgeColor()}`}
+            >
+              {status}
+            </span>
+            <IoChevronForward size={20} className="text-text-secondary flex-shrink-0" />
+          </div>
         </div>
       </div>
 
