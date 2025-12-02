@@ -11,7 +11,6 @@ import React, {
 import { PopupCustomizado } from "./PopupCustomizado";
 import { AntPathComponent } from "./AntPathComponent";
 import { Parada, Linha } from "../types/data.types";
-import { buscarParadasPorIds } from "../../lib/utils";
 
 interface MapaProps {
   todasParadas: Parada[];
