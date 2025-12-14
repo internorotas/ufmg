@@ -113,10 +113,13 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
     const markersRef = useRef<{ [key: string]: L.Marker | null }>({});
     const [paradaDestacada, setParadaDestacada] = useState<string | null>(null);
     const { trackTiming } = useAnalytics();
-    const mapLoadStartRef = useRef<number>(Date.now());
+    const mapLoadStartRef = useRef<number>(0);
 
     // Rastreia o tempo de carregamento do mapa
     useEffect(() => {
+      if (mapLoadStartRef.current === 0) {
+        mapLoadStartRef.current = Date.now();
+      }
       const loadTime = Date.now() - mapLoadStartRef.current;
       trackTiming({
         name: "Map Load Time",
