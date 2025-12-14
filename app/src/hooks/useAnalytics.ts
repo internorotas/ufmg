@@ -117,7 +117,7 @@ export function useSessionTiming(
   label: string,
   category: EventCategory = "Session"
 ) {
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number>(0);
   const { trackTiming, isEnabled } = useAnalytics();
 
   useEffect(() => {
