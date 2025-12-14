@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import ReactGA from "react-ga4";
 import { useDebounce } from "use-debounce";
+import { useAnalytics } from "../hooks/useAnalytics";
 import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
 import { ThemeToggle } from "./ThemeToggle";
 import { DisclaimerBanner } from "./DisclaimerBanner";
@@ -10,8 +10,6 @@ import { Linha, CategoriaLinhas, Parada } from "../types/data.types";
 import logo from "../assets/logo-horizontal-transparente.svg";
 import { IoSearch, IoMenu, IoClose } from "react-icons/io5";
 import { LineCard } from "./LineCard";
-
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 interface MenuLateralProps {
   linhasData: CategoriaLinhas;
@@ -46,16 +44,17 @@ export function MenuLateral({
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
     null
   );
+  const { trackEvent } = useAnalytics();
 
   useEffect(() => {
-    if (GA_MEASUREMENT_ID && debouncedSearchTerm) {
-      ReactGA.event({
+    if (debouncedSearchTerm) {
+      trackEvent({
         category: "Busca",
         action: "Termo Pesquisado",
         label: debouncedSearchTerm,
       });
     }
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, trackEvent]);
 
   const handleCardClick = (linha: Linha) => {
     // Clique no card: seleciona a linha e mostra no mapa
@@ -93,20 +92,18 @@ export function MenuLateral({
 
   useEffect(() => {
     if (searchTerm && linhasFiltradas.length === 0) {
-      if (GA_MEASUREMENT_ID) {
-        ReactGA.event({
-          category: "Busca",
-          action: "Busca Sem Resultados",
-          label: searchTerm,
-        });
-      }
+      trackEvent({
+        category: "Busca",
+        action: "Busca Sem Resultados",
+        label: searchTerm,
+      });
     }
-  }, [searchTerm, linhasFiltradas.length]);
+  }, [searchTerm, linhasFiltradas.length, trackEvent]);
 
   const handleCategoriaClick = (index: number) => {
     const categoria = linhasData.categoriasDias[index];
-    if (GA_MEASUREMENT_ID && categoria) {
-      ReactGA.event({
+    if (categoria) {
+      trackEvent({
         category: "Navegação Principal",
         action: "Selecionar Categoria Dia",
         label: categoria.displayName,

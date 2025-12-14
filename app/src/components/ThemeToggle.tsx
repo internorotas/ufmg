@@ -1,8 +1,6 @@
-import ReactGA from "react-ga4";
 import { useTheme } from "../contexts/ThemeContext";
 import { IoMoon, IoSunny } from "react-icons/io5";
-
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+import { useAnalytics } from "../hooks/useAnalytics";
 
 /**
  * Renderiza um botão que permite ao usuário alternar entre os temas claro and escuro.
@@ -11,16 +9,15 @@ const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
  */
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const { trackEvent } = useAnalytics();
 
   const handleThemeToggle = () => {
     const newTheme = theme === "light" ? "dark" : "light";
-    if (GA_MEASUREMENT_ID) {
-      ReactGA.event({
-        category: "UI Interaction",
-        action: "Toggle Theme",
-        label: newTheme,
-      });
-    }
+    trackEvent({
+      category: "UI Interaction",
+      action: "Toggle Theme",
+      label: newTheme,
+    });
     toggleTheme();
   };
 

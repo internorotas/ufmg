@@ -11,6 +11,7 @@ import React, {
 import { PopupCustomizado } from "./PopupCustomizado";
 import { AntPathComponent } from "./AntPathComponent";
 import { Parada, Linha } from "../types/data.types";
+import { useAnalytics } from "../hooks/useAnalytics";
 
 interface MapaProps {
   todasParadas: Parada[];
@@ -111,6 +112,19 @@ export const Mapa = forwardRef<MapaRef, MapaProps>(
   ({ todasParadas, linhaSelecionada, paradaSelecionada }, ref) => {
     const markersRef = useRef<{ [key: string]: L.Marker | null }>({});
     const [paradaDestacada, setParadaDestacada] = useState<string | null>(null);
+    const { trackTiming } = useAnalytics();
+    const mapLoadStartRef = useRef<number>(Date.now());
+
+    // Rastreia o tempo de carregamento do mapa
+    useEffect(() => {
+      const loadTime = Date.now() - mapLoadStartRef.current;
+      trackTiming({
+        name: "Map Load Time",
+        value: loadTime,
+        category: "Performance",
+        label: "Initial Map Render",
+      });
+    }, [trackTiming]);
 
     // Callback ref para gerenciar a lista de referências de marcadores de forma estável
     const handleSetMarkerRef = React.useCallback(
