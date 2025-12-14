@@ -65,7 +65,7 @@ export function MenuFooter() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() =>
-          handleLinkClick("Dev Profile", "https://github.com/igormartins44")
+          handleLinkClick("Dev Profile", "https://github.com/igormartins4")
         }
         className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-text-secondary hover:text-text-primary transition-colors"
       >
