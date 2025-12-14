@@ -1,10 +1,8 @@
 import { useMemo } from "react";
-import ReactGA from "react-ga4";
 import { Linha } from "../types/data.types";
 import { IoTimeOutline, IoBusOutline, IoChevronForward } from "react-icons/io5";
 import { timeToMinutes, minutesToTime } from "../../lib/utils";
-
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+import { useAnalytics } from "../hooks/useAnalytics";
 
 interface LineCardProps {
   linha: Linha;
@@ -89,6 +87,7 @@ export function LineCard({
   onDetailsClick,
   isSelected = false,
 }: LineCardProps) {
+  const { trackEvent } = useAnalytics();
   const { nextSchedule, previousSchedule, status } = useMemo(
     () => calculateSchedules(linha.horarios),
     [linha.horarios],
@@ -108,13 +107,11 @@ export function LineCard({
 
   const handleDetailsClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Impede que o clique propague para o card
-    if (GA_MEASUREMENT_ID) {
-      ReactGA.event({
-        category: "Engajamento",
-        action: "Abrir Card Detalhes",
-        label: linha.nome,
-      });
-    }
+    trackEvent({
+      category: "Engajamento",
+      action: "Abrir Card Detalhes",
+      label: linha.nome,
+    });
     onDetailsClick();
   };
 

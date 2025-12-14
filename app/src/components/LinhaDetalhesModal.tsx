@@ -1,5 +1,4 @@
 import { useState } from "react";
-import ReactGA from "react-ga4";
 import { Modal } from "./Modal";
 import { Linha, Parada } from "../types/data.types";
 import {
@@ -9,6 +8,7 @@ import {
   IoBusOutline,
 } from "react-icons/io5";
 import { buscarParadasPorIds, timeToMinutes } from "../../lib/utils";
+import { useAnalytics, useSessionTiming } from "../hooks/useAnalytics";
 
 interface LinhaDetalhesModalProps {
   isOpen: boolean;
@@ -39,8 +39,10 @@ export function LinhaDetalhesModal({
   onParadaClick,
 }: LinhaDetalhesModalProps) {
   const [tabAtiva, setTabAtiva] = useState<TabType>("itinerario");
+  const { trackEvent } = useAnalytics();
 
-  const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  // Rastreia tempo que o usuário passa visualizando detalhes desta linha
+  useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
 
   // Buscar paradas do itinerário dinamicamente usando os IDs
   const paradasDoItinerario = buscarParadasPorIds(
@@ -65,36 +67,30 @@ export function LinhaDetalhesModal({
   const passados = horariosOrganizados.filter((h) => h.passou);
 
   const handleTabChange = (tab: TabType) => {
-    if (GA_MEASUREMENT_ID) {
-      ReactGA.event({
-        category: "Navegação Detalhes",
-        action: "Visualizar Aba",
-        label: `${tab === "itinerario" ? "Itinerário" : "Todos os Horários"} - ${
-          linha.nome
-        }`,
-      });
-    }
+    trackEvent({
+      category: "Navegação Detalhes",
+      action: "Visualizar Aba",
+      label: `${tab === "itinerario" ? "Itinerário" : "Todos os Horários"} - ${
+        linha.nome
+      }`,
+    });
     setTabAtiva(tab);
   };
 
   const handleHorarioClick = (horario: string) => {
-    if (GA_MEASUREMENT_ID) {
-      ReactGA.event({
-        category: "Horarios",
-        action: "Clique Horario Especifico",
-        label: `${horario} - ${linha.nome}`,
-      });
-    }
+    trackEvent({
+      category: "Horarios",
+      action: "Clique Horario Especifico",
+      label: `${horario} - ${linha.nome}`,
+    });
   };
 
   const handleParadaClick = (parada: Parada) => {
-    if (GA_MEASUREMENT_ID) {
-      ReactGA.event({
-        category: "Engajamento Detalhes",
-        action: "Selecionar Parada Itinerario",
-        label: `${parada.nome} - ${linha.nome}`,
-      });
-    }
+    trackEvent({
+      category: "Engajamento Detalhes",
+      action: "Selecionar Parada Itinerario",
+      label: `${parada.nome} - ${linha.nome}`,
+    });
     onParadaClick(parada);
     onClose();
   };

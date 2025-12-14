@@ -5,8 +5,11 @@ import {
   useState,
   ReactNode,
 } from "react";
+import ReactGA from "react-ga4";
 
 type Theme = "light" | "dark";
+
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 interface ThemeContextType {
   theme: Theme;
@@ -40,6 +43,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     // Salvar no localStorage
     localStorage.setItem("theme", theme);
+
+    // Definir user property no Google Analytics
+    if (GA_MEASUREMENT_ID) {
+      ReactGA.set({ user_theme: theme });
+    }
   }, [theme]);
 
   const toggleTheme = () => {
