@@ -11,6 +11,8 @@ import ReactGA from "react-ga4";
 import { MenuLateral } from "./components/MenuLateral";
 import type { MapaRef } from "./components/Mapa";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { useAnalytics } from "./hooks/useAnalytics";
 
 // Importa os dados da pasta /data
 import linhasData from "./data/linhas";
@@ -49,39 +51,34 @@ export function App() {
     null,
   );
   const mapaRef = useRef<MapaRef>(null);
+  const { trackEvent, trackPageView } = useAnalytics();
 
   useEffect(() => {
-    if (GA_MEASUREMENT_ID) {
-      ReactGA.send({ hitType: "pageview", page: window.location.pathname });
-    }
-  }, []);
+    trackPageView();
+  }, [trackPageView]);
 
   // Otimização: useCallback para evitar recriação da função em cada render
   const handleLinhaSelect = useCallback((linha: Linha) => {
     setLinhaSelecionada(linha);
 
-    if (GA_MEASUREMENT_ID) {
-      ReactGA.event({
-        category: "Engajamento",
-        action: "Selecionar Linha",
-        label: linha.nome,
-      });
-    }
-  }, []);
+    trackEvent({
+      category: "Engajamento",
+      action: "Selecionar Linha",
+      label: linha.nome,
+    });
+  }, [trackEvent]);
 
   // Otimização: useCallback para evitar recriação da função em cada render
   const handleParadaClick = useCallback((parada: Parada) => {
     setParadaSelecionada(parada);
     mapaRef.current?.centralizarParada(parada);
 
-    if (GA_MEASUREMENT_ID) {
-      ReactGA.event({
-        category: "Engajamento",
-        action: "Selecionar Parada",
-        label: parada.nome,
-      });
-    }
-  }, []);
+    trackEvent({
+      category: "Engajamento",
+      action: "Selecionar Parada",
+      label: parada.nome,
+    });
+  }, [trackEvent]);
 
   // Memoização dos dados de paradas para garantir estabilidade referencial
   const todasParadas = useMemo(() => paradasData?.paradas || [], []);
@@ -125,8 +122,9 @@ export function App() {
   }
 
   return (
-    <ThemeProvider>
-      <div className="relative h-screen w-screen overflow-hidden flex flex-col md:flex-row font-['Poppins',_sans-serif] bg-background">
+    <ErrorBoundary>
+      <ThemeProvider>
+        <div className="relative h-screen w-screen overflow-hidden flex flex-col md:flex-row font-['Poppins',_sans-serif] bg-background">
         <MenuLateral
           linhasData={linhasData}
           todasParadas={todasParadas}
@@ -144,7 +142,8 @@ export function App() {
             />
           </Suspense>
         </main>
-      </div>
-    </ThemeProvider>
+        </div>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
