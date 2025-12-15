@@ -8,7 +8,7 @@ import { InfoBanner } from "./InfoBanner";
 import { VacationBanner } from "./VacationBanner";
 import { MenuFooter } from "./MenuFooter";
 import { Linha, CategoriaLinhas, Parada } from "../types/data.types";
-import logo from "../assets/logo-horizontal-transparente.svg";
+import logo from "../assets/logo-natal-horizontal.svg";
 import { IoSearch, IoMenu, IoArrowBack } from "react-icons/io5";
 import { LineCard } from "./LineCard";
 import { getCurrentSpecialPeriod } from "../config/specialPeriods";

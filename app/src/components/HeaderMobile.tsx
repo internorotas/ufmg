@@ -1,6 +1,6 @@
 import React from "react";
 // Importa o logo da pasta de assets
-import logo from "../assets/logo-horizontal-transparente.svg";
+import logo from "../assets/logo-natal-horizontal.svg";
 
 interface HeaderMobileProps {
   isMenuOpen: boolean;
