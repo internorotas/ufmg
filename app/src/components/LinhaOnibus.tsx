@@ -93,9 +93,7 @@ export function LinhaOnibus({
               <div className="flex justify-between text-center mb-4">
                 <div>
                   <p className="text-xs text-gray-400 mb-1">Último Partiu</p>
-                  <p className="text-xl font-bold">
-                    {previousSchedule}
-                  </p>
+                  <p className="text-xl font-bold">{previousSchedule}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 mb-1">Próximo</p>

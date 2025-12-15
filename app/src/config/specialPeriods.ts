@@ -1,6 +1,6 @@
 /**
  * Configuração de períodos especiais (férias e recessos)
- * 
+ *
  * Este arquivo centraliza a configuração de períodos especiais, facilitando
  * a manutenção e atualização das datas de férias e recessos.
  */
@@ -15,7 +15,7 @@ export interface SpecialPeriod {
 
 /**
  * Lista de períodos especiais configurados
- * 
+ *
  * Para adicionar um novo período de férias:
  * 1. Adicione um novo objeto ao array com as datas
  * 2. Defina isActive como true para o período atual
@@ -47,33 +47,33 @@ export const SPECIAL_PERIODS: SpecialPeriod[] = [
 export function getCurrentSpecialPeriod(): SpecialPeriod | null {
   const now = new Date();
   now.setHours(0, 0, 0, 0); // Normaliza para início do dia
-  
+
   for (const period of SPECIAL_PERIODS) {
     if (!period.isActive) continue;
-    
+
     const start = new Date(period.startDate);
     start.setHours(0, 0, 0, 0);
-    
+
     const end = new Date(period.endDate);
     end.setHours(23, 59, 59, 999);
-    
+
     // Debug (pode ser removido em produção)
-    if (typeof window !== 'undefined' && import.meta.env.DEV) {
-      console.log('🔍 Verificação de Período de Férias:', {
+    if (typeof window !== "undefined" && import.meta.env.DEV) {
+      console.log("🔍 Verificação de Período de Férias:", {
         periodo: period.name,
         ativo: period.isActive,
-        hoje: now.toLocaleDateString('pt-BR'),
-        inicio: start.toLocaleDateString('pt-BR'),
-        fim: end.toLocaleDateString('pt-BR'),
-        dentroPeríodo: now >= start && now <= end
+        hoje: now.toLocaleDateString("pt-BR"),
+        inicio: start.toLocaleDateString("pt-BR"),
+        fim: end.toLocaleDateString("pt-BR"),
+        dentroPeríodo: now >= start && now <= end,
       });
     }
-    
+
     if (now >= start && now <= end) {
       return period;
     }
   }
-  
+
   return null;
 }
 

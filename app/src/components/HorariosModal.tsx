@@ -58,8 +58,8 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
               ⚠️ Horários suspensos
             </p>
             <p className="text-sm text-yellow-200">
-              Esta linha não está operando durante o período de férias e recessos.
-              Utilize os horários de "Férias e Recessos".
+              Esta linha não está operando durante o período de férias e
+              recessos. Utilize os horários de "Férias e Recessos".
             </p>
           </div>
         )}
@@ -111,7 +111,9 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           <div className="bg-internoRotas-cinza-grafite rounded-lg p-4 text-sm">
             <p className="text-center text-gray-300">
               Total de {horariosOrganizados.length} horários •{" "}
-              <span className="text-green-400">{proximos.length} restantes</span>
+              <span className="text-green-400">
+                {proximos.length} restantes
+              </span>
             </p>
           </div>
         )}

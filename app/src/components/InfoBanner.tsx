@@ -24,8 +24,8 @@ export function InfoBanner() {
         style={{ color: "var(--info-text)" }}
       >
         Todas as rotas iniciam e terminam próximas à{" "}
-        <strong>Escola de Música</strong>. Os horários indicam a saída
-        dos ônibus deste ponto.
+        <strong>Escola de Música</strong>. Os horários indicam a saída dos
+        ônibus deste ponto.
       </p>
     </div>
   );

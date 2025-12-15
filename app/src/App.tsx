@@ -58,27 +58,33 @@ export function App() {
   }, [trackPageView]);
 
   // Otimização: useCallback para evitar recriação da função em cada render
-  const handleLinhaSelect = useCallback((linha: Linha) => {
-    setLinhaSelecionada(linha);
+  const handleLinhaSelect = useCallback(
+    (linha: Linha) => {
+      setLinhaSelecionada(linha);
 
-    trackEvent({
-      category: "Engajamento",
-      action: "Selecionar Linha",
-      label: linha.nome,
-    });
-  }, [trackEvent]);
+      trackEvent({
+        category: "Engajamento",
+        action: "Selecionar Linha",
+        label: linha.nome,
+      });
+    },
+    [trackEvent],
+  );
 
   // Otimização: useCallback para evitar recriação da função em cada render
-  const handleParadaClick = useCallback((parada: Parada) => {
-    setParadaSelecionada(parada);
-    mapaRef.current?.centralizarParada(parada);
+  const handleParadaClick = useCallback(
+    (parada: Parada) => {
+      setParadaSelecionada(parada);
+      mapaRef.current?.centralizarParada(parada);
 
-    trackEvent({
-      category: "Engajamento",
-      action: "Selecionar Parada",
-      label: parada.nome,
-    });
-  }, [trackEvent]);
+      trackEvent({
+        category: "Engajamento",
+        action: "Selecionar Parada",
+        label: parada.nome,
+      });
+    },
+    [trackEvent],
+  );
 
   // Memoização dos dados de paradas para garantir estabilidade referencial
   const todasParadas = useMemo(() => paradasData?.paradas || [], []);
@@ -125,23 +131,23 @@ export function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <div className="relative h-screen w-screen overflow-hidden flex flex-col md:flex-row font-['Poppins',_sans-serif] bg-background">
-        <MenuLateral
-          linhasData={linhasData}
-          todasParadas={todasParadas}
-          onLinhaSelect={handleLinhaSelect}
-          onParadaClick={handleParadaClick}
-          linhaSelecionada={linhaSelecionada}
-        />
-        <main role="main" className="flex-grow h-full w-full">
-          <Suspense fallback={<LoadingMap />}>
-            <Mapa
-              ref={mapaRef}
-              todasParadas={todasParadas}
-              linhaSelecionada={linhaSelecionada}
-              paradaSelecionada={paradaSelecionada}
-            />
-          </Suspense>
-        </main>
+          <MenuLateral
+            linhasData={linhasData}
+            todasParadas={todasParadas}
+            onLinhaSelect={handleLinhaSelect}
+            onParadaClick={handleParadaClick}
+            linhaSelecionada={linhaSelecionada}
+          />
+          <main role="main" className="flex-grow h-full w-full">
+            <Suspense fallback={<LoadingMap />}>
+              <Mapa
+                ref={mapaRef}
+                todasParadas={todasParadas}
+                linhaSelecionada={linhaSelecionada}
+                paradaSelecionada={paradaSelecionada}
+              />
+            </Suspense>
+          </main>
         </div>
       </ThemeProvider>
     </ErrorBoundary>
