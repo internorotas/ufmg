@@ -15,7 +15,7 @@ export function MenuFooter() {
 
   return (
     <div className="flex-shrink-0 p-2 bg-background-secondary border-t border-card-border space-y-2">
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-1.5">
         {/* Botão Reportar Problema */}
         <a
           href="https://forms.gle/5e9MHq9pp1p8T5Px5"
@@ -23,13 +23,13 @@ export function MenuFooter() {
           rel="noopener noreferrer"
           onClick={() =>
             handleLinkClick(
-              "Fale Conosco",
+              "Contato",
               "https://forms.gle/5e9MHq9pp1p8T5Px5",
             )
           }
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-colors"
+          className="w-full flex items-center justify-center py-1.5 px-2 rounded-md bg-red-500 hover:bg-red-600 text-white font-semibold text-[10px] transition-colors"
         >
-          Fale Conosco
+          Contato
         </a>
 
         {/* Botão Sobre o Projeto */}
@@ -43,24 +43,24 @@ export function MenuFooter() {
               "https://github.com/internorotas/ufmg",
             )
           }
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-internoRotas-azul-eletrico hover:bg-blue-700 text-white font-bold text-xs transition-colors"
+          className="w-full flex items-center justify-center py-1.5 px-2 rounded-md bg-internoRotas-azul-eletrico hover:bg-blue-700 text-white font-semibold text-[10px] transition-colors"
         >
-          Sobre o Projeto
+          Sobre
+        </a>
+
+        {/* Botão Versão Antiga */}
+        <a
+          href="https://ufmg-pi.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() =>
+            handleLinkClick("Versão Antiga", "https://ufmg-pi.vercel.app/")
+          }
+          className="w-full flex items-center justify-center py-1.5 px-2 rounded-md bg-card hover:bg-card-hover text-text-secondary hover:text-text-primary border border-card-border font-semibold text-[10px] transition-colors"
+        >
+          Versão Antiga
         </a>
       </div>
-
-      {/* Botão Usar antiga versão */}
-      <a
-        href="https://ufmg-pi.vercel.app/"
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() =>
-          handleLinkClick("Usar antiga versão", "https://ufmg-pi.vercel.app/")
-        }
-        className="w-full flex items-center justify-center py-2 px-3 rounded-lg bg-card hover:bg-card-hover text-text-secondary hover:text-text-primary border border-card-border font-semibold text-xs transition-colors"
-      >
-        Usar antiga versão
-      </a>
 
       {/* Desenvolvido por */}
       <a
