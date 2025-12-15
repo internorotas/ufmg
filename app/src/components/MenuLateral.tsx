@@ -5,11 +5,13 @@ import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
 import { ThemeToggle } from "./ThemeToggle";
 import { DisclaimerBanner } from "./DisclaimerBanner";
 import { InfoBanner } from "./InfoBanner";
+import { VacationBanner } from "./VacationBanner";
 import { MenuFooter } from "./MenuFooter";
 import { Linha, CategoriaLinhas, Parada } from "../types/data.types";
 import logo from "../assets/logo-horizontal-transparente.svg";
-import { IoSearch, IoMenu, IoClose } from "react-icons/io5";
+import { IoSearch, IoMenu, IoArrowBack } from "react-icons/io5";
 import { LineCard } from "./LineCard";
+import { getCurrentSpecialPeriod } from "../config/specialPeriods";
 
 interface MenuLateralProps {
   linhasData: CategoriaLinhas;
@@ -38,7 +40,21 @@ export function MenuLateral({
   linhaSelecionada,
 }: MenuLateralProps) {
   const [isMenuVisible, setMenuVisible] = useState(false);
-  const [categoriaAtiva, setCategoriaAtiva] = useState<number>(0);
+  
+  // Determinar categoria inicial baseado no período de férias
+  const getInitialCategory = () => {
+    const specialPeriod = getCurrentSpecialPeriod();
+    if (specialPeriod) {
+      // Procurar pela categoria de férias e recessos
+      const feriasIndex = linhasData.categoriasDias.findIndex(
+        (cat) => cat.categoriaDia === "feriasRecessos"
+      );
+      return feriasIndex !== -1 ? feriasIndex : 0;
+    }
+    return 0; // Dias úteis por padrão
+  };
+  
+  const [categoriaAtiva, setCategoriaAtiva] = useState<number>(getInitialCategory());
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 1500);
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
@@ -155,7 +171,7 @@ export function MenuLateral({
               onClick={() => setMenuVisible(false)}
               className="md:hidden text-white p-2 hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
             >
-              <IoClose size={24} />
+              <IoArrowBack size={24} />
             </button>
           </div>
         </header>
@@ -199,6 +215,9 @@ export function MenuLateral({
           className="p-4 overflow-y-auto flex-1 bg-background"
           aria-label="Lista de Linhas"
         >
+          {/* Banner de Férias e Recessos */}
+          <VacationBanner />
+          
           {/* Banner Informativo */}
           <InfoBanner />
 
