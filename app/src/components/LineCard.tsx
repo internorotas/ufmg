@@ -3,6 +3,7 @@ import { Linha } from "../types/data.types";
 import { IoTimeOutline, IoBusOutline, IoChevronForward } from "react-icons/io5";
 import { timeToMinutes, minutesToTime } from "../../lib/utils";
 import { useAnalytics } from "../hooks/useAnalytics";
+import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
 interface LineCardProps {
   linha: Linha;
@@ -88,13 +89,28 @@ export function LineCard({
   isSelected = false,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
-  const { nextSchedule, previousSchedule, status } = useMemo(
-    () => calculateSchedules(linha.horarios),
-    [linha.horarios],
-  );
+  
+  // Verificar se é linha de férias ou período de férias
+  const isVacationLine = linha.categoriaDia === "feriasRecessos";
+  const isInVacationPeriod = shouldDisableRegularSchedules();
+  const shouldDisableSchedules = !isVacationLine && isInVacationPeriod;
+  
+  const { nextSchedule, previousSchedule, status } = useMemo(() => {
+    if (shouldDisableSchedules) {
+      return {
+        nextSchedule: "Indisponível",
+        previousSchedule: "Indisponível",
+        status: "Não Circulando",
+      };
+    }
+    return calculateSchedules(linha.horarios);
+  }, [linha.horarios, shouldDisableSchedules]);
 
   // Definir cor do badge baseado no status
   const getBadgeColor = () => {
+    // "Não Circulando" -> Warning (Vermelho/Alerta)
+    if (status === "Não Circulando")
+      return "bg-red-900/30 text-red-300 border-red-600";
     // "Próximo" -> Success (Urgência positiva)
     if (status.includes("Próximo"))
       return "bg-success-bg text-success-text border-success-border";
@@ -156,28 +172,36 @@ export function LineCard({
         </div>
       </div>
 
-      {/* Corpo - Horários */}
+      {/* Corpo - Horários ou Aviso de Suspensão */}
       <div className="px-4 pb-4">
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="text-center p-2 rounded-lg bg-background-secondary/50">
-            <p className="text-[10px] md:text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
-              <IoTimeOutline size={14} />
-              Último Partiu
-            </p>
-            <p className="text-base md:text-lg font-bold text-text-primary">
-              {previousSchedule}
+        {shouldDisableSchedules ? (
+          <div className="mb-4 p-3 rounded-lg bg-red-900/20 border border-red-600/50 text-center">
+            <p className="text-xs md:text-sm text-red-300 font-semibold">
+              Linha suspensa durante férias
             </p>
           </div>
-          <div className="text-center p-2 rounded-lg bg-background-secondary/50">
-            <p className="text-[10px] md:text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
-              <IoTimeOutline size={14} />
-              Próximo
-            </p>
-            <p className="text-base md:text-lg font-bold text-success-text">
-              {nextSchedule}
-            </p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="text-center p-2 rounded-lg bg-background-secondary/50">
+              <p className="text-[10px] md:text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
+                <IoTimeOutline size={14} />
+                Último Partiu
+              </p>
+              <p className="text-base md:text-lg font-bold text-text-primary">
+                {previousSchedule}
+              </p>
+            </div>
+            <div className="text-center p-2 rounded-lg bg-background-secondary/50">
+              <p className="text-[10px] md:text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
+                <IoTimeOutline size={14} />
+                Próximo
+              </p>
+              <p className="text-base md:text-lg font-bold text-success-text">
+                {nextSchedule}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Botão Ver Detalhes */}
         <button
