@@ -4,6 +4,7 @@ import { HorariosModal } from "./HorariosModal";
 import { ItinerarioModal } from "./ItinerarioModal";
 import { IoTimeOutline, IoMapOutline } from "react-icons/io5";
 import { calculateNextAndPreviousSchedule } from "../../lib/utils";
+import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
 interface LinhaOnibusProps {
   linha: Linha;
@@ -34,11 +35,18 @@ export function LinhaOnibus({
   const [isItinerarioVisible, setItinerarioVisible] = useState(false);
   const [isHorariosVisible, setHorariosVisible] = useState(false);
 
-  // Calcular horários anterior e próximo
-  const { nextSchedule, previousSchedule } = useMemo(
-    () => calculateNextAndPreviousSchedule(linha.horarios),
-    [linha.horarios],
-  );
+  // Verificar se é linha de férias ou dias regulares
+  const isVacationLine = linha.categoriaDia === "feriasRecessos";
+  const isInVacationPeriod = shouldDisableRegularSchedules();
+  const shouldDisableSchedules = !isVacationLine && isInVacationPeriod;
+
+  // Calcular horários anterior e próximo (ou mostrar Encerrado se desabilitado)
+  const { nextSchedule, previousSchedule } = useMemo(() => {
+    if (shouldDisableSchedules) {
+      return { nextSchedule: "Encerrado", previousSchedule: "Encerrado" };
+    }
+    return calculateNextAndPreviousSchedule(linha.horarios);
+  }, [linha.horarios, shouldDisableSchedules]);
 
   const sublinha = linha.sublinha
     ? `<p class="text-xs font-normal">${linha.sublinha}</p>`
@@ -71,19 +79,32 @@ export function LinhaOnibus({
 
         <div className="py-2 px-1 bg-internoRotas-cinza-grafite rounded-b-lg">
           <div className="p-4 bg-internoRotas-cinza-grafite text-white">
-            {/* Horários Anterior e Próximo */}
-            <div className="flex justify-between text-center mb-4">
-              <div>
-                <p className="text-xs text-gray-400 mb-1">Último Partiu</p>
-                <p className="text-xl font-bold">{previousSchedule}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400 mb-1">Próximo</p>
-                <p className="text-xl font-bold text-green-400">
-                  {nextSchedule}
+            {/* Aviso de Horários Suspensos ou Horários Normais */}
+            {shouldDisableSchedules ? (
+              <div className="mb-4 p-4 bg-red-900/30 border border-red-600 rounded-lg text-center">
+                <p className="text-sm text-red-300 font-bold mb-1">
+                  🚫 NÃO CIRCULANDO
+                </p>
+                <p className="text-xs text-red-200">
+                  Esta linha está suspensa durante o período de férias
                 </p>
               </div>
-            </div>
+            ) : (
+              <div className="flex justify-between text-center mb-4">
+                <div>
+                  <p className="text-xs text-gray-400 mb-1">Último Partiu</p>
+                  <p className="text-xl font-bold">
+                    {previousSchedule}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 mb-1">Próximo</p>
+                  <p className="text-xl font-bold text-green-400">
+                    {nextSchedule}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Botões de Ação */}
             <div className="flex gap-2">
