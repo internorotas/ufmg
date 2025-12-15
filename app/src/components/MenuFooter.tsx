@@ -61,15 +61,15 @@ export function MenuFooter() {
 
       {/* Desenvolvido por */}
       <a
-        href="https://github.com/igormartins44"
+        href="https://github.com/igormartins4"
         target="_blank"
         rel="noopener noreferrer"
         onClick={() =>
           handleLinkClick("Dev Profile", "https://github.com/igormartins4")
         }
-        className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-text-secondary hover:text-text-primary transition-colors"
+        className="font-bold w-full flex items-center justify-center gap-1.5 py-2 text-xs text-text-secondary hover:text-text-primary transition-colors"
       >
-        Desenvolvido com <IoHeart size={14} className="text-blue-500" /> por
+        Desenvolvido com <IoHeart size={14} className="text-internoRotas-azul-eletrico" /> por
         Igor Martins
       </a>
     </div>
