@@ -22,7 +22,10 @@ export function MenuFooter() {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() =>
-            handleLinkClick("Fale Conosco", "https://forms.gle/5e9MHq9pp1p8T5Px5")
+            handleLinkClick(
+              "Fale Conosco",
+              "https://forms.gle/5e9MHq9pp1p8T5Px5",
+            )
           }
           className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-colors"
         >
@@ -37,7 +40,7 @@ export function MenuFooter() {
           onClick={() =>
             handleLinkClick(
               "Sobre o Projeto",
-              "https://github.com/internorotas/ufmg"
+              "https://github.com/internorotas/ufmg",
             )
           }
           className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-internoRotas-azul-eletrico hover:bg-blue-700 text-white font-bold text-xs transition-colors"
@@ -69,7 +72,8 @@ export function MenuFooter() {
         }
         className="font-bold w-full flex items-center justify-center gap-1.5 py-2 text-xs text-text-secondary hover:text-text-primary transition-colors"
       >
-        Desenvolvido com <IoHeart size={14} className="text-internoRotas-azul-eletrico" /> por
+        Desenvolvido com{" "}
+        <IoHeart size={14} className="text-internoRotas-azul-eletrico" /> por
         Igor Martins
       </a>
     </div>

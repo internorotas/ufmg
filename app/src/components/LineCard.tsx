@@ -89,12 +89,12 @@ export function LineCard({
   isSelected = false,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
-  
+
   // Verificar se é linha de férias ou período de férias
   const isVacationLine = linha.categoriaDia === "feriasRecessos";
   const isInVacationPeriod = shouldDisableRegularSchedules();
   const shouldDisableSchedules = !isVacationLine && isInVacationPeriod;
-  
+
   const { nextSchedule, previousSchedule, status } = useMemo(() => {
     if (shouldDisableSchedules) {
       return {
@@ -167,7 +167,10 @@ export function LineCard({
             >
               {status}
             </span>
-            <IoChevronForward size={20} className="text-text-secondary flex-shrink-0" />
+            <IoChevronForward
+              size={20}
+              className="text-text-secondary flex-shrink-0"
+            />
           </div>
         </div>
       </div>

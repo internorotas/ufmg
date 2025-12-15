@@ -40,25 +40,26 @@ export function MenuLateral({
   linhaSelecionada,
 }: MenuLateralProps) {
   const [isMenuVisible, setMenuVisible] = useState(false);
-  
+
   // Determinar categoria inicial baseado no período de férias
   const getInitialCategory = () => {
     const specialPeriod = getCurrentSpecialPeriod();
     if (specialPeriod) {
       // Procurar pela categoria de férias e recessos
       const feriasIndex = linhasData.categoriasDias.findIndex(
-        (cat) => cat.categoriaDia === "feriasRecessos"
+        (cat) => cat.categoriaDia === "feriasRecessos",
       );
       return feriasIndex !== -1 ? feriasIndex : 0;
     }
     return 0; // Dias úteis por padrão
   };
-  
-  const [categoriaAtiva, setCategoriaAtiva] = useState<number>(getInitialCategory());
+
+  const [categoriaAtiva, setCategoriaAtiva] =
+    useState<number>(getInitialCategory());
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 1500);
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
-    null
+    null,
   );
   const { trackEvent } = useAnalytics();
 
@@ -103,7 +104,7 @@ export function MenuLateral({
         linha.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (linha.sublinha &&
           linha.sublinha.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        linha.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+        linha.descricao.toLowerCase().includes(searchTerm.toLowerCase()),
     ) || [];
 
   useEffect(() => {
@@ -217,7 +218,7 @@ export function MenuLateral({
         >
           {/* Banner de Férias e Recessos */}
           <VacationBanner />
-          
+
           {/* Banner Informativo */}
           <InfoBanner />
 
