@@ -13,6 +13,7 @@ import { AntPathComponent } from "./AntPathComponent";
 import { Parada, Linha } from "../types/data.types";
 import { useAnalytics } from "../hooks/useAnalytics";
 
+import icon from "../assets/logo-natal_Parada.svg";
 interface MapaProps {
   todasParadas: Parada[];
   linhaSelecionada: Linha | null;
@@ -24,14 +25,14 @@ export interface MapaRef {
 }
 
 const stationIcon = L.icon({
-  iconUrl: "./marker.svg",
+  iconUrl: icon,
   iconSize: [30, 30],
   iconAnchor: [15, 30],
   popupAnchor: [0, -30],
 });
 
 const highlightedIcon = L.icon({
-  iconUrl: "./marker.svg",
+  iconUrl: icon,
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
