@@ -3,6 +3,7 @@ import { Modal } from "./Modal";
 import { IoTimeOutline, IoCheckmarkCircle } from "react-icons/io5";
 import { Linha } from "../types/data.types";
 import { timeToMinutes } from "../../lib/utils";
+import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
 interface HorariosModalProps {
   isOpen: boolean;
@@ -22,6 +23,11 @@ interface HorariosModalProps {
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // Verificar se devemos desabilitar os horários
+  const isVacationLine = linha.categoriaDia === "feriasRecessos";
+  const isInVacationPeriod = shouldDisableRegularSchedules();
+  const shouldDisableSchedules = !isVacationLine && isInVacationPeriod;
 
   const horariosOrganizados = useMemo(() => {
     return linha.horarios
@@ -45,8 +51,21 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
       maxWidth="max-w-md"
     >
       <div className="space-y-6">
+        {/* Aviso de Horários Suspensos */}
+        {shouldDisableSchedules && (
+          <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-4 text-center">
+            <p className="text-yellow-300 font-semibold mb-2">
+              ⚠️ Horários suspensos
+            </p>
+            <p className="text-sm text-yellow-200">
+              Esta linha não está operando durante o período de férias e recessos.
+              Utilize os horários de "Férias e Recessos".
+            </p>
+          </div>
+        )}
+
         {/* Próximos Horários */}
-        {proximos.length > 0 && (
+        {!shouldDisableSchedules && proximos.length > 0 && (
           <div>
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <IoTimeOutline className="text-green-400" size={20} />
@@ -66,7 +85,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
         )}
 
         {/* Horários Passados */}
-        {passados.length > 0 && (
+        {!shouldDisableSchedules && passados.length > 0 && (
           <div>
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <IoCheckmarkCircle className="text-gray-500" size={20} />
@@ -88,12 +107,14 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
         )}
 
         {/* Informação Extra */}
-        <div className="bg-internoRotas-cinza-grafite rounded-lg p-4 text-sm">
-          <p className="text-center text-gray-300">
-            Total de {horariosOrganizados.length} horários •{" "}
-            <span className="text-green-400">{proximos.length} restantes</span>
-          </p>
-        </div>
+        {!shouldDisableSchedules && (
+          <div className="bg-internoRotas-cinza-grafite rounded-lg p-4 text-sm">
+            <p className="text-center text-gray-300">
+              Total de {horariosOrganizados.length} horários •{" "}
+              <span className="text-green-400">{proximos.length} restantes</span>
+            </p>
+          </div>
+        )}
       </div>
     </Modal>
   );
