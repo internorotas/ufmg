@@ -22,10 +22,7 @@ export function MenuFooter() {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() =>
-            handleLinkClick(
-              "Contato",
-              "https://forms.gle/5e9MHq9pp1p8T5Px5",
-            )
+            handleLinkClick("Contato", "https://forms.gle/5e9MHq9pp1p8T5Px5")
           }
           className="w-full flex items-center justify-center py-1.5 px-2 rounded-md bg-red-500 hover:bg-red-600 text-white font-semibold text-[10px] transition-colors"
         >
