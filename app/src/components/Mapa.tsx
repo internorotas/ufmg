@@ -13,7 +13,7 @@ import { AntPathComponent } from "./AntPathComponent";
 import { Parada, Linha } from "../types/data.types";
 import { useAnalytics } from "../hooks/useAnalytics";
 
-import icon from "../assets/logo-natal_Parada.svg";
+import icon from "../assets/marker.svg";
 interface MapaProps {
   todasParadas: Parada[];
   linhaSelecionada: Linha | null;
