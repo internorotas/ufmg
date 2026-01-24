@@ -1,18 +1,86 @@
+/**
+ * ThemeToggle - Botão de alternância de tema
+ * Design System - Interno Rotas UFMG
+ */
+
+import type { ComponentProps } from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+import { Moon, Sun } from "lucide-react";
+import { cn } from "../lib/utils";
 import { useTheme } from "../contexts/ThemeContext";
-import { IoMoon, IoSunny } from "react-icons/io5";
 import { useAnalytics } from "../hooks/useAnalytics";
 
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
 /**
- * Renderiza um botão que permite ao usuário alternar entre os temas claro and escuro.
- *
- * @returns {JSX.Element} O botão de alternância de tema renderizado.
+ * Variantes do botão de tema
  */
-export function ThemeToggle() {
+export const themeToggleVariants = tv({
+  base: [
+    "inline-flex items-center justify-center rounded-lg p-1",
+    "transition-colors duration-200",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+  ],
+  variants: {
+    variant: {
+      default: [
+        "bg-background-secondary hover:bg-card",
+        "dark:bg-card dark:hover:bg-card-hover",
+      ],
+      ghost: "hover:bg-card-hover",
+    },
+    size: {
+      sm: "p-1",
+      md: "p-2",
+      lg: "p-3",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "sm",
+  },
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface ThemeToggleProps
+  extends Omit<ComponentProps<"button">, "children">,
+    VariantProps<typeof themeToggleVariants> {
+  /** Tamanho do ícone em pixels */
+  iconSize?: number;
+}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
+/**
+ * Botão que permite ao usuário alternar entre os temas claro e escuro.
+ *
+ * @example
+ * ```tsx
+ * <ThemeToggle />
+ * <ThemeToggle variant="ghost" size="md" />
+ * ```
+ */
+export function ThemeToggle({
+  variant,
+  size,
+  iconSize = 20,
+  className,
+  ...props
+}: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme();
   const { trackEvent } = useAnalytics();
 
-  const handleThemeToggle = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
+  const isDark = theme === "dark";
+
+  const handleToggle = () => {
+    const newTheme = isDark ? "light" : "dark";
     trackEvent({
       category: "UI Interaction",
       action: "Toggle Theme",
@@ -23,15 +91,18 @@ export function ThemeToggle() {
 
   return (
     <button
-      onClick={handleThemeToggle}
-      className="p-1 rounded-lg transition-colors bg-background-secondary hover:bg-card dark:bg-card dark:hover:bg-card-hover"
-      aria-label={`Alternar para tema ${theme === "light" ? "escuro" : "claro"}`}
-      title={`Alternar para tema ${theme === "light" ? "escuro" : "claro"}`}
+      data-slot="toggle"
+      data-state={isDark ? "dark" : "light"}
+      onClick={handleToggle}
+      className={cn(themeToggleVariants({ variant, size }), className)}
+      aria-label={`Alternar para tema ${isDark ? "claro" : "escuro"}`}
+      title={`Alternar para tema ${isDark ? "claro" : "escuro"}`}
+      {...props}
     >
-      {theme === "light" ? (
-        <IoMoon size={20} className="text-text-primary" />
+      {isDark ? (
+        <Sun size={iconSize} className="text-brand-accent" />
       ) : (
-        <IoSunny size={20} className="text-brand-accent" />
+        <Moon size={iconSize} className="text-text-primary" />
       )}
     </button>
   );

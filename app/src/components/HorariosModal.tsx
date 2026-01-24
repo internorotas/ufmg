@@ -1,24 +1,90 @@
+/**
+ * HorariosModal - Modal de horários da linha
+ * Design System - Interno Rotas UFMG
+ */
+
 import { useMemo } from "react";
+import { tv } from "tailwind-variants";
+import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal";
-import { IoTimeOutline, IoCheckmarkCircle } from "react-icons/io5";
-import { Linha } from "../types/data.types";
+import type { Linha } from "../types/data.types";
 import { timeToMinutes } from "../../lib/utils";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
-interface HorariosModalProps {
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
+/**
+ * Variantes do card de horário
+ */
+export const scheduleCardVariants = tv({
+  base: "rounded-lg border p-3 text-center transition-colors",
+  variants: {
+    status: {
+      upcoming: [
+        "border-green-600 bg-green-900/30",
+        "hover:bg-green-900/50",
+      ],
+      passed: "border-gray-700 bg-gray-800/50 opacity-50",
+    },
+  },
+  defaultVariants: {
+    status: "upcoming",
+  },
+});
+
+/**
+ * Variantes do texto de horário
+ */
+export const scheduleTimeVariants = tv({
+  base: "font-bold",
+  variants: {
+    status: {
+      upcoming: "text-xl text-green-300",
+      passed: "text-lg text-gray-400",
+    },
+  },
+  defaultVariants: {
+    status: "upcoming",
+  },
+});
+
+/**
+ * Variantes do alerta de suspensão
+ */
+export const suspensionAlertVariants = tv({
+  base: [
+    "rounded-lg border p-4 text-center",
+    "border-yellow-600 bg-yellow-900/30",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface HorariosModalProps {
   isOpen: boolean;
   onClose: () => void;
   linha: Linha;
 }
 
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 /**
- * Renderiza um modal que exibe os horários de uma linha de ônibus específica, separando os horários futuros e os que já passaram.
+ * Modal que exibe os horários de uma linha de ônibus.
  *
- * @param {object} props - As propriedades do componente.
- * @param {boolean} props.isOpen - Um booleano que indica se o modal está aberto.
- * @param {() => void} props.onClose - Uma função para fechar o modal.
- * @param {Linha} props.linha - Um objeto contendo os dados da linha de ônibus.
- * @returns {JSX.Element} O componente de modal de horários renderizado.
+ * @example
+ * ```tsx
+ * <HorariosModal
+ *   isOpen={true}
+ *   onClose={() => setOpen(false)}
+ *   linha={linhaData}
+ * />
+ * ```
  */
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const now = new Date();
@@ -48,14 +114,15 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
       isOpen={isOpen}
       onClose={onClose}
       title={`Horários - ${linha.nome}`}
-      maxWidth="max-w-md"
+      size="md"
     >
       <div className="space-y-6">
         {/* Aviso de Horários Suspensos */}
         {shouldDisableSchedules && (
-          <div className="bg-yellow-900/30 border border-yellow-600 rounded-lg p-4 text-center">
-            <p className="text-yellow-300 font-semibold mb-2">
-              ⚠️ Horários suspensos
+          <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
+            <p className="mb-2 font-semibold text-yellow-300">
+              <AlertTriangle className="mr-1 inline size-4" />
+              Horários suspensos
             </p>
             <p className="text-sm text-yellow-200">
               Esta linha não está operando durante o período de férias e
@@ -66,18 +133,20 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
 
         {/* Próximos Horários */}
         {!shouldDisableSchedules && proximos.length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <IoTimeOutline className="text-green-400" size={20} />
+          <div data-slot="upcoming-schedules">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+              <Clock className="text-green-400" size={20} />
               Próximos Horários
             </h3>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
               {proximos.map(({ horario }, index) => (
                 <div
                   key={`proximo-${index}`}
-                  className="bg-green-900/30 border border-green-600 rounded-lg p-3 text-center hover:bg-green-900/50 transition-colors"
+                  className={scheduleCardVariants({ status: "upcoming" })}
                 >
-                  <p className="text-xl font-bold text-green-300">{horario}</p>
+                  <p className={scheduleTimeVariants({ status: "upcoming" })}>
+                    {horario}
+                  </p>
                 </div>
               ))}
             </div>
@@ -86,18 +155,18 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
 
         {/* Horários Passados */}
         {!shouldDisableSchedules && passados.length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <IoCheckmarkCircle className="text-gray-500" size={20} />
+          <div data-slot="passed-schedules">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+              <CheckCircle className="text-gray-500" size={20} />
               Horários Passados
             </h3>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
               {passados.map(({ horario }, index) => (
                 <div
                   key={`passado-${index}`}
-                  className="bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-center opacity-50"
+                  className={scheduleCardVariants({ status: "passed" })}
                 >
-                  <p className="text-lg font-semibold text-gray-400">
+                  <p className={scheduleTimeVariants({ status: "passed" })}>
                     {horario}
                   </p>
                 </div>
@@ -108,7 +177,10 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
 
         {/* Informação Extra */}
         {!shouldDisableSchedules && (
-          <div className="bg-internoRotas-cinza-grafite rounded-lg p-4 text-sm">
+          <div
+            data-slot="summary"
+            className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm"
+          >
             <p className="text-center text-gray-300">
               Total de {horariosOrganizados.length} horários •{" "}
               <span className="text-green-400">

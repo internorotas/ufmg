@@ -1,71 +1,92 @@
-import React from "react";
-// Importa o logo da pasta de assets
+/**
+ * HeaderMobile - Cabeçalho mobile do app
+ * Design System - Interno Rotas UFMG
+ */
+
+import type { ComponentProps } from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+import { Menu, X } from "lucide-react";
+import { cn } from "../lib/utils";
 import logo from "../assets/logo-natal-horizontal.svg";
 
-interface HeaderMobileProps {
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
+/**
+ * Variantes do header mobile
+ */
+export const headerMobileVariants = tv({
+  base: [
+    "fixed left-0 right-0 top-0 z-[1005] md:hidden",
+    "flex h-14 items-center justify-between px-4",
+    // Glassmorphism effect
+    "bg-interno-rotas-primaria/95 backdrop-blur-xl backdrop-saturate-150",
+    "shadow-lg border-b border-white/10",
+  ],
+});
+
+/**
+ * Variantes do botão de menu
+ */
+export const menuButtonVariants = tv({
+  base: [
+    "rounded-full p-2 text-white transition-colors",
+    "focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface HeaderMobileProps
+  extends Omit<ComponentProps<"header">, "children">,
+    VariantProps<typeof headerMobileVariants> {
   isMenuOpen: boolean;
   toggleMenu: () => void;
 }
 
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 /**
- * Renderiza o cabeçalho para dispositivos móveis com o logo e um botão para abrir/fechar o menu.
+ * Cabeçalho mobile com logo e botão de menu.
  *
- * @param {object} props - As propriedades do componente.
- * @param {boolean} props.isMenuOpen - Um booleano que indica se o menu está aberto.
- * @param {() => void} props.toggleMenu - Uma função para alternar a visibilidade do menu.
- * @returns {JSX.Element} O componente de cabeçalho móvel renderizado.
+ * @example
+ * ```tsx
+ * <HeaderMobile isMenuOpen={false} toggleMenu={() => setIsOpen(!isOpen)} />
+ * ```
  */
-export const HeaderMobile: React.FC<HeaderMobileProps> = ({
+export function HeaderMobile({
   isMenuOpen,
   toggleMenu,
-}) => {
+  className,
+  ...props
+}: HeaderMobileProps) {
   return (
-    // O header é fixo no topo, com z-index alto e visível apenas em ecrãs pequenos (md:hidden)
-    <header className="md:hidden fixed top-0 left-0 right-0 z-[1005] bg-interno-rotas-primaria h-14 flex items-center justify-between px-4 shadow-lg">
+    <header
+      data-slot="header"
+      className={cn(headerMobileVariants(), className)}
+      {...props}
+    >
       <div className="h-8">
         <img src={logo} alt="Logo Interno Rotas" className="h-full" />
       </div>
 
       <button
         onClick={toggleMenu}
-        className="p-2 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+        className={menuButtonVariants()}
         aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
+        aria-expanded={isMenuOpen}
       >
-        {/* Usamos SVGs inline para os ícones de "hamburger" e "X" para simplicidade */}
         {isMenuOpen ? (
-          // Ícone "X" (Fechar)
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="w-7 h-7"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <X className="size-7" />
         ) : (
-          // Ícone "Hamburger" (Menu)
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="w-7 h-7"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-            />
-          </svg>
+          <Menu className="size-7" />
         )}
       </button>
     </header>
   );
-};
+}

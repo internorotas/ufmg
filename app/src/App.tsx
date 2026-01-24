@@ -105,7 +105,7 @@ function AppContent() {
   }
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden flex flex-col md:flex-row font-['Poppins',_sans-serif] bg-background">
+    <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
       <MenuLateral
         linhasData={linhasData}
         todasParadas={todasParadas}
@@ -113,7 +113,7 @@ function AppContent() {
         onParadaClick={handleParadaClick}
         linhaSelecionada={linhaSelecionada}
       />
-      <main role="main" className="flex-grow h-full w-full">
+      <main role="main" className="h-full w-full grow">
         <Suspense fallback={<LoadingMap />}>
           <Mapa
             ref={mapaRef}

@@ -1,12 +1,83 @@
-import { IoHeart } from "react-icons/io5";
+/**
+ * MenuFooter - Rodapé do menu lateral
+ * Design System - Interno Rotas UFMG
+ */
+
+import type { ComponentProps } from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+import { Heart } from "lucide-react";
+import { cn } from "../lib/utils";
 import { useExternalLinkTracking } from "../hooks/useAnalytics";
 
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
 /**
- * Renderiza o menu de rodapé com links para reportar problemas, ver o projeto no GitHub e creditar o desenvolvedor.
- *
- * @returns {JSX.Element} O componente de menu de rodapé renderizado.
+ * Variantes do container do footer
  */
-export function MenuFooter() {
+export const footerContainerVariants = tv({
+  base: [
+    "shrink-0 space-y-2 border-t p-2",
+    "border-card-border bg-background-secondary",
+  ],
+});
+
+/**
+ * Variantes dos botões do footer
+ */
+export const footerButtonVariants = tv({
+  base: [
+    "flex w-full items-center justify-center rounded-md px-2 py-1.5",
+    "text-[10px] font-semibold transition-colors",
+  ],
+  variants: {
+    intent: {
+      danger: "bg-red-500 text-white hover:bg-red-600",
+      primary: "bg-internoRotas-azul-eletrico text-white hover:bg-blue-700",
+      ghost: [
+        "border border-card-border bg-card text-text-secondary",
+        "hover:bg-card-hover hover:text-text-primary",
+      ],
+    },
+  },
+  defaultVariants: {
+    intent: "ghost",
+  },
+});
+
+/**
+ * Variantes do link de crédito
+ */
+export const creditLinkVariants = tv({
+  base: [
+    "flex w-full items-center justify-center gap-1.5 py-2",
+    "text-xs font-bold text-text-secondary transition-colors",
+    "hover:text-text-primary",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface MenuFooterProps
+  extends ComponentProps<"div">,
+    VariantProps<typeof footerContainerVariants> {}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
+/**
+ * Menu de rodapé com links para contato, projeto e créditos.
+ *
+ * @example
+ * ```tsx
+ * <MenuFooter />
+ * ```
+ */
+export function MenuFooter({ className, ...props }: MenuFooterProps) {
   const { trackExternalLink } = useExternalLinkTracking();
 
   const handleLinkClick = (label: string, url: string) => {
@@ -14,7 +85,11 @@ export function MenuFooter() {
   };
 
   return (
-    <div className="flex-shrink-0 p-2 bg-background-secondary border-t border-card-border space-y-2">
+    <div
+      data-slot="footer"
+      className={cn(footerContainerVariants(), className)}
+      {...props}
+    >
       <div className="flex flex-row gap-1.5">
         {/* Botão Reportar Problema */}
         <a
@@ -24,7 +99,7 @@ export function MenuFooter() {
           onClick={() =>
             handleLinkClick("Contato", "https://forms.gle/5e9MHq9pp1p8T5Px5")
           }
-          className="w-full flex items-center justify-center py-1.5 px-2 rounded-md bg-red-500 hover:bg-red-600 text-white font-semibold text-[10px] transition-colors"
+          className={footerButtonVariants({ intent: "danger" })}
         >
           Contato
         </a>
@@ -40,7 +115,7 @@ export function MenuFooter() {
               "https://github.com/internorotas/ufmg",
             )
           }
-          className="w-full flex items-center justify-center py-1.5 px-2 rounded-md bg-internoRotas-azul-eletrico hover:bg-blue-700 text-white font-semibold text-[10px] transition-colors"
+          className={footerButtonVariants({ intent: "primary" })}
         >
           Sobre
         </a>
@@ -53,7 +128,7 @@ export function MenuFooter() {
           onClick={() =>
             handleLinkClick("Versão Antiga", "https://ufmg-pi.vercel.app/")
           }
-          className="w-full flex items-center justify-center py-1.5 px-2 rounded-md bg-card hover:bg-card-hover text-text-secondary hover:text-text-primary border border-card-border font-semibold text-[10px] transition-colors"
+          className={footerButtonVariants({ intent: "ghost" })}
         >
           Versão Antiga
         </a>
@@ -67,10 +142,10 @@ export function MenuFooter() {
         onClick={() =>
           handleLinkClick("Dev Profile", "https://github.com/igormartins4")
         }
-        className="font-bold w-full flex items-center justify-center gap-1.5 py-2 text-xs text-text-secondary hover:text-text-primary transition-colors"
+        className={creditLinkVariants()}
       >
         Desenvolvido com{" "}
-        <IoHeart size={14} className="text-internoRotas-azul-eletrico" /> por
+        <Heart size={14} className="text-internoRotas-azul-eletrico" /> por
         Igor Martins
       </a>
     </div>

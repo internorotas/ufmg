@@ -1,4 +1,12 @@
-import { useState } from "react";
+/**
+ * MenuLateral - Menu lateral com lista de linhas
+ * Design System - Interno Rotas UFMG
+ */
+
+import { useState, type ComponentProps } from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+import { Search, Menu, ArrowLeft } from "lucide-react";
+import { cn } from "../lib/utils";
 import { useLinhasFilter } from "../hooks/useLinhasFilter";
 import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
 import { ThemeToggle } from "./ThemeToggle";
@@ -6,12 +14,86 @@ import { DisclaimerBanner } from "./DisclaimerBanner";
 import { InfoBanner } from "./InfoBanner";
 import { VacationBanner } from "./VacationBanner";
 import { MenuFooter } from "./MenuFooter";
-import { Linha, CategoriaLinhas, Parada } from "../types/data.types";
-import logo from "../assets/logo-horizontal-transparente.svg";
-import { IoSearch, IoMenu, IoArrowBack } from "react-icons/io5";
 import { LineCard } from "./LineCard";
+import { SearchEmptyState } from "./ui/EmptyState";
+import { Tabs, TabsList, TabsTrigger } from "./ui/Tabs";
+import type { Linha, CategoriaLinhas, Parada } from "../types/data.types";
+import logo from "../assets/logo-horizontal-transparente.svg";
 
-interface MenuLateralProps {
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
+/**
+ * Variantes do container sidebar
+ */
+export const sidebarVariants = tv({
+  base: [
+    "fixed inset-y-0 left-0 z-[1003] flex flex-col",
+    "w-[85vw] max-w-md md:relative md:w-1/2",
+    "border-r border-card-border/50 text-text-primary",
+    // Glassmorphism effect
+    "bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150",
+    "shadow-2xl md:shadow-none",
+    "transform transition-transform duration-300",
+  ],
+  variants: {
+    visible: {
+      true: "translate-x-0",
+      false: "-translate-x-full md:translate-x-0",
+    },
+  },
+  defaultVariants: {
+    visible: false,
+  },
+});
+
+/**
+ * Variantes do botão de tab de categoria (usando variante pills do Tabs)
+ */
+export const categoryTabVariants = tv({
+  base: [
+    "flex-1 rounded-md px-2.5 py-0.5 lg:py-2.5",
+    "text-xs font-medium",
+    "cursor-pointer transition-all duration-200",
+    "data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm",
+    "data-[state=inactive]:bg-card data-[state=inactive]:text-text-secondary",
+    "data-[state=inactive]:hover:bg-card-hover data-[state=inactive]:hover:text-text-primary",
+    "data-[state=inactive]:border data-[state=inactive]:border-transparent",
+    "data-[state=inactive]:hover:border-card-border",
+  ],
+});
+
+/**
+ * Variantes do input de busca
+ */
+export const searchInputVariants = tv({
+  base: [
+    "w-full rounded-lg border bg-input pl-10 pr-4 py-1 lg:py-3",
+    "border-input-border text-text-primary",
+    "placeholder:text-text-tertiary",
+    "transition-all duration-200",
+    "focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary",
+  ],
+});
+
+/**
+ * Variantes do botão mobile
+ */
+export const mobileButtonVariants = tv({
+  base: [
+    "flex items-center gap-3 rounded-full px-6 py-3",
+    "bg-brand-primary text-white font-bold shadow-lg",
+    "cursor-pointer transition-colors",
+    "hover:bg-blue-700 active:scale-95",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
   linhasData: CategoriaLinhas;
   todasParadas: Parada[];
   onLinhaSelect: (linha: Linha) => void;
@@ -19,16 +101,89 @@ interface MenuLateralProps {
   linhaSelecionada: Linha | null;
 }
 
+// ============================================================================
+// SUBCOMPONENTS
+// ============================================================================
+
+interface SearchInputProps extends ComponentProps<"input"> {
+  value: string;
+  onValueChange: (value: string) => void;
+}
+
+function SearchInput({ value, onValueChange, className, ...props }: SearchInputProps) {
+  return (
+    <div data-slot="search" className="relative">
+      <Search
+        className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-text-secondary"
+      />
+      <input
+        type="text"
+        placeholder="Pesquisar linha..."
+        value={value}
+        onChange={(e) => onValueChange(e.target.value)}
+        className={cn(searchInputVariants(), className)}
+        {...props}
+      />
+    </div>
+  );
+}
+
+interface CategoryTabsProps {
+  categories: CategoriaLinhas["categoriasDias"];
+  activeIndex: number;
+  onSelect: (index: number) => void;
+}
+
+function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) {
+  // Converte id numérico para string para o Tabs component
+  const activeValue = String(categories[activeIndex]?.id ?? "");
+
+  const handleValueChange = (value: string) => {
+    const numericId = Number(value);
+    const index = categories.findIndex((cat) => cat.id === numericId);
+    if (index !== -1) {
+      onSelect(index);
+    }
+  };
+
+  return (
+    <Tabs
+      value={activeValue}
+      onValueChange={handleValueChange}
+      className="border-b border-card-border bg-background px-4 py-3 md:border-none"
+    >
+      <TabsList variant="pills" className="gap-2 bg-transparent p-0">
+        {categories.map((categoria) => (
+          <TabsTrigger
+            key={categoria.id}
+            value={String(categoria.id)}
+            className={categoryTabVariants()}
+          >
+            {categoria.displayName}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
 /**
- * Renderiza o menu lateral, que exibe uma lista de linhas de ônibus, uma barra de pesquisa e abas de categorias.
+ * Menu lateral que exibe lista de linhas de ônibus com busca e categorias.
  *
- * @param {object} props - As propriedades do componente.
- * @param {CategoriaLinhas} props.linhasData - Um objeto contendo os dados das linhas de ônibus, categorizados por tipo de dia.
- * @param {Parada[]} props.todasParadas - Um array com todas as paradas de ônibus disponíveis.
- * @param {(linha: Linha) => void} props.onLinhaSelect - Uma função para lidar com a seleção de uma linha de ônibus.
- * @param {(parada: Parada) => void} props.onParadaClick - Uma função para lidar com cliques em uma parada de ônibus.
- * @param {Linha | null} props.linhaSelecionada - A linha de ônibus atualmente selecionada, ou nulo se nenhuma estiver selecionada.
- * @returns {JSX.Element} O componente de menu lateral renderizado.
+ * @example
+ * ```tsx
+ * <MenuLateral
+ *   linhasData={linhasData}
+ *   todasParadas={todasParadas}
+ *   onLinhaSelect={handleSelect}
+ *   onParadaClick={handleParadaClick}
+ *   linhaSelecionada={selectedLinha}
+ * />
+ * ```
  */
 export function MenuLateral({
   linhasData,
@@ -37,10 +192,9 @@ export function MenuLateral({
   onParadaClick,
   linhaSelecionada,
 }: MenuLateralProps) {
-  // Estado de visibilidade do menu (mobile)
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
 
-  // Hook customizado para filtro de linhas (Separation of Concerns)
   const {
     searchTerm,
     setSearchTerm,
@@ -50,29 +204,19 @@ export function MenuLateral({
     handleCategoriaChange,
   } = useLinhasFilter(linhasData);
 
-  // Estado do modal de detalhes
-  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
-    null
-  );
-
   const handleCardClick = (linha: Linha) => {
-    // Clique no card: seleciona a linha e mostra no mapa
     onLinhaSelect(linha);
-    // Não fecha o menu no desktop, apenas no mobile
     if (window.innerWidth < 768) {
       setMenuVisible(false);
     }
   };
 
   const handleDetailsClick = (linha: Linha) => {
-    // Clique no botão: abre o modal de detalhes
     setLinhaDetalhesAberta(linha);
   };
 
   const handleParadaClickWrapper = (parada: Parada) => {
-    // Chama a função original de clique na parada
     onParadaClick(parada);
-    // Fecha o menu no mobile
     if (window.innerWidth < 768) {
       setMenuVisible(false);
     }
@@ -80,99 +224,80 @@ export function MenuLateral({
 
   return (
     <>
-      {/* Botão Mobile */}
-      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[1001]">
+      {/* Mobile Trigger Button */}
+      <div className="fixed bottom-6 left-1/2 z-1001 -translate-x-1/2 md:hidden">
         <button
+          data-slot="mobile-trigger"
           onClick={() => setMenuVisible(true)}
-          className="bg-brand-primary text-white py-3 px-6 rounded-full shadow-lg flex items-center gap-3 font-bold hover:bg-blue-700 transition-colors cursor-pointer active:scale-95"
+          className={mobileButtonVariants()}
         >
-          <IoMenu size={24} />
+          <Menu size={24} />
           Ver Linhas
         </button>
       </div>
 
-      {/* Backdrop Mobile */}
+      {/* Backdrop */}
       {isMenuVisible && (
         <div
+          data-slot="backdrop"
           onClick={() => setMenuVisible(false)}
-          className="md:hidden fixed inset-0 bg-backdrop z-[1002] animate-fade-in backdrop-blur-sm"
-        ></div>
+          className="fixed inset-0 z-1002 animate-fade-in bg-backdrop backdrop-blur-sm md:hidden"
+        />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:relative inset-y-0 left-0 w-[85vw] max-w-md md:w-1/2 bg-sidebar text-text-primary z-[1003] transform transition-transform duration-300 ${
-          isMenuVisible ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 flex flex-col border-r border-card-border shadow-2xl md:shadow-none`}
+        data-slot="sidebar"
+        data-state={isMenuVisible ? "open" : "closed"}
+        className={sidebarVariants({ visible: isMenuVisible })}
       >
         {/* Header */}
-        <header className="bg-brand-primary p-2 flex justify-between items-center flex-shrink-0 shadow-sm">
-          <div className="flex items-center justify-center flex-1">
+        <header
+          data-slot="header"
+          className="flex shrink-0 items-center justify-between bg-brand-primary p-2 shadow-sm"
+        >
+          <div className="flex flex-1 items-center justify-center">
             <img src={logo} alt="Logo Interno Rotas" className="h-6" />
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Toggle de Tema */}
-
             <ThemeToggle />
-
-            {/* Botão Fechar Mobile */}
             <button
+              data-slot="close"
               onClick={() => setMenuVisible(false)}
-              className="md:hidden text-white p-2 hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
+              className="cursor-pointer rounded-lg p-2 text-white transition-colors hover:bg-white/20 md:hidden"
             >
-              <IoArrowBack size={24} />
+              <ArrowLeft size={24} />
             </button>
           </div>
         </header>
 
-        {/* Barra de Pesquisa */}
-        <div className="p-2 lg:p-4 bg-background-secondary flex-shrink-0 border-b border-card-border">
-          <div className="relative">
-            <IoSearch
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary"
-              size={20}
-            />
-            <input
-              type="text"
-              placeholder="Pesquisar linha..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-input border border-input-border text-text-primary rounded-lg pl-10 pr-4 py-1 lg:py-3 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all placeholder:text-text-tertiary"
-            />
-          </div>
+        {/* Search */}
+        <div className="shrink-0 border-b border-card-border bg-background-secondary p-2 lg:p-4">
+          <SearchInput
+            value={searchTerm}
+            onValueChange={setSearchTerm}
+          />
         </div>
 
-        {/* Tabs de Categoria */}
-        <div className="flex gap-2 px-4 py-3 bg-background flex-shrink-0 border-b border-card-border md:border-none">
-          {linhasData.categoriasDias.map((categoria, index) => (
-            <button
-              key={categoria.id}
-              onClick={() => handleCategoriaChange(index)}
-              className={`flex-1 py-0.5 lg:py-2.5 px-2.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
-                categoriaAtiva === index
-                  ? "bg-brand-primary text-white shadow-sm"
-                  : "bg-card text-text-secondary hover:bg-card-hover hover:text-text-primary border border-transparent hover:border-card-border"
-              }`}
-            >
-              {categoria.displayName}
-            </button>
-          ))}
-        </div>
+        {/* Category Tabs */}
+        <CategoryTabs
+          categories={linhasData.categoriasDias}
+          activeIndex={categoriaAtiva}
+          onSelect={handleCategoriaChange}
+        />
 
-        {/* Lista de Linhas */}
+        {/* Lines List */}
         <nav
-          className="p-4 overflow-y-auto flex-1 bg-background"
+          data-slot="list"
+          className="flex-1 overflow-y-auto bg-background p-4"
           aria-label="Lista de Linhas"
         >
-          {/* Banner de Férias e Recessos */}
           <VacationBanner />
-
-          {/* Banner Informativo */}
           <InfoBanner />
 
           {hasResults ? (
-            linhasFiltradas.map((linha: Linha) => (
+            linhasFiltradas.map((linha) => (
               <LineCard
                 key={linha.idRota}
                 linha={linha}
@@ -182,19 +307,12 @@ export function MenuLateral({
               />
             ))
           ) : (
-            <div className="text-center py-12 text-text-secondary flex flex-col items-center justify-center h-full">
-              <IoSearch
-                size={48}
-                className="text-text-tertiary mb-4 opacity-20"
-              />
-              <p className="text-lg font-medium">Nenhuma linha encontrada</p>
-              <p className="text-sm mt-2 text-text-tertiary">
-                Tente ajustar sua pesquisa
-              </p>
-            </div>
+            <SearchEmptyState
+              searchTerm={searchTerm}
+              onClear={() => setSearchTerm("")}
+            />
           )}
 
-          {/* Banner de Aviso */}
           <DisclaimerBanner />
         </nav>
 
@@ -202,7 +320,7 @@ export function MenuLateral({
         <MenuFooter />
       </aside>
 
-      {/* Modal de Detalhes da Linha */}
+      {/* Details Modal */}
       {linhaDetalhesAberta && (
         <LinhaDetalhesModal
           isOpen={true}

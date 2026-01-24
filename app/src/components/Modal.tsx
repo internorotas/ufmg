@@ -1,82 +1,126 @@
-import { ReactNode, useEffect } from "react";
-import { IoClose } from "react-icons/io5";
+/**
+ * Modal - Componente de modal genérico usando Dialog headless
+ * Design System - Interno Rotas UFMG
+ *
+ * Este componente é um wrapper de alto nível sobre o Dialog headless,
+ * fornecendo uma API simplificada para casos de uso comuns.
+ */
 
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string | ReactNode;
-  children: ReactNode;
-  maxWidth?: string;
-}
+import { type ReactNode, type ComponentProps } from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+import { cn } from "../lib/utils";
+import {
+  Dialog,
+  dialogPopupVariants,
+} from "./ui/Dialog";
+
+// ============================================================================
+// VARIANTS
+// ============================================================================
 
 /**
- * Renderiza um componente de modal genérico.
+ * Variantes do header
+ */
+export const modalHeaderVariants = tv({
+  base: [
+    "flex items-center justify-between",
+    "rounded-t-xl border-b border-card-border bg-background-secondary p-4",
+  ],
+});
+
+// Re-export variants for backward compatibility
+export { dialogPopupVariants as modalContentVariants };
+
+export const modalOverlayVariants = tv({
+  base: "fixed inset-0 z-[2000] flex items-center justify-center p-4",
+});
+
+export const modalBackdropVariants = tv({
+  base: "absolute inset-0 bg-black/70 animate-fade-in",
+});
+
+export const modalCloseButtonVariants = tv({
+  base: [
+    "rounded-lg p-2 transition-colors",
+    "hover:bg-card",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface ModalProps
+  extends Omit<ComponentProps<"div">, "title">,
+    VariantProps<typeof dialogPopupVariants> {
+  /** Se o modal está aberto */
+  isOpen: boolean;
+  /** Callback para fechar o modal */
+  onClose: () => void;
+  /** Título do modal (pode ser string ou ReactNode) */
+  title: string | ReactNode;
+  /** Conteúdo do modal */
+  children: ReactNode;
+}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
+/**
+ * Componente de modal genérico usando Dialog headless.
  *
- * @param {object} props - As propriedades do componente.
- * @param {boolean} props.isOpen - Um booleano que indica se o modal está aberto.
- * @param {() => void} props.onClose - Uma função para fechar o modal.
- * @param {string} props.title - O título do modal.
- * @param {ReactNode} props.children - O conteúdo a ser exibido dentro do modal.
- * @param {string} [props.maxWidth="max-w-2xl"] - A largura máxima do modal.
- * @returns {JSX.Element | null} O componente de modal renderizado, ou nulo se não estiver aberto.
+ * @example
+ * ```tsx
+ * <Modal
+ *   isOpen={isOpen}
+ *   onClose={handleClose}
+ *   title="Título do Modal"
+ *   size="lg"
+ * >
+ *   <p>Conteúdo do modal</p>
+ * </Modal>
+ * ```
  */
 export function Modal({
   isOpen,
   onClose,
   title,
   children,
-  maxWidth = "max-w-2xl",
+  size,
+  className,
+  ...props
 }: ModalProps) {
-  // Fechar modal com ESC
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    if (isOpen) {
-      document.addEventListener("keydown", handleEsc);
-      document.body.style.overflow = "hidden";
-    }
-    return () => {
-      document.removeEventListener("keydown", handleEsc);
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className="absolute inset-0 bg-black/70 animate-fade-in"
-      />
+    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Popup
+          size={size}
+          className={cn(className)}
+          {...props}
+        >
+          {/* Header */}
+          <div data-slot="header" className={modalHeaderVariants()}>
+            {typeof title === "string" ? (
+              <Dialog.Title>{title}</Dialog.Title>
+            ) : (
+              <div className="flex-1">{title}</div>
+            )}
+            <Dialog.Close aria-label="Fechar modal" />
+          </div>
 
-      {/* Modal Content */}
-      <div
-        className={`relative bg-modal text-text-primary rounded-xl shadow-2xl w-full ${maxWidth} max-h-[90vh] flex flex-col animate-slide-up border border-card-border`}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-card-border bg-background-secondary rounded-t-xl">
-          {typeof title === "string" ? (
-            <h2 className="text-xl font-bold">{title}</h2>
-          ) : (
-            title
-          )}
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-card transition-colors"
-            aria-label="Fechar modal"
+          {/* Content */}
+          <div
+            data-slot="body"
+            className="flex-1 overflow-y-auto rounded-b-xl bg-modal p-4"
           >
-            <IoClose size={24} />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="overflow-y-auto p-4 flex-1 bg-modal rounded-b-xl">
-          {children}
-        </div>
-      </div>
-    </div>
+            {children}
+          </div>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
+

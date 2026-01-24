@@ -1,13 +1,51 @@
-import { IoInformationCircleOutline } from "react-icons/io5";
+/**
+ * VacationBanner - Banner de férias e recessos
+ * Design System - Interno Rotas UFMG
+ */
+
+import type { ComponentProps } from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+import { Info } from "lucide-react";
+import { cn } from "../lib/utils";
 import { getCurrentSpecialPeriod, isWeekday } from "../config/specialPeriods";
 
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
 /**
- * Renderiza um banner informativo durante períodos de férias e recessos.
- * O banner aparece apenas quando há um período especial ativo.
- *
- * @returns {JSX.Element | null} O componente de banner de férias ou null se não houver período ativo.
+ * Variantes do banner de férias
  */
-export function VacationBanner() {
+export const vacationBannerVariants = tv({
+  base: [
+    "flex items-start gap-2 rounded-lg border p-3",
+    "mb-3",
+    "border-warning-border bg-warning-bg text-warning-text",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface VacationBannerProps
+  extends ComponentProps<"div">,
+    VariantProps<typeof vacationBannerVariants> {}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
+/**
+ * Banner informativo durante períodos de férias e recessos.
+ * Só aparece quando há um período especial ativo.
+ *
+ * @example
+ * ```tsx
+ * <VacationBanner />
+ * ```
+ */
+export function VacationBanner({ className, ...props }: VacationBannerProps) {
   const specialPeriod = getCurrentSpecialPeriod();
 
   // Não mostrar se não houver período especial ativo
@@ -19,22 +57,14 @@ export function VacationBanner() {
 
   return (
     <div
-      className="mb-3 p-3 rounded-lg border flex items-start gap-2"
-      style={{
-        backgroundColor: "var(--warning-bg)",
-        borderColor: "var(--warning-border)",
-      }}
+      data-slot="banner"
+      data-intent="warning"
+      className={cn(vacationBannerVariants(), className)}
+      {...props}
     >
-      <IoInformationCircleOutline
-        className="flex-shrink-0 mt-0.5"
-        size={20}
-        style={{ color: "var(--warning-text)" }}
-      />
-      <div
-        className="text-xs lg:text-sm leading-relaxed"
-        style={{ color: "var(--warning-text)" }}
-      >
-        <p className="font-bold mb-1">{specialPeriod.name}</p>
+      <Info className="mt-0.5 size-5 shrink-0" />
+      <div className="text-xs leading-relaxed lg:text-sm">
+        <p className="mb-1 font-bold">{specialPeriod.name}</p>
         <p>
           De {specialPeriod.startDate.toLocaleDateString("pt-BR")} a{" "}
           {specialPeriod.endDate.toLocaleDateString("pt-BR")}, operam apenas os
