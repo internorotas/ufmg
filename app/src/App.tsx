@@ -1,24 +1,11 @@
-import {
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
-  lazy,
-  Suspense,
-  useEffect,
-} from "react";
+import { lazy, Suspense, useEffect } from "react";
 import ReactGA from "react-ga4";
 import { MenuLateral } from "./components/MenuLateral";
-import type { MapaRef } from "./components/Mapa";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { RotasProvider, useRotas } from "./contexts/RotasContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useAnalytics } from "./hooks/useAnalytics";
-
-// Importa os dados da pasta /data
-import linhasData from "./data/linhas";
-import paradasData from "./data/paradas";
-
-import { Linha, Parada } from "./types/data.types";
+import type { Linha, Parada } from "./types/data.types";
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
 const Mapa = lazy(() =>
@@ -41,56 +28,46 @@ if (GA_MEASUREMENT_ID) {
 }
 
 /**
- * O componente principal da aplicação. Gerencia o estado da linha e parada selecionadas e renderiza o layout principal com o menu lateral e o mapa.
- *
- * @returns {JSX.Element} O componente principal da aplicação renderizado.
+ * Componente interno que consome o contexto de rotas.
+ * Separado do App principal para que o useRotas funcione dentro do Provider.
  */
-export function App() {
-  const [linhaSelecionada, setLinhaSelecionada] = useState<Linha | null>(null);
-  const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(
-    null,
-  );
-  const mapaRef = useRef<MapaRef>(null);
+function AppContent() {
+  const {
+    linhasData,
+    todasParadas,
+    linhaSelecionada,
+    paradaSelecionada,
+    selecionarLinha,
+    selecionarParada,
+    mapaRef,
+  } = useRotas();
+
   const { trackEvent, trackPageView } = useAnalytics();
 
   useEffect(() => {
     trackPageView();
   }, [trackPageView]);
 
-  // Otimização: useCallback para evitar recriação da função em cada render
-  const handleLinhaSelect = useCallback(
-    (linha: Linha) => {
-      setLinhaSelecionada(linha);
+  // Handlers com tracking de analytics
+  const handleLinhaSelect = (linha: Linha) => {
+    selecionarLinha(linha);
+    trackEvent({
+      category: "Engajamento",
+      action: "Selecionar Linha",
+      label: linha.nome,
+    });
+  };
 
-      trackEvent({
-        category: "Engajamento",
-        action: "Selecionar Linha",
-        label: linha.nome,
-      });
-    },
-    [trackEvent],
-  );
+  const handleParadaClick = (parada: Parada) => {
+    selecionarParada(parada);
+    trackEvent({
+      category: "Engajamento",
+      action: "Selecionar Parada",
+      label: parada.nome,
+    });
+  };
 
-  // Otimização: useCallback para evitar recriação da função em cada render
-  const handleParadaClick = useCallback(
-    (parada: Parada) => {
-      setParadaSelecionada(parada);
-      mapaRef.current?.centralizarParada(parada);
-
-      trackEvent({
-        category: "Engajamento",
-        action: "Selecionar Parada",
-        label: parada.nome,
-      });
-    },
-    [trackEvent],
-  );
-
-  // Memoização dos dados de paradas para garantir estabilidade referencial
-  const todasParadas = useMemo(() => paradasData?.paradas || [], []);
-
-  // Validação Crítica dos dados
-  // Verificamos tanto linhasData quanto paradasData para evitar quebrar a aplicação
+  // Validação dos dados
   if (!todasParadas || todasParadas.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen w-screen bg-gray-100 text-gray-800">
@@ -128,27 +105,41 @@ export function App() {
   }
 
   return (
+    <div className="relative h-screen w-screen overflow-hidden flex flex-col md:flex-row font-['Poppins',_sans-serif] bg-background">
+      <MenuLateral
+        linhasData={linhasData}
+        todasParadas={todasParadas}
+        onLinhaSelect={handleLinhaSelect}
+        onParadaClick={handleParadaClick}
+        linhaSelecionada={linhaSelecionada}
+      />
+      <main role="main" className="flex-grow h-full w-full">
+        <Suspense fallback={<LoadingMap />}>
+          <Mapa
+            ref={mapaRef}
+            todasParadas={todasParadas}
+            linhaSelecionada={linhaSelecionada}
+            paradaSelecionada={paradaSelecionada}
+          />
+        </Suspense>
+      </main>
+    </div>
+  );
+}
+
+/**
+ * O componente principal da aplicação.
+ * Configura os Providers e renderiza o conteúdo.
+ *
+ * @returns {JSX.Element} O componente principal da aplicação renderizado.
+ */
+export function App() {
+  return (
     <ErrorBoundary>
       <ThemeProvider>
-        <div className="relative h-screen w-screen overflow-hidden flex flex-col md:flex-row font-['Poppins',_sans-serif] bg-background">
-          <MenuLateral
-            linhasData={linhasData}
-            todasParadas={todasParadas}
-            onLinhaSelect={handleLinhaSelect}
-            onParadaClick={handleParadaClick}
-            linhaSelecionada={linhaSelecionada}
-          />
-          <main role="main" className="flex-grow h-full w-full">
-            <Suspense fallback={<LoadingMap />}>
-              <Mapa
-                ref={mapaRef}
-                todasParadas={todasParadas}
-                linhaSelecionada={linhaSelecionada}
-                paradaSelecionada={paradaSelecionada}
-              />
-            </Suspense>
-          </main>
-        </div>
+        <RotasProvider>
+          <AppContent />
+        </RotasProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
