@@ -51,7 +51,7 @@ function useDialogContext() {
  */
 export const dialogBackdropVariants = tv({
   base: [
-    "fixed inset-0 bg-black/70 backdrop-blur-sm",
+    "fixed inset-0 z-[1999] bg-black/70 cursor-pointer",
     "data-[state=open]:animate-fade-in",
     "data-[state=closed]:animate-fade-out",
   ],
@@ -64,8 +64,8 @@ export const dialogPopupVariants = tv({
   base: [
     "relative flex max-h-[90vh] w-full flex-col",
     "rounded-xl border border-card-border bg-modal text-text-primary shadow-2xl",
-    "data-[state=open]:animate-slide-up",
-    "data-[state=closed]:animate-slide-down",
+    "data-[state=open]:animate-modal-in",
+    "data-[state=closed]:animate-modal-out",
   ],
   variants: {
     size: {
@@ -253,7 +253,7 @@ function DialogPopup({ size, className, children, ...props }: DialogPopupProps) 
 
   return (
     <div
-      className="fixed inset-0 z-[2000] flex items-center justify-center p-4"
+      className="pointer-events-none fixed inset-0 z-[2000] flex items-center justify-center p-4"
       role="presentation"
     >
       <div
@@ -263,7 +263,7 @@ function DialogPopup({ size, className, children, ...props }: DialogPopupProps) 
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className={cn(dialogPopupVariants({ size }), className)}
+        className={cn("pointer-events-auto", dialogPopupVariants({ size }), className)}
         {...props}
       >
         {children}

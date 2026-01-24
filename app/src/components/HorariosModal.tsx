@@ -93,7 +93,15 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   // Verificar se devemos desabilitar os horários
   const isVacationLine = linha.categoriaDia === "feriasRecessos";
   const isInVacationPeriod = shouldDisableRegularSchedules();
-  const shouldDisableSchedules = !isVacationLine && isInVacationPeriod;
+  
+  // Verificar se é fim de semana (sábado=6, domingo=0)
+  const today = now.getDay();
+  const isWeekend = today === 0 || today === 6;
+  
+  // Lógica de desabilitar horários durante férias:
+  // - Linhas de sábado e dias úteis: SEMPRE desabilitadas durante férias
+  // - Linhas de férias/recessos: desabilitadas apenas em fins de semana
+  const shouldDisableSchedules = isInVacationPeriod && (!isVacationLine || isWeekend);
 
   const horariosOrganizados = useMemo(() => {
     return linha.horarios

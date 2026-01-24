@@ -36,7 +36,8 @@ export const titleIconVariants = tv({
  */
 export const tabVariants = tv({
   base: [
-    "flex items-center gap-2 px-4 py-3 font-semibold transition-all cursor-pointer",
+    "flex items-center gap-2 px-4 py-3 font-semibold transition-all duration-200 cursor-pointer",
+    "hover:bg-card-hover/50 rounded-t-lg",
   ],
   variants: {
     active: {
@@ -236,7 +237,7 @@ export function LinhaDetalhesModal({
 
       {/* Conteúdo das Tabs */}
       {tabAtiva === "itinerario" ? (
-        <div data-slot="itinerary-tab" className="relative">
+        <div data-slot="itinerary-tab" className="relative animate-in fade-in-0 duration-200">
           {paradasDoItinerario.length > 0 ? (
             <div className="relative">
               {paradasDoItinerario.map((parada, index) => {
@@ -315,7 +316,7 @@ export function LinhaDetalhesModal({
           </div>
         </div>
       ) : (
-        <div data-slot="schedules-tab" className="space-y-6">
+        <div data-slot="schedules-tab" className="space-y-6 animate-in fade-in-0 duration-200">
           {/* Próximos Horários */}
           {proximos.length > 0 && (
             <div data-slot="upcoming-schedules">

@@ -53,9 +53,10 @@ export const sidebarVariants = tv({
  */
 export const categoryTabVariants = tv({
   base: [
-    "flex-1 rounded-md px-2.5 py-0.5 lg:py-2.5",
-    "text-xs font-medium",
-    "cursor-pointer transition-all duration-200",
+    "flex-1 rounded-md px-2.5 py-2 lg:py-2.5",
+    "text-xs lg:text-sm font-medium",
+    "cursor-pointer transition-all duration-150 ease-out",
+    "active:scale-[0.97]",
     "data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm",
     "data-[state=inactive]:bg-card data-[state=inactive]:text-text-secondary",
     "data-[state=inactive]:hover:bg-card-hover data-[state=inactive]:hover:text-text-primary",
@@ -69,7 +70,7 @@ export const categoryTabVariants = tv({
  */
 export const searchInputVariants = tv({
   base: [
-    "w-full rounded-lg border bg-input pl-10 pr-4 py-1 lg:py-3",
+    "w-full rounded-lg border bg-input pl-10 pr-4 py-2.5 lg:py-3",
     "border-input-border text-text-primary",
     "placeholder:text-text-tertiary",
     "transition-all duration-200",

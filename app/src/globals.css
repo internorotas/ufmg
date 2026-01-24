@@ -213,6 +213,17 @@ body {
   color: var(--text-secondary) !important;
 }
 
+/* Dialog/Modal Backdrop - Ensure it covers everything including Leaflet */
+[data-slot="dialog-backdrop"] {
+  isolation: isolate;
+}
+
+/* Ensure Leaflet controls don't overlap modal */
+.leaflet-pane,
+.leaflet-control-container {
+  z-index: auto !important;
+}
+
 /* Animations */
 @keyframes fade-in {
   from {
@@ -220,6 +231,15 @@ body {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 
@@ -234,15 +254,6 @@ body {
   }
 }
 
-@keyframes fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
 @keyframes slide-down {
   from {
     transform: translateY(0);
@@ -254,20 +265,158 @@ body {
   }
 }
 
+/* Modal specific animations with scale */
+@keyframes modal-in {
+  from {
+    transform: translateY(16px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes modal-out {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(16px) scale(0.96);
+    opacity: 0;
+  }
+}
+
+/* Slide animations for sidebar/menu */
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Pop animation for interactive elements */
+@keyframes pop-in {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Pulse animation for attention */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 .animate-fade-in {
-  animation: fade-in 0.2s ease-out;
+  animation: fade-in 0.2s ease-out forwards;
 }
 
 .animate-fade-out {
-  animation: fade-out 0.2s ease-out;
+  animation: fade-out 0.15s ease-out forwards;
 }
 
 .animate-slide-up {
-  animation: slide-up 0.3s ease-out;
+  animation: slide-up 0.25s ease-out forwards;
 }
 
 .animate-slide-down {
-  animation: slide-down 0.2s ease-out;
+  animation: slide-down 0.2s ease-out forwards;
+}
+
+/* Animate In/Out utilities (similar to shadcn/ui) */
+.animate-in {
+  animation-name: enter;
+  animation-duration: 200ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.animate-out {
+  animation-name: exit;
+  animation-duration: 150ms;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+.fade-in-0 {
+  --tw-enter-opacity: 0;
+}
+
+.fade-out-0 {
+  --tw-exit-opacity: 0;
+}
+
+.duration-200 {
+  animation-duration: 200ms;
+}
+
+.duration-300 {
+  animation-duration: 300ms;
+}
+
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1));
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0)
+      scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1));
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-modal-out {
+  animation: modal-out 0.15s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-out forwards;
+}
+
+.animate-slide-out-left {
+  animation: slide-out-left 0.25s ease-out forwards;
+}
+
+.animate-pop-in {
+  animation: pop-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
 }
 
 /* Leaflet Ant Path Animation */
