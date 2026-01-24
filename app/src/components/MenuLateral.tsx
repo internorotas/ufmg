@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-import { useDebounce } from "use-debounce";
-import { useAnalytics } from "../hooks/useAnalytics";
+import { useState } from "react";
+import { useLinhasFilter } from "../hooks/useLinhasFilter";
 import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
 import { ThemeToggle } from "./ThemeToggle";
 import { DisclaimerBanner } from "./DisclaimerBanner";
@@ -11,7 +10,6 @@ import { Linha, CategoriaLinhas, Parada } from "../types/data.types";
 import logo from "../assets/logo-horizontal-transparente.svg";
 import { IoSearch, IoMenu, IoArrowBack } from "react-icons/io5";
 import { LineCard } from "./LineCard";
-import { getCurrentSpecialPeriod } from "../config/specialPeriods";
 
 interface MenuLateralProps {
   linhasData: CategoriaLinhas;
@@ -39,39 +37,23 @@ export function MenuLateral({
   onParadaClick,
   linhaSelecionada,
 }: MenuLateralProps) {
+  // Estado de visibilidade do menu (mobile)
   const [isMenuVisible, setMenuVisible] = useState(false);
 
-  // Determinar categoria inicial baseado no período de férias
-  const getInitialCategory = () => {
-    const specialPeriod = getCurrentSpecialPeriod();
-    if (specialPeriod) {
-      // Procurar pela categoria de férias e recessos
-      const feriasIndex = linhasData.categoriasDias.findIndex(
-        (cat) => cat.categoriaDia === "feriasRecessos",
-      );
-      return feriasIndex !== -1 ? feriasIndex : 0;
-    }
-    return 0; // Dias úteis por padrão
-  };
+  // Hook customizado para filtro de linhas (Separation of Concerns)
+  const {
+    searchTerm,
+    setSearchTerm,
+    categoriaAtiva,
+    linhasFiltradas,
+    hasResults,
+    handleCategoriaChange,
+  } = useLinhasFilter(linhasData);
 
-  const [categoriaAtiva, setCategoriaAtiva] =
-    useState<number>(getInitialCategory());
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 1500);
+  // Estado do modal de detalhes
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
-    null,
+    null
   );
-  const { trackEvent } = useAnalytics();
-
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      trackEvent({
-        category: "Busca",
-        action: "Termo Pesquisado",
-        label: debouncedSearchTerm,
-      });
-    }
-  }, [debouncedSearchTerm, trackEvent]);
 
   const handleCardClick = (linha: Linha) => {
     // Clique no card: seleciona a linha e mostra no mapa
@@ -94,39 +76,6 @@ export function MenuLateral({
     if (window.innerWidth < 768) {
       setMenuVisible(false);
     }
-  };
-
-  // Obter linhas da categoria ativa
-  const categoriaAtual = linhasData.categoriasDias[categoriaAtiva];
-  const linhasFiltradas =
-    categoriaAtual?.linhas.filter(
-      (linha) =>
-        linha.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (linha.sublinha &&
-          linha.sublinha.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        linha.descricao.toLowerCase().includes(searchTerm.toLowerCase()),
-    ) || [];
-
-  useEffect(() => {
-    if (searchTerm && linhasFiltradas.length === 0) {
-      trackEvent({
-        category: "Busca",
-        action: "Busca Sem Resultados",
-        label: searchTerm,
-      });
-    }
-  }, [searchTerm, linhasFiltradas.length, trackEvent]);
-
-  const handleCategoriaClick = (index: number) => {
-    const categoria = linhasData.categoriasDias[index];
-    if (categoria) {
-      trackEvent({
-        category: "Navegação Principal",
-        action: "Selecionar Categoria Dia",
-        label: categoria.displayName,
-      });
-    }
-    setCategoriaAtiva(index);
   };
 
   return (
@@ -199,7 +148,7 @@ export function MenuLateral({
           {linhasData.categoriasDias.map((categoria, index) => (
             <button
               key={categoria.id}
-              onClick={() => handleCategoriaClick(index)}
+              onClick={() => handleCategoriaChange(index)}
               className={`flex-1 py-0.5 lg:py-2.5 px-2.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
                 categoriaAtiva === index
                   ? "bg-brand-primary text-white shadow-sm"
@@ -222,7 +171,7 @@ export function MenuLateral({
           {/* Banner Informativo */}
           <InfoBanner />
 
-          {linhasFiltradas.length > 0 ? (
+          {hasResults ? (
             linhasFiltradas.map((linha: Linha) => (
               <LineCard
                 key={linha.idRota}

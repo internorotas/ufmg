@@ -1,103 +1,63 @@
 import { useEffect, useCallback, useRef } from "react";
-import ReactGA from "react-ga4";
+import {
+  ga4Analytics,
+  type IAnalyticsService,
+  type AnalyticsEvent,
+  type TimingEvent,
+  type EventCategory,
+} from "../services/analytics";
 
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
-const IS_ANALYTICS_ENABLED = !!GA_MEASUREMENT_ID;
+// Re-exporta os tipos para compatibilidade
+export type { EventCategory, AnalyticsEvent, TimingEvent };
 
-export type EventCategory =
-  | "Engajamento"
-  | "Navegação"
-  | "Navegação Principal"
-  | "Busca"
-  | "UI Interaction"
-  | "Navegação Detalhes"
-  | "Horarios"
-  | "Engajamento Detalhes"
-  | "Performance"
-  | "Erro"
-  | "External Link"
-  | "Session";
+// Serviço de analytics injetável (permite trocar implementação)
+let analyticsService: IAnalyticsService = ga4Analytics;
 
-export interface AnalyticsEvent {
-  category: EventCategory;
-  action: string;
-  label?: string;
-  value?: number;
-}
-
-export interface TimingEvent {
-  name: string;
-  value: number;
-  category?: string;
-  label?: string;
+/**
+ * Permite injetar um serviço de analytics diferente (útil para testes).
+ */
+export function setAnalyticsService(service: IAnalyticsService): void {
+  analyticsService = service;
 }
 
 /**
- * Hook customizado para rastrear eventos no Google Analytics.
- * Centraliza toda a lógica de analytics e garante que só execute quando o GA está configurado.
+ * Hook customizado para rastrear eventos no Analytics.
+ * Centraliza toda a lógica de analytics e usa a abstração IAnalyticsService.
  */
 export function useAnalytics() {
   /**
-   * Envia um evento para o Google Analytics
+   * Envia um evento para o Analytics
    */
   const trackEvent = useCallback((event: AnalyticsEvent) => {
-    if (!IS_ANALYTICS_ENABLED) return;
-
-    ReactGA.event({
-      category: event.category,
-      action: event.action,
-      label: event.label,
-      value: event.value,
-    });
+    analyticsService.trackEvent(event);
   }, []);
 
   /**
    * Envia um evento de pageview
    */
   const trackPageView = useCallback((path?: string) => {
-    if (!IS_ANALYTICS_ENABLED) return;
-
-    ReactGA.send({
-      hitType: "pageview",
-      page: path || window.location.pathname,
-    });
+    analyticsService.trackPageView({ path });
   }, []);
 
   /**
    * Define uma propriedade do usuário (ex: tema preferido)
    */
   const setUserProperty = useCallback((property: string, value: string) => {
-    if (!IS_ANALYTICS_ENABLED) return;
-
-    ReactGA.set({ [property]: value });
+    analyticsService.setUserProperty(property, value);
   }, []);
 
   /**
    * Rastreia tempo de execução/performance
    */
   const trackTiming = useCallback((timing: TimingEvent) => {
-    if (!IS_ANALYTICS_ENABLED) return;
-
-    ReactGA.event({
-      category: timing.category || "Performance",
-      action: timing.name,
-      label: timing.label,
-      value: timing.value,
-    });
+    analyticsService.trackTiming(timing);
   }, []);
 
   /**
    * Rastreia exceções/erros
    */
   const trackError = useCallback((error: Error, fatal: boolean = false) => {
-    if (!IS_ANALYTICS_ENABLED) return;
-
-    ReactGA.event({
-      category: "Erro",
-      action: error.name || "Error",
-      label: error.message,
-      value: fatal ? 1 : 0,
-    });
+    analyticsService.trackError(error, fatal);
   }, []);
 
   return {
@@ -106,7 +66,7 @@ export function useAnalytics() {
     setUserProperty,
     trackTiming,
     trackError,
-    isEnabled: IS_ANALYTICS_ENABLED,
+    isEnabled: analyticsService.isEnabled,
   };
 }
 
@@ -115,7 +75,7 @@ export function useAnalytics() {
  */
 export function useSessionTiming(
   label: string,
-  category: EventCategory = "Session",
+  category: EventCategory = "Session"
 ) {
   const startTimeRef = useRef<number>(0);
   const { trackTiming, isEnabled } = useAnalytics();
@@ -155,7 +115,7 @@ export function useExternalLinkTracking() {
         label: `${label} - ${url}`,
       });
     },
-    [trackEvent],
+    [trackEvent]
   );
 
   return { trackExternalLink };
