@@ -105,15 +105,16 @@ export function LinhaOnibus({
   // Verificar se é linha de férias ou dias regulares
   const isVacationLine = linha.categoriaDia === "feriasRecessos";
   const isInVacationPeriod = shouldDisableRegularSchedules();
-  
+
   // Verificar se é fim de semana (sábado=6, domingo=0)
   const today = new Date().getDay();
   const isWeekend = today === 0 || today === 6;
-  
+
   // Lógica de desabilitar horários durante férias:
   // - Linhas de sábado e dias úteis: SEMPRE desabilitadas durante férias
   // - Linhas de férias/recessos: desabilitadas apenas em fins de semana
-  const shouldDisableSchedules = isInVacationPeriod && (!isVacationLine || isWeekend);
+  const shouldDisableSchedules =
+    isInVacationPeriod && (!isVacationLine || isWeekend);
 
   // Calcular horários anterior e próximo (ou mostrar Encerrado se desabilitado)
   const { nextSchedule, previousSchedule } = useMemo(() => {
@@ -156,7 +157,10 @@ export function LinhaOnibus({
           <div className="bg-internoRotas-cinza-grafite p-4 text-white">
             {/* Aviso de Horários Suspensos ou Horários Normais */}
             {shouldDisableSchedules ? (
-              <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
+              <div
+                data-slot="suspension-alert"
+                className={suspensionAlertVariants()}
+              >
                 <p className="mb-1 text-sm font-bold text-red-300">
                   🚫 NÃO CIRCULANDO
                 </p>
@@ -165,7 +169,10 @@ export function LinhaOnibus({
                 </p>
               </div>
             ) : (
-              <div data-slot="schedules" className="mb-4 flex justify-between text-center">
+              <div
+                data-slot="schedules"
+                className="mb-4 flex justify-between text-center"
+              >
                 <div>
                   <p className="mb-1 text-xs text-gray-400">Último Partiu</p>
                   <p className="text-xl font-bold">{previousSchedule}</p>

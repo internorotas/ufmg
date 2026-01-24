@@ -216,7 +216,10 @@ export function LinhaDetalhesModal({
       size="2xl"
     >
       {/* Tabs */}
-      <div data-slot="tabs" className="mb-6 flex gap-2 border-b border-card-border">
+      <div
+        data-slot="tabs"
+        className="mb-6 flex gap-2 border-b border-card-border"
+      >
         <button
           onClick={() => handleTabChange("itinerario")}
           className={tabVariants({ active: tabAtiva === "itinerario" })}
@@ -237,7 +240,10 @@ export function LinhaDetalhesModal({
 
       {/* Conteúdo das Tabs */}
       {tabAtiva === "itinerario" ? (
-        <div data-slot="itinerary-tab" className="relative animate-in fade-in-0 duration-200">
+        <div
+          data-slot="itinerary-tab"
+          className="relative animate-in fade-in-0 duration-200"
+        >
           {paradasDoItinerario.length > 0 ? (
             <div className="relative">
               {paradasDoItinerario.map((parada, index) => {
@@ -316,7 +322,10 @@ export function LinhaDetalhesModal({
           </div>
         </div>
       ) : (
-        <div data-slot="schedules-tab" className="space-y-6 animate-in fade-in-0 duration-200">
+        <div
+          data-slot="schedules-tab"
+          className="space-y-6 animate-in fade-in-0 duration-200"
+        >
           {/* Próximos Horários */}
           {proximos.length > 0 && (
             <div data-slot="upcoming-schedules">

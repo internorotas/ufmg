@@ -63,7 +63,8 @@ interface ScheduleResult {
 }
 
 export interface LineCardProps
-  extends Omit<ComponentProps<"article">, "onClick">,
+  extends
+    Omit<ComponentProps<"article">, "onClick">,
     VariantProps<typeof lineCardVariants> {
   /** Dados da linha de ônibus */
   linha: Linha;
@@ -130,7 +131,7 @@ function calculateSchedules(horarios: string[]): ScheduleResult {
 
   // Último que partiu
   const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule <= currentMinutes
+    (schedule) => schedule <= currentMinutes,
   );
   if (previousSchedules.length > 0) {
     previousSchedule = minutesToTime(Math.max(...previousSchedules));
@@ -178,7 +179,7 @@ function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
       <p
         className={cn(
           "text-base font-bold md:text-lg",
-          highlight ? "text-success-text" : "text-text-primary"
+          highlight ? "text-success-text" : "text-text-primary",
         )}
       >
         {time}
@@ -230,15 +231,16 @@ export function LineCard({
   // Verificar se é período de férias
   const isVacationLine = linha.categoriaDia === "feriasRecessos";
   const isInVacationPeriod = shouldDisableRegularSchedules();
-  
+
   // Verificar se é fim de semana (sábado=6, domingo=0)
   const today = new Date().getDay();
   const isWeekend = today === 0 || today === 6;
-  
+
   // Lógica de desabilitar horários durante férias:
   // - Linhas de sábado e dias úteis: SEMPRE desabilitadas durante férias
   // - Linhas de férias/recessos: desabilitadas apenas em fins de semana
-  const shouldDisableSchedules = isInVacationPeriod && (!isVacationLine || isWeekend);
+  const shouldDisableSchedules =
+    isInVacationPeriod && (!isVacationLine || isWeekend);
 
   // Calcular horários
   const { nextSchedule, previousSchedule, status, statusType } = useMemo(() => {
@@ -268,7 +270,11 @@ export function LineCard({
       data-slot="card"
       data-state={isSelected ? "selected" : undefined}
       onClick={onClick}
-      className={cn(lineCardVariants({ selected: isSelected }), "mb-3", className)}
+      className={cn(
+        lineCardVariants({ selected: isSelected }),
+        "mb-3",
+        className,
+      )}
       {...props}
     >
       {/* Header */}

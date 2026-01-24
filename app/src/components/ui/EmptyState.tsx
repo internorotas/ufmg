@@ -20,10 +20,7 @@ import { Button } from "./Button";
  * Variantes do container de empty state
  */
 export const emptyStateVariants = tv({
-  base: [
-    "flex flex-col items-center justify-center text-center",
-    "py-8 px-4",
-  ],
+  base: ["flex flex-col items-center justify-center text-center", "py-8 px-4"],
   variants: {
     size: {
       sm: "py-6 gap-2",
@@ -61,8 +58,7 @@ export const emptyStateIconVariants = tv({
 // ============================================================================
 
 export interface EmptyStateProps
-  extends ComponentProps<"div">,
-    VariantProps<typeof emptyStateVariants> {
+  extends ComponentProps<"div">, VariantProps<typeof emptyStateVariants> {
   /** Ícone personalizado */
   icon?: ReactNode;
   /** Título principal */
@@ -205,7 +201,10 @@ export interface LinesEmptyStateProps {
   size?: "sm" | "md" | "lg";
 }
 
-export function LinesEmptyState({ category, size = "md" }: LinesEmptyStateProps) {
+export function LinesEmptyState({
+  category,
+  size = "md",
+}: LinesEmptyStateProps) {
   const iconSizes = { sm: 24, md: 32, lg: 40 };
 
   return (

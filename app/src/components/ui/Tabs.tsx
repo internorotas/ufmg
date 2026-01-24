@@ -126,7 +126,8 @@ export const tabsContentVariants = tv({
 // ============================================================================
 
 export interface TabsProps
-  extends Omit<ComponentProps<"div">, "defaultValue">,
+  extends
+    Omit<ComponentProps<"div">, "defaultValue">,
     VariantProps<typeof tabsVariants> {
   /** Valor ativo (controlado) */
   value?: string;
@@ -139,14 +140,14 @@ export interface TabsProps
 }
 
 export interface TabsListProps
-  extends ComponentProps<"div">,
-    VariantProps<typeof tabsListVariants> {
+  extends ComponentProps<"div">, VariantProps<typeof tabsListVariants> {
   /** Lista de triggers */
   children: ReactNode;
 }
 
 export interface TabsTriggerProps
-  extends ComponentProps<"button">,
+  extends
+    ComponentProps<"button">,
     Omit<VariantProps<typeof tabsTriggerVariants>, "variant"> {
   /** Valor único da tab */
   value: string;
@@ -199,7 +200,9 @@ export function Tabs({
   };
 
   return (
-    <TabsContext.Provider value={{ activeValue, onValueChange: handleValueChange }}>
+    <TabsContext.Provider
+      value={{ activeValue, onValueChange: handleValueChange }}
+    >
       <div
         data-slot="tabs"
         className={cn(tabsVariants(), className)}

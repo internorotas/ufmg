@@ -41,7 +41,8 @@ export const menuButtonVariants = tv({
 // ============================================================================
 
 export interface HeaderMobileProps
-  extends Omit<ComponentProps<"header">, "children">,
+  extends
+    Omit<ComponentProps<"header">, "children">,
     VariantProps<typeof headerMobileVariants> {
   isMenuOpen: boolean;
   toggleMenu: () => void;
@@ -81,11 +82,7 @@ export function HeaderMobile({
         aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
         aria-expanded={isMenuOpen}
       >
-        {isMenuOpen ? (
-          <X className="size-7" />
-        ) : (
-          <Menu className="size-7" />
-        )}
+        {isMenuOpen ? <X className="size-7" /> : <Menu className="size-7" />}
       </button>
     </header>
   );

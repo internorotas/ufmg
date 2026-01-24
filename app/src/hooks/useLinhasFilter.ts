@@ -50,7 +50,7 @@ function getInitialCategory(linhasData: CategoriaLinhas): number {
   const specialPeriod = getCurrentSpecialPeriod();
   if (specialPeriod) {
     const feriasIndex = linhasData.categoriasDias.findIndex(
-      (cat) => cat.categoriaDia === "feriasRecessos"
+      (cat) => cat.categoriaDia === "feriasRecessos",
     );
     return feriasIndex !== -1 ? feriasIndex : 0;
   }
@@ -72,7 +72,7 @@ function filterLinhas(linhas: Linha[], searchTerm: string): Linha[] {
     (linha) =>
       linha.nome.toLowerCase().includes(termLower) ||
       (linha.sublinha && linha.sublinha.toLowerCase().includes(termLower)) ||
-      linha.descricao.toLowerCase().includes(termLower)
+      linha.descricao.toLowerCase().includes(termLower),
   );
 }
 
@@ -104,7 +104,7 @@ function filterLinhas(linhas: Linha[], searchTerm: string): Linha[] {
  */
 export function useLinhasFilter(
   linhasData: CategoriaLinhas,
-  options: UseLinhasFilterOptions = {}
+  options: UseLinhasFilterOptions = {},
 ): UseLinhasFilterReturn {
   const { debounceMs = 1500, trackSearch = true } = options;
   const { trackEvent } = useAnalytics();
@@ -115,13 +115,13 @@ export function useLinhasFilter(
 
   // Estado de categoria (inicializa baseado em período especial)
   const [categoriaAtiva, setCategoriaAtiva] = useState<number>(() =>
-    getInitialCategory(linhasData)
+    getInitialCategory(linhasData),
   );
 
   // Categoria atual memoizada
   const categoriaAtual = useMemo(
     () => linhasData.categoriasDias[categoriaAtiva],
-    [linhasData.categoriasDias, categoriaAtiva]
+    [linhasData.categoriasDias, categoriaAtiva],
   );
 
   // Linhas filtradas memoizadas
@@ -168,7 +168,7 @@ export function useLinhasFilter(
       }
       setCategoriaAtiva(index);
     },
-    [linhasData.categoriasDias, trackEvent, trackSearch]
+    [linhasData.categoriasDias, trackEvent, trackSearch],
   );
 
   return {
