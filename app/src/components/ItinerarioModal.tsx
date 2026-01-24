@@ -1,9 +1,50 @@
-import { Modal } from "./Modal";
-import { Linha, Parada } from "../types/data.types";
-import { buscarParadasPorIds } from "../../lib/utils";
-import { IoLocationOutline } from "react-icons/io5";
+/**
+ * ItinerarioModal - Modal de itinerário da linha
+ * Design System - Interno Rotas UFMG
+ */
 
-interface ItinerarioModalProps {
+import { tv } from "tailwind-variants";
+import { MapPin } from "lucide-react";
+import { Modal } from "./Modal";
+import type { Linha, Parada } from "../types/data.types";
+import { buscarParadasPorIds } from "../../lib/utils";
+
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
+/**
+ * Variantes do botão de parada
+ */
+export const stopButtonVariants = tv({
+  base: "group flex w-full items-start gap-3 py-2 text-left",
+});
+
+/**
+ * Variantes do container do ícone de parada
+ */
+export const stopIconContainerVariants = tv({
+  base: [
+    "relative z-10 mt-0.5 shrink-0",
+    "flex size-6 items-center justify-center rounded-full",
+  ],
+});
+
+/**
+ * Variantes do card de informação
+ */
+export const infoCardVariants = tv({
+  base: [
+    "rounded-lg border p-4 text-center text-sm",
+    "border-card-border bg-card",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface ItinerarioModalProps {
   isOpen: boolean;
   onClose: () => void;
   linha: Linha;
@@ -11,16 +52,23 @@ interface ItinerarioModalProps {
   onParadaClick: (parada: Parada) => void;
 }
 
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 /**
- * Renderiza um modal que exibe o itinerário de uma linha de ônibus específica.
+ * Modal que exibe o itinerário de uma linha de ônibus.
  *
- * @param {object} props - As propriedades do componente.
- * @param {boolean} props.isOpen - Um booleano que indica se o modal está aberto.
- * @param {() => void} props.onClose - Uma função para fechar o modal.
- * @param {Linha} props.linha - Um objeto contendo os dados da linha de ônibus.
- * @param {Parada[]} props.paradas - Um array com todas as paradas de ônibus disponíveis.
- * @param {(parada: Parada) => void} props.onParadaClick - Uma função para lidar com cliques em uma parada de ônibus.
- * @returns {JSX.Element} O componente de modal de itinerário renderizado.
+ * @example
+ * ```tsx
+ * <ItinerarioModal
+ *   isOpen={true}
+ *   onClose={() => setOpen(false)}
+ *   linha={linhaData}
+ *   paradas={paradasData}
+ *   onParadaClick={(parada) => focusOnMap(parada)}
+ * />
+ * ```
  */
 export function ItinerarioModal({
   isOpen,
@@ -45,7 +93,7 @@ export function ItinerarioModal({
       isOpen={isOpen}
       onClose={onClose}
       title={`Itinerário - ${linha.nome}`}
-      maxWidth="max-w-lg"
+      size="lg"
     >
       <div className="relative">
         {paradasDoItinerario.length > 0 ? (
@@ -59,7 +107,7 @@ export function ItinerarioModal({
                   {/* Linha conectora vertical tracejada */}
                   {!isLast && (
                     <div
-                      className="absolute left-[11px] top-[28px] w-[2px] h-full"
+                      className="absolute left-2.75 top-7 h-full w-0.5"
                       style={{
                         backgroundColor: `${linha.corHex}40`,
                         backgroundImage: `repeating-linear-gradient(0deg, ${linha.corHex}40, ${linha.corHex}40 6px, transparent 6px, transparent 12px)`,
@@ -69,41 +117,36 @@ export function ItinerarioModal({
 
                   <button
                     onClick={() => handleParadaClick(parada)}
-                    className="w-full text-left py-2 flex items-start gap-3 group"
+                    className={stopButtonVariants()}
                   >
                     {/* Ícone de localização com círculo */}
-                    <div className="flex-shrink-0 relative z-10 mt-0.5">
-                      <div
-                        className="w-6 h-6 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: `${linha.corHex}20` }}
-                      >
-                        <IoLocationOutline
-                          size={18}
-                          style={{ color: linha.corHex }}
-                        />
-                      </div>
+                    <div
+                      className={stopIconContainerVariants()}
+                      style={{ backgroundColor: `${linha.corHex}20` }}
+                    >
+                      <MapPin size={18} style={{ color: linha.corHex }} />
                     </div>
 
                     {/* Conteúdo da parada */}
-                    <div className="flex-1 min-w-0 pt-0.5">
-                      <h4 className="font-semibold text-[15px] text-text-primary leading-snug group-hover:underline">
+                    <div className="min-w-0 flex-1 pt-0.5">
+                      <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
                         {parada.nome}
                       </h4>
 
                       {isFirst && (
-                        <p className="text-xs text-text-secondary mt-0.5">
+                        <p className="mt-0.5 text-xs text-text-secondary">
                           Ponto de Origem/Destino
                         </p>
                       )}
                       {!isFirst && !isLast && (
-                        <p className="text-xs text-text-secondary mt-0.5">
+                        <p className="mt-0.5 text-xs text-text-secondary">
                           Parada Regular
                         </p>
                       )}
 
                       {isFirst && (
                         <span
-                          className="inline-block text-xs font-semibold mt-1 px-0"
+                          className="mt-1 inline-block px-0 text-xs font-semibold"
                           style={{ color: linha.corHex }}
                         >
                           Partida
@@ -116,13 +159,13 @@ export function ItinerarioModal({
             })}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-400">
+          <div className="py-8 text-center text-gray-400">
             <p>Nenhuma parada encontrada para este itinerário.</p>
           </div>
         )}
       </div>
 
-      <div className="mt-6 bg-card rounded-lg p-4 text-sm text-center border border-card-border">
+      <div data-slot="tip" className={`mt-6 ${infoCardVariants()}`}>
         <p className="text-text-secondary">
           💡 Clique em uma parada para visualizá-la no mapa
         </p>

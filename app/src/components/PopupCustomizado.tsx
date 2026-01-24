@@ -1,33 +1,91 @@
-import { Popup } from "react-leaflet";
-import { Parada } from "../types/data.types";
-import { IoBusOutline, IoLocationSharp } from "react-icons/io5";
+/**
+ * PopupCustomizado - Popup de parada de ônibus no mapa
+ * Design System - Interno Rotas UFMG
+ */
 
-interface PopupCustomizadoProps {
+import type { ComponentProps } from "react";
+import { Popup } from "react-leaflet";
+import { tv, type VariantProps } from "tailwind-variants";
+import { Bus, MapPin } from "lucide-react";
+import { cn } from "../lib/utils";
+import type { Parada } from "../types/data.types";
+
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
+/**
+ * Variantes do container do popup
+ */
+export const popupContainerVariants = tv({
+  base: "min-w-[220px]",
+});
+
+/**
+ * Variantes do header do popup
+ */
+export const popupHeaderVariants = tv({
+  base: "mb-3 flex items-start gap-2",
+});
+
+/**
+ * Variantes da seção de linhas
+ */
+export const popupLinesSectionVariants = tv({
+  base: "mt-3 border-t border-card-border pt-3",
+});
+
+/**
+ * Variantes da badge de linha
+ */
+export const lineBadgeVariants = tv({
+  base: [
+    "rounded px-2 py-1 text-xs font-medium",
+    "bg-internoRotas-azul-eletrico text-white",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface PopupCustomizadoProps
+  extends Omit<ComponentProps<typeof Popup>, "children">,
+    VariantProps<typeof popupContainerVariants> {
   parada: Parada;
 }
 
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 /**
- * Renderiza um popup customizado para um marcador de parada de ônibus no mapa.
+ * Popup customizado para marcador de parada de ônibus no mapa.
  *
- * @param {object} props - As propriedades do componente.
- * @param {Parada} props.parada - Um objeto contendo os dados da parada de ônibus.
- * @returns {JSX.Element} O componente de popup customizado renderizado.
+ * @example
+ * ```tsx
+ * <PopupCustomizado parada={paradaData} />
+ * ```
  */
-export function PopupCustomizado({ parada }: PopupCustomizadoProps) {
+export function PopupCustomizado({
+  parada,
+  className,
+  ...props
+}: PopupCustomizadoProps) {
   return (
-    <Popup className="popup-customizado" minWidth={220}>
-      <div className="min-w-[220px]">
+    <Popup className={cn("popup-customizado", className)} minWidth={220} {...props}>
+      <div data-slot="container" className={popupContainerVariants()}>
         {/* Cabeçalho */}
-        <div className="flex items-start gap-2 mb-3">
-          <IoLocationSharp
-            className="text-internoRotas-laranja-ambar mt-1 flex-shrink-0"
+        <div data-slot="header" className={popupHeaderVariants()}>
+          <MapPin
+            className="mt-1 shrink-0 text-internoRotas-laranja-ambar"
             size={22}
           />
           <div>
-            <h3 className="font-bold text-base leading-tight text-text-primary">
+            <h3 className="text-base font-bold leading-tight text-text-primary">
               {parada.nome}
             </h3>
-            <p className="text-xs text-text-secondary mt-1">
+            <p className="mt-1 text-xs text-text-secondary">
               {parada.categoria}
             </p>
           </div>
@@ -35,9 +93,9 @@ export function PopupCustomizado({ parada }: PopupCustomizadoProps) {
 
         {/* Linhas Atendidas */}
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-card-border">
-            <div className="flex items-center gap-2 mb-2">
-              <IoBusOutline
+          <div data-slot="lines-section" className={popupLinesSectionVariants()}>
+            <div className="mb-2 flex items-center gap-2">
+              <Bus
                 className="text-internoRotas-azul-eletrico"
                 size={16}
               />
@@ -49,10 +107,7 @@ export function PopupCustomizado({ parada }: PopupCustomizadoProps) {
             </div>
             <div className="flex flex-wrap gap-1.5">
               {parada.linhasAtendidas.map((nomeLinha, index) => (
-                <span
-                  key={index}
-                  className="text-xs bg-internoRotas-azul-eletrico text-white px-2 py-1 rounded font-medium"
-                >
+                <span key={index} className={lineBadgeVariants()}>
                   {nomeLinha}
                 </span>
               ))}
@@ -62,8 +117,8 @@ export function PopupCustomizado({ parada }: PopupCustomizadoProps) {
 
         {/* Descrição */}
         {parada.descricao && parada.descricao !== parada.nome && (
-          <div className="mt-3 pt-3 border-t border-card-border">
-            <p className="text-xs text-text-secondary italic">
+          <div data-slot="description" className="mt-3 border-t border-card-border pt-3">
+            <p className="text-xs italic text-text-secondary">
               {parada.descricao}
             </p>
           </div>

@@ -1,12 +1,72 @@
-import React, { useState, useMemo } from "react";
-import { Linha, Parada } from "../types/data.types";
+/**
+ * LinhaOnibus - Card de linha de ônibus
+ * Design System - Interno Rotas UFMG
+ */
+
+import { useState, useMemo } from "react";
+import { tv } from "tailwind-variants";
+import { Clock, Map } from "lucide-react";
+import type { Linha, Parada } from "../types/data.types";
 import { HorariosModal } from "./HorariosModal";
 import { ItinerarioModal } from "./ItinerarioModal";
-import { IoTimeOutline, IoMapOutline } from "react-icons/io5";
 import { calculateNextAndPreviousSchedule } from "../../lib/utils";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
-interface LinhaOnibusProps {
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
+/**
+ * Variantes do card da linha
+ */
+export const lineCardContainerVariants = tv({
+  base: "mb-2",
+});
+
+/**
+ * Variantes do header da linha
+ */
+export const lineHeaderVariants = tv({
+  base: [
+    "flex w-full items-center justify-between rounded-t-lg p-3 shadow-md",
+    "font-bold text-white transition-colors",
+  ],
+});
+
+/**
+ * Variantes do botão de ação
+ */
+export const actionButtonVariants = tv({
+  base: [
+    "flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5",
+    "text-sm font-medium text-white transition-colors",
+  ],
+  variants: {
+    intent: {
+      primary: "bg-internoRotas-azul-eletrico hover:bg-blue-700",
+      secondary: "bg-internoRotas-laranja-ambar hover:bg-orange-600",
+    },
+  },
+  defaultVariants: {
+    intent: "primary",
+  },
+});
+
+/**
+ * Variantes do alerta de suspensão
+ */
+export const suspensionAlertVariants = tv({
+  base: [
+    "mb-4 rounded-lg border p-4 text-center",
+    "border-red-600 bg-red-900/30",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface LinhaOnibusProps {
   linha: Linha;
   onLinhaClick: () => void;
   bgColor: string;
@@ -14,16 +74,23 @@ interface LinhaOnibusProps {
   onParadaClick: (parada: Parada) => void;
 }
 
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 /**
- * Renderiza um componente que exibe informações sobre uma linha de ônibus e fornece acesso ao seu itinerário e horários.
+ * Card de linha de ônibus com informações de horário e ações.
  *
- * @param {object} props - As propriedades do componente.
- * @param {Linha} props.linha - Um objeto contendo os dados da linha de ônibus.
- * @param {() => void} props.onLinhaClick - Uma função para lidar com cliques na linha.
- * @param {string} props.bgColor - A cor de fundo para o cabeçalho da linha.
- * @param {Parada[]} props.paradas - Um array com todas as paradas de ônibus disponíveis.
- * @param {(parada: Parada) => void} props.onParadaClick - Uma função para lidar com cliques em uma parada de ônibus.
- * @returns {JSX.Element} O componente de linha de ônibus renderizado.
+ * @example
+ * ```tsx
+ * <LinhaOnibus
+ *   linha={linhaData}
+ *   onLinhaClick={() => selectLine(linha)}
+ *   bgColor="bg-blue-500"
+ *   paradas={paradasData}
+ *   onParadaClick={(parada) => focusOnMap(parada)}
+ * />
+ * ```
  */
 export function LinhaOnibus({
   linha,
@@ -64,10 +131,10 @@ export function LinhaOnibus({
 
   return (
     <>
-      <div className="mb-2">
+      <div data-slot="line-card" className={lineCardContainerVariants()}>
         <button
           onClick={onLinhaClick}
-          className={`w-full p-3 rounded-t-lg text-white font-bold flex justify-between items-center transition-colors shadow-md ${bgColor}`}
+          className={`${lineHeaderVariants()} ${bgColor}`}
         >
           <div
             className="text-left"
@@ -77,12 +144,12 @@ export function LinhaOnibus({
           />
         </button>
 
-        <div className="py-2 px-1 bg-internoRotas-cinza-grafite rounded-b-lg">
-          <div className="p-4 bg-internoRotas-cinza-grafite text-white">
+        <div className="rounded-b-lg bg-internoRotas-cinza-grafite px-1 py-2">
+          <div className="bg-internoRotas-cinza-grafite p-4 text-white">
             {/* Aviso de Horários Suspensos ou Horários Normais */}
             {shouldDisableSchedules ? (
-              <div className="mb-4 p-4 bg-red-900/30 border border-red-600 rounded-lg text-center">
-                <p className="text-sm text-red-300 font-bold mb-1">
+              <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
+                <p className="mb-1 text-sm font-bold text-red-300">
                   🚫 NÃO CIRCULANDO
                 </p>
                 <p className="text-xs text-red-200">
@@ -90,13 +157,13 @@ export function LinhaOnibus({
                 </p>
               </div>
             ) : (
-              <div className="flex justify-between text-center mb-4">
+              <div data-slot="schedules" className="mb-4 flex justify-between text-center">
                 <div>
-                  <p className="text-xs text-gray-400 mb-1">Último Partiu</p>
+                  <p className="mb-1 text-xs text-gray-400">Último Partiu</p>
                   <p className="text-xl font-bold">{previousSchedule}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400 mb-1">Próximo</p>
+                  <p className="mb-1 text-xs text-gray-400">Próximo</p>
                   <p className="text-xl font-bold text-green-400">
                     {nextSchedule}
                   </p>
@@ -105,19 +172,19 @@ export function LinhaOnibus({
             )}
 
             {/* Botões de Ação */}
-            <div className="flex gap-2">
+            <div data-slot="actions" className="flex gap-2">
               <button
                 onClick={handleItinerarioToggle}
-                className="flex-1 flex items-center justify-center gap-2 text-sm bg-internoRotas-azul-eletrico hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+                className={actionButtonVariants({ intent: "primary" })}
               >
-                <IoMapOutline size={18} />
+                <Map size={18} />
                 Itinerário
               </button>
               <button
                 onClick={handleHorariosToggle}
-                className="flex-1 flex items-center justify-center gap-2 text-sm bg-internoRotas-laranja-ambar hover:bg-orange-600 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+                className={actionButtonVariants({ intent: "secondary" })}
               >
-                <IoTimeOutline size={18} />
+                <Clock size={18} />
                 Mais Horários
               </button>
             </div>

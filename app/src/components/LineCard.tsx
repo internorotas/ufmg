@@ -1,24 +1,94 @@
-import { useMemo } from "react";
-import { Linha } from "../types/data.types";
-import { IoTimeOutline, IoBusOutline, IoChevronForward } from "react-icons/io5";
+/**
+ * LineCard - Card de linha de ônibus
+ * Design System - Interno Rotas UFMG
+ */
+
+import { useMemo, type ComponentProps } from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+import { Bus, Clock, ChevronRight } from "lucide-react";
+import { cn } from "../lib/utils";
 import { timeToMinutes, minutesToTime } from "../../lib/utils";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
+import { LineStatusBadge, type LineStatusType } from "./ui/Badge";
+import type { Linha } from "../types/data.types";
 
-interface LineCardProps {
+// ============================================================================
+// VARIANTS - Definição de estilos com tailwind-variants
+// ============================================================================
+
+/**
+ * Variantes do card principal
+ */
+export const lineCardVariants = tv({
+  base: [
+    "relative overflow-hidden rounded-xl border bg-card shadow-sm",
+    "cursor-pointer transition-all duration-200",
+    "hover:shadow-md",
+  ],
+  variants: {
+    selected: {
+      true: [
+        "border-2 border-brand-primary shadow-lg",
+        "ring-1 ring-brand-primary/20",
+      ],
+      false: ["border-card-border", "hover:border-info-border"],
+    },
+  },
+  defaultVariants: {
+    selected: false,
+  },
+});
+
+/**
+ * Variantes do botão de detalhes
+ */
+export const detailsButtonVariants = tv({
+  base: [
+    "w-full py-2.5 rounded-lg text-white font-semibold",
+    "text-xs md:text-sm shadow-sm",
+    "hover:opacity-90 active:scale-[0.98] transition-all",
+  ],
+});
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface ScheduleResult {
+  nextSchedule: string;
+  previousSchedule: string;
+  status: string;
+  statusType: LineStatusType;
+}
+
+export interface LineCardProps
+  extends Omit<ComponentProps<"article">, "onClick">,
+    VariantProps<typeof lineCardVariants> {
+  /** Dados da linha de ônibus */
   linha: Linha;
+  /** Callback ao clicar no card */
   onClick: () => void;
+  /** Callback ao clicar em "Ver Detalhes" */
   onDetailsClick: () => void;
+  /** Se o card está selecionado */
   isSelected?: boolean;
 }
 
-// Função para calcular próximo e anterior horário (REGRA DE NEGÓCIO CORRETA)
-const calculateSchedules = (horarios: string[]) => {
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+/**
+ * Calcula os horários de próximo ônibus e último que partiu
+ */
+function calculateSchedules(horarios: string[]): ScheduleResult {
   if (!horarios || horarios.length === 0) {
     return {
       nextSchedule: "--:--",
       previousSchedule: "--:--",
       status: "Sem Horários",
+      statusType: "closed",
     };
   }
 
@@ -35,94 +105,148 @@ const calculateSchedules = (horarios: string[]) => {
       nextSchedule: "--:--",
       previousSchedule: "--:--",
       status: "Sem Horários",
+      statusType: "closed",
     };
   }
 
   let nextSchedule = "--:--";
   let previousSchedule = "--:--";
   let status = "Encerrado";
+  let statusType: LineStatusType = "closed";
 
-  // PRÓXIMO: Primeiro horário posterior à hora atual
+  // Próximo horário
   const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
   if (next !== undefined) {
     nextSchedule = minutesToTime(next);
     const diffMinutes = next - currentMinutes;
     if (diffMinutes <= 15) {
-      status = "Próximo às " + nextSchedule;
+      status = `Próximo às ${nextSchedule}`;
+      statusType = "upcoming";
     } else {
       status = "Circulando";
+      statusType = "running";
     }
-  } else {
-    // Todos os horários já passaram
-    nextSchedule = "--:--";
-    status = "Encerrado";
   }
 
-  // ÚLTIMO PARTIU: Último horário anterior ou igual à hora atual
+  // Último que partiu
   const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule <= currentMinutes,
+    (schedule) => schedule <= currentMinutes
   );
   if (previousSchedules.length > 0) {
     previousSchedule = minutesToTime(Math.max(...previousSchedules));
-  } else {
-    // Hora atual é anterior ao primeiro horário do dia
-    previousSchedule = "--:--";
   }
 
-  return { nextSchedule, previousSchedule, status };
-};
+  return { nextSchedule, previousSchedule, status, statusType };
+}
+
+// ============================================================================
+// SUBCOMPONENTS
+// ============================================================================
+
+interface LineIconProps {
+  color: string;
+}
+
+function LineIcon({ color }: LineIconProps) {
+  return (
+    <div
+      data-slot="icon"
+      className="flex size-12 shrink-0 items-center justify-center rounded-lg shadow-sm"
+      style={{ backgroundColor: color }}
+    >
+      <Bus className="size-6 text-white drop-shadow-sm" />
+    </div>
+  );
+}
+
+interface ScheduleDisplayProps {
+  label: string;
+  time: string;
+  highlight?: boolean;
+}
+
+function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
+  return (
+    <div
+      data-slot="schedule"
+      className="rounded-lg bg-background-secondary/50 p-2 text-center"
+    >
+      <p className="mb-1 flex items-center justify-center gap-1 text-[10px] text-text-secondary md:text-xs">
+        <Clock className="size-3.5" />
+        {label}
+      </p>
+      <p
+        className={cn(
+          "text-base font-bold md:text-lg",
+          highlight ? "text-success-text" : "text-text-primary"
+        )}
+      >
+        {time}
+      </p>
+    </div>
+  );
+}
+
+function SuspendedNotice() {
+  return (
+    <div
+      data-slot="notice"
+      className="mb-4 rounded-lg border border-red-600/50 bg-red-900/20 p-3 text-center"
+    >
+      <p className="text-xs font-semibold text-red-300 md:text-sm">
+        Linha suspensa durante férias
+      </p>
+    </div>
+  );
+}
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 
 /**
- * Renderiza um card que exibe informações sobre uma linha de ônibus, incluindo seu nome, horários e status.
+ * Card que exibe informações sobre uma linha de ônibus.
  *
- * @param {object} props - As propriedades do componente.
- * @param {Linha} props.linha - Um objeto contendo os dados da linha de ônibus.
- * @param {() => void} props.onClick - Uma função para lidar com cliques no card.
- * @param {() => void} props.onDetailsClick - Uma função para lidar com cliques no botão "Ver Detalhes".
- * @param {boolean} [props.isSelected=false] - Um booleano que indica se o card está selecionado.
- * @returns {JSX.Element} O componente de card de linha renderizado.
+ * @example
+ * ```tsx
+ * <LineCard
+ *   linha={linha}
+ *   onClick={() => handleSelect(linha)}
+ *   onDetailsClick={() => openDetails(linha)}
+ *   isSelected={selectedId === linha.idRota}
+ * />
+ * ```
  */
 export function LineCard({
   linha,
   onClick,
   onDetailsClick,
   isSelected = false,
+  className,
+  ...props
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
 
-  // Verificar se é linha de férias ou período de férias
+  // Verificar se é período de férias
   const isVacationLine = linha.categoriaDia === "feriasRecessos";
   const isInVacationPeriod = shouldDisableRegularSchedules();
   const shouldDisableSchedules = !isVacationLine && isInVacationPeriod;
 
-  const { nextSchedule, previousSchedule, status } = useMemo(() => {
+  // Calcular horários
+  const { nextSchedule, previousSchedule, status, statusType } = useMemo(() => {
     if (shouldDisableSchedules) {
       return {
         nextSchedule: "Indisponível",
         previousSchedule: "Indisponível",
         status: "Não Circulando",
+        statusType: "notRunning" as LineStatusType,
       };
     }
     return calculateSchedules(linha.horarios);
   }, [linha.horarios, shouldDisableSchedules]);
 
-  // Definir cor do badge baseado no status
-  const getBadgeColor = () => {
-    // "Não Circulando" -> Warning (Vermelho/Alerta)
-    if (status === "Não Circulando")
-      return "bg-red-900/30 text-red-300 border-red-600";
-    // "Próximo" -> Success (Urgência positiva)
-    if (status.includes("Próximo"))
-      return "bg-success-bg text-success-text border-success-border";
-    // "Circulando" -> Info (Informativo)
-    if (status === "Circulando")
-      return "bg-info-bg text-info-text border-info-border";
-    // Default/Encerrado -> Neutral
-    return "bg-neutral-bg text-neutral-text border-neutral-border";
-  };
-
   const handleDetailsClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Impede que o clique propague para o card
+    e.stopPropagation();
     trackEvent({
       category: "Engajamento",
       action: "Abrir Card Detalhes",
@@ -132,89 +256,57 @@ export function LineCard({
   };
 
   return (
-    <div
+    <article
+      data-slot="card"
+      data-state={isSelected ? "selected" : undefined}
       onClick={onClick}
-      className={`bg-card rounded-xl shadow-sm hover:shadow-md transition-all mb-3 overflow-hidden border cursor-pointer ${
-        isSelected
-          ? "border-2 border-brand-primary shadow-lg ring-1 ring-brand-primary/20"
-          : "border-card-border hover:border-info-border"
-      }`}
+      className={cn(lineCardVariants({ selected: isSelected }), "mb-3", className)}
+      {...props}
     >
-      {/* Header com Badge */}
-      <div className="p-4 pb-3 relative">
+      {/* Header */}
+      <div data-slot="header" className="relative p-4 pb-3">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-start gap-3 flex-1">
-            <div
-              className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm"
-              style={{ backgroundColor: linha.corHex }}
-            >
-              <IoBusOutline size={24} className="text-white drop-shadow-sm" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm md:text-base font-bold text-text-primary leading-tight">
+          <div className="flex flex-1 items-start gap-3">
+            <LineIcon color={linha.corHex} />
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-bold leading-tight text-text-primary md:text-base">
                 {linha.nome}
               </h3>
               {linha.sublinha && (
-                <p className="text-xs md:text-sm text-text-secondary mt-0.5">
+                <p className="mt-0.5 text-xs text-text-secondary md:text-sm">
                   {linha.sublinha}
                 </p>
               )}
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span
-              className={`text-[10px] md:text-xs px-2.5 py-1 rounded-full border font-medium whitespace-nowrap ${getBadgeColor()}`}
-            >
-              {status}
-            </span>
-            <IoChevronForward
-              size={20}
-              className="text-text-secondary flex-shrink-0"
-            />
+            <LineStatusBadge status={statusType} label={status} size="xs" />
+            <ChevronRight className="size-5 shrink-0 text-text-secondary" />
           </div>
         </div>
       </div>
 
-      {/* Corpo - Horários ou Aviso de Suspensão */}
-      <div className="px-4 pb-4">
+      {/* Body */}
+      <div data-slot="body" className="px-4 pb-4">
         {shouldDisableSchedules ? (
-          <div className="mb-4 p-3 rounded-lg bg-red-900/20 border border-red-600/50 text-center">
-            <p className="text-xs md:text-sm text-red-300 font-semibold">
-              Linha suspensa durante férias
-            </p>
-          </div>
+          <SuspendedNotice />
         ) : (
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="text-center p-2 rounded-lg bg-background-secondary/50">
-              <p className="text-[10px] md:text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
-                <IoTimeOutline size={14} />
-                Último Partiu
-              </p>
-              <p className="text-base md:text-lg font-bold text-text-primary">
-                {previousSchedule}
-              </p>
-            </div>
-            <div className="text-center p-2 rounded-lg bg-background-secondary/50">
-              <p className="text-[10px] md:text-xs text-text-secondary mb-1 flex items-center justify-center gap-1">
-                <IoTimeOutline size={14} />
-                Próximo
-              </p>
-              <p className="text-base md:text-lg font-bold text-success-text">
-                {nextSchedule}
-              </p>
-            </div>
+          <div className="mb-4 grid grid-cols-2 gap-3">
+            <ScheduleDisplay label="Último Partiu" time={previousSchedule} />
+            <ScheduleDisplay label="Próximo" time={nextSchedule} highlight />
           </div>
         )}
 
-        {/* Botão Ver Detalhes */}
+        {/* Button */}
         <button
+          data-slot="action"
           onClick={handleDetailsClick}
-          className="w-full py-2.5 rounded-lg text-white font-semibold text-xs md:text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-sm"
+          className={detailsButtonVariants()}
           style={{ backgroundColor: linha.corHex }}
         >
           Ver Detalhes
         </button>
       </div>
-    </div>
+    </article>
   );
 }
