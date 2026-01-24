@@ -3,10 +3,9 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useState, type ComponentProps } from "react";
+import { useState } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
-import { Search, Menu, ArrowLeft } from "lucide-react";
-import { cn } from "../lib/utils";
+import { Menu, ArrowLeft } from "lucide-react";
 import { useLinhasFilter } from "../hooks/useLinhasFilter";
 import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
 import { ThemeToggle } from "./ThemeToggle";
@@ -17,6 +16,8 @@ import { MenuFooter } from "./MenuFooter";
 import { LineCard } from "./LineCard";
 import { SearchEmptyState } from "./ui/EmptyState";
 import { Tabs, TabsList, TabsTrigger } from "./ui/Tabs";
+import { SearchInput } from "./ui/Input";
+import { Button } from "./ui/Button";
 import type { Linha, CategoriaLinhas, Parada } from "../types/data.types";
 import logo from "../assets/logo-horizontal-transparente.svg";
 
@@ -65,31 +66,6 @@ export const categoryTabVariants = tv({
   ],
 });
 
-/**
- * Variantes do input de busca
- */
-export const searchInputVariants = tv({
-  base: [
-    "w-full rounded-lg border bg-input pl-10 pr-4 py-2.5 lg:py-3",
-    "border-input-border text-text-primary",
-    "placeholder:text-text-tertiary",
-    "transition-all duration-200",
-    "focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary",
-  ],
-});
-
-/**
- * Variantes do botão mobile
- */
-export const mobileButtonVariants = tv({
-  base: [
-    "flex items-center gap-3 rounded-full px-6 py-3",
-    "bg-brand-primary text-white font-bold shadow-lg",
-    "cursor-pointer transition-colors",
-    "hover:bg-blue-700 active:scale-95",
-  ],
-});
-
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -106,36 +82,17 @@ export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
 // SUBCOMPONENTS
 // ============================================================================
 
-interface SearchInputProps extends ComponentProps<"input"> {
-  value: string;
-  onValueChange: (value: string) => void;
-}
-
-function SearchInput({ value, onValueChange, className, ...props }: SearchInputProps) {
-  return (
-    <div data-slot="search" className="relative">
-      <Search
-        className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-text-secondary"
-      />
-      <input
-        type="text"
-        placeholder="Pesquisar linha..."
-        value={value}
-        onChange={(e) => onValueChange(e.target.value)}
-        className={cn(searchInputVariants(), className)}
-        {...props}
-      />
-    </div>
-  );
-}
-
 interface CategoryTabsProps {
   categories: CategoriaLinhas["categoriasDias"];
   activeIndex: number;
   onSelect: (index: number) => void;
 }
 
-function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) {
+function CategoryTabs({
+  categories,
+  activeIndex,
+  onSelect,
+}: CategoryTabsProps) {
   // Converte id numérico para string para o Tabs component
   const activeValue = String(categories[activeIndex]?.id ?? "");
 
@@ -194,7 +151,9 @@ export function MenuLateral({
   linhaSelecionada,
 }: MenuLateralProps) {
   const [isMenuVisible, setMenuVisible] = useState(false);
-  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
+  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
+    null,
+  );
 
   const {
     searchTerm,
@@ -227,14 +186,16 @@ export function MenuLateral({
     <>
       {/* Mobile Trigger Button */}
       <div className="fixed bottom-6 left-1/2 z-1001 -translate-x-1/2 md:hidden">
-        <button
+        <Button
           data-slot="mobile-trigger"
           onClick={() => setMenuVisible(true)}
-          className={mobileButtonVariants()}
+          variant="primary"
+          size="lg"
+          className="gap-3 rounded-full px-6 shadow-lg"
         >
           <Menu size={24} />
           Ver Linhas
-        </button>
+        </Button>
       </div>
 
       {/* Backdrop */}
@@ -263,13 +224,15 @@ export function MenuLateral({
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <button
+            <Button
               data-slot="close"
               onClick={() => setMenuVisible(false)}
-              className="cursor-pointer rounded-lg p-2 text-white transition-colors hover:bg-white/20 md:hidden"
+              variant="ghost"
+              size="sm"
+              className="rounded-lg p-2 text-white hover:bg-white/20 md:hidden"
             >
               <ArrowLeft size={24} />
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -278,6 +241,7 @@ export function MenuLateral({
           <SearchInput
             value={searchTerm}
             onValueChange={setSearchTerm}
+            placeholder="Pesquisar linha..."
           />
         </div>
 
