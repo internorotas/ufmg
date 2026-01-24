@@ -7,7 +7,12 @@
 
 import linhasData from "../data/linhas";
 import paradasData from "../data/paradas";
-import type { Linha, Parada, CategoriaLinhas, DadosLinhas } from "../types/data.types";
+import type {
+  Linha,
+  Parada,
+  CategoriaLinhas,
+  DadosLinhas,
+} from "../types/data.types";
 
 /**
  * Interface que define o contrato do serviço de rotas.

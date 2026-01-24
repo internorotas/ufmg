@@ -18,9 +18,7 @@ import { cn } from "../../lib/utils";
  * Variantes do skeleton base
  */
 export const skeletonVariants = tv({
-  base: [
-    "animate-pulse rounded bg-card-border",
-  ],
+  base: ["animate-pulse rounded bg-card-border"],
   variants: {
     variant: {
       default: "bg-card-border",
@@ -47,8 +45,7 @@ export const skeletonVariants = tv({
 // ============================================================================
 
 export interface SkeletonProps
-  extends ComponentProps<"div">,
-    VariantProps<typeof skeletonVariants> {
+  extends ComponentProps<"div">, VariantProps<typeof skeletonVariants> {
   /** Largura do skeleton */
   width?: string | number;
   /** Altura do skeleton */
@@ -167,7 +164,7 @@ export function SkeletonLineCard({ className }: { className?: string }) {
       data-slot="skeleton-line-card"
       className={cn(
         "rounded-xl border border-card-border bg-card p-4",
-        className
+        className,
       )}
     >
       {/* Header */}
@@ -227,7 +224,7 @@ export function SkeletonMap({ className }: { className?: string }) {
       className={cn(
         "relative flex h-full w-full items-center justify-center",
         "bg-card-hover",
-        className
+        className,
       )}
     >
       <div className="flex flex-col items-center gap-4">

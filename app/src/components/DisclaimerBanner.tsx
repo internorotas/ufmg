@@ -40,7 +40,8 @@ export const contactButtonVariants = tv({
 // ============================================================================
 
 export interface DisclaimerBannerProps
-  extends ComponentProps<"div">,
+  extends
+    ComponentProps<"div">,
     VariantProps<typeof disclaimerBannerVariants> {}
 
 // ============================================================================
@@ -55,7 +56,10 @@ export interface DisclaimerBannerProps
  * <DisclaimerBanner />
  * ```
  */
-export function DisclaimerBanner({ className, ...props }: DisclaimerBannerProps) {
+export function DisclaimerBanner({
+  className,
+  ...props
+}: DisclaimerBannerProps) {
   return (
     <div
       data-slot="banner"
@@ -85,10 +89,7 @@ export function DisclaimerBanner({ className, ...props }: DisclaimerBannerProps)
           </p>
 
           <div className="mt-2 flex flex-col gap-2 border-t border-warning-border pt-2 lg:grid lg:grid-cols-2">
-            <a
-              href="tel:3409-4601"
-              className={contactButtonVariants()}
-            >
+            <a href="tel:3409-4601" className={contactButtonVariants()}>
               <Phone className="size-4 shrink-0" />
               <span>3409-4601 / 4606</span>
             </a>

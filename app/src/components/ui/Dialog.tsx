@@ -132,24 +132,19 @@ export interface DialogPortalProps {
 }
 
 export interface DialogBackdropProps
-  extends ComponentProps<"div">,
-    VariantProps<typeof dialogBackdropVariants> {}
+  extends ComponentProps<"div">, VariantProps<typeof dialogBackdropVariants> {}
 
 export interface DialogPopupProps
-  extends ComponentProps<"div">,
-    VariantProps<typeof dialogPopupVariants> {}
+  extends ComponentProps<"div">, VariantProps<typeof dialogPopupVariants> {}
 
 export interface DialogTitleProps
-  extends ComponentProps<"h2">,
-    VariantProps<typeof dialogTitleVariants> {}
+  extends ComponentProps<"h2">, VariantProps<typeof dialogTitleVariants> {}
 
 export interface DialogDescriptionProps
-  extends ComponentProps<"p">,
-    VariantProps<typeof dialogDescriptionVariants> {}
+  extends ComponentProps<"p">, VariantProps<typeof dialogDescriptionVariants> {}
 
 export interface DialogCloseProps
-  extends ComponentProps<"button">,
-    VariantProps<typeof dialogCloseVariants> {
+  extends ComponentProps<"button">, VariantProps<typeof dialogCloseVariants> {
   /** Label para acessibilidade */
   "aria-label"?: string;
 }
@@ -207,7 +202,9 @@ function DialogRoot({ open, onOpenChange, children }: DialogRootProps) {
   if (!open) return null;
 
   return (
-    <DialogContext.Provider value={{ open, onOpenChange, titleId, descriptionId }}>
+    <DialogContext.Provider
+      value={{ open, onOpenChange, titleId, descriptionId }}
+    >
       {children}
     </DialogContext.Provider>
   );
@@ -248,7 +245,12 @@ function DialogBackdrop({ className, onClick, ...props }: DialogBackdropProps) {
 /**
  * Popup - Container do conteúdo do dialog
  */
-function DialogPopup({ size, className, children, ...props }: DialogPopupProps) {
+function DialogPopup({
+  size,
+  className,
+  children,
+  ...props
+}: DialogPopupProps) {
   const { open, titleId, descriptionId } = useDialogContext();
 
   return (
@@ -263,7 +265,11 @@ function DialogPopup({ size, className, children, ...props }: DialogPopupProps) 
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className={cn("pointer-events-auto", dialogPopupVariants({ size }), className)}
+        className={cn(
+          "pointer-events-auto",
+          dialogPopupVariants({ size }),
+          className,
+        )}
         {...props}
       >
         {children}
@@ -293,7 +299,11 @@ function DialogTitle({ className, children, ...props }: DialogTitleProps) {
 /**
  * Description - Descrição do dialog
  */
-function DialogDescription({ className, children, ...props }: DialogDescriptionProps) {
+function DialogDescription({
+  className,
+  children,
+  ...props
+}: DialogDescriptionProps) {
   const { descriptionId } = useDialogContext();
 
   return (

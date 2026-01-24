@@ -26,21 +26,11 @@ export const badgeVariants = tv({
   variants: {
     variant: {
       // Status badges
-      success: [
-        "bg-success-bg text-success-text border-success-border",
-      ],
-      info: [
-        "bg-info-bg text-info-text border-info-border",
-      ],
-      warning: [
-        "bg-warning-bg text-warning-text border-warning-border",
-      ],
-      danger: [
-        "bg-red-900/30 text-red-300 border-red-600",
-      ],
-      neutral: [
-        "bg-neutral-bg text-neutral-text border-neutral-border",
-      ],
+      success: ["bg-success-bg text-success-text border-success-border"],
+      info: ["bg-info-bg text-info-text border-info-border"],
+      warning: ["bg-warning-bg text-warning-text border-warning-border"],
+      danger: ["bg-red-900/30 text-red-300 border-red-600"],
+      neutral: ["bg-neutral-bg text-neutral-text border-neutral-border"],
 
       // Brand badges
       primary: [
@@ -53,12 +43,8 @@ export const badgeVariants = tv({
       ],
 
       // Minimal badges
-      outline: [
-        "bg-transparent text-text-secondary border-card-border",
-      ],
-      ghost: [
-        "bg-card-hover text-text-secondary border-transparent",
-      ],
+      outline: ["bg-transparent text-text-secondary border-card-border"],
+      ghost: ["bg-card-hover text-text-secondary border-transparent"],
     },
     size: {
       xs: "h-5 px-1.5 text-[10px]",
@@ -83,8 +69,7 @@ export const badgeVariants = tv({
 // ============================================================================
 
 export interface BadgeProps
-  extends ComponentProps<"span">,
-    VariantProps<typeof badgeVariants> {
+  extends ComponentProps<"span">, VariantProps<typeof badgeVariants> {
   /** Ícone à esquerda */
   leftIcon?: ReactNode;
   /** Ícone à direita */
@@ -216,7 +201,10 @@ const dayCategoryConfig: Record<
   feriasRecessos: { variant: "warning", label: "Férias" },
 };
 
-export function DayCategoryBadge({ category, size = "sm" }: DayCategoryBadgeProps) {
+export function DayCategoryBadge({
+  category,
+  size = "sm",
+}: DayCategoryBadgeProps) {
   const config = dayCategoryConfig[category];
 
   return (

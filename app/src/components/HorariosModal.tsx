@@ -93,15 +93,16 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   // Verificar se devemos desabilitar os horários
   const isVacationLine = linha.categoriaDia === "feriasRecessos";
   const isInVacationPeriod = shouldDisableRegularSchedules();
-  
+
   // Verificar se é fim de semana (sábado=6, domingo=0)
   const today = now.getDay();
   const isWeekend = today === 0 || today === 6;
-  
+
   // Lógica de desabilitar horários durante férias:
   // - Linhas de sábado e dias úteis: SEMPRE desabilitadas durante férias
   // - Linhas de férias/recessos: desabilitadas apenas em fins de semana
-  const shouldDisableSchedules = isInVacationPeriod && (!isVacationLine || isWeekend);
+  const shouldDisableSchedules =
+    isInVacationPeriod && (!isVacationLine || isWeekend);
 
   const horariosOrganizados = useMemo(() => {
     return linha.horarios
@@ -127,7 +128,10 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
       <div className="space-y-6">
         {/* Aviso de Horários Suspensos */}
         {shouldDisableSchedules && (
-          <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
+          <div
+            data-slot="suspension-alert"
+            className={suspensionAlertVariants()}
+          >
             <p className="mb-2 font-semibold text-yellow-300">
               <AlertTriangle className="mr-1 inline size-4" />
               Horários suspensos

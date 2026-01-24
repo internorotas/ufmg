@@ -29,8 +29,7 @@ export const vacationBannerVariants = tv({
 // ============================================================================
 
 export interface VacationBannerProps
-  extends ComponentProps<"div">,
-    VariantProps<typeof vacationBannerVariants> {}
+  extends ComponentProps<"div">, VariantProps<typeof vacationBannerVariants> {}
 
 // ============================================================================
 // COMPONENT

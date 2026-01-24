@@ -66,7 +66,7 @@ const MemoizedMarker = React.memo(
       prev.isDestacada === next.isDestacada &&
       prev.parada.idParada === next.parada.idParada
     );
-  }
+  },
 );
 
 MemoizedMarker.displayName = "MemoizedMarker";
@@ -85,7 +85,7 @@ export const MapMarkers = React.memo(function MapMarkers({
     (id: string, marker: L.Marker | null) => {
       onMarkerRef?.(id, marker);
     },
-    [onMarkerRef]
+    [onMarkerRef],
   );
 
   return (
@@ -108,7 +108,9 @@ export const MapMarkers = React.memo(function MapMarkers({
  */
 export function useMapMarkers() {
   const markersRef = useRef<{ [key: string]: L.Marker | null }>({});
-  const [paradaDestacadaId, setParadaDestacadaId] = useState<string | null>(null);
+  const [paradaDestacadaId, setParadaDestacadaId] = useState<string | null>(
+    null,
+  );
 
   const handleMarkerRef = useCallback((id: string, marker: L.Marker | null) => {
     if (marker) {

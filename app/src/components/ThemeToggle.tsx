@@ -49,7 +49,8 @@ export const themeToggleVariants = tv({
 // ============================================================================
 
 export interface ThemeToggleProps
-  extends Omit<ComponentProps<"button">, "children">,
+  extends
+    Omit<ComponentProps<"button">, "children">,
     VariantProps<typeof themeToggleVariants> {
   /** Tamanho do ícone em pixels */
   iconSize?: number;

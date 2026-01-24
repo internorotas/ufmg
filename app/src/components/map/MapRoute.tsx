@@ -34,7 +34,7 @@ export const MapRoute = React.memo(function MapRoute({ linha }: MapRouteProps) {
   // Coordenadas memoizadas
   const coordinates = useMemo(
     () => (linha?.coordenadasTrajeto as L.LatLngExpression[]) || [],
-    [linha?.coordenadasTrajeto]
+    [linha?.coordenadasTrajeto],
   );
 
   // Opções do AntPath com a cor da linha
@@ -44,7 +44,7 @@ export const MapRoute = React.memo(function MapRoute({ linha }: MapRouteProps) {
       color: linha?.corHex || "#3388ff",
       pulseColor: linha?.corHex || "#3388ff",
     }),
-    [linha?.corHex]
+    [linha?.corHex],
   );
 
   // Não renderiza se não há linha ou coordenadas
@@ -66,9 +66,7 @@ export function useRouteBounds(linha: Linha | null): L.LatLngBounds | null {
       linha.coordenadasTrajeto &&
       linha.coordenadasTrajeto.length > 0
     ) {
-      return L.latLngBounds(
-        linha.coordenadasTrajeto as L.LatLngExpression[]
-      );
+      return L.latLngBounds(linha.coordenadasTrajeto as L.LatLngExpression[]);
     }
     return null;
   }, [linha]);

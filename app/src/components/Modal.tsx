@@ -9,10 +9,7 @@
 import { type ReactNode, type ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { cn } from "../lib/utils";
-import {
-  Dialog,
-  dialogPopupVariants,
-} from "./ui/Dialog";
+import { Dialog, dialogPopupVariants } from "./ui/Dialog";
 
 // ============================================================================
 // VARIANTS
@@ -52,7 +49,8 @@ export const modalCloseButtonVariants = tv({
 // ============================================================================
 
 export interface ModalProps
-  extends Omit<ComponentProps<"div">, "title">,
+  extends
+    Omit<ComponentProps<"div">, "title">,
     VariantProps<typeof dialogPopupVariants> {
   /** Se o modal está aberto */
   isOpen: boolean;
@@ -96,11 +94,7 @@ export function Modal({
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Backdrop />
-        <Dialog.Popup
-          size={size}
-          className={cn(className)}
-          {...props}
-        >
+        <Dialog.Popup size={size} className={cn(className)} {...props}>
           {/* Header */}
           <div data-slot="header" className={modalHeaderVariants()}>
             {typeof title === "string" ? (
@@ -123,4 +117,3 @@ export function Modal({
     </Dialog.Root>
   );
 }
-

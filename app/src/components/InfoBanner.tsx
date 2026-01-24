@@ -16,10 +16,7 @@ import { cn } from "../lib/utils";
  * Variantes do banner
  */
 export const bannerVariants = tv({
-  base: [
-    "flex items-start gap-2 rounded-lg border p-3",
-    "mb-3",
-  ],
+  base: ["flex items-start gap-2 rounded-lg border p-3", "mb-3"],
   variants: {
     intent: {
       info: "border-info-border bg-info-bg text-info-text",
@@ -38,8 +35,7 @@ export const bannerVariants = tv({
 // ============================================================================
 
 export interface InfoBannerProps
-  extends ComponentProps<"div">,
-    VariantProps<typeof bannerVariants> {}
+  extends ComponentProps<"div">, VariantProps<typeof bannerVariants> {}
 
 // ============================================================================
 // COMPONENT

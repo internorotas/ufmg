@@ -149,7 +149,8 @@ export const cardFooterVariants = tv({
 // ============================================================================
 
 export interface CardProps
-  extends Omit<ComponentProps<"div">, "ref">,
+  extends
+    Omit<ComponentProps<"div">, "ref">,
     VariantProps<typeof cardVariants> {
   /** Conteúdo do card */
   children: ReactNode;
@@ -158,15 +159,13 @@ export interface CardProps
 }
 
 export interface CardHeaderProps
-  extends ComponentProps<"header">,
-    VariantProps<typeof cardHeaderVariants> {
+  extends ComponentProps<"header">, VariantProps<typeof cardHeaderVariants> {
   /** Conteúdo do header */
   children: ReactNode;
 }
 
 export interface CardTitleProps
-  extends ComponentProps<"h3">,
-    VariantProps<typeof cardTitleVariants> {
+  extends ComponentProps<"h3">, VariantProps<typeof cardTitleVariants> {
   /** Elemento HTML para o título */
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span";
   /** Conteúdo do título */
@@ -179,15 +178,13 @@ export interface CardDescriptionProps extends ComponentProps<"p"> {
 }
 
 export interface CardContentProps
-  extends ComponentProps<"div">,
-    VariantProps<typeof cardContentVariants> {
+  extends ComponentProps<"div">, VariantProps<typeof cardContentVariants> {
   /** Conteúdo principal */
   children: ReactNode;
 }
 
 export interface CardFooterProps
-  extends ComponentProps<"footer">,
-    VariantProps<typeof cardFooterVariants> {
+  extends ComponentProps<"footer">, VariantProps<typeof cardFooterVariants> {
   /** Conteúdo do footer */
   children: ReactNode;
 }
@@ -333,7 +330,7 @@ export function CardFooter({
       data-slot="card-footer"
       className={cn(
         cardFooterVariants({ padding, withBorder, justify }),
-        className
+        className,
       )}
       {...props}
     >

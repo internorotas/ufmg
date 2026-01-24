@@ -50,7 +50,8 @@ export const lineBadgeVariants = tv({
 // ============================================================================
 
 export interface PopupCustomizadoProps
-  extends Omit<ComponentProps<typeof Popup>, "children">,
+  extends
+    Omit<ComponentProps<typeof Popup>, "children">,
     VariantProps<typeof popupContainerVariants> {
   parada: Parada;
 }
@@ -73,7 +74,11 @@ export function PopupCustomizado({
   ...props
 }: PopupCustomizadoProps) {
   return (
-    <Popup className={cn("popup-customizado", className)} minWidth={220} {...props}>
+    <Popup
+      className={cn("popup-customizado", className)}
+      minWidth={220}
+      {...props}
+    >
       <div data-slot="container" className={popupContainerVariants()}>
         {/* Cabeçalho */}
         <div data-slot="header" className={popupHeaderVariants()}>
@@ -93,12 +98,12 @@ export function PopupCustomizado({
 
         {/* Linhas Atendidas */}
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
-          <div data-slot="lines-section" className={popupLinesSectionVariants()}>
+          <div
+            data-slot="lines-section"
+            className={popupLinesSectionVariants()}
+          >
             <div className="mb-2 flex items-center gap-2">
-              <Bus
-                className="text-internoRotas-azul-eletrico"
-                size={16}
-              />
+              <Bus className="text-internoRotas-azul-eletrico" size={16} />
               <p className="text-xs font-semibold text-text-primary">
                 {parada.linhasAtendidas.length} linha
                 {parada.linhasAtendidas.length !== 1 ? "s" : ""} atende
@@ -117,7 +122,10 @@ export function PopupCustomizado({
 
         {/* Descrição */}
         {parada.descricao && parada.descricao !== parada.nome && (
-          <div data-slot="description" className="mt-3 border-t border-card-border pt-3">
+          <div
+            data-slot="description"
+            className="mt-3 border-t border-card-border pt-3"
+          >
             <p className="text-xs italic text-text-secondary">
               {parada.descricao}
             </p>

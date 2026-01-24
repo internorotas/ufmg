@@ -53,12 +53,18 @@ const MAP_CONFIG = {
  *
  * React 19: ref é recebida diretamente como prop, sem necessidade de forwardRef.
  */
-export function Mapa({ todasParadas, linhaSelecionada, paradaSelecionada, ref }: MapaProps) {
+export function Mapa({
+  todasParadas,
+  linhaSelecionada,
+  paradaSelecionada,
+  ref,
+}: MapaProps) {
   const { trackTiming } = useAnalytics();
   const mapLoadStartRef = useRef<number>(0);
 
   // Hook para gerenciar marcadores
-  const { paradaDestacadaId, handleMarkerRef, destacarParada } = useMapMarkers();
+  const { paradaDestacadaId, handleMarkerRef, destacarParada } =
+    useMapMarkers();
 
   // Hook para calcular bounds da rota
   const bounds = useRouteBounds(linhaSelecionada);
@@ -93,7 +99,10 @@ export function Mapa({ todasParadas, linhaSelecionada, paradaSelecionada, ref }:
       }}
     >
       {/* Camada de tiles */}
-      <TileLayer url={MAP_CONFIG.tileUrl} attribution={MAP_CONFIG.attribution} />
+      <TileLayer
+        url={MAP_CONFIG.tileUrl}
+        attribution={MAP_CONFIG.attribution}
+      />
 
       {/* Controles de visualização */}
       <ChangeView bounds={bounds} />

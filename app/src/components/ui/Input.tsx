@@ -73,7 +73,8 @@ export const inputContainerVariants = tv({
 // ============================================================================
 
 export interface InputProps
-  extends Omit<ComponentProps<"input">, "size">,
+  extends
+    Omit<ComponentProps<"input">, "size">,
     Omit<VariantProps<typeof inputVariants>, "hasLeftIcon" | "hasRightIcon"> {
   /** Ícone à esquerda */
   leftIcon?: ReactNode;
@@ -144,7 +145,7 @@ export function Input({
             hasRightIcon: !!rightIcon,
             error,
           }),
-          className
+          className,
         )}
         {...props}
       />
@@ -159,10 +160,7 @@ export function Input({
       )}
 
       {errorMessage && error && (
-        <p
-          data-slot="input-error"
-          className="mt-1 text-xs text-red-500"
-        >
+        <p data-slot="input-error" className="mt-1 text-xs text-red-500">
           {errorMessage}
         </p>
       )}
@@ -176,7 +174,10 @@ export function Input({
 
 import { Search, X } from "lucide-react";
 
-export interface SearchInputProps extends Omit<ComponentProps<"input">, "size"> {
+export interface SearchInputProps extends Omit<
+  ComponentProps<"input">,
+  "size"
+> {
   /** Valor do input */
   value?: string;
   /** Callback quando o valor muda */
@@ -232,8 +233,11 @@ export function SearchInput({
         value={value}
         onChange={handleChange}
         className={cn(
-          inputVariants({ hasLeftIcon: true, hasRightIcon: showClear && hasValue }),
-          "pr-10"
+          inputVariants({
+            hasLeftIcon: true,
+            hasRightIcon: showClear && hasValue,
+          }),
+          "pr-10",
         )}
         {...props}
       />

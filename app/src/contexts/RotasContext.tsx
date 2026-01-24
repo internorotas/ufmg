@@ -79,7 +79,9 @@ export function RotasProvider({
 }: RotasProviderProps) {
   // Estado de seleção
   const [linhaSelecionada, setLinhaSelecionada] = useState<Linha | null>(null);
-  const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(null);
+  const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(
+    null,
+  );
 
   // Referência do mapa para centralização
   const mapaRef = useRef<MapaRef | null>(null);
@@ -94,7 +96,7 @@ export function RotasProvider({
       setLinhaSelecionada(linha);
       onLinhaSelect?.(linha);
     },
-    [onLinhaSelect]
+    [onLinhaSelect],
   );
 
   // Ação: Selecionar uma parada (também centraliza no mapa)
@@ -104,7 +106,7 @@ export function RotasProvider({
       mapaRef.current?.centralizarParada(parada);
       onParadaSelect?.(parada);
     },
-    [onParadaSelect]
+    [onParadaSelect],
   );
 
   // Ação: Limpar seleção
@@ -143,7 +145,7 @@ export function RotasProvider({
       selecionarLinha,
       selecionarParada,
       limparSelecao,
-    ]
+    ],
   );
 
   return (

@@ -62,8 +62,7 @@ export const creditLinkVariants = tv({
 // ============================================================================
 
 export interface MenuFooterProps
-  extends ComponentProps<"div">,
-    VariantProps<typeof footerContainerVariants> {}
+  extends ComponentProps<"div">, VariantProps<typeof footerContainerVariants> {}
 
 // ============================================================================
 // COMPONENT
@@ -145,8 +144,12 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
         className={creditLinkVariants()}
       >
         Desenvolvido com{" "}
-        <Heart size={14} fill="currentColor" className="text-internoRotas-azul-eletrico" /> por
-        Igor Martins
+        <Heart
+          size={14}
+          fill="currentColor"
+          className="text-internoRotas-azul-eletrico"
+        />{" "}
+        por Igor Martins
       </a>
     </div>
   );

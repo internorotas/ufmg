@@ -83,8 +83,7 @@ export const buttonVariants = tv({
 // ============================================================================
 
 export interface ButtonProps
-  extends ComponentProps<"button">,
-    VariantProps<typeof buttonVariants> {
+  extends ComponentProps<"button">, VariantProps<typeof buttonVariants> {
   /** Ícone à esquerda do texto */
   leftIcon?: ReactNode;
   /** Ícone à direita do texto */
