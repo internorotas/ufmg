@@ -29,7 +29,7 @@ export const lineCardContainerVariants = tv({
 export const lineHeaderVariants = tv({
   base: [
     "flex w-full items-center justify-between rounded-t-lg p-3 shadow-md",
-    "font-bold text-white transition-colors",
+    "font-bold text-white transition-colors cursor-pointer",
   ],
 });
 
@@ -39,7 +39,7 @@ export const lineHeaderVariants = tv({
 export const actionButtonVariants = tv({
   base: [
     "flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5",
-    "text-sm font-medium text-white transition-colors",
+    "text-sm font-medium text-white transition-colors cursor-pointer",
   ],
   variants: {
     intent: {

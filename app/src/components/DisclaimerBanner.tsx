@@ -29,7 +29,7 @@ export const disclaimerBannerVariants = tv({
 export const contactButtonVariants = tv({
   base: [
     "flex items-center justify-center gap-2 rounded-lg border px-3 py-2",
-    "text-xs font-semibold transition-opacity",
+    "text-xs font-semibold transition-opacity cursor-pointer",
     "border-warning-border bg-warning-bg text-warning-text",
     "hover:opacity-80",
   ],

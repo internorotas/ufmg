@@ -19,7 +19,7 @@ import { useAnalytics } from "../hooks/useAnalytics";
  */
 export const themeToggleVariants = tv({
   base: [
-    "inline-flex items-center justify-center rounded-lg p-1",
+    "inline-flex items-center justify-center rounded-lg p-1 cursor-pointer",
     "transition-colors duration-200",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
   ],

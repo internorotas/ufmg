@@ -241,7 +241,7 @@ export function MenuLateral({
         <div
           data-slot="backdrop"
           onClick={() => setMenuVisible(false)}
-          className="fixed inset-0 z-1002 animate-fade-in bg-backdrop backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-1002 animate-fade-in bg-backdrop backdrop-blur-sm cursor-pointer md:hidden"
         />
       )}
 

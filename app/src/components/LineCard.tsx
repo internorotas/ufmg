@@ -45,7 +45,7 @@ export const lineCardVariants = tv({
  */
 export const detailsButtonVariants = tv({
   base: [
-    "w-full py-2.5 rounded-lg text-white font-semibold",
+    "w-full py-2.5 rounded-lg text-white font-semibold cursor-pointer",
     "text-xs md:text-sm shadow-sm",
     "hover:opacity-90 active:scale-[0.98] transition-all",
   ],

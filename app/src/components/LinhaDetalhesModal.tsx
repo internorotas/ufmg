@@ -36,7 +36,7 @@ export const titleIconVariants = tv({
  */
 export const tabVariants = tv({
   base: [
-    "flex items-center gap-2 px-4 py-3 font-semibold transition-all",
+    "flex items-center gap-2 px-4 py-3 font-semibold transition-all cursor-pointer",
   ],
   variants: {
     active: {
@@ -53,7 +53,7 @@ export const tabVariants = tv({
  * Variantes do botão de parada
  */
 export const stopButtonVariants = tv({
-  base: "group flex w-full items-start gap-3 py-2 text-left",
+  base: "group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2",
 });
 
 /**
@@ -70,11 +70,11 @@ export const stopIconContainerVariants = tv({
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-colors",
+  base: "rounded-lg border p-3 text-center transition-colors cursor-pointer",
   variants: {
     status: {
-      upcoming: "border-2 hover:bg-opacity-10",
-      passed: "border border-card-border bg-card opacity-50",
+      upcoming: "border-2 hover:scale-105 hover:shadow-md active:scale-95",
+      passed: "border border-card-border bg-card opacity-50 cursor-default",
     },
   },
   defaultVariants: {

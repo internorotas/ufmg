@@ -19,14 +19,14 @@ import { shouldDisableRegularSchedules } from "../config/specialPeriods";
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-colors",
+  base: "rounded-lg border p-3 text-center transition-all",
   variants: {
     status: {
       upcoming: [
-        "border-green-600 bg-green-900/30",
-        "hover:bg-green-900/50",
+        "border-green-600 bg-green-900/30 cursor-pointer",
+        "hover:bg-green-900/50 hover:scale-105 hover:shadow-md active:scale-95",
       ],
-      passed: "border-gray-700 bg-gray-800/50 opacity-50",
+      passed: "border-gray-700 bg-gray-800/50 opacity-50 cursor-default",
     },
   },
   defaultVariants: {
