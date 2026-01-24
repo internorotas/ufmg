@@ -243,7 +243,7 @@ export function SearchInput({
           data-slot="clear-button"
           type="button"
           onClick={handleClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary"
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary"
           aria-label="Limpar busca"
         >
           <X size={16} />

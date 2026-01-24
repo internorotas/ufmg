@@ -51,7 +51,7 @@ function useDialogContext() {
  */
 export const dialogBackdropVariants = tv({
   base: [
-    "fixed inset-0 bg-black/70",
+    "fixed inset-0 bg-black/70 backdrop-blur-sm",
     "data-[state=open]:animate-fade-in",
     "data-[state=closed]:animate-fade-out",
   ],
@@ -105,7 +105,7 @@ export const dialogDescriptionVariants = tv({
 export const dialogCloseVariants = tv({
   base: [
     "inline-flex items-center justify-center rounded-lg p-2",
-    "text-text-secondary transition-colors",
+    "text-text-secondary transition-colors cursor-pointer",
     "hover:bg-card hover:text-text-primary",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
   ],

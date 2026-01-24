@@ -29,7 +29,7 @@ export const footerContainerVariants = tv({
 export const footerButtonVariants = tv({
   base: [
     "flex w-full items-center justify-center rounded-md px-2 py-1.5",
-    "text-[10px] font-semibold transition-colors",
+    "text-[10px] font-semibold transition-colors cursor-pointer",
   ],
   variants: {
     intent: {
@@ -51,7 +51,7 @@ export const footerButtonVariants = tv({
  */
 export const creditLinkVariants = tv({
   base: [
-    "flex w-full items-center justify-center gap-1.5 py-2",
+    "flex w-full items-center justify-center gap-1.5 py-2 cursor-pointer",
     "text-xs font-bold text-text-secondary transition-colors",
     "hover:text-text-primary",
   ],

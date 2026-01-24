@@ -31,7 +31,7 @@ export const headerMobileVariants = tv({
  */
 export const menuButtonVariants = tv({
   base: [
-    "rounded-full p-2 text-white transition-colors",
+    "rounded-full p-2 text-white transition-colors cursor-pointer",
     "focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white",
   ],
 });
