@@ -23,8 +23,8 @@ import type { Linha } from "../types/data.types";
 export const lineCardVariants = tv({
   base: [
     "relative overflow-hidden rounded-xl border bg-card shadow-sm",
-    "cursor-pointer transition-all duration-200",
-    "hover:shadow-md",
+    "cursor-pointer transition-all duration-200 ease-out",
+    "hover:shadow-lg hover:-translate-y-0.5",
   ],
   variants: {
     selected: {
@@ -47,7 +47,7 @@ export const detailsButtonVariants = tv({
   base: [
     "w-full py-2.5 rounded-lg text-white font-semibold cursor-pointer",
     "text-xs md:text-sm shadow-sm",
-    "hover:opacity-90 active:scale-[0.98] transition-all",
+    "hover:brightness-110 active:scale-[0.97] transition-all duration-150",
   ],
 });
 
@@ -230,7 +230,15 @@ export function LineCard({
   // Verificar se é período de férias
   const isVacationLine = linha.categoriaDia === "feriasRecessos";
   const isInVacationPeriod = shouldDisableRegularSchedules();
-  const shouldDisableSchedules = !isVacationLine && isInVacationPeriod;
+  
+  // Verificar se é fim de semana (sábado=6, domingo=0)
+  const today = new Date().getDay();
+  const isWeekend = today === 0 || today === 6;
+  
+  // Lógica de desabilitar horários durante férias:
+  // - Linhas de sábado e dias úteis: SEMPRE desabilitadas durante férias
+  // - Linhas de férias/recessos: desabilitadas apenas em fins de semana
+  const shouldDisableSchedules = isInVacationPeriod && (!isVacationLine || isWeekend);
 
   // Calcular horários
   const { nextSchedule, previousSchedule, status, statusType } = useMemo(() => {

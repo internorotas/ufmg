@@ -20,8 +20,9 @@ import { useAnalytics } from "../hooks/useAnalytics";
 export const themeToggleVariants = tv({
   base: [
     "inline-flex items-center justify-center rounded-lg p-1 cursor-pointer",
-    "transition-colors duration-200",
+    "transition-all duration-150 ease-out",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+    "active:scale-90 hover:scale-105",
   ],
   variants: {
     variant: {
