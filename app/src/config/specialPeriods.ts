@@ -57,18 +57,6 @@ export function getCurrentSpecialPeriod(): SpecialPeriod | null {
     const end = new Date(period.endDate);
     end.setHours(23, 59, 59, 999);
 
-    // Debug (pode ser removido em produção)
-    if (typeof window !== "undefined" && import.meta.env.DEV) {
-      console.log("🔍 Verificação de Período de Férias:", {
-        periodo: period.name,
-        ativo: period.isActive,
-        hoje: now.toLocaleDateString("pt-BR"),
-        inicio: start.toLocaleDateString("pt-BR"),
-        fim: end.toLocaleDateString("pt-BR"),
-        dentroPeríodo: now >= start && now <= end,
-      });
-    }
-
     if (now >= start && now <= end) {
       return period;
     }
