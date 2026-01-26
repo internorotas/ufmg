@@ -193,8 +193,10 @@ export function MenuLateral({
           size="lg"
           className="gap-3 rounded-full px-6 shadow-lg"
         >
-          <Menu size={24} />
-          Ver Linhas
+          <span className="flex items-center gap-2">
+            <Menu size={24} />
+            Ver Linhas
+          </span>
         </Button>
       </div>
 
