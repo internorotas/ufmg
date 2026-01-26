@@ -1,0 +1,459 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/*
+  Design System - Interno Rotas
+  Based on Tailwind CSS v4
+*/
+
+@theme {
+  /* --- Cores Semânticas (Mapeadas para variáveis CSS) --- */
+
+  /* Fundos */
+  --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
+  --color-sidebar: var(--sidebar-background);
+  --color-modal: var(--modal-background);
+  --color-backdrop: var(--backdrop);
+
+  /* Elementos de Interface */
+  --color-card: var(--card-background);
+  --color-card-hover: var(--card-hover);
+  --color-card-border: var(--card-border);
+  --color-input: var(--input-background);
+  --color-input-border: var(--input-border);
+
+  /* Textos */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-inverse: var(--text-inverse);
+
+  /* Status: Sucesso (Verde) */
+  --color-success-bg: var(--success-bg);
+  --color-success-border: var(--success-border);
+  --color-success-text: var(--success-text);
+
+  /* Status: Informação/Circulando (Azul) */
+  --color-info-bg: var(--info-bg);
+  --color-info-border: var(--info-border);
+  --color-info-text: var(--info-text);
+
+  /* Status: Alerta/Próximo (Amarelo/Laranja) */
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-border: var(--warning-border);
+  --color-warning-text: var(--warning-text);
+
+  /* Status: Inativo/Neutro (Cinza) */
+  --color-neutral-bg: var(--neutral-bg);
+  --color-neutral-border: var(--neutral-border);
+  --color-neutral-text: var(--neutral-text);
+
+  /* Cores da Marca (Preservadas) */
+  /* --color-brand-primary: #f00631; */ /* Vermelho Natal  */
+  --color-brand-primary: #2c0eeb; /* Azul Elétrico */
+  --color-brand-secondary: #ecdcc4; /* Bege Areia */
+  --color-brand-accent: #ffa400; /* Laranja Âmbar */
+  --color-brand-dark: #1a1819; /* Preto Carvão */
+  --color-brand-gray: #3a3b3c; /* Cinza Grafite */
+
+  /* Aliases para compatibilidade ou uso específico */
+  --color-internoRotas-azul-eletrico: #2c0eeb;
+  --color-internoRotas-bege-areia: #ecdcc4;
+  --color-internoRotas-laranja-ambar: #ffa400;
+  --color-internoRotas-preto-carvao: #1a1819;
+  --color-internoRotas-cinza-grafite: #3a3b3c;
+
+  /* Fontes */
+  --font-poppins: Poppins, sans-serif;
+}
+
+/* Variáveis CSS - Definição dos Valores */
+:root {
+  /* --- Light Mode --- */
+
+  /* Backgrounds */
+  --background: #ffffff;
+  --background-secondary: #f3f4f6; /* Gray 100 */
+  --sidebar-background: #f9fafb; /* Gray 50 */
+  --modal-background: #ffffff;
+  --backdrop: rgba(0, 0, 0, 0.5);
+
+  /* Cards & Inputs */
+  --card-background: #ffffff;
+  --card-hover: #f9fafb;
+  --card-border: #e5e7eb; /* Gray 200 */
+  --input-background: #f9fafb;
+  --input-border: #e5e7eb;
+
+  /* Texto */
+  --text-primary: #111827; /* Gray 900 */
+  --text-secondary: #4b5563; /* Gray 600 - Melhor contraste que o antigo 6b7280 */
+  --text-tertiary: #9ca3af; /* Gray 400 */
+  --text-inverse: #ffffff;
+
+  /* Semantic: Success (Verde) - Ajustado para WCAG */
+  --success-bg: #dcfce7; /* Green 100 */
+  --success-border: #86efac; /* Green 300 */
+  --success-text: #166534; /* Green 800 */
+
+  /* Semantic: Info (Azul) - Ajustado para WCAG */
+  --info-bg: #dbeafe; /* Blue 100 */
+  --info-border: #93c5fd; /* Blue 300 */
+  --info-text: #1e40af; /* Blue 800 */
+
+  /* Semantic: Warning (Amarelo/Laranja) - Ajustado para WCAG */
+  --warning-bg: #fef9c3; /* Yellow 100 */
+  --warning-border: #fde047; /* Yellow 300 */
+  --warning-text: #854d0e; /* Yellow 800 */
+
+  /* Semantic: Neutral (Cinza) */
+  --neutral-bg: #f3f4f6; /* Gray 100 */
+  --neutral-border: #d1d5db; /* Gray 300 */
+  --neutral-text: #4b5563; /* Gray 600 */
+}
+
+.dark {
+  /* --- Dark Mode --- */
+
+  /* Backgrounds */
+  --background: #111827; /* Gray 900 */
+  --background-secondary: #1f2937; /* Gray 800 */
+  --sidebar-background: #0f172a; /* Slate 900 - Levemente diferente para profundidade */
+  --modal-background: #1f2937;
+  --backdrop: rgba(0, 0, 0, 0.7);
+
+  /* Cards & Inputs */
+  --card-background: #1f2937;
+  --card-hover: #374151; /* Gray 700 */
+  --card-border: #374151;
+  --input-background: #374151;
+  --input-border: #4b5563;
+
+  /* Texto */
+  --text-primary: #f9fafb; /* Gray 50 */
+  --text-secondary: #d1d5db; /* Gray 300 - Mais claro para contraste no dark */
+  --text-tertiary: #9ca3af; /* Gray 400 */
+  --text-inverse: #111827;
+
+  /* Semantic: Success (Verde) - Dark Mode */
+  --success-bg: #064e3b; /* Green 900 */
+  --success-border: #059669; /* Green 600 */
+  --success-text: #d1fae5; /* Green 100 */
+
+  /* Semantic: Info (Azul) - Dark Mode */
+  --info-bg: #1e3a8a; /* Blue 900 */
+  --info-border: #2563eb; /* Blue 600 */
+  --info-text: #dbeafe; /* Blue 100 */
+
+  /* Semantic: Warning (Amarelo) - Dark Mode */
+  --warning-bg: #422006; /* Yellow 950 */
+  --warning-border: #a16207; /* Yellow 700 */
+  --warning-text: #fef08a; /* Yellow 200 */
+
+  /* Semantic: Neutral (Cinza) - Dark Mode */
+  --neutral-bg: #374151; /* Gray 700 */
+  --neutral-border: #4b5563; /* Gray 600 */
+  --neutral-text: #e5e7eb; /* Gray 200 */
+}
+
+/* Global Reset & Typography */
+* {
+  font-family: var(--font-poppins);
+  font-display: swap;
+  /* Melhora a renderização de fontes */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  font-family: var(--font-poppins);
+  background: var(--background);
+  color: var(--text-primary);
+  /* Transição suave para troca de tema */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Scrollbar Personalizada */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-tertiary) var(--background);
+}
+
+*::-webkit-scrollbar {
+  width: 0.5rem; /* Mais fino para mobile */
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--text-tertiary);
+  border-radius: 9999px;
+  border: 2px solid var(--background); /* Espaço ao redor */
+}
+
+/* Leaflet Popups - Dark Mode Support */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background-color: var(--card-background) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--card-border);
+}
+
+.leaflet-popup-content h4 {
+  color: var(--text-primary) !important;
+}
+
+.leaflet-popup-content p {
+  color: var(--text-secondary) !important;
+}
+
+/* Dialog/Modal Backdrop - Ensure it covers everything including Leaflet */
+[data-slot="dialog-backdrop"] {
+  isolation: isolate;
+}
+
+/* Leaflet z-index management - preserve popup functionality */
+.leaflet-pane {
+  z-index: 400;
+}
+
+.leaflet-control-container {
+  z-index: 800;
+}
+
+.leaflet-popup-pane {
+  z-index: 700 !important;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-down {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+/* Modal specific animations with scale */
+@keyframes modal-in {
+  from {
+    transform: translateY(16px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes modal-out {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(16px) scale(0.96);
+    opacity: 0;
+  }
+}
+
+/* Slide animations for sidebar/menu */
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Pop animation for interactive elements */
+@keyframes pop-in {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Pulse animation for attention */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
+}
+
+.animate-fade-out {
+  animation: fade-out 0.15s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.25s ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.2s ease-out forwards;
+}
+
+/* Animate In/Out utilities (similar to shadcn/ui) */
+.animate-in {
+  animation-name: enter;
+  animation-duration: 200ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.animate-out {
+  animation-name: exit;
+  animation-duration: 150ms;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+.fade-in-0 {
+  --tw-enter-opacity: 0;
+}
+
+.fade-out-0 {
+  --tw-exit-opacity: 0;
+}
+
+.duration-200 {
+  animation-duration: 200ms;
+}
+
+.duration-300 {
+  animation-duration: 300ms;
+}
+
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(
+        var(--tw-enter-translate-x, 0),
+        var(--tw-enter-translate-y, 0),
+        0
+      )
+      scale3d(
+        var(--tw-enter-scale, 1),
+        var(--tw-enter-scale, 1),
+        var(--tw-enter-scale, 1)
+      );
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(
+        var(--tw-exit-translate-x, 0),
+        var(--tw-exit-translate-y, 0),
+        0
+      )
+      scale3d(
+        var(--tw-exit-scale, 1),
+        var(--tw-exit-scale, 1),
+        var(--tw-exit-scale, 1)
+      );
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-modal-out {
+  animation: modal-out 0.15s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-out forwards;
+}
+
+.animate-slide-out-left {
+  animation: slide-out-left 0.25s ease-out forwards;
+}
+
+.animate-pop-in {
+  animation: pop-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Leaflet Ant Path Animation */
+@keyframes leaflet-ant-path-animation {
+  from {
+    stroke-dashoffset: 100%;
+  }
+  to {
+    stroke-dashoffset: 0%;
+  }
+}
+
+path.leaflet-ant-path {
+  fill: none;
+  animation: linear infinite leaflet-ant-path-animation;
+}

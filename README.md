@@ -1,130 +1,307 @@
-# Interno Rotas - UFMG 🚌
+<div align="center">
 
-<h1 align="center">
-  <img alt="Logo Interno Rotas" title="Interno Rotas" src="./github/Capa-mapa.png"/>
-</h1>
+# 🚌 Interno Rotas - UFMG
 
-<p align="center">
-  <img alt="GitHub repo status" src="https://img.shields.io/badge/status-In%20Development-brightgreen">
-  <a href="https://github.com/internorotas/internorotas/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/internorotas/internorotas" alt="Contributors">
-  </a>  
-  <a href="https://github.com/internorotas/internorotas/stargazers">
-    <img alt="GitHub stars" src="https://img.shields.io/github/stars/internorotas/internorotas">
-  </a>
-  <a href="https://github.com/internorotas/internorotas/network">
-    <img alt="GitHub forks" src="https://img.shields.io/github/forks/internorotas/internorotas">
-  </a>
-  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/internorotas/internorotas">
-  <a href="https://github.com/internorotas/     internorotas/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/internorotas/internorotas" >
-  </a>
-</p>
+![Logo Interno Rotas](.github/README/branding/capa-mapa.png)
 
-## Sumário
+### Navegue pelo Campus Pampulha com facilidade
 
-- <a href="#sobre-o-projeto">Sobre o Projeto</a>
-- <a href="#tecnologias">Tecnologias</a>
-- <a href="#acessar-o-projeto">Acessar o projeto</a>
-- <a href="#layout">Layout</a>
-- <a href="#requisitos">Requisitos</a>
-- <a href="#funcionalidades-extras">Funcionalidades Extras</a>
-- <a href="#licença">Licença</a>
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vite](https://img.shields.io/badge/Vite-7.3-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![License](https://img.shields.io/github/license/internorotas/ufmg?style=flat-square)](https://github.com/internorotas/ufmg/blob/main/LICENSE)
+[![Repo Size](https://img.shields.io/github/repo-size/internorotas/ufmg?style=flat-square)](https://github.com/internorotas/ufmg)
 
-## Sobre o Projeto
+**[🌐 Acessar Aplicação](https://internorotas.github.io/ufmg/)** ·
+**[🐛 Reportar Bug](https://forms.gle/5e9MHq9pp1p8T5Px5)** ·
+**[💡 Sugerir Feature](https://github.com/internorotas/ufmg/issues)**
 
-O Interno Rotas é um site que vem para facilitar a locomoção de pessoas dentro do Campus Pampulha da UFMG, sejam elas parte da comunidade acadêmica ou não. O projeto surgiu a partir de uma necessidade que eu mesmo tinha quando precisava usar os ônibus internos da UFMG. No site disponibilizado pela universidade consta as rotas, horários e locais que os ônibus passam, porém a informação muitas vezes não é intuitiva. Para pessoas pouco familiarizadas com o ambiente da UFMG fica muito difícil se orientar pelo site, já que são mostradas apenas as siglas de onde o interno passa próximo.
+</div>
 
-Por conta disso, achei que seria interessante criar um site que pudesse ser útil tanto para os colegas da comunidade acadêmica como também para o público externo que precise, em algum momento, usar os ônibus internos.
+---
 
-Caso tenha gostado do projeto e encontrado pontos de melhorias, fique a vontade para ajudar!
+## 📖 Sobre o Projeto
 
-## Tecnologias
+O **Interno Rotas** é uma aplicação web moderna e interativa para consulta de horários e rotas dos ônibus internos do Campus Pampulha da UFMG. Desenvolvido com foco em **experiência do usuário**, **acessibilidade** e **performance**, o projeto transforma informações fragmentadas em uma interface intuitiva e visualmente clara.
 
-Para tornar real o projeto foram utilizadas as seguintes tecnologias:
+### 🎯 O Problema
 
-- HTML
-- CSS
-- JavaScript
-- OpenStreetMap (API de mapas)
-- Leaflet (biblioteca javascript de mapeamento)
-- Leaflet Ant Path (animação da polyline)
+O site oficial da UFMG disponibiliza informações sobre o transporte interno, porém:
 
-## Acessar o projeto
+- 📍 Utiliza apenas **siglas de localização**, dificultando a orientação de novos usuários
+- 🖥️ Interface **pouco intuitiva** e não responsiva
+- 🗺️ **Ausência de visualização geográfica** das rotas
+- ⏰ Difícil identificar **qual linha pegar** para chegar a um destino específico
 
-O projeto pode ser acessado através [deste site](https://internorotas.github.io/ufmg/), hospedado no GitHub Pages.
+### 💡 A Solução
 
-## Layout
+|        Funcionalidade        | Descrição                                                 |
+| :--------------------------: | :-------------------------------------------------------- |
+|    🗺️ **Mapa Interativo**     | Visualização geográfica completa do campus com zoom e pan |
+|     🎨 **Rotas Animadas**     | Cada linha com cor única e animação de trajeto            |
+| ⏱️ **Horários em Tempo Real** | Próximo ônibus e último que passou                        |
+|    📱 **100% Responsivo**     | Otimizado para mobile, tablet e desktop                   |
+|      🌙 **Tema Escuro**       | Suporte a dark mode nativo                                |
+|   🔍 **Busca Inteligente**    | Encontre linhas rapidamente                               |
 
-Seção com o layout do projeto. O layout serve para auxiliar no desenvolvimento do código, servindo como guia e economizando tempo. O layout serve apenas para se ter uma ideia e referência, não sendo necessário que seja perfeito. O design do projeto pode ser visto com mais detalhes aqui no [Figma](https://www.figma.com/file/eTM6soQcsMP2vZr4d2zGus/Interno-Rotas?node-id=0%3A1&t=np3vESaYKP8h6Bn1-1).
+---
 
-A medida que fui desenvolvendo o código do projeto fui notando a necessidade de fazer algumas adaptações, portanto o design final está ligeiramente diferente do mostrado aqui. Por enquanto irei deixar o layout antigo aqui apenas por curiosidade, para ver quais mudanças foram feitas.
+## ✨ Funcionalidades
 
-### Tela Inicial - Desktop
+<table>
+<tr>
+<td width="50%">
 
-Tela inicial em que o usuário consegue ver o mapa ao fundo, com as linhas internas em uma painel lateral. Cada linha tem sua cor única, para facilitar sua identificação. Na tela não é possível ver, mas o menu lateral conta com scroll para ver mais linhas e um botão de reportar problemas e outro para exibir informações sobre o projeto.
+### 🗺️ Mapa & Rotas
 
-![Tela Inicial no Desktop](/github/Desktop%20-%20Inicial.png)
+- ✅ Mapa interativo com OpenStreetMap
+- ✅ Rotas animadas com Leaflet Ant Path
+- ✅ Marcadores de paradas clicáveis
+- ✅ Popup com detalhes de cada parada
+- ✅ Centralização automática na rota selecionada
 
-### Escolher Linha - Desktop
+</td>
+<td width="50%">
 
-Tela em que o usuário escolhe uma linha específica. Com isso, é exibida o horário anterior e o próximo horário daquele interno. O usuário também pode escolher se deseja ver mais horários daquela linha.
+### 📊 Horários & Informações
 
-![Escolher Linha no Desktop](/github/Desktop%20-%20Escolher%20Linha.png)
+- ✅ Horários em tempo real
+- ✅ Grade completa de horários
+- ✅ Categorias: Dias Úteis, Sábados, Férias
+- ✅ Indicador de próximo ônibus
+- ✅ Aviso de período de férias/recesso
 
-### Exibir Horários - Desktop
+</td>
+</tr>
+<tr>
+<td width="50%">
 
-Nesta tela são mostrados todos os horários em que aquela linha roda.
+### 🎨 Interface & UX
 
-![Exibir Horários no Desktop](/github/Desktop%20-%20Exibir%20Hor%C3%A1rios.png)
+- ✅ Design System completo
+- ✅ Tema claro/escuro automático
+- ✅ Animações suaves e transições
+- ✅ Componentes acessíveis (ARIA)
+- ✅ Feedback visual em interações
 
-### Tela Inicial - Mobile
+</td>
+<td width="50%">
 
-Pensando no fato de a maioria das pessoas utilizarem o celular, foi feito o layout com as mesmas funções, porém adaptado para as telas de celulares e outros dispositivos com telas pequenas. A responsividade deve ser trabalhada nesse projeto para melhorar a acessibilidade.
+### 📱 Mobile & Performance
 
-![Tela Inicial no Mobile](/github/Mobile%20-%20Inicial.png)
+- ✅ Layout responsivo mobile-first
+- ✅ Menu lateral adaptativo
+- ✅ Touch-friendly interactions
+- ✅ Performance otimizada
+- ✅ Carregamento rápido
 
-### Escolher Linha - Mobile
+</td>
+</tr>
+</table>
 
-![Escolher Linha no Mobile](/github/Mobile%20-%20Escolher%20Linha.png)
+---
 
-### Exibir Horários - Mobile
+## 🎨 Screenshots
 
-![Exibir Horários no Mobile](/github/Mobile%20-%20Exibir%20Hor%C3%A1rios.png)
+### 🖥️ Desktop
 
-## Requisitos
+<div align="center">
 
-Requisitos mínimos e importantes levantados até o momento para o desenvolvimento do site.
+|                            Tela Inicial                            |                            Linha Selecionada                            |                              Grade de Horários                              |
+| :----------------------------------------------------------------: | :---------------------------------------------------------------------: | :-------------------------------------------------------------------------: |
+| ![Desktop Inicial](.github/README/screenshots/desktop/inicial.png) | ![Desktop Linha](.github/README/screenshots/desktop/escolher-linha.png) | ![Desktop Horários](.github/README/screenshots/desktop/exibir-horarios.png) |
 
-- Mostrar mapa que tenha nome dos prédios e pontos
-- Menu lateral com nome das linhas
-- O usuário deve ver um traçado por onde as linhas passam, além de poder dar zoom para ver as informações
-- As linhas devem ser separadas com cores, além de representadas as suas subdivisões
-- O site deve ser completamente funcional em celulares e aparelhos com telas pequenas
+</div>
 
-## Funcionalidades Extras
+### 📱 Mobile
 
-A ideia inicial é terminar primeiro o básico para ter o site funcional, com as demais funções sendo implementadas ao longo do tempo.
+<div align="center">
 
-- [x] Cada ponto de parada no mapa exibir quais ônibus param naquela parada
-- [x] Mostrar horário dos ônibus de cada linha selecionada
-- [x] Mostrar horário do ônibus anterior e do próximo ônibus
-- [ ] Criar base de comunidade para levar a aplicação para outras universidades que contam com linhas internas mas que não tenham as suas rotas.
+|                           Tela Inicial                           |                             Menu Lateral                             |                             Detalhes da Linha                             |
+| :--------------------------------------------------------------: | :------------------------------------------------------------------: | :-----------------------------------------------------------------------: |
+| ![Mobile Inicial](.github/README/screenshots/mobile/inicial.png) | ![Mobile Menu](.github/README/screenshots/mobile/escolher-linha.png) | ![Mobile Horários](.github/README/screenshots/mobile/exibir-horarios.png) |
 
-## Licença
+</div>
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE.md) para mais detalhes.
+---
 
-<hr>
+## 🛠️ Stack Tecnológica
 
-<h3 align="center" >Gostou do projeto e quer entrar em contato?</h3>
-<p align="center">
-    <a href="https://www.linkedin.com/in/igormartins44/">LinkedIn</a> |
-    <a href="https://www.instagram.com/titan.css">Instagram</a> |
-    <a href="https://www.behance.net/titanstudio44">Behance</a>
-</p>
+### ⚛️ Frontend Core
 
-<br />
-<p align="center">
-    Desenvolvido com 💙 por Igor Martins
-</p>
+|                                                   Tecnologia                                                    | Versão | Descrição                                          |
+| :-------------------------------------------------------------------------------------------------------------: | :----: | :------------------------------------------------- |
+|        ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)         |  19.x  | Framework UI com novos recursos (use, ref as prop) |
+| ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) |  5.9   | Tipagem estática e IntelliSense                    |
+|          ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)          |  7.3   | Build tool ultrarrápido com HMR                    |
+
+### 🎨 Estilização
+
+|                                                  Tecnologia                                                   | Versão | Descrição                          |
+| :-----------------------------------------------------------------------------------------------------------: | :----: | :--------------------------------- |
+| ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) |  4.x   | CSS utility-first com @theme       |
+|        ![tailwind-variants](https://img.shields.io/badge/tailwind--variants-purple?style=flat-square)         |  3.x   | Variantes de componentes type-safe |
+|                    ![Lucide](https://img.shields.io/badge/Lucide-F56565?style=flat-square)                    | 0.563  | Ícones modernos e consistentes     |
+
+### 🗺️ Mapas & Visualização
+
+|                                                        Tecnologia                                                        | Descrição                              |
+| :----------------------------------------------------------------------------------------------------------------------: | :------------------------------------- |
+|          ![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=flat-square&logo=leaflet&logoColor=white)          | Biblioteca de mapas interativos        |
+| ![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-7EBC6F?style=flat-square&logo=openstreetmap&logoColor=white) | Tiles de mapa open source              |
+|                                                   **Leaflet Ant Path**                                                   | Animação de rotas com efeito "formiga" |
+
+### 📦 Outras Dependências
+
+- **@base-ui/react** - Componentes headless acessíveis
+- **react-ga4** - Google Analytics 4 integration
+- **date-fns** - Manipulação de datas
+- **use-debounce** - Hooks de debounce
+
+---
+
+## 🏗️ Arquitetura
+
+```bash
+app/
+├── src/
+│   ├── components/          # Componentes React
+│   │   ├── ui/              # Design System (Button, Card, Badge, Dialog...)
+│   │   └── map/             # Componentes do mapa (MapMarkers, MapRoute...)
+│   ├── contexts/            # Context API (RotasContext, ThemeContext)
+│   ├── hooks/               # Custom hooks (useAnalytics, useLinhasFilter)
+│   ├── services/            # Camada de serviços (RotasService)
+│   ├── data/                # Dados estáticos (linhas, paradas)
+│   ├── types/               # TypeScript types
+│   └── config/              # Configurações (specialPeriods)
+├── public/                  # Assets estáticos
+└── docs/                    # Documentação técnica
+```
+
+### 🎯 Design Patterns Utilizados
+
+- **Compound Components** - Dialog, Tabs, Card
+- **Context API** - Estado global sem prop drilling
+- **Custom Hooks** - Lógica reutilizável
+- **Service Layer** - Abstração de dados
+- **Composition** - Componentes flexíveis e extensíveis
+
+---
+
+## 🚀 Quick Start
+
+### Pré-requisitos
+
+- **Node.js** 18+
+- **pnpm** 8+ (recomendado) ou npm/yarn
+
+### Instalação
+
+```bash
+
+# Clone o repositório
+
+git clone https://github.com/internorotas/ufmg.git
+cd ufmg/app
+
+# Instale as dependências
+
+pnpm install
+
+# Inicie o servidor de desenvolvimento
+
+pnpm dev
+
+# Acesse http://localhost:5173/ufmg/
+
+```
+
+### Scripts Disponíveis
+
+|     Comando      | Descrição                            |
+| :--------------: | :----------------------------------- |
+|   \`pnpm dev\`   | Inicia o servidor de desenvolvimento |
+|  \`pnpm build\`  | Gera build de produção               |
+| \`pnpm preview\` | Preview do build local               |
+|  \`pnpm lint\`   | Executa ESLint                       |
+| \`pnpm format\`  | Formata código com Prettier          |
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são **muito bem-vindas**! Este é um projeto open source feito para a comunidade.
+
+### Como Contribuir
+
+1. **Fork** o repositório
+2. Crie uma **branch** para sua feature
+   \`\`\`bash
+   git checkout -b feature/minha-feature
+   \`\`\`
+3. **Commit** suas mudanças seguindo [Conventional Commits](https://www.conventionalcommits.org/)
+   \`\`\`bash
+   git commit -m "feat: adiciona nova funcionalidade"
+   \`\`\`
+4. **Push** para sua branch
+   \`\`\`bash
+   git push origin feature/minha-feature
+   \`\`\`
+5. Abra um **Pull Request**
+
+### Tipos de Commit
+
+|     Tipo     | Descrição                          |
+| :----------: | :--------------------------------- |
+|   \`feat\`   | Nova funcionalidade                |
+|   \`fix\`    | Correção de bug                    |
+|   \`docs\`   | Documentação                       |
+|  \`style\`   | Formatação (sem mudança de lógica) |
+| \`refactor\` | Refatoração de código              |
+|   \`perf\`   | Melhoria de performance            |
+|   \`test\`   | Adição/correção de testes          |
+|  \`chore\`   | Tarefas de manutenção              |
+
+### 💡 Ideias para Contribuir
+
+- 🐛 Reportar bugs encontrados
+- 💡 Sugerir novas funcionalidades
+- 📝 Melhorar documentação
+- ♿ Aprimorar acessibilidade
+- 🌍 Adicionar internacionalização
+- 🎓 Adaptar para outras universidades
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] **PWA** - Modo offline e instalação
+- [ ] **Notificações** - Alertas de horários favoritos
+- [ ] **Geolocalização** - Parada mais próxima do usuário
+- [ ] **API Pública** - Endpoints para desenvolvedores
+- [ ] **Calendário Acadêmico** - Integração automática de férias
+- [ ] **Outros Campi** - Expansão para unidades fora do Pampulha
+
+---
+
+## 📄 Licença
+
+Distribuído sob a licença **MIT**. Veja [LICENSE](LICENSE) para mais informações.
+
+---
+
+<div align="center">
+
+### 💙 Desenvolvido com carinho por [Igor Martins](https://github.com/igormartins4)
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/igormartins44/)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/igormartins4)
+
+---
+
+**⭐ Se este projeto foi útil, considere dar uma estrela!**
+
+[![Star History Chart](https://api.star-history.com/svg?repos=internorotas/ufmg&type=Date)](https://star-history.com/#internorotas/ufmg&Date)
+
+</div>
