@@ -1,0 +1,477 @@
+import { Parada } from "../types/data.types";
+
+/**
+ * Um objeto que contém todos os dados das paradas de ônibus.
+ *
+ * @property {Parada[]} paradas - Um array de objetos, onde cada objeto representa uma parada de ônibus.
+ * @property {string} paradas[].idParada - O identificador único da parada.
+ * @property {string} paradas[].nome - O nome da parada.
+ * @property {string[]} paradas[].linhasAtendidas - Um array com os nomes das linhas que atendem a essa parada.
+ * @property {[number, number]} paradas[].coordenadas - As coordenadas de latitude e longitude da parada.
+ * @property {string} paradas[].categoria - A categoria da parada (ex: "Ponto de Origem/Destino", "Parada Regular").
+ * @property {string} paradas[].descricao - Uma descrição mais detalhada da localização da parada.
+ */
+const dataParadas: { paradas: Parada[] } = {
+  paradas: [
+    {
+      idParada: "P01",
+      nome: "Escola de Música (Ida)",
+      linhasAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
+      ],
+      coordenadas: [-19.86287799458614, -43.961197296562915],
+      categoria: "Ponto de Origem/Destino",
+      descricao: "Parada em frente à Escola de Música",
+    },
+    {
+      idParada: "P02",
+      nome: "Belas Artes (Ida)",
+      linhasAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
+      ],
+      coordenadas: [-19.864005462253772, -43.96029825730666],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Escola de Belas Artes",
+    },
+    {
+      idParada: "P03",
+      nome: "CAD 2 - Letras - Ciência da Informação - FAFICH (Ida)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.865026983179526, -43.961424437234214],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente ao CAD 2 - Letras - Ciência da Informação - FAFICH",
+    },
+    {
+      idParada: "P04",
+      nome: "Reitoria - FACE (Ida)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.866801812650163, -43.963722425199386],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Reitoria - FACE",
+    },
+    {
+      idParada: "P05",
+      nome: "Praça de Serviços – Biblioteca Universitária – Reitoria (Ida)",
+      linhasAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
+      ],
+      coordenadas: [-19.866306847634856, -43.9652399167434],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente à Praça de Serviços – Biblioteca Universitária – Reitoria",
+    },
+    {
+      idParada: "P06",
+      nome: "Unidade Administrativa III",
+      linhasAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas) (Volta)",
+      ],
+      coordenadas: [-19.862289079650914, -43.96406056180162],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Unidade Administrativa III",
+    },
+    {
+      idParada: "P07",
+      nome: "Unidade Administrativa II (Ida)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.862539674966527, -43.96713237253709],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Unidade Administrativa II",
+    },
+    {
+      idParada: "P08",
+      nome: "Av. Antônio Abrahão Caram (em frente ao Restaurante Farroupilha) (Ida)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.8626495277957, -43.96993297019641],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente à Av. Antônio Abrahão Caram (em frente ao Restaurante Farroupilha)",
+    },
+    {
+      idParada: "P09",
+      nome: "Centro Esportivo Universitário - CEU (Ida)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.86634692381805, -43.97313237352062],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao Centro Esportivo Universitário - CEU",
+    },
+    {
+      idParada: "P10",
+      nome: "Veterinária (Lado de Fora) - CEU  (Ida)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.868652895489674, -43.97225744035409],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Veterinária (Lado de Fora) - CEU",
+    },
+    {
+      idParada: "P11",
+      nome: "Centro de Treinamento Esportivo - CTE (Ida)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.869852627120906, -43.97545081272303],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao Centro de Treinamento Esportivo - CTE",
+    },
+    {
+      idParada: "P12",
+      nome: "Av.Presidente Carlos Luz (em frente McDonald's) (Ida)",
+      linhasAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 04 (Atendimento ao ponto McDonald's e/ou BH-Tec)",
+      ],
+      coordenadas: [-19.87334489433249, -43.97710039322493],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente à Av. Presidente Carlos Luz (em frente ao McDonald's)",
+    },
+    {
+      idParada: "P13",
+      nome: "EEFFTO (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.876632574930333, -43.97571363916382],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à EEFFTO",
+    },
+    {
+      idParada: "P14",
+      nome: "Odontologia (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.87328246300903, -43.97348575014181],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Odontologia",
+    },
+    {
+      idParada: "P15",
+      nome: "Veterinária - Estação Ecológica (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.871816972689945, -43.97046642831759],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Veterinária - Estação Ecológica",
+    },
+    {
+      idParada: "P16",
+      nome: "Farmácia (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.87024439190227, -43.96839369702036],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Farmácia",
+    },
+    {
+      idParada: "P17",
+      nome: "Restaurante Universitário Setorial II (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.869982361625382, -43.96667044024115],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao Restaurante Universitário Setorial II",
+    },
+    {
+      idParada: "P18",
+      nome: "Física – Engenharia Elétrica (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.870752293238624, -43.96531645193499],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente ao Departamento de Física - Engenharia Elétrica",
+    },
+    {
+      idParada: "P19",
+      nome: "CNEN / CDTN (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.873184994054483, -43.966534085339894],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao CNEN / CDTN",
+    },
+    {
+      idParada: "P20",
+      nome: "Centro de Pesquisa e Recursos Hídricos (CPH) - Túnel de Vento (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.874441354711273, -43.967735795957495],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente ao Centro de Pesquisa e Recursos Hídricos (CPH) - Túnel de Vento",
+    },
+    {
+      idParada: "P21",
+      nome: "CNEN / CDTN - Final da Linha 9502 (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.87318008718384, -43.96626798814181],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao CNEN / CDTN - Final da Linha 9502",
+    },
+    {
+      idParada: "P22",
+      nome: "CAD 3 - Química - Colégio Técnico (COLTEC) (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)"],
+      coordenadas: [-19.870788120876036, -43.9650737061928],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente ao CAD 3 - Química - Colégio Técnico (COLTEC)",
+    },
+    {
+      idParada: "P23",
+      nome: "ICEX - Engenharia (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.869555795528473, -43.963949680063905],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao ICEX - Engenharia",
+    },
+    {
+      idParada: "P24",
+      nome: "Geociências (Volta)",
+      linhasAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.86872536254893, -43.96290638484716],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao Geociências",
+    },
+    {
+      idParada: "P25",
+      nome: "Restaurante Universitário Setorial I (Entrada Rampa) (Volta)",
+      linhasAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.8689961617339, -43.960109940258924],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente ao Restaurante Universitário Setorial I (Entrada Rampa)",
+    },
+    {
+      idParada: "P26",
+      nome: "FAE - Centro Pedagógico (Volta)",
+      linhasAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.867834336840456, -43.958552358960816],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao FAE - Centro Pedagógico",
+    },
+    {
+      idParada: "P27",
+      nome: "Creche da UFMG (Volta)",
+      linhasAtendidas: ["Linha 02 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.864795131981317, -43.95928985684761],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Creche da UFMG",
+    },
+    {
+      idParada: "P28",
+      nome: "Belas Artes (Volta)",
+
+      linhasAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
+      ],
+      coordenadas: [-19.863942344424277, -43.9600520561966],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao Belas Artes",
+    },
+    {
+      idParada: "P29",
+      nome: "Escola de Música (Volta)",
+      linhasAtendidas: [
+        "Linha 01",
+        "Linha 02 (Todas)",
+        "Linha 03 (Todas)",
+        "Linha 04 (Todas)",
+      ],
+      coordenadas: [-19.862868916085574, -43.96100450532476],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Escola de Música",
+    },
+
+    {
+      idParada: "P30",
+      nome: "CAD 2 - Letras - Ciência da Informação - FAFICH (Volta)",
+      linhasAtendidas: ["Linha 01", "Linha 03 (Todas)"],
+      coordenadas: [-19.865724373667415, -43.961750820377226],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente ao CAD 2 - Letras - Ciência da Informação - FAFICH",
+    },
+
+    {
+      idParada: "P31",
+      nome: "Creche da UFMG (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.86519700179325, -43.95928709454078],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Creche da UFMG",
+    },
+    {
+      idParada: "P32",
+      nome: "FAE - Centro Pedagógico (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.867799194741085, -43.958920546798744],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao FAE - Centro Pedagógico",
+    },
+    {
+      idParada: "P33",
+      nome: "Restaurante Universitário Setorial I (Entrada Rampa) (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.868837316782614, -43.96027282842894],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente ao Restaurante Universitário Setorial I (Entrada Rampa)",
+    },
+
+    {
+      idParada: "P34",
+      nome: "ICEX - FACE",
+      linhasAtendidas: [
+        "Linha 03 (Todas) (Ida)",
+        "Linha 04 (Todas) (Ida)",
+        "Linha 01 (Volta)",
+      ],
+      coordenadas: [-19.8682506314667, -43.96359821849866],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao ICEX - FACE",
+    },
+    {
+      idParada: "P35",
+      nome: "CAD 1 - ICB (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.86720214489026, -43.96725778862436],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao CAD 1 - ICB",
+    },
+    {
+      idParada: "P36",
+      nome: "Biotério Central - ICB (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.86854229636154, -43.967920147732734],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao Biotério Central - ICB",
+    },
+    {
+      idParada: "P37",
+      nome: "Farmácia (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.870043672302177, -43.968596159091305],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Farmácia",
+    },
+    {
+      idParada: "P38",
+      nome: "Veterinária - Estação Ecológica (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.871481650764963, -43.970445558741844],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Veterinária - Estação Ecológica",
+    },
+    {
+      idParada: "P39",
+      nome: "Odontologia (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.87283785450227, -43.97344409249714],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Odontologia",
+    },
+    {
+      idParada: "P40",
+      nome: "EEFFTO (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)", "Linha 04 (Todas)"],
+      coordenadas: [-19.876394774914708, -43.97594804676533],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao EEFFTO",
+    },
+    {
+      idParada: "P41",
+      nome: "Av.Presidente Carlos Luz (em frente McDonald's) (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)"],
+      coordenadas: [-19.87339309568137, -43.976607144376736],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao McDonald's",
+    },
+
+    {
+      idParada: "P42",
+      nome: "CEU - Veterinária (Lado de Fora) (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)"],
+      coordenadas: [-19.86967940665683, -43.9723549563709],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao CEU - Veterinária (Lado de Fora)",
+    },
+    {
+      idParada: "P43",
+      nome: "Av. Antônio Abrahão Caram (em frente ao Restaurante Farroupilha) (Ida)",
+      linhasAtendidas: ["Linha 03 (Todas)"],
+      coordenadas: [-19.862973316654763, -43.96959700070347],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao Restaurante Farroupilha",
+    },
+    {
+      idParada: "P44",
+      nome: "Unidade Administrativa II (Volta)",
+      linhasAtendidas: ["Linha 03 (Todas)"],
+      coordenadas: [-19.862750703381952, -43.96736279706283],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Unidade Administrativa II",
+    },
+    {
+      idParada: "P45",
+      nome: "Reitoria (Volta)",
+      linhasAtendidas: ["Linha 03 (Todas)"],
+      coordenadas: [-19.86534055790254, -43.96384762039304],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Reitoria",
+    },
+    {
+      idParada: "P46",
+      nome: "Rua Prof. Eduardo M. Guimarães - Reitoria (Volta)",
+      linhasAtendidas: ["Linha 03 (Todas)"],
+      coordenadas: [-19.865614864852443, -43.96243719367546],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente à Rua Prof. Eduardo M. Guimarães - Reitoria",
+    },
+    // Linha 02, 03 e 04 com retorno na área militar
+    {
+      idParada: "P47",
+      nome: "Restaurante Universitário Setorial I (Entrada Escada)",
+      linhasAtendidas: [
+        "Linha 02 (Retorno na Área Militar) (Volta)",
+        "Linha 04 (Retorno na Área Militar) (Volta)",
+      ],
+      coordenadas: [-19.869980968928637, -43.96033490875403],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente ao Restaurante Universitário Setorial I (Entrada Escada)",
+    },
+    {
+      idParada: "P48",
+      nome: "Restaurante Universitário Setorial I - Portaria Área Militar",
+      linhasAtendidas: [
+        "Linha 02 (Retorno na Área Militar) (Volta)",
+        "Linha 03 (Retorno na Área Militar) (Ida)",
+        "Linha 04 (Retorno na Área Militar) (Volta)",
+      ],
+      coordenadas: [-19.870083909625748, -43.95992714744056],
+      categoria: "Parada Regular",
+      descricao:
+        "Parada em frente ao Restaurante Universitário Setorial I - Portaria Área Militar",
+    },
+
+    {
+      idParada: "P49",
+      nome: "BH-Tec (Ida)",
+      linhasAtendidas: [
+        "Linha 03 (Atendimento ao BH-Tec)",
+        "Linha 04 (Atendimento ao BH-Tec)",
+      ],
+      coordenadas: [-19.88434212304126, -43.97543339398637],
+      categoria: "Parada Regular",
+      descricao: "Parada em frente ao BH-Tec",
+    },
+  ],
+};
+
+export default dataParadas;
