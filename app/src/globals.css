@@ -218,10 +218,17 @@ body {
   isolation: isolate;
 }
 
-/* Ensure Leaflet controls don't overlap modal */
-.leaflet-pane,
+/* Leaflet z-index management - preserve popup functionality */
+.leaflet-pane {
+  z-index: 400;
+}
+
 .leaflet-control-container {
-  z-index: auto !important;
+  z-index: 800;
+}
+
+.leaflet-popup-pane {
+  z-index: 700 !important;
 }
 
 /* Animations */
