@@ -327,8 +327,14 @@ export function buscarParadasPorIds<T extends { idParada: string }>(
   itinerarioParadasIds: string[],
   todasParadas: T[],
 ): T[] {
+  const paradasMap = new Map<string, T>();
+  for (let i = 0; i < todasParadas.length; i++) {
+    const p = todasParadas[i];
+    paradasMap.set(p.idParada, p);
+  }
+
   return itinerarioParadasIds
-    .map((idParada) => todasParadas.find((p) => p.idParada === idParada))
+    .map((idParada) => paradasMap.get(idParada))
     .filter((p): p is T => p !== undefined);
 }
 
