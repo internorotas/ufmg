@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { tv } from "tailwind-variants";
 import { Clock, Map, MapPin, Bus } from "lucide-react";
 import { Modal } from "./Modal";
@@ -139,26 +139,46 @@ export function LinhaDetalhesModal({
   useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
 
   // Buscar paradas do itinerário dinamicamente usando os IDs
-  const paradasDoItinerario = buscarParadasPorIds(
-    linha.itinerarioParadasIds,
-    todasParadas,
+  const paradasDoItinerario = useMemo(
+    () => buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas),
+    [linha.itinerarioParadasIds, todasParadas],
   );
 
   // Calcular horários passados e futuros
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const horariosOrganizados = linha.horarios
-    .filter((h) => h && h.includes(":"))
-    .map((horario) => ({
-      horario,
-      minutos: timeToMinutes(horario),
-      passou: timeToMinutes(horario) < currentMinutes,
-    }))
-    .sort((a, b) => a.minutos - b.minutos);
+  // Memoizar o processamento base dos horários (sem depender do tempo atual)
+  const horariosComMinutos = useMemo(
+    () =>
+      linha.horarios
+        .filter((h) => h && h.includes(":"))
+        .map((horario) => ({
+          horario,
+          minutos: timeToMinutes(horario),
+        }))
+        .sort((a, b) => a.minutos - b.minutos),
+    [linha.horarios],
+  );
 
-  const proximos = horariosOrganizados.filter((h) => !h.passou);
-  const passados = horariosOrganizados.filter((h) => h.passou);
+  // Organizar horários com base no tempo atual
+  const horariosOrganizados = useMemo(
+    () =>
+      horariosComMinutos.map((h) => ({
+        ...h,
+        passou: h.minutos < currentMinutes,
+      })),
+    [horariosComMinutos, currentMinutes],
+  );
+
+  const proximos = useMemo(
+    () => horariosOrganizados.filter((h) => !h.passou),
+    [horariosOrganizados],
+  );
+  const passados = useMemo(
+    () => horariosOrganizados.filter((h) => h.passou),
+    [horariosOrganizados],
+  );
 
   const handleTabChange = (tab: TabType) => {
     trackEvent({
