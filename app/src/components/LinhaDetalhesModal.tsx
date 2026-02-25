@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { tv } from "tailwind-variants";
 import { Clock, Map, MapPin, Bus } from "lucide-react";
 import { Modal } from "./Modal";
@@ -148,14 +148,18 @@ export function LinhaDetalhesModal({
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const horariosOrganizados = linha.horarios
-    .filter((h) => h && h.includes(":"))
-    .map((horario) => ({
-      horario,
-      minutos: timeToMinutes(horario),
-      passou: timeToMinutes(horario) < currentMinutes,
-    }))
-    .sort((a, b) => a.minutos - b.minutos);
+  const horariosOrganizados = useMemo(
+    () =>
+      linha.horarios
+        .filter((h) => h && h.includes(":"))
+        .map((horario) => ({
+          horario,
+          minutos: timeToMinutes(horario),
+          passou: timeToMinutes(horario) < currentMinutes,
+        }))
+        .sort((a, b) => a.minutos - b.minutos),
+    [linha.horarios, currentMinutes],
+  );
 
   const proximos = horariosOrganizados.filter((h) => !h.passou);
   const passados = horariosOrganizados.filter((h) => h.passou);
