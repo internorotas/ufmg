@@ -55,13 +55,6 @@ export const detailsButtonVariants = tv({
 // TYPES
 // ============================================================================
 
-interface ScheduleResult {
-  nextSchedule: string;
-  previousSchedule: string;
-  status: string;
-  statusType: LineStatusType;
-}
-
 export interface LineCardProps
   extends
     Omit<ComponentProps<"article">, "onClick">,
@@ -74,70 +67,6 @@ export interface LineCardProps
   onDetailsClick: () => void;
   /** Se o card está selecionado */
   isSelected?: boolean;
-}
-
-// ============================================================================
-// HELPERS
-// ============================================================================
-
-/**
- * Calcula os horários de próximo ônibus e último que partiu
- */
-function calculateSchedules(horarios: string[]): ScheduleResult {
-  if (!horarios || horarios.length === 0) {
-    return {
-      nextSchedule: "--:--",
-      previousSchedule: "--:--",
-      status: "Sem Horários",
-      statusType: "closed",
-    };
-  }
-
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const schedulesInMinutes = horarios
-    .filter((time) => time && time.includes(":"))
-    .map(timeToMinutes)
-    .sort((a, b) => a - b);
-
-  if (schedulesInMinutes.length === 0) {
-    return {
-      nextSchedule: "--:--",
-      previousSchedule: "--:--",
-      status: "Sem Horários",
-      statusType: "closed",
-    };
-  }
-
-  let nextSchedule = "--:--";
-  let previousSchedule = "--:--";
-  let status = "Encerrado";
-  let statusType: LineStatusType = "closed";
-
-  // Próximo horário
-  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
-  if (next !== undefined) {
-    nextSchedule = minutesToTime(next);
-    const diffMinutes = next - currentMinutes;
-    if (diffMinutes <= 15) {
-      status = `Próximo às ${nextSchedule}`;
-      statusType = "upcoming";
-    } else {
-      status = "Circulando";
-      statusType = "running";
-    }
-  }
-
-  // Último que partiu
-  const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule <= currentMinutes,
-  );
-  if (previousSchedules.length > 0) {
-    previousSchedule = minutesToTime(Math.max(...previousSchedules));
-  }
-
-  return { nextSchedule, previousSchedule, status, statusType };
 }
 
 // ============================================================================
@@ -242,8 +171,19 @@ export function LineCard({
   const shouldDisableSchedules =
     isInVacationPeriod && (!isVacationLine || isWeekend);
 
-  // Calcular horários
-  const { nextSchedule, previousSchedule, status, statusType } = useMemo(() => {
+  // ⚡ Performance Optimization: Split schedule parsing from time check.
+  // 1. Memoize sorted schedules (expensive parsing/sorting) - runs only when data changes
+  const schedulesInMinutes = useMemo(() => {
+    if (!linha.horarios || linha.horarios.length === 0) return [];
+    return linha.horarios
+      .filter((time) => time && time.includes(":"))
+      .map(timeToMinutes)
+      .sort((a, b) => a - b);
+  }, [linha.horarios]);
+
+  // 2. Calculate status (cheap time-dependent logic)
+  // This runs on every render to ensure freshness, solving the stale data issue
+  const { nextSchedule, previousSchedule, status, statusType } = (() => {
     if (shouldDisableSchedules) {
       return {
         nextSchedule: "Indisponível",
@@ -252,8 +192,50 @@ export function LineCard({
         statusType: "notRunning" as LineStatusType,
       };
     }
-    return calculateSchedules(linha.horarios);
-  }, [linha.horarios, shouldDisableSchedules]);
+
+    if (schedulesInMinutes.length === 0) {
+      return {
+        nextSchedule: "--:--",
+        previousSchedule: "--:--",
+        status: "Sem Horários",
+        statusType: "closed" as LineStatusType,
+      };
+    }
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    let nextSchedule = "--:--";
+    let previousSchedule = "--:--";
+    let status = "Encerrado";
+    let statusType: LineStatusType = "closed";
+
+    // Próximo horário
+    const next = schedulesInMinutes.find(
+      (schedule) => schedule > currentMinutes,
+    );
+    if (next !== undefined) {
+      nextSchedule = minutesToTime(next);
+      const diffMinutes = next - currentMinutes;
+      if (diffMinutes <= 15) {
+        status = `Próximo às ${nextSchedule}`;
+        statusType = "upcoming";
+      } else {
+        status = "Circulando";
+        statusType = "running";
+      }
+    }
+
+    // Último que partiu
+    const previousSchedules = schedulesInMinutes.filter(
+      (schedule) => schedule <= currentMinutes,
+    );
+    if (previousSchedules.length > 0) {
+      previousSchedule = minutesToTime(Math.max(...previousSchedules));
+    }
+
+    return { nextSchedule, previousSchedule, status, statusType };
+  })();
 
   const handleDetailsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
