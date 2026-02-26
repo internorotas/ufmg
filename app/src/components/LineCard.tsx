@@ -81,26 +81,26 @@ export interface LineCardProps
 // ============================================================================
 
 /**
- * Calcula os horários de próximo ônibus e último que partiu
+ * Analisa e ordena os horários em minutos.
+ * Esta operação é cara (O(N log N)) e deve ser memoizada.
  */
-function calculateSchedules(horarios: string[]): ScheduleResult {
-  if (!horarios || horarios.length === 0) {
-    return {
-      nextSchedule: "--:--",
-      previousSchedule: "--:--",
-      status: "Sem Horários",
-      statusType: "closed",
-    };
-  }
+function parseSchedules(horarios: string[]): number[] {
+  if (!horarios || horarios.length === 0) return [];
 
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const schedulesInMinutes = horarios
+  return horarios
     .filter((time) => time && time.includes(":"))
     .map(timeToMinutes)
     .sort((a, b) => a - b);
+}
 
+/**
+ * Calcula o status com base nos horários já processados e no tempo atual.
+ * Esta operação é barata (O(N)) e pode rodar em cada render para garantir frescor.
+ */
+function calculateStatus(
+  schedulesInMinutes: number[],
+  currentMinutes: number,
+): ScheduleResult {
   if (schedulesInMinutes.length === 0) {
     return {
       nextSchedule: "--:--",
@@ -242,8 +242,16 @@ export function LineCard({
   const shouldDisableSchedules =
     isInVacationPeriod && (!isVacationLine || isWeekend);
 
-  // Calcular horários
-  const { nextSchedule, previousSchedule, status, statusType } = useMemo(() => {
+  // 1. Otimização: Memoizar o processamento pesado dos horários (parse + sort)
+  // Isso evita re-ordenar o array em cada render
+  const schedulesInMinutes = useMemo(() => {
+    return parseSchedules(linha.horarios);
+  }, [linha.horarios]);
+
+  // 2. Calcular status baseado no tempo atual
+  // Executado a cada render para garantir que o "Próximo em X min" esteja atualizado
+  // quando o componente for re-renderizado por outras razões (ex: scroll, interação)
+  const { nextSchedule, previousSchedule, status, statusType } = (() => {
     if (shouldDisableSchedules) {
       return {
         nextSchedule: "Indisponível",
@@ -252,8 +260,12 @@ export function LineCard({
         statusType: "notRunning" as LineStatusType,
       };
     }
-    return calculateSchedules(linha.horarios);
-  }, [linha.horarios, shouldDisableSchedules]);
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    return calculateStatus(schedulesInMinutes, currentMinutes);
+  })();
 
   const handleDetailsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
