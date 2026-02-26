@@ -1,0 +1,3 @@
+## 2025-02-18 - ARIA Tab Pattern in React Modals
+**Learning:** When implementing ARIA Tab Pattern in simple React components without focus management libraries, sticking to native button focus behavior (Tab key) is safer than manually managing `tabIndex` (-1/0) if you don't implement full arrow key navigation. Setting inactive tabs to `tabIndex={-1}` without arrow key handlers makes them inaccessible to keyboard users.
+**Action:** Always verify keyboard navigation after adding ARIA roles; if full roving tabindex is too complex for a micro-fix, rely on standard button navigation and just use ARIA attributes for semantics.
