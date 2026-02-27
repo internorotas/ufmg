@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useMemo, type ComponentProps } from "react";
+import React, { useMemo, type ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -64,14 +64,18 @@ interface ScheduleResult {
 
 export interface LineCardProps
   extends
-    Omit<ComponentProps<"article">, "onClick">,
+    Omit<ComponentProps<"article">, "onClick" | "onSelect">,
     VariantProps<typeof lineCardVariants> {
   /** Dados da linha de ônibus */
   linha: Linha;
-  /** Callback ao clicar no card */
-  onClick: () => void;
-  /** Callback ao clicar em "Ver Detalhes" */
-  onDetailsClick: () => void;
+  /** @deprecated Use onSelect instead. Callback ao clicar no card */
+  onClick?: () => void;
+  /** Callback ao clicar no card, recebendo a linha */
+  onSelect?: (linha: Linha) => void;
+  /** @deprecated Use onDetails instead. Callback ao clicar em "Ver Detalhes" */
+  onDetailsClick?: () => void;
+  /** Callback ao clicar em "Ver Detalhes", recebendo a linha */
+  onDetails?: (linha: Linha) => void;
   /** Se o card está selecionado */
   isSelected?: boolean;
 }
@@ -207,21 +211,24 @@ function SuspendedNotice() {
 
 /**
  * Card que exibe informações sobre uma linha de ônibus.
+ * Otimizado com React.memo para evitar re-renderizações desnecessárias.
  *
  * @example
  * ```tsx
  * <LineCard
  *   linha={linha}
- *   onClick={() => handleSelect(linha)}
- *   onDetailsClick={() => openDetails(linha)}
+ *   onSelect={handleSelect}
+ *   onDetails={openDetails}
  *   isSelected={selectedId === linha.idRota}
  * />
  * ```
  */
-export function LineCard({
+function LineCardComponent({
   linha,
   onClick,
+  onSelect,
   onDetailsClick,
+  onDetails,
   isSelected = false,
   className,
   ...props
@@ -255,6 +262,14 @@ export function LineCard({
     return calculateSchedules(linha.horarios);
   }, [linha.horarios, shouldDisableSchedules]);
 
+  const handleCardClick = () => {
+    if (onSelect) {
+      onSelect(linha);
+    } else if (onClick) {
+      onClick();
+    }
+  };
+
   const handleDetailsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent({
@@ -262,14 +277,19 @@ export function LineCard({
       action: "Abrir Card Detalhes",
       label: linha.nome,
     });
-    onDetailsClick();
+
+    if (onDetails) {
+      onDetails(linha);
+    } else if (onDetailsClick) {
+      onDetailsClick();
+    }
   };
 
   return (
     <article
       data-slot="card"
       data-state={isSelected ? "selected" : undefined}
-      onClick={onClick}
+      onClick={handleCardClick}
       className={cn(
         lineCardVariants({ selected: isSelected }),
         "mb-3",
@@ -324,3 +344,5 @@ export function LineCard({
     </article>
   );
 }
+
+export const LineCard = React.memo(LineCardComponent);
