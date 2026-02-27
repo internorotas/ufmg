@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Menu, ArrowLeft } from "lucide-react";
 import { useLinhasFilter } from "../hooks/useLinhasFilter";
@@ -164,16 +164,19 @@ export function MenuLateral({
     handleCategoriaChange,
   } = useLinhasFilter(linhasData);
 
-  const handleCardClick = (linha: Linha) => {
-    onLinhaSelect(linha);
-    if (window.innerWidth < 768) {
-      setMenuVisible(false);
-    }
-  };
+  const handleCardClick = useCallback(
+    (linha: Linha) => {
+      onLinhaSelect(linha);
+      if (window.innerWidth < 768) {
+        setMenuVisible(false);
+      }
+    },
+    [onLinhaSelect],
+  );
 
-  const handleDetailsClick = (linha: Linha) => {
+  const handleDetailsClick = useCallback((linha: Linha) => {
     setLinhaDetalhesAberta(linha);
-  };
+  }, []);
 
   const handleParadaClickWrapper = (parada: Parada) => {
     onParadaClick(parada);
@@ -268,8 +271,8 @@ export function MenuLateral({
               <LineCard
                 key={linha.idRota}
                 linha={linha}
-                onClick={() => handleCardClick(linha)}
-                onDetailsClick={() => handleDetailsClick(linha)}
+                onSelect={handleCardClick}
+                onDetails={handleDetailsClick}
                 isSelected={linhaSelecionada?.idRota === linha.idRota}
               />
             ))
