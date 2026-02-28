@@ -265,14 +265,25 @@ export function LineCard({
     onDetailsClick();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick?.();
+    }
+  };
+
   return (
     <article
       data-slot="card"
       data-state={isSelected ? "selected" : undefined}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      aria-label={`Selecionar linha ${linha.nome}`}
       className={cn(
         lineCardVariants({ selected: isSelected }),
         "mb-3",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
         className,
       )}
       {...props}
