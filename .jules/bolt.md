@@ -1,0 +1,3 @@
+## 2024-03-24 - [O(N^2) Array finding in render path]
+**Learning:** Found an `Array.find` nested inside an `Array.map` (`buscarParadasPorIds`) in `app/lib/utils.ts` which runs on render in modals. Because the arrays of schedules and stops can grow reasonably large, finding an item in a list across another list resulted in $O(N \times M)$ complexity during critical paths like opening modals.
+**Action:** When filtering or mapping data across different collections by ID in utility functions, always prefer to convert the searched array into a `Map` first to bring time complexity down to $O(N + M)$.
