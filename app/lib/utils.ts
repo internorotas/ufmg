@@ -319,6 +319,7 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
 
 /**
  * Busca paradas do itinerário usando os IDs fornecidos
+ * Utiliza um Map para otimizar a busca de O(N*M) para O(N+M)
  * @param itinerarioParadasIds Array de IDs de paradas
  * @param todasParadas Array com todas as paradas disponíveis
  * @returns Array de paradas encontradas
@@ -327,8 +328,16 @@ export function buscarParadasPorIds<T extends { idParada: string }>(
   itinerarioParadasIds: string[],
   todasParadas: T[],
 ): T[] {
+  const paradasMap = new Map(todasParadas.map((p) => [p.idParada, p]));
+  // Optimize: Use Map for O(1) lookups instead of O(N) Array.find()
+  // Reduces overall time complexity from O(N*M) to O(N+M)
+  const paradasMap = new Map<string, T>();
+  for (const parada of todasParadas) {
+    paradasMap.set(parada.idParada, parada);
+  }
+
   return itinerarioParadasIds
-    .map((idParada) => todasParadas.find((p) => p.idParada === idParada))
+    .map((idParada) => paradasMap.get(idParada))
     .filter((p): p is T => p !== undefined);
 }
 
