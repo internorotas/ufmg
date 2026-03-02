@@ -167,6 +167,38 @@ export function LinhaDetalhesModal({
 
   const proximos = horariosOrganizados.filter((h) => !h.passou);
   const passados = horariosOrganizados.filter((h) => h.passou);
+  // Buscar paradas do itinerário dinamicamente usando os IDs
+  // ⚡ Bolt: Memoizing O(N*M) lookup to prevent recalculation when switching modal tabs
+  const paradasDoItinerario = useMemo(
+    () => buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas),
+    [linha.itinerarioParadasIds, todasParadas],
+  );
+
+  // Calcular horários passados e futuros
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // ⚡ Bolt: Memoizing expensive time parsing and array sorting to prevent re-execution on every render
+  const horariosOrganizados = useMemo(() => {
+    return linha.horarios
+      .filter((h) => h && h.includes(":"))
+      .map((horario) => ({
+        horario,
+        minutos: timeToMinutes(horario),
+        passou: timeToMinutes(horario) < currentMinutes,
+      }))
+      .sort((a, b) => a.minutos - b.minutos);
+  }, [linha.horarios, currentMinutes]);
+
+  // ⚡ Bolt: Memoizing the derived filtered lists
+  const proximos = useMemo(
+    () => horariosOrganizados.filter((h) => !h.passou),
+    [horariosOrganizados],
+  );
+  const passados = useMemo(
+    () => horariosOrganizados.filter((h) => h.passou),
+    [horariosOrganizados],
+  );
 
   const handleTabChange = (tab: TabType) => {
     trackEvent({
@@ -226,9 +258,15 @@ export function LinhaDetalhesModal({
       {/* Tabs */}
       <div
         data-slot="tabs"
+        role="tablist"
+        aria-label="Opções de visualização"
         className="mb-6 flex gap-2 border-b border-card-border"
       >
         <button
+          role="tab"
+          aria-selected={tabAtiva === "itinerario"}
+          aria-controls="panel-itinerario"
+          id="tab-itinerario"
           onClick={() => handleTabChange("itinerario")}
           className={tabVariants({ active: tabAtiva === "itinerario" })}
           style={tabAtiva === "itinerario" ? { borderColor: linha.corHex } : {}}
@@ -237,6 +275,10 @@ export function LinhaDetalhesModal({
           Itinerário
         </button>
         <button
+          role="tab"
+          aria-selected={tabAtiva === "horarios"}
+          aria-controls="panel-horarios"
+          id="tab-horarios"
           onClick={() => handleTabChange("horarios")}
           className={tabVariants({ active: tabAtiva === "horarios" })}
           style={tabAtiva === "horarios" ? { borderColor: linha.corHex } : {}}
@@ -249,8 +291,12 @@ export function LinhaDetalhesModal({
       {/* Conteúdo das Tabs */}
       {tabAtiva === "itinerario" ? (
         <div
+          role="tabpanel"
+          id="panel-itinerario"
+          aria-labelledby="tab-itinerario"
+          tabIndex={0}
           data-slot="itinerary-tab"
-          className="relative animate-in fade-in-0 duration-200"
+          className="relative animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
         >
           {paradasDoItinerario.length > 0 ? (
             <div className="relative">
@@ -331,8 +377,12 @@ export function LinhaDetalhesModal({
         </div>
       ) : (
         <div
+          role="tabpanel"
+          id="panel-horarios"
+          aria-labelledby="tab-horarios"
+          tabIndex={0}
           data-slot="schedules-tab"
-          className="space-y-6 animate-in fade-in-0 duration-200"
+          className="space-y-6 animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
         >
           {/* Próximos Horários */}
           {proximos.length > 0 && (
