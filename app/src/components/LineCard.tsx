@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useMemo, type ComponentProps } from "react";
+import { memo, useMemo, type ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -69,9 +69,9 @@ export interface LineCardProps
   /** Dados da linha de ônibus */
   linha: Linha;
   /** Callback ao clicar no card */
-  onClick: () => void;
+  onClick: (linha: Linha) => void;
   /** Callback ao clicar em "Ver Detalhes" */
-  onDetailsClick: () => void;
+  onDetailsClick: (linha: Linha) => void;
   /** Se o card está selecionado */
   isSelected?: boolean;
 }
@@ -212,13 +212,13 @@ function SuspendedNotice() {
  * ```tsx
  * <LineCard
  *   linha={linha}
- *   onClick={() => handleSelect(linha)}
- *   onDetailsClick={() => openDetails(linha)}
+ *   onClick={handleSelect} // (linha) => void
+ *   onDetailsClick={openDetails} // (linha) => void
  *   isSelected={selectedId === linha.idRota}
  * />
  * ```
  */
-export function LineCard({
+function LineCardComponent({
   linha,
   onClick,
   onDetailsClick,
@@ -255,6 +255,10 @@ export function LineCard({
     return calculateSchedules(linha.horarios);
   }, [linha.horarios, shouldDisableSchedules]);
 
+  const handleCardClick = () => {
+    onClick(linha);
+  };
+
   const handleDetailsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent({
@@ -262,14 +266,14 @@ export function LineCard({
       action: "Abrir Card Detalhes",
       label: linha.nome,
     });
-    onDetailsClick();
+    onDetailsClick(linha);
   };
 
   return (
     <article
       data-slot="card"
       data-state={isSelected ? "selected" : undefined}
-      onClick={onClick}
+      onClick={handleCardClick}
       className={cn(
         lineCardVariants({ selected: isSelected }),
         "mb-3",
@@ -324,3 +328,6 @@ export function LineCard({
     </article>
   );
 }
+
+// Memoize the component to prevent re-renders when props are stable
+export const LineCard = memo(LineCardComponent);
