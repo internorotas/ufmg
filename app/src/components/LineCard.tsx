@@ -72,6 +72,70 @@ export interface LineCardProps
 }
 
 // ============================================================================
+// HELPERS
+// ============================================================================
+
+/**
+ * Analisa e ordena os horários em minutos.
+ * Esta operação é cara (O(N log N)) e deve ser memoizada.
+ */
+function parseSchedules(horarios: string[]): number[] {
+  if (!horarios || horarios.length === 0) return [];
+
+  return horarios
+    .filter((time) => time && time.includes(":"))
+    .map(timeToMinutes)
+    .sort((a, b) => a - b);
+}
+
+/**
+ * Calcula o status com base nos horários já processados e no tempo atual.
+ * Esta operação é barata (O(N)) e pode rodar em cada render para garantir frescor.
+ */
+function calculateStatus(
+  schedulesInMinutes: number[],
+  currentMinutes: number,
+): ScheduleResult {
+  if (schedulesInMinutes.length === 0) {
+    return {
+      nextSchedule: "--:--",
+      previousSchedule: "--:--",
+      status: "Sem Horários",
+      statusType: "closed",
+    };
+  }
+
+  let nextSchedule = "--:--";
+  let previousSchedule = "--:--";
+  let status = "Encerrado";
+  let statusType: LineStatusType = "closed";
+
+  // Próximo horário
+  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
+  if (next !== undefined) {
+    nextSchedule = minutesToTime(next);
+    const diffMinutes = next - currentMinutes;
+    if (diffMinutes <= 15) {
+      status = `Próximo às ${nextSchedule}`;
+      statusType = "upcoming";
+    } else {
+      status = "Circulando";
+      statusType = "running";
+    }
+  }
+
+  // Último que partiu
+  const previousSchedules = schedulesInMinutes.filter(
+    (schedule) => schedule <= currentMinutes,
+  );
+  if (previousSchedules.length > 0) {
+    previousSchedule = minutesToTime(Math.max(...previousSchedules));
+  }
+
+  return { nextSchedule, previousSchedule, status, statusType };
+}
+
+// ============================================================================
 // SUBCOMPONENTS
 // ============================================================================
 
@@ -173,6 +237,15 @@ function LineCardComponent({
   const shouldDisableSchedules =
     isInVacationPeriod && (!isVacationLine || isWeekend);
 
+  // 1. Otimização: Memoizar o processamento pesado dos horários (parse + sort)
+  // Isso evita re-ordenar o array em cada render
+  const schedulesInMinutes = useMemo(() => {
+    return parseSchedules(linha.horarios);
+  }, [linha.horarios]);
+
+  // 2. Calcular status baseado no tempo atual
+  // Executado a cada render para garantir que o "Próximo em X min" esteja atualizado
+  // quando o componente for re-renderizado por outras razões (ex: scroll, interação)
   /**
    * Performance Optimization: Memoize parsing of schedules.
    * Only re-calculate if the schedule list changes.
@@ -198,6 +271,11 @@ function LineCardComponent({
       };
     }
 
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    return calculateStatus(schedulesInMinutes, currentMinutes);
+  })();
     if (schedulesInMinutes.length === 0) {
       return {
         nextSchedule: "--:--",
