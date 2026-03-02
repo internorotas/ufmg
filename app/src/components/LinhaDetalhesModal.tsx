@@ -148,6 +148,7 @@ export function LinhaDetalhesModal({
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
+  const horariosOrganizados = useMemo(
   // Memoizar o processamento base dos horários (sem depender do tempo atual)
   const horariosComMinutos = useMemo(
     () =>
@@ -156,6 +157,14 @@ export function LinhaDetalhesModal({
         .map((horario) => ({
           horario,
           minutos: timeToMinutes(horario),
+          passou: timeToMinutes(horario) < currentMinutes,
+        }))
+        .sort((a, b) => a.minutos - b.minutos),
+    [linha.horarios, currentMinutes],
+  );
+
+  const proximos = horariosOrganizados.filter((h) => !h.passou);
+  const passados = horariosOrganizados.filter((h) => h.passou);
         }))
         .sort((a, b) => a.minutos - b.minutos),
     [linha.horarios],
