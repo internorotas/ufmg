@@ -143,42 +143,11 @@ export function LinhaDetalhesModal({
     return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
   }, [linha.itinerarioParadasIds, todasParadas]);
 
-  // Separar lógica custosa de parser e sort dos horários
-  const horariosParseados = useMemo(() => {
-    return linha.horarios
-      .filter((h) => h && h.includes(":"))
-      .map((horario) => ({
-        horario,
-        minutos: timeToMinutes(horario),
-      }))
-      .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios]);
-
-  // Calcular horários passados e futuros de forma otimizada
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const horariosOrganizados = useMemo(() => {
-    return horariosParseados.map((h) => ({
-      ...h,
-      passou: h.minutos < currentMinutes,
-    }));
-  }, [horariosParseados, currentMinutes]);
-
-  const proximos = horariosOrganizados.filter((h) => !h.passou);
-  const passados = horariosOrganizados.filter((h) => h.passou);
-  // Buscar paradas do itinerário dinamicamente usando os IDs
-  // ⚡ Bolt: Memoizing O(N*M) lookup to prevent recalculation when switching modal tabs
-  const paradasDoItinerario = useMemo(
-    () => buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas),
-    [linha.itinerarioParadasIds, todasParadas],
-  );
-
   // Calcular horários passados e futuros
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // ⚡ Bolt: Memoizing expensive time parsing and array sorting to prevent re-execution on every render
+  // Memoizar parsing e ordenação custosa dos horários
   const horariosOrganizados = useMemo(() => {
     return linha.horarios
       .filter((h) => h && h.includes(":"))
@@ -190,7 +159,7 @@ export function LinhaDetalhesModal({
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha.horarios, currentMinutes]);
 
-  // ⚡ Bolt: Memoizing the derived filtered lists
+  // Memoizar listas filtradas derivadas
   const proximos = useMemo(
     () => horariosOrganizados.filter((h) => !h.passou),
     [horariosOrganizados],
