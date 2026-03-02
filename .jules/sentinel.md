@@ -1,3 +1,7 @@
+## 2025-05-18 - [Add CSP to index.html]
+**Vulnerability:** Missing Content Security Policy (CSP) headers in `index.html`.
+**Learning:** React handles default escaping, but defense in depth is important. A CSP was added as a meta tag to restrict loading sources (e.g., scripts, styles, images) to trusted domains (like OpenStreetMap, Google Fonts, Google Analytics).
+**Prevention:** Always include a strong CSP by default in new projects or when setting up the main `index.html` file.
 ## 2025-03-02 - [Defense in Depth] Adding Content Security Policy
 **Vulnerability:** The application was lacking a Content Security Policy (CSP), allowing unmitigated execution if an XSS vulnerability were to be introduced.
 **Learning:** Due to modern frameworks (React) and builders (Vite) often using inline styles or scripts, a standard `default-src 'self'` policy requires careful tuning. Specifically, it was critical to explicitly allow Google Analytics (`https://www.googletagmanager.com`, `https://www.google-analytics.com`), Google Fonts (`https://fonts.googleapis.com`, `https://fonts.gstatic.com`), OpenStreetMap tiles (`https://*.tile.openstreetmap.org`), and inline scripts/styles used by the framework and map libraries. A `worker-src` allowing `blob:` was necessary for potential web workers often used by map libraries. `object-src 'none'` and `base-uri 'self'` were added as additional best practices.
