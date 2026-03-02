@@ -124,10 +124,6 @@ export function LinhaOnibus({
     return calculateNextAndPreviousSchedule(linha.horarios);
   }, [linha.horarios, shouldDisableSchedules]);
 
-  const sublinha = linha.sublinha
-    ? `<p class="text-xs font-normal">${linha.sublinha}</p>`
-    : "";
-
   const handleItinerarioToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setItinerarioVisible(true);
@@ -145,12 +141,12 @@ export function LinhaOnibus({
           onClick={onLinhaClick}
           className={`${lineHeaderVariants()} ${bgColor}`}
         >
-          <div
-            className="text-left"
-            dangerouslySetInnerHTML={{
-              __html: `<h1 class="text-base">${linha.nome}</h1>${sublinha}`,
-            }}
-          />
+          <div className="text-left">
+            <h1 className="text-base">{linha.nome}</h1>
+            {linha.sublinha && (
+              <p className="text-xs font-normal">{linha.sublinha}</p>
+            )}
+          </div>
         </button>
 
         <div className="rounded-b-lg bg-internoRotas-cinza-grafite px-1 py-2">
