@@ -3,6 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
+import { useState, useRef, useEffect } from "react";
 import { useState, useCallback } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Menu, ArrowLeft } from "lucide-react";
@@ -154,6 +155,15 @@ export function MenuLateral({
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
     null,
   );
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize state based on environment
+  const [shortcutLabel] = useState(() => {
+    if (typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform)) {
+      return "⌘K";
+    }
+    return "Ctrl+K";
+  });
 
   const {
     searchTerm,
@@ -164,6 +174,32 @@ export function MenuLateral({
     handleCategoriaChange,
   } = useLinhasFilter(linhasData);
 
+  // Keyboard shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+
+        // If mobile menu is closed, open it to show search (optional,
+        // but helpful if search is inside menu)
+        if (window.innerWidth < 768) {
+          setMenuVisible(true);
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleCardClick = (linha: Linha) => {
+    onLinhaSelect(linha);
+    if (window.innerWidth < 768) {
+      setMenuVisible(false);
+    }
+  };
   const handleCardClick = useCallback(
     (linha: Linha) => {
       onLinhaSelect(linha);
@@ -244,9 +280,11 @@ export function MenuLateral({
         {/* Search */}
         <div className="shrink-0 border-b border-card-border bg-background-secondary p-2 lg:p-4">
           <SearchInput
+            ref={searchInputRef}
             value={searchTerm}
             onValueChange={setSearchTerm}
             placeholder="Pesquisar linha..."
+            shortcut={shortcutLabel}
           />
         </div>
 
