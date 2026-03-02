@@ -139,9 +139,9 @@ export function LinhaDetalhesModal({
   useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
 
   // Buscar paradas do itinerário dinamicamente usando os IDs
-  const paradasDoItinerario = buscarParadasPorIds(
-    linha.itinerarioParadasIds,
-    todasParadas,
+  const paradasDoItinerario = useMemo(
+    () => buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas),
+    [linha.itinerarioParadasIds, todasParadas],
   );
 
   // Calcular horários passados e futuros
@@ -149,6 +149,8 @@ export function LinhaDetalhesModal({
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   const horariosOrganizados = useMemo(
+  // Memoizar o processamento base dos horários (sem depender do tempo atual)
+  const horariosComMinutos = useMemo(
     () =>
       linha.horarios
         .filter((h) => h && h.includes(":"))
@@ -163,6 +165,29 @@ export function LinhaDetalhesModal({
 
   const proximos = horariosOrganizados.filter((h) => !h.passou);
   const passados = horariosOrganizados.filter((h) => h.passou);
+        }))
+        .sort((a, b) => a.minutos - b.minutos),
+    [linha.horarios],
+  );
+
+  // Organizar horários com base no tempo atual
+  const horariosOrganizados = useMemo(
+    () =>
+      horariosComMinutos.map((h) => ({
+        ...h,
+        passou: h.minutos < currentMinutes,
+      })),
+    [horariosComMinutos, currentMinutes],
+  );
+
+  const proximos = useMemo(
+    () => horariosOrganizados.filter((h) => !h.passou),
+    [horariosOrganizados],
+  );
+  const passados = useMemo(
+    () => horariosOrganizados.filter((h) => h.passou),
+    [horariosOrganizados],
+  );
 
   const handleTabChange = (tab: TabType) => {
     trackEvent({
