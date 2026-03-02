@@ -309,6 +309,8 @@ export function MenuLateral({
               <LineCard
                 key={linha.idRota}
                 linha={linha}
+                onSelect={handleCardClick}
+                onDetails={handleDetailsClick}
                 onClick={handleCardClick}
                 onDetailsClick={handleDetailsClick}
                 isSelected={linhaSelecionada?.idRota === linha.idRota}

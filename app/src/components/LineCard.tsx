@@ -3,6 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
+import React, { useMemo, type ComponentProps } from "react";
 import { useMemo, type ComponentProps, type KeyboardEvent } from "react";
 import { memo, useMemo, type ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
@@ -60,10 +61,18 @@ export const detailsButtonVariants = tv({
 
 export interface LineCardProps
   extends
-    Omit<ComponentProps<"article">, "onClick">,
+    Omit<ComponentProps<"article">, "onClick" | "onSelect">,
     VariantProps<typeof lineCardVariants> {
   /** Dados da linha de ônibus */
   linha: Linha;
+  /** @deprecated Use onSelect instead. Callback ao clicar no card */
+  onClick?: () => void;
+  /** Callback ao clicar no card, recebendo a linha */
+  onSelect?: (linha: Linha) => void;
+  /** @deprecated Use onDetails instead. Callback ao clicar em "Ver Detalhes" */
+  onDetailsClick?: () => void;
+  /** Callback ao clicar em "Ver Detalhes", recebendo a linha */
+  onDetails?: (linha: Linha) => void;
   /** Callback ao clicar no card */
   onClick: (linha: Linha) => void;
   /** Callback ao clicar em "Ver Detalhes" */
@@ -203,11 +212,14 @@ function SuspendedNotice() {
 
 /**
  * Card que exibe informações sobre uma linha de ônibus.
+ * Otimizado com React.memo para evitar re-renderizações desnecessárias.
  *
  * @example
  * ```tsx
  * <LineCard
  *   linha={linha}
+ *   onSelect={handleSelect}
+ *   onDetails={openDetails}
  *   onClick={handleSelect} // (linha) => void
  *   onDetailsClick={openDetails} // (linha) => void
  *   isSelected={selectedId === linha.idRota}
@@ -217,7 +229,9 @@ function SuspendedNotice() {
 function LineCardComponent({
   linha,
   onClick,
+  onSelect,
   onDetailsClick,
+  onDetails,
   isSelected = false,
   className,
   ...props
@@ -323,6 +337,14 @@ function LineCardComponent({
     onClick(linha);
   };
 
+  const handleCardClick = () => {
+    if (onSelect) {
+      onSelect(linha);
+    } else if (onClick) {
+      onClick();
+    }
+  };
+
   const handleDetailsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent({
@@ -330,6 +352,11 @@ function LineCardComponent({
       action: "Abrir Card Detalhes",
       label: linha.nome,
     });
+
+    if (onDetails) {
+      onDetails(linha);
+    } else if (onDetailsClick) {
+      onDetailsClick();
     onDetailsClick(linha);
   };
 
@@ -446,5 +473,6 @@ function LineCardComponent({
   );
 }
 
+export const LineCard = React.memo(LineCardComponent);
 // Memoize the component to prevent re-renders when props are stable
 export const LineCard = memo(LineCardComponent);
