@@ -107,11 +107,14 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const horariosOrganizados = useMemo(() => {
     return linha.horarios
       .filter((time) => time && time.includes(":"))
-      .map((horario) => ({
-        horario,
-        minutos: timeToMinutes(horario),
-        passou: timeToMinutes(horario) < currentMinutes,
-      }))
+      .map((horario) => {
+        const minutes = timeToMinutes(horario);
+        return {
+          horario,
+          minutos: minutes,
+          passou: minutes < currentMinutes,
+        };
+      })
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha.horarios, currentMinutes]);
 
