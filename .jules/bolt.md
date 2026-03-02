@@ -1,0 +1,6 @@
+## 2024-03-24 - [O(N^2) Array finding in render path]
+**Learning:** Found an `Array.find` nested inside an `Array.map` (`buscarParadasPorIds`) in `app/lib/utils.ts` which runs on render in modals. Because the arrays of schedules and stops can grow reasonably large, finding an item in a list across another list resulted in $O(N \times M)$ complexity during critical paths like opening modals.
+**Action:** When filtering or mapping data across different collections by ID in utility functions, always prefer to convert the searched array into a `Map` first to bring time complexity down to $O(N + M)$.
+## 2024-05-24 - LinhaDetalhesModal Re-renders
+**Learning:** Found a specific codebase bottleneck in `LinhaDetalhesModal.tsx` where expensive array operations (searching for stops via IDs and parsing/sorting schedule strings) were not memoized. As a result, simply switching between the "Itinerário" and "Todos os Horários" tabs was re-executing O(N*M) lookups and re-sorting arrays on every tab change render.
+**Action:** Always wrap derived data calculations that involve sorting or deep array lookups (like `buscarParadasPorIds`) in `useMemo`, particularly in Modals that have internal state variables (like active tabs) that trigger frequent re-renders.
