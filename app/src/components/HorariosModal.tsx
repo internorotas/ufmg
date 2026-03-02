@@ -26,7 +26,8 @@ export const scheduleCardVariants = tv({
         "border-green-600 bg-green-900/30 cursor-pointer focus-visible:ring-green-500",
         "hover:bg-green-900/50 hover:scale-105 hover:shadow-md active:scale-95",
       ],
-      passed: "border-gray-700 bg-gray-800/50 opacity-50 cursor-default focus-visible:ring-gray-500",
+      passed:
+        "border-gray-700 bg-gray-800/50 opacity-50 cursor-default focus-visible:ring-gray-500",
     },
   },
   defaultVariants: {
