@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useCallback } from "react";
 import ReactGA from "react-ga4";
 import { MenuLateral } from "./components/MenuLateral";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -49,23 +49,29 @@ function AppContent() {
   }, [trackPageView]);
 
   // Handlers com tracking de analytics
-  const handleLinhaSelect = (linha: Linha) => {
-    selecionarLinha(linha);
-    trackEvent({
-      category: "Engajamento",
-      action: "Selecionar Linha",
-      label: linha.nome,
-    });
-  };
+  const handleLinhaSelect = useCallback(
+    (linha: Linha) => {
+      selecionarLinha(linha);
+      trackEvent({
+        category: "Engajamento",
+        action: "Selecionar Linha",
+        label: linha.nome,
+      });
+    },
+    [selecionarLinha, trackEvent],
+  );
 
-  const handleParadaClick = (parada: Parada) => {
-    selecionarParada(parada);
-    trackEvent({
-      category: "Engajamento",
-      action: "Selecionar Parada",
-      label: parada.nome,
-    });
-  };
+  const handleParadaClick = useCallback(
+    (parada: Parada) => {
+      selecionarParada(parada);
+      trackEvent({
+        category: "Engajamento",
+        action: "Selecionar Parada",
+        label: parada.nome,
+      });
+    },
+    [selecionarParada, trackEvent],
+  );
 
   // Validação dos dados
   if (!todasParadas || todasParadas.length === 0) {
