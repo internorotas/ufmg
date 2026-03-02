@@ -252,6 +252,8 @@ function LineCardComponent({
   const shouldDisableSchedules =
     isInVacationPeriod && (!isVacationLine || isWeekend);
 
+  // ⚡ Performance Optimization: Split schedule parsing from time check.
+  // 1. Memoize sorted schedules (expensive parsing/sorting) - runs only when data changes
   // 1. Otimização: Memoizar o processamento pesado dos horários (parse + sort)
   // Isso evita re-ordenar o array em cada render
   const schedulesInMinutes = useMemo(() => {
@@ -274,6 +276,8 @@ function LineCardComponent({
       .sort((a, b) => a - b);
   }, [linha.horarios]);
 
+  // 2. Calculate status (cheap time-dependent logic)
+  // This runs on every render to ensure freshness, solving the stale data issue
   // Calculate status/next/prev on every render to ensure freshness
   // This is cheap (O(N) on small array) but ensures "currentMinutes" is always up to date
   const { nextSchedule, previousSchedule, status, statusType } = (() => {
@@ -309,6 +313,9 @@ function LineCardComponent({
     let statusType: LineStatusType = "closed";
 
     // Próximo horário
+    const next = schedulesInMinutes.find(
+      (schedule) => schedule > currentMinutes,
+    );
     const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
     if (next !== undefined) {
       nextSchedule = minutesToTime(next);
