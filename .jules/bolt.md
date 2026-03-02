@@ -1,0 +1,3 @@
+## 2024-03-02 - O(1) map lookups and separating memoized dependencies
+**Learning:** Performing `O(N*M)` array find operations during render (like mapping over stop IDs to find objects from a larger list) and mixing costly one-time calculations (parsing/sorting) with frequently updated values (the current time) creates performance bottlenecks.
+**Action:** Always prefer `Map` for ID lookups (`O(N+M)`) instead of nested array loops. Break up `useMemo` hooks so that heavy parsing/sorting logic relies strictly on source arrays, and dynamic filtering (e.g. checking if a schedule has passed) relies only on the current state variable and the memoized pre-calculated data.
