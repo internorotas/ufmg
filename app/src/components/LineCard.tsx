@@ -395,6 +395,13 @@ function LineCardComponent({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
     <article
       tabIndex={0}
@@ -410,6 +417,9 @@ function LineCardComponent({
       onKeyDown={handleKeyDown}
       tabIndex={0}
       aria-label={`Selecionar linha ${linha.nome}`}
+      className={cn(
+        lineCardVariants({ selected: isSelected }),
+        "mb-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
       aria-label={`Selecionar linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ""}`}
       onClick={handleCardClick}
       className={cn(
