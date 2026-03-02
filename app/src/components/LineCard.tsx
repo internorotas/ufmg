@@ -3,6 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
+import { useMemo, type ComponentProps, type KeyboardEvent } from "react";
 import { memo, useMemo, type ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
@@ -267,8 +268,18 @@ function LineCardComponent({
     }
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
     <article
+      tabIndex={0}
+      aria-label={`Linha ${linha.nome}. Status: ${status}`}
+      onKeyDown={handleKeyDown}
       data-slot="card"
       data-state={isSelected ? "selected" : undefined}
       onClick={onClick}
@@ -331,6 +342,7 @@ function LineCardComponent({
 
         {/* Button */}
         <button
+          aria-label={`Ver detalhes da linha ${linha.nome}`}
           data-slot="action"
           onClick={handleDetailsClick}
           className={detailsButtonVariants()}
