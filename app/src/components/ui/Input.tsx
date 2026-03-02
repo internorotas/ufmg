@@ -244,7 +244,8 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           className={cn(
             inputVariants({
               hasLeftIcon: true,
-              hasRightIcon: (showClear && hasValue) || (!hasValue && !!shortcut),
+              hasRightIcon:
+                (showClear && hasValue) || (!hasValue && !!shortcut),
             }),
             "pr-10",
             className,
