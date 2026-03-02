@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useMemo, type ComponentProps } from "react";
+import { memo, useMemo, type ComponentProps } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -25,6 +25,7 @@ export const lineCardVariants = tv({
     "relative overflow-hidden rounded-xl border bg-card shadow-sm",
     "cursor-pointer transition-all duration-200 ease-out",
     "hover:shadow-lg hover:-translate-y-0.5",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2",
   ],
   variants: {
     selected: {
@@ -55,13 +56,6 @@ export const detailsButtonVariants = tv({
 // TYPES
 // ============================================================================
 
-interface ScheduleResult {
-  nextSchedule: string;
-  previousSchedule: string;
-  status: string;
-  statusType: LineStatusType;
-}
-
 export interface LineCardProps
   extends
     Omit<ComponentProps<"article">, "onClick">,
@@ -69,75 +63,11 @@ export interface LineCardProps
   /** Dados da linha de ônibus */
   linha: Linha;
   /** Callback ao clicar no card */
-  onClick: () => void;
+  onClick: (linha: Linha) => void;
   /** Callback ao clicar em "Ver Detalhes" */
-  onDetailsClick: () => void;
+  onDetailsClick: (linha: Linha) => void;
   /** Se o card está selecionado */
   isSelected?: boolean;
-}
-
-// ============================================================================
-// HELPERS
-// ============================================================================
-
-/**
- * Calcula os horários de próximo ônibus e último que partiu
- */
-function calculateSchedules(horarios: string[]): ScheduleResult {
-  if (!horarios || horarios.length === 0) {
-    return {
-      nextSchedule: "--:--",
-      previousSchedule: "--:--",
-      status: "Sem Horários",
-      statusType: "closed",
-    };
-  }
-
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const schedulesInMinutes = horarios
-    .filter((time) => time && time.includes(":"))
-    .map(timeToMinutes)
-    .sort((a, b) => a - b);
-
-  if (schedulesInMinutes.length === 0) {
-    return {
-      nextSchedule: "--:--",
-      previousSchedule: "--:--",
-      status: "Sem Horários",
-      statusType: "closed",
-    };
-  }
-
-  let nextSchedule = "--:--";
-  let previousSchedule = "--:--";
-  let status = "Encerrado";
-  let statusType: LineStatusType = "closed";
-
-  // Próximo horário
-  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
-  if (next !== undefined) {
-    nextSchedule = minutesToTime(next);
-    const diffMinutes = next - currentMinutes;
-    if (diffMinutes <= 15) {
-      status = `Próximo às ${nextSchedule}`;
-      statusType = "upcoming";
-    } else {
-      status = "Circulando";
-      statusType = "running";
-    }
-  }
-
-  // Último que partiu
-  const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule <= currentMinutes,
-  );
-  if (previousSchedules.length > 0) {
-    previousSchedule = minutesToTime(Math.max(...previousSchedules));
-  }
-
-  return { nextSchedule, previousSchedule, status, statusType };
 }
 
 // ============================================================================
@@ -172,7 +102,7 @@ function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
       data-slot="schedule"
       className="rounded-lg bg-background-secondary/50 p-2 text-center"
     >
-      <p className="mb-1 flex items-center justify-center gap-1 text-[10px] text-text-secondary md:text-xs">
+      <p className="mb-1 flex items-center justify-center gap-1 text-xs text-text-secondary">
         <Clock className="size-3.5" />
         {label}
       </p>
@@ -212,13 +142,13 @@ function SuspendedNotice() {
  * ```tsx
  * <LineCard
  *   linha={linha}
- *   onClick={() => handleSelect(linha)}
- *   onDetailsClick={() => openDetails(linha)}
+ *   onClick={handleSelect} // (linha) => void
+ *   onDetailsClick={openDetails} // (linha) => void
  *   isSelected={selectedId === linha.idRota}
  * />
  * ```
  */
-export function LineCard({
+function LineCardComponent({
   linha,
   onClick,
   onDetailsClick,
@@ -242,8 +172,22 @@ export function LineCard({
   const shouldDisableSchedules =
     isInVacationPeriod && (!isVacationLine || isWeekend);
 
-  // Calcular horários
-  const { nextSchedule, previousSchedule, status, statusType } = useMemo(() => {
+  /**
+   * Performance Optimization: Memoize parsing of schedules.
+   * Only re-calculate if the schedule list changes.
+   * Sorting is included to be safe, although data is likely sorted.
+   */
+  const schedulesInMinutes = useMemo(() => {
+    if (!linha.horarios || linha.horarios.length === 0) return [];
+    return linha.horarios
+      .filter((time) => time && time.includes(":"))
+      .map(timeToMinutes)
+      .sort((a, b) => a - b);
+  }, [linha.horarios]);
+
+  // Calculate status/next/prev on every render to ensure freshness
+  // This is cheap (O(N) on small array) but ensures "currentMinutes" is always up to date
+  const { nextSchedule, previousSchedule, status, statusType } = (() => {
     if (shouldDisableSchedules) {
       return {
         nextSchedule: "Indisponível",
@@ -252,8 +196,52 @@ export function LineCard({
         statusType: "notRunning" as LineStatusType,
       };
     }
-    return calculateSchedules(linha.horarios);
-  }, [linha.horarios, shouldDisableSchedules]);
+
+    if (schedulesInMinutes.length === 0) {
+      return {
+        nextSchedule: "--:--",
+        previousSchedule: "--:--",
+        status: "Sem Horários",
+        statusType: "closed" as LineStatusType,
+      };
+    }
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    let nextSchedule = "--:--";
+    let previousSchedule = "--:--";
+    let status = "Encerrado";
+    let statusType: LineStatusType = "closed";
+
+    // Próximo horário
+    const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
+    if (next !== undefined) {
+      nextSchedule = minutesToTime(next);
+      const diffMinutes = next - currentMinutes;
+      if (diffMinutes <= 15) {
+        status = `Próximo às ${nextSchedule}`;
+        statusType = "upcoming";
+      } else {
+        status = "Circulando";
+        statusType = "running";
+      }
+    }
+
+    // Último que partiu
+    const previousSchedules = schedulesInMinutes.filter(
+      (schedule) => schedule <= currentMinutes,
+    );
+    if (previousSchedules.length > 0) {
+      previousSchedule = minutesToTime(Math.max(...previousSchedules));
+    }
+
+    return { nextSchedule, previousSchedule, status, statusType };
+  })();
+
+  const handleCardClick = () => {
+    onClick(linha);
+  };
 
   const handleDetailsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -262,7 +250,21 @@ export function LineCard({
       action: "Abrir Card Detalhes",
       label: linha.nome,
     });
-    onDetailsClick();
+    onDetailsClick(linha);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick?.();
+    }
   };
 
   return (
@@ -270,15 +272,31 @@ export function LineCard({
       data-slot="card"
       data-state={isSelected ? "selected" : undefined}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      aria-label={`Selecionar linha ${linha.nome}`}
+      aria-label={`Selecionar linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ""}`}
+      onClick={handleCardClick}
       className={cn(
         lineCardVariants({ selected: isSelected }),
         "mb-3",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
         className,
       )}
       {...props}
     >
       {/* Header */}
-      <div data-slot="header" className="relative p-4 pb-3">
+      <button
+        type="button"
+        data-slot="header"
+        aria-pressed={isSelected}
+        aria-label={`Selecionar linha ${linha.nome}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick();
+        }}
+        className="relative w-full cursor-pointer rounded-lg p-4 pb-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+      >
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-1 items-start gap-3">
             <LineIcon color={linha.corHex} />
@@ -298,7 +316,7 @@ export function LineCard({
             <ChevronRight className="size-5 shrink-0 text-text-secondary" />
           </div>
         </div>
-      </div>
+      </button>
 
       {/* Body */}
       <div data-slot="body" className="px-4 pb-4">
@@ -324,3 +342,6 @@ export function LineCard({
     </article>
   );
 }
+
+// Memoize the component to prevent re-renders when props are stable
+export const LineCard = memo(LineCardComponent);
