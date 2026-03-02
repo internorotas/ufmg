@@ -138,6 +138,35 @@ export function LinhaDetalhesModal({
   // Rastreia tempo que o usuário passa visualizando detalhes desta linha
   useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
 
+  // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
+  const paradasDoItinerario = useMemo(() => {
+    return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
+  }, [linha.itinerarioParadasIds, todasParadas]);
+
+  // Separar lógica custosa de parser e sort dos horários
+  const horariosParseados = useMemo(() => {
+    return linha.horarios
+      .filter((h) => h && h.includes(":"))
+      .map((horario) => ({
+        horario,
+        minutos: timeToMinutes(horario),
+      }))
+      .sort((a, b) => a.minutos - b.minutos);
+  }, [linha.horarios]);
+
+  // Calcular horários passados e futuros de forma otimizada
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const horariosOrganizados = useMemo(() => {
+    return horariosParseados.map((h) => ({
+      ...h,
+      passou: h.minutos < currentMinutes,
+    }));
+  }, [horariosParseados, currentMinutes]);
+
+  const proximos = horariosOrganizados.filter((h) => !h.passou);
+  const passados = horariosOrganizados.filter((h) => h.passou);
   // Buscar paradas do itinerário dinamicamente usando os IDs
   // ⚡ Bolt: Memoizing O(N*M) lookup to prevent recalculation when switching modal tabs
   const paradasDoItinerario = useMemo(

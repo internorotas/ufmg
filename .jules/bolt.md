@@ -1,3 +1,6 @@
+## 2024-03-02 - O(1) map lookups and separating memoized dependencies
+**Learning:** Performing `O(N*M)` array find operations during render (like mapping over stop IDs to find objects from a larger list) and mixing costly one-time calculations (parsing/sorting) with frequently updated values (the current time) creates performance bottlenecks.
+**Action:** Always prefer `Map` for ID lookups (`O(N+M)`) instead of nested array loops. Break up `useMemo` hooks so that heavy parsing/sorting logic relies strictly on source arrays, and dynamic filtering (e.g. checking if a schedule has passed) relies only on the current state variable and the memoized pre-calculated data.
 ## 2024-03-24 - [O(N^2) Array finding in render path]
 **Learning:** Found an `Array.find` nested inside an `Array.map` (`buscarParadasPorIds`) in `app/lib/utils.ts` which runs on render in modals. Because the arrays of schedules and stops can grow reasonably large, finding an item in a list across another list resulted in $O(N \times M)$ complexity during critical paths like opening modals.
 **Action:** When filtering or mapping data across different collections by ID in utility functions, always prefer to convert the searched array into a `Map` first to bring time complexity down to $O(N + M)$.
