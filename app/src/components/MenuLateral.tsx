@@ -4,6 +4,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Menu, ArrowLeft } from "lucide-react";
 import { useLinhasFilter } from "../hooks/useLinhasFilter";
@@ -199,10 +200,19 @@ export function MenuLateral({
       setMenuVisible(false);
     }
   };
+  const handleCardClick = useCallback(
+    (linha: Linha) => {
+      onLinhaSelect(linha);
+      if (window.innerWidth < 768) {
+        setMenuVisible(false);
+      }
+    },
+    [onLinhaSelect],
+  );
 
-  const handleDetailsClick = (linha: Linha) => {
+  const handleDetailsClick = useCallback((linha: Linha) => {
     setLinhaDetalhesAberta(linha);
-  };
+  }, []);
 
   const handleParadaClickWrapper = (parada: Parada) => {
     onParadaClick(parada);
@@ -299,8 +309,8 @@ export function MenuLateral({
               <LineCard
                 key={linha.idRota}
                 linha={linha}
-                onClick={() => handleCardClick(linha)}
-                onDetailsClick={() => handleDetailsClick(linha)}
+                onClick={handleCardClick}
+                onDetailsClick={handleDetailsClick}
                 isSelected={linhaSelecionada?.idRota === linha.idRota}
               />
             ))
