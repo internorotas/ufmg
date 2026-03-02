@@ -3,8 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useState, useRef, useEffect } from "react";
-import { useState, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Menu, ArrowLeft } from "lucide-react";
 import { useLinhasFilter } from "../hooks/useLinhasFilter";
@@ -159,7 +158,10 @@ export function MenuLateral({
 
   // Initialize state based on environment
   const [shortcutLabel] = useState(() => {
-    if (typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform)) {
+    if (
+      typeof navigator !== "undefined" &&
+      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+    ) {
       return "⌘K";
     }
     return "Ctrl+K";
@@ -194,12 +196,6 @@ export function MenuLateral({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const handleCardClick = (linha: Linha) => {
-    onLinhaSelect(linha);
-    if (window.innerWidth < 768) {
-      setMenuVisible(false);
-    }
-  };
   const handleCardClick = useCallback(
     (linha: Linha) => {
       onLinhaSelect(linha);
@@ -309,8 +305,6 @@ export function MenuLateral({
               <LineCard
                 key={linha.idRota}
                 linha={linha}
-                onSelect={handleCardClick}
-                onDetails={handleDetailsClick}
                 onClick={handleCardClick}
                 onDetailsClick={handleDetailsClick}
                 isSelected={linhaSelecionada?.idRota === linha.idRota}
