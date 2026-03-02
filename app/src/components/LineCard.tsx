@@ -26,6 +26,7 @@ export const lineCardVariants = tv({
     "relative overflow-hidden rounded-xl border bg-card shadow-sm",
     "cursor-pointer transition-all duration-200 ease-out",
     "hover:shadow-lg hover:-translate-y-0.5",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2",
   ],
   variants: {
@@ -353,6 +354,13 @@ function LineCardComponent({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
     <article
       tabIndex={0}
@@ -360,6 +368,10 @@ function LineCardComponent({
       onKeyDown={handleKeyDown}
       data-slot="card"
       data-state={isSelected ? "selected" : undefined}
+      role="button"
+      tabIndex={0}
+      aria-label={`Selecionar linha ${linha.nome}`}
+      aria-pressed={isSelected}
       onClick={onClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
@@ -425,6 +437,7 @@ function LineCardComponent({
           onClick={handleDetailsClick}
           className={detailsButtonVariants()}
           style={{ backgroundColor: linha.corHex }}
+          aria-label={`Ver detalhes da linha ${linha.nome}`}
         >
           Ver Detalhes
         </button>
