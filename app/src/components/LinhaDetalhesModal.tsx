@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { tv } from "tailwind-variants";
 import { Clock, Map, MapPin, Bus } from "lucide-react";
 import { Modal } from "./Modal";
@@ -138,24 +138,32 @@ export function LinhaDetalhesModal({
   // Rastreia tempo que o usuário passa visualizando detalhes desta linha
   useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
 
-  // Buscar paradas do itinerário dinamicamente usando os IDs
-  const paradasDoItinerario = buscarParadasPorIds(
-    linha.itinerarioParadasIds,
-    todasParadas,
-  );
+  // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
+  const paradasDoItinerario = useMemo(() => {
+    return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
+  }, [linha.itinerarioParadasIds, todasParadas]);
 
-  // Calcular horários passados e futuros
+  // Separar lógica custosa de parser e sort dos horários
+  const horariosParseados = useMemo(() => {
+    return linha.horarios
+      .filter((h) => h && h.includes(":"))
+      .map((horario) => ({
+        horario,
+        minutos: timeToMinutes(horario),
+      }))
+      .sort((a, b) => a.minutos - b.minutos);
+  }, [linha.horarios]);
+
+  // Calcular horários passados e futuros de forma otimizada
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const horariosOrganizados = linha.horarios
-    .filter((h) => h && h.includes(":"))
-    .map((horario) => ({
-      horario,
-      minutos: timeToMinutes(horario),
-      passou: timeToMinutes(horario) < currentMinutes,
-    }))
-    .sort((a, b) => a.minutos - b.minutos);
+  const horariosOrganizados = useMemo(() => {
+    return horariosParseados.map((h) => ({
+      ...h,
+      passou: h.minutos < currentMinutes,
+    }));
+  }, [horariosParseados, currentMinutes]);
 
   const proximos = horariosOrganizados.filter((h) => !h.passou);
   const passados = horariosOrganizados.filter((h) => h.passou);
