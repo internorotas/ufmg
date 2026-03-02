@@ -102,7 +102,7 @@ function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
       data-slot="schedule"
       className="rounded-lg bg-background-secondary/50 p-2 text-center"
     >
-      <p className="mb-1 flex items-center justify-center gap-1 text-[10px] text-text-secondary md:text-xs">
+      <p className="mb-1 flex items-center justify-center gap-1 text-xs text-text-secondary">
         <Clock className="size-3.5" />
         {label}
       </p>
@@ -286,7 +286,17 @@ function LineCardComponent({
       {...props}
     >
       {/* Header */}
-      <div data-slot="header" className="relative p-4 pb-3">
+      <button
+        type="button"
+        data-slot="header"
+        aria-pressed={isSelected}
+        aria-label={`Selecionar linha ${linha.nome}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick();
+        }}
+        className="relative w-full cursor-pointer rounded-lg p-4 pb-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+      >
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-1 items-start gap-3">
             <LineIcon color={linha.corHex} />
@@ -306,7 +316,7 @@ function LineCardComponent({
             <ChevronRight className="size-5 shrink-0 text-text-secondary" />
           </div>
         </div>
-      </div>
+      </button>
 
       {/* Body */}
       <div data-slot="body" className="px-4 pb-4">
