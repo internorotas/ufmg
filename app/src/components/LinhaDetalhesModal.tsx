@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, type KeyboardEvent } from "react";
 import { tv } from "tailwind-variants";
 import { Clock, Map, MapPin, Bus } from "lucide-react";
 import { Modal } from "./Modal";
@@ -71,11 +71,16 @@ export const stopIconContainerVariants = tv({
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-colors cursor-pointer",
+  base: [
+    "rounded-lg border p-3 text-center transition-colors cursor-pointer",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+  ],
   variants: {
     status: {
-      upcoming: "border-2 hover:scale-105 hover:shadow-md active:scale-95",
-      passed: "border border-card-border bg-card opacity-50 cursor-default",
+      upcoming:
+        "border-2 hover:scale-105 hover:shadow-md active:scale-95 focus-visible:ring-brand-primary",
+      passed:
+        "border border-card-border bg-card opacity-50 cursor-default focus-visible:ring-card-border",
     },
   },
   defaultVariants: {
@@ -186,6 +191,16 @@ export function LinhaDetalhesModal({
       action: "Clique Horario Especifico",
       label: `${horario} - ${linha.nome}`,
     });
+  };
+
+  const handleHorarioKeyDown = (
+    e: KeyboardEvent<HTMLDivElement>,
+    horario: string,
+  ) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleHorarioClick(horario);
+    }
   };
 
   const handleParadaClick = (parada: Parada) => {
@@ -368,6 +383,10 @@ export function LinhaDetalhesModal({
                   <div
                     key={`proximo-${minutos}-${index}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => handleHorarioKeyDown(e, horario)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Próximo horário às ${horario}`}
                     className={scheduleCardVariants({ status: "upcoming" })}
                     style={{
                       borderColor: linha.corHex,
@@ -398,6 +417,10 @@ export function LinhaDetalhesModal({
                   <div
                     key={`passado-${minutos}-${index}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => handleHorarioKeyDown(e, horario)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Horário passado às ${horario}`}
                     className={scheduleCardVariants({ status: "passed" })}
                   >
                     <p className="text-lg font-semibold text-text-secondary">
