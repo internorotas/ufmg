@@ -105,16 +105,24 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const shouldDisableSchedules =
     isInVacationPeriod && (!isVacationLine || isWeekend);
 
-  const horariosOrganizados = useMemo(() => {
+  // ⚡ Bolt: Memoize expensive schedule parsing/sorting separately from current time check.
+  // This prevents O(N log N) re-calculations on every render when time or other state changes.
+  const horariosParsed = useMemo(() => {
     return linha.horarios
       .filter((time) => time && time.includes(":"))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
-        passou: timeToMinutes(horario) < currentMinutes,
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios, currentMinutes]);
+  }, [linha.horarios]);
+
+  const horariosOrganizados = useMemo(() => {
+    return horariosParsed.map((h) => ({
+      ...h,
+      passou: h.minutos < currentMinutes,
+    }));
+  }, [horariosParsed, currentMinutes]);
 
   const proximos = horariosOrganizados.filter((h) => !h.passou);
   const passados = horariosOrganizados.filter((h) => h.passou);
