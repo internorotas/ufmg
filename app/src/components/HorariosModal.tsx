@@ -105,19 +105,29 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const shouldDisableSchedules =
     isInVacationPeriod && (!isVacationLine || isWeekend);
 
-  const horariosOrganizados = useMemo(() => {
+  // Memoizar apenas o parse e sort (operações caras de array e string)
+  // que dependem exclusivamente de linha.horarios
+  const horariosParseadosEOrdenados = useMemo(() => {
     return linha.horarios
       .filter((time) => time && time.includes(":"))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
-        passou: timeToMinutes(horario) < currentMinutes,
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios, currentMinutes]);
+  }, [linha.horarios]);
 
-  const proximos = horariosOrganizados.filter((h) => !h.passou);
-  const passados = horariosOrganizados.filter((h) => h.passou);
+  // Recalcular apenas o estado de passou a cada render,
+  // pois a variável currentMinutes atualiza rapidamente.
+  const horariosComStatus = useMemo(() => {
+    return horariosParseadosEOrdenados.map((item) => ({
+      ...item,
+      passou: item.minutos < currentMinutes,
+    }));
+  }, [horariosParseadosEOrdenados, currentMinutes]);
+
+  const proximos = useMemo(() => horariosComStatus.filter((h) => !h.passou), [horariosComStatus]);
+  const passados = useMemo(() => horariosComStatus.filter((h) => h.passou), [horariosComStatus]);
 
   return (
     <Modal
@@ -198,7 +208,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
             className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm"
           >
             <p className="text-center text-gray-300">
-              Total de {horariosOrganizados.length} horários •{" "}
+              Total de {horariosComStatus.length} horários •{" "}
               <span className="text-green-400">
                 {proximos.length} restantes
               </span>
