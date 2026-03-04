@@ -188,6 +188,13 @@ export function LinhaDetalhesModal({
     });
   };
 
+  const handleHorarioKeyDown = (e: React.KeyboardEvent, horario: string) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleHorarioClick(horario);
+    }
+  };
+
   const handleParadaClick = (parada: Parada) => {
     trackEvent({
       category: "Engajamento Detalhes",
@@ -368,7 +375,11 @@ export function LinhaDetalhesModal({
                   <div
                     key={`proximo-${minutos}-${index}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => handleHorarioKeyDown(e, horario)}
                     className={scheduleCardVariants({ status: "upcoming" })}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Próximo horário às ${horario}`}
                     style={{
                       borderColor: linha.corHex,
                       backgroundColor: `${linha.corHex}20`,
@@ -398,7 +409,11 @@ export function LinhaDetalhesModal({
                   <div
                     key={`passado-${minutos}-${index}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => handleHorarioKeyDown(e, horario)}
                     className={scheduleCardVariants({ status: "passed" })}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Horário passado às ${horario}`}
                   >
                     <p className="text-lg font-semibold text-text-secondary">
                       {horario}
