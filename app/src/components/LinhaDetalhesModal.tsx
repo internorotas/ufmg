@@ -148,26 +148,32 @@ export function LinhaDetalhesModal({
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   // Memoizar parsing e ordenação custosa dos horários
+  // Otimização: memoizar apenas parsing e ordenação que são O(N log N) e não dependem do tempo
   const horariosOrganizados = useMemo(() => {
     return linha.horarios
       .filter((h) => h && h.includes(":"))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
-        passou: timeToMinutes(horario) < currentMinutes,
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios, currentMinutes]);
+  }, [linha.horarios]);
 
-  // Memoizar listas filtradas derivadas
-  const proximos = useMemo(
-    () => horariosOrganizados.filter((h) => !h.passou),
-    [horariosOrganizados],
-  );
-  const passados = useMemo(
-    () => horariosOrganizados.filter((h) => h.passou),
-    [horariosOrganizados],
-  );
+  // Recalcular status de tempo base em tempo real sem re-ordenar
+  const { proximos, passados } = useMemo(() => {
+    const prox = [];
+    const pass = [];
+    for (const h of horariosOrganizados) {
+      const passou = h.minutos < currentMinutes;
+      const horarioItem = { ...h, passou };
+      if (passou) {
+        pass.push(horarioItem);
+      } else {
+        prox.push(horarioItem);
+      }
+    }
+    return { proximos: prox, passados: pass };
+  }, [horariosOrganizados, currentMinutes]);
 
   const handleTabChange = (tab: TabType) => {
     trackEvent({
