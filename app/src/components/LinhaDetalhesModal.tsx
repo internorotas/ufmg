@@ -71,11 +71,13 @@ export const stopIconContainerVariants = tv({
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-colors cursor-pointer",
+  base: "rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
   variants: {
     status: {
-      upcoming: "border-2 hover:scale-105 hover:shadow-md active:scale-95",
-      passed: "border border-card-border bg-card opacity-50 cursor-default",
+      upcoming:
+        "border-2 hover:scale-105 hover:shadow-md active:scale-95 cursor-pointer focus-visible:ring-brand-primary",
+      passed:
+        "border border-card-border bg-card opacity-50 cursor-default focus-visible:ring-card-border",
     },
   },
   defaultVariants: {
@@ -367,7 +369,16 @@ export function LinhaDetalhesModal({
                 {proximos.map(({ horario, minutos }, index) => (
                   <div
                     key={`proximo-${minutos}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Próximo horário às ${horario}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
                     className={scheduleCardVariants({ status: "upcoming" })}
                     style={{
                       borderColor: linha.corHex,
@@ -397,7 +408,16 @@ export function LinhaDetalhesModal({
                 {passados.map(({ horario, minutos }, index) => (
                   <div
                     key={`passado-${minutos}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Horário passado às ${horario}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
                     className={scheduleCardVariants({ status: "passed" })}
                   >
                     <p className="text-lg font-semibold text-text-secondary">
