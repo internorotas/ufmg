@@ -476,32 +476,66 @@ export function isNumberArray(value: unknown): value is number[] {
 }
 
 /**
- * Detecta e converte URLs em texto simples para links HTML
- * @param texto Texto que pode conter URLs
- * @returns Texto com URLs convertidas em tags <a>
+ * Escapa caracteres HTML perigosos para prevenir ataques de Cross-Site Scripting (XSS)
+ * @param texto Texto a ser escapado
+ * @returns Texto com caracteres perigosos escapados
  */
-export function converterUrlsEmLinks(texto: string): string {
-  // Regex melhorada para detectar URLs começando com http://, https:// ou www.
-  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
-
-  // Substitui URLs encontradas por tags <a>
-  return texto.replace(urlRegex, (url) => {
-    // Adiciona o protocolo http:// às URLs que começam com www.
-    let href = url.startsWith("www.") ? `http://${url}` : url;
-    if (href.endsWith(",") || href.endsWith("."))
-      href = href.substring(0, href.length - 1);
-    return `<a style='color:#2357b0; text-decoration:none;' href="${href}" target="_blank" rel="noopener noreferrer" onmouseover="this.style.opacity=0.75;" onmouseout="this.style.opacity=1;">${url}</a>`;
-  });
+export function escapeHtml(texto: string): string {
+  if (!texto) return "";
+  return texto
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 /**
- * formatar quebras de linha do texto original
- * transformar quebras de linha em tags <br/>
- * para garantir que a exibição mantenha a formatação esperada
+ * Detecta e converte URLs em texto simples para links HTML de forma segura
+ * @param texto Texto que pode conter URLs
+ * @returns Texto seguro com URLs convertidas em tags <a>
+ */
+export function converterUrlsEmLinks(texto: string): string {
+  if (!texto) return "";
+
+  // Regex melhorada para detectar URLs começando com http://, https:// ou www.
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+
+  // Divide o texto com base no regex, isolando as URLs para escapá-las individualmente
+  const parts = texto.split(urlRegex);
+
+  return parts
+    .map((part) => {
+      if (part && part.match(urlRegex)) {
+        let urlStr = part;
+        let suffix = "";
+
+        // Remove pontuação final para não incluir no link
+        if (urlStr.endsWith(",") || urlStr.endsWith(".")) {
+          suffix = urlStr.slice(-1);
+          urlStr = urlStr.slice(0, -1);
+        }
+
+        // Adiciona o protocolo http:// às URLs que começam com www.
+        const href = urlStr.startsWith("www.") ? `http://${urlStr}` : urlStr;
+
+        // Os atributos e o texto são construídos com segurança
+        return `<a style='color:#2357b0; text-decoration:none;' href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" onmouseover="this.style.opacity=0.75;" onmouseout="this.style.opacity=1;">${escapeHtml(urlStr)}</a>${suffix}`;
+      }
+      // Para o texto normal, apenas escapamos para evitar injeção de HTML/XSS
+      return escapeHtml(part);
+    })
+    .join("");
+}
+
+/**
+ * Formata quebras de linha do texto original,
+ * transformando quebras de linha em tags <br/> de forma segura (escapando HTML antes).
  * @param texto a ser convertido
- * @returns Texto substituindo as quebras de linha por tags <br/>
+ * @returns Texto substituindo as quebras de linha por tags <br/> com conteúdo escapado
  */
 export function formatarTextoComQuebras(texto: string) {
   if (!texto) return "";
-  return texto.replace(/\n/g, "<br/>");
+  // Proteção contra XSS: Escapamos o texto antes de injetar as tags <br/>
+  return escapeHtml(texto).replace(/\n/g, "<br/>");
 }
