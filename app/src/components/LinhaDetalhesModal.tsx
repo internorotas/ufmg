@@ -367,6 +367,15 @@ export function LinhaDetalhesModal({
                 {proximos.map(({ horario, minutos }, index) => (
                   <div
                     key={`proximo-${minutos}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Próximo horário às ${horario}`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
                     onClick={() => handleHorarioClick(horario)}
                     className={scheduleCardVariants({ status: "upcoming" })}
                     style={{
@@ -397,6 +406,15 @@ export function LinhaDetalhesModal({
                 {passados.map(({ horario, minutos }, index) => (
                   <div
                     key={`passado-${minutos}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Horário passado às ${horario}`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
                     onClick={() => handleHorarioClick(horario)}
                     className={scheduleCardVariants({ status: "passed" })}
                   >
