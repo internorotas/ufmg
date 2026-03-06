@@ -302,12 +302,16 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
   }
 
   // Encontrar horário anterior
-  const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule < currentMinutes,
-  );
-  if (previousSchedules.length > 0) {
-    previousSchedule = minutesToTime(Math.max(...previousSchedules));
-  } else if (schedulesInMinutes.length > 0) {
+  let foundPrevious = false;
+  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
+    if (schedulesInMinutes[i] < currentMinutes) {
+      previousSchedule = minutesToTime(schedulesInMinutes[i]);
+      foundPrevious = true;
+      break;
+    }
+  }
+
+  if (!foundPrevious && schedulesInMinutes.length > 0) {
     // Se não há horários anteriores hoje, o anterior é o último de ontem
     previousSchedule = minutesToTime(
       schedulesInMinutes[schedulesInMinutes.length - 1],
