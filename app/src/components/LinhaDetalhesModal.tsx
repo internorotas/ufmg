@@ -159,17 +159,21 @@ export function LinhaDetalhesModal({
   // Mensagem de aviso quando a linha não está circulando
   const getNotRunningMessage = (): string => {
     if (isWeekdayLine) {
-      if (isInVacationPeriod) return "Esta linha não circula durante período de férias";
+      if (isInVacationPeriod)
+        return "Esta linha não circula durante período de férias";
       if (isSaturday) return "Esta linha não circula aos sábados";
       if (isSunday) return "Esta linha não circula aos domingos";
     }
     if (isSaturdayLine) {
-      if (isInVacationPeriod) return "Esta linha não circula durante período de férias";
+      if (isInVacationPeriod)
+        return "Esta linha não circula durante período de férias";
       return "Esta linha circula apenas aos sábados";
     }
     if (isVacationLine) {
-      if (!isInVacationPeriod) return "Esta linha circula apenas durante período de férias";
-      if (isSaturday || isSunday) return "Esta linha não circula em fins de semana";
+      if (!isInVacationPeriod)
+        return "Esta linha circula apenas durante período de férias";
+      if (isSaturday || isSunday)
+        return "Esta linha não circula em fins de semana";
     }
     return "Esta linha não está circulando hoje";
   };
@@ -476,34 +480,34 @@ export function LinhaDetalhesModal({
             </div>
           ) : (
             passados.length > 0 && (
-            <div data-slot="passed-schedules">
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
-                <Clock size={20} />
-                Horários Passados ({passados.length})
-              </h3>
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {passados.map(({ horario, minutos }, index) => (
-                  <div
-                    key={`passado-${minutos}-${index}`}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`Horário passado às ${horario}`}
-                    onClick={() => handleHorarioClick(horario)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleHorarioClick(horario);
-                      }
-                    }}
-                    className={scheduleCardVariants({ status: "passed" })}
-                  >
-                    <p className="text-lg font-semibold text-text-secondary">
-                      {horario}
-                    </p>
-                  </div>
-                ))}
+              <div data-slot="passed-schedules">
+                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+                  <Clock size={20} />
+                  Horários Passados ({passados.length})
+                </h3>
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                  {passados.map(({ horario, minutos }, index) => (
+                    <div
+                      key={`passado-${minutos}-${index}`}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Horário passado às ${horario}`}
+                      onClick={() => handleHorarioClick(horario)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleHorarioClick(horario);
+                        }
+                      }}
+                      className={scheduleCardVariants({ status: "passed" })}
+                    >
+                      <p className="text-lg font-semibold text-text-secondary">
+                        {horario}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
             )
           )}
 

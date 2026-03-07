@@ -5,6 +5,13 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { RotasProvider, useRotas } from "./contexts/RotasContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useAnalytics } from "./hooks/useAnalytics";
+import {
+  useLocalizacaoUsuario,
+  COORDENADAS_UFMG,
+} from "./hooks/useLocalizacaoUsuario";
+import { Modal } from "./components/Modal";
+import { Button } from "./components/ui/Button";
+import { MapPin, Navigation } from "lucide-react";
 import type { Linha, Parada } from "./types/data.types";
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
@@ -44,6 +51,21 @@ function AppContent() {
 
   const { trackEvent, trackPageView } = useAnalytics();
 
+  // Hook de localização do usuário
+  const {
+    localizacao,
+    heading,
+    permissaoConcedida,
+    carregando: carregandoLocalizacao,
+    erro: erroLocalizacao,
+    mostrarModalPermissao,
+    mostrarModalLonge,
+    abrirModalPermissao,
+    fecharModalPermissao,
+    fecharModalLonge,
+    iniciarRastreamento,
+  } = useLocalizacaoUsuario();
+
   useEffect(() => {
     trackPageView();
   }, [trackPageView]);
@@ -72,6 +94,20 @@ function AppContent() {
     },
     [selecionarParada, trackEvent],
   );
+
+  // Handler para voltar ao campus UFMG
+  const handleVoltarParaUFMG = useCallback(() => {
+    mapaRef.current?.centralizarCoordenada(COORDENADAS_UFMG, 15);
+    fecharModalLonge();
+  }, [mapaRef, fecharModalLonge]);
+
+  // Handler para ficar na localização atual do usuário
+  const handleContinuarAqui = useCallback(() => {
+    if (localizacao) {
+      mapaRef.current?.centralizarCoordenada(localizacao, 17);
+    }
+    fecharModalLonge();
+  }, [localizacao, mapaRef, fecharModalLonge]);
 
   // Validação dos dados
   if (!todasParadas || todasParadas.length === 0) {
@@ -126,9 +162,89 @@ function AppContent() {
             todasParadas={todasParadas}
             linhaSelecionada={linhaSelecionada}
             paradaSelecionada={paradaSelecionada}
+            localizacaoUsuario={localizacao}
+            headingUsuario={heading}
+            permissaoLocalizacao={permissaoConcedida}
+            onPedirLocalizacao={abrirModalPermissao}
           />
         </Suspense>
       </main>
+
+      {/* Modal de Permissão de Localização */}
+      <Modal
+        isOpen={mostrarModalPermissao}
+        onClose={fecharModalPermissao}
+        title={
+          <div className="flex items-center gap-2">
+            <Navigation className="h-5 w-5 text-brand-primary" />
+            <span>Ativar Localização</span>
+          </div>
+        }
+        size="sm"
+      >
+        <div className="space-y-4 p-4">
+          <div className="text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+              <MapPin className="h-8 w-8 text-brand-primary" />
+            </div>
+            <p className="text-text-secondary">
+              Para mostrar sua localização no mapa e te ajudar a encontrar a
+              parada mais próxima, precisamos acessar seu GPS.
+            </p>
+          </div>
+          {erroLocalizacao && (
+            <div className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-600">
+              {erroLocalizacao}
+            </div>
+          )}
+          <div className="flex flex-col gap-2">
+            <Button
+              variant="primary"
+              fullWidth
+              disabled={carregandoLocalizacao}
+              onClick={() => {
+                iniciarRastreamento();
+                trackEvent({
+                  category: "Engajamento",
+                  action: "Localização Permitida",
+                });
+              }}
+            >
+              {carregandoLocalizacao
+                ? "Obtendo localização..."
+                : "Permitir Localização"}
+            </Button>
+            <Button variant="ghost" fullWidth onClick={fecharModalPermissao}>
+              Agora não
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal de Distância (Longe da UFMG) */}
+      <Modal
+        isOpen={mostrarModalLonge}
+        onClose={fecharModalLonge}
+        title="Você está longe do campus"
+        size="sm"
+      >
+        <div className="space-y-4 p-4">
+          <div className="text-center">
+            <p className="text-text-secondary">
+              Parece que você está a mais de 4km da UFMG. Deseja voltar a
+              visualizar o campus no mapa?
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Button variant="primary" fullWidth onClick={handleVoltarParaUFMG}>
+              Voltar para a UFMG
+            </Button>
+            <Button variant="ghost" fullWidth onClick={handleContinuarAqui}>
+              Continuar aqui
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
