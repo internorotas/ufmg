@@ -5,8 +5,9 @@
  * @description Input reutilizável com suporte a ícones e validação.
  */
 
-import type { ComponentProps, ReactNode } from "react";
+import { type ComponentProps, type ReactNode, forwardRef } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
+import { Search, X } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 // ============================================================================
@@ -172,8 +173,6 @@ export function Input({
 // SEARCH INPUT PRESET
 // ============================================================================
 
-import { Search, X } from "lucide-react";
-
 export interface SearchInputProps extends Omit<
   ComponentProps<"input">,
   "size"
@@ -186,6 +185,8 @@ export interface SearchInputProps extends Omit<
   onClear?: () => void;
   /** Mostrar botão de limpar */
   showClear?: boolean;
+  /** Tecla de atalho para focar (ex: "⌘K") */
+  shortcut?: string;
 }
 
 /**
@@ -197,62 +198,81 @@ export interface SearchInputProps extends Omit<
  *   value={search}
  *   onValueChange={setSearch}
  *   placeholder="Pesquisar linha..."
+ *   shortcut="⌘K"
  * />
  * ```
  */
-export function SearchInput({
-  value,
-  onValueChange,
-  onClear,
-  showClear = true,
-  onChange,
-  ...props
-}: SearchInputProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onValueChange?.(e.target.value);
-    onChange?.(e);
-  };
+export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
+  (
+    {
+      value,
+      onValueChange,
+      onClear,
+      showClear = true,
+      onChange,
+      shortcut,
+      className,
+      ...props
+    },
+    ref,
+  ) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      onValueChange?.(e.target.value);
+      onChange?.(e);
+    };
 
-  const handleClear = () => {
-    onValueChange?.("");
-    onClear?.();
-  };
+    const handleClear = () => {
+      onValueChange?.("");
+      onClear?.();
+    };
 
-  const hasValue = Boolean(value);
+    const hasValue = Boolean(value);
 
-  return (
-    <div data-slot="search-input" className="relative w-full">
-      <Search
-        className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-text-secondary"
-        aria-hidden="true"
-      />
+    return (
+      <div data-slot="search-input" className="relative w-full">
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-text-secondary"
+          aria-hidden="true"
+        />
 
-      <input
-        data-slot="input"
-        type="search"
-        value={value}
-        onChange={handleChange}
-        className={cn(
-          inputVariants({
-            hasLeftIcon: true,
-            hasRightIcon: showClear && hasValue,
-          }),
-          "pr-10",
-        )}
-        {...props}
-      />
+        <input
+          ref={ref}
+          data-slot="input"
+          type="search"
+          value={value}
+          onChange={handleChange}
+          className={cn(
+            inputVariants({
+              hasLeftIcon: true,
+              hasRightIcon:
+                (showClear && hasValue) || (!hasValue && !!shortcut),
+            }),
+            "pr-10",
+            className,
+          )}
+          {...props}
+        />
 
-      {showClear && hasValue && (
-        <button
-          data-slot="clear-button"
-          type="button"
-          onClick={handleClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary"
-          aria-label="Limpar busca"
-        >
-          <X size={16} />
-        </button>
-      )}
-    </div>
-  );
-}
+        {showClear && hasValue ? (
+          <button
+            data-slot="clear-button"
+            type="button"
+            onClick={handleClear}
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary"
+            aria-label="Limpar busca"
+          >
+            <X size={16} />
+          </button>
+        ) : shortcut ? (
+          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 hidden md:block">
+            <kbd className="inline-flex h-5 items-center rounded border border-card-border bg-background px-1.5 text-[10px] font-medium text-text-tertiary font-mono">
+              {shortcut}
+            </kbd>
+          </div>
+        ) : null}
+      </div>
+    );
+  },
+);
+
+SearchInput.displayName = "SearchInput";

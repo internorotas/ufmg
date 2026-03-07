@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Content Security Policy for defense in depth -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org https://www.google-analytics.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com ws: wss:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="#2c0eeb" />
 
     <title>Interno Rotas 🚌 | Horários e Rotas dos Ônibus da UFMG</title>
 
@@ -17,9 +24,6 @@
     <meta name="author" content="Igor Martins" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://internorotas.github.io/ufmg/" />
-
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="theme-color" content="#2c0eeb" />
 
     <link rel="icon" href="/logo_Icone.svg" type="image/svg+xml" />
     <link rel="shortcut icon" href="/logo_Icone.svg" type="image/svg+xml" />
@@ -37,6 +41,15 @@
     <meta
       property="og:image"
       content="https://internorotas.github.io/ufmg/og-image.png"
+    />
+    <meta
+      property="og:image:secure_url"
+      content="https://internorotas.github.io/ufmg/og-image.png"
+    />
+    <meta property="og:image:type" content="image/png" />
+    <meta
+      property="og:image:alt"
+      content="Interno Rotas — Mapa e horários dos ônibus da UFMG"
     />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -58,7 +71,11 @@
       property="twitter:image"
       content="https://internorotas.github.io/ufmg/og-image.png"
     />
-    <meta property="twitter:creator" content="@internorotas" />
+    <meta
+      property="twitter:image:alt"
+      content="Interno Rotas — Mapa e horários dos ônibus da UFMG"
+    />
+    <meta property="twitter:creator" content="@titanmpolo" />
   </head>
 
   <body>

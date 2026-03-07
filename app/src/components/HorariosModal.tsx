@@ -19,14 +19,15 @@ import { shouldDisableRegularSchedules } from "../config/specialPeriods";
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-all",
+  base: "rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
   variants: {
     status: {
       upcoming: [
-        "border-green-600 bg-green-900/30 cursor-pointer",
+        "border-green-600 bg-green-900/30 cursor-pointer focus-visible:ring-green-500",
         "hover:bg-green-900/50 hover:scale-105 hover:shadow-md active:scale-95",
       ],
-      passed: "border-gray-700 bg-gray-800/50 opacity-50 cursor-default",
+      passed:
+        "border-gray-700 bg-gray-800/50 opacity-50 cursor-default focus-visible:ring-gray-500",
     },
   },
   defaultVariants: {
@@ -104,19 +105,24 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const shouldDisableSchedules =
     isInVacationPeriod && (!isVacationLine || isWeekend);
 
-  const horariosOrganizados = useMemo(() => {
+  // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
+  const baseHorarios = useMemo(() => {
     return linha.horarios
       .filter((time) => time && time.includes(":"))
-      .map((horario) => {
-        const minutes = timeToMinutes(horario);
-        return {
-          horario,
-          minutos: minutes,
-          passou: minutes < currentMinutes,
-        };
-      })
+      .map((horario) => ({
+        horario,
+        minutos: timeToMinutes(horario),
+      }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios, currentMinutes]);
+  }, [linha.horarios]);
+
+  // ⚡ Bolt: Calcular status 'passou' O(N) separado com base no tempo atual
+  const horariosOrganizados = useMemo(() => {
+    return baseHorarios.map((h) => ({
+      ...h,
+      passou: h.minutos < currentMinutes,
+    }));
+  }, [baseHorarios, currentMinutes]);
 
   const proximos = horariosOrganizados.filter((h) => !h.passou);
   const passados = horariosOrganizados.filter((h) => h.passou);
@@ -158,6 +164,8 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                 <div
                   key={`proximo-${index}`}
                   className={scheduleCardVariants({ status: "upcoming" })}
+                  tabIndex={0}
+                  aria-label={`Próximo horário às ${horario}`}
                 >
                   <p className={scheduleTimeVariants({ status: "upcoming" })}>
                     {horario}
@@ -180,6 +188,8 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                 <div
                   key={`passado-${index}`}
                   className={scheduleCardVariants({ status: "passed" })}
+                  tabIndex={0}
+                  aria-label={`Horário passado às ${horario}`}
                 >
                   <p className={scheduleTimeVariants({ status: "passed" })}>
                     {horario}

@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useMemo, type ComponentProps } from "react";
+import React, { memo, useMemo, type KeyboardEvent } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -25,6 +25,7 @@ export const lineCardVariants = tv({
     "relative overflow-hidden rounded-xl border bg-card shadow-sm",
     "cursor-pointer transition-all duration-200 ease-out",
     "hover:shadow-lg hover:-translate-y-0.5",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2",
   ],
   variants: {
     selected: {
@@ -62,18 +63,17 @@ interface ScheduleResult {
   statusType: LineStatusType;
 }
 
-export interface LineCardProps
-  extends
-    Omit<ComponentProps<"article">, "onClick">,
-    VariantProps<typeof lineCardVariants> {
+export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
   /** Dados da linha de ônibus */
   linha: Linha;
   /** Callback ao clicar no card */
-  onClick: () => void;
+  onClick: (linha: Linha) => void;
   /** Callback ao clicar em "Ver Detalhes" */
-  onDetailsClick: () => void;
+  onDetailsClick: (linha: Linha) => void;
   /** Se o card está selecionado */
   isSelected?: boolean;
+  /** Classe CSS adicional */
+  className?: string;
 }
 
 // ============================================================================
@@ -81,26 +81,26 @@ export interface LineCardProps
 // ============================================================================
 
 /**
- * Calcula os horários de próximo ônibus e último que partiu
+ * Analisa e ordena os horários em minutos.
+ * Esta operação é cara (O(N log N)) e deve ser memoizada.
  */
-function calculateSchedules(horarios: string[]): ScheduleResult {
-  if (!horarios || horarios.length === 0) {
-    return {
-      nextSchedule: "--:--",
-      previousSchedule: "--:--",
-      status: "Sem Horários",
-      statusType: "closed",
-    };
-  }
+function parseSchedules(horarios: string[]): number[] {
+  if (!horarios || horarios.length === 0) return [];
 
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const schedulesInMinutes = horarios
+  return horarios
     .filter((time) => time && time.includes(":"))
     .map(timeToMinutes)
     .sort((a, b) => a - b);
+}
 
+/**
+ * Calcula o status com base nos horários já processados e no tempo atual.
+ * Esta operação é barata (O(N)) e pode rodar em cada render para garantir frescor.
+ */
+function calculateStatus(
+  schedulesInMinutes: number[],
+  currentMinutes: number,
+): ScheduleResult {
   if (schedulesInMinutes.length === 0) {
     return {
       nextSchedule: "--:--",
@@ -130,11 +130,11 @@ function calculateSchedules(horarios: string[]): ScheduleResult {
   }
 
   // Último que partiu
-  const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule <= currentMinutes,
-  );
-  if (previousSchedules.length > 0) {
-    previousSchedule = minutesToTime(Math.max(...previousSchedules));
+  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
+    if (schedulesInMinutes[i] <= currentMinutes) {
+      previousSchedule = minutesToTime(schedulesInMinutes[i]);
+      break;
+    }
   }
 
   return { nextSchedule, previousSchedule, status, statusType };
@@ -172,7 +172,7 @@ function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
       data-slot="schedule"
       className="rounded-lg bg-background-secondary/50 p-2 text-center"
     >
-      <p className="mb-1 flex items-center justify-center gap-1 text-[10px] text-text-secondary md:text-xs">
+      <p className="mb-1 flex items-center justify-center gap-1 text-xs text-text-secondary">
         <Clock className="size-3.5" />
         {label}
       </p>
@@ -188,15 +188,17 @@ function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
   );
 }
 
-function SuspendedNotice() {
+interface SuspendedNoticeProps {
+  message: string;
+}
+
+function SuspendedNotice({ message }: SuspendedNoticeProps) {
   return (
     <div
       data-slot="notice"
       className="mb-4 rounded-lg border border-red-600/50 bg-red-900/20 p-3 text-center"
     >
-      <p className="text-xs font-semibold text-red-300 md:text-sm">
-        Linha suspensa durante férias
-      </p>
+      <p className="text-xs font-semibold text-red-300 md:text-sm">{message}</p>
     </div>
   );
 }
@@ -207,43 +209,75 @@ function SuspendedNotice() {
 
 /**
  * Card que exibe informações sobre uma linha de ônibus.
+ * Otimizado com React.memo para evitar re-renderizações desnecessárias.
  *
  * @example
  * ```tsx
  * <LineCard
  *   linha={linha}
- *   onClick={() => handleSelect(linha)}
- *   onDetailsClick={() => openDetails(linha)}
+ *   onClick={handleSelect}
+ *   onDetailsClick={openDetails}
  *   isSelected={selectedId === linha.idRota}
  * />
  * ```
  */
-export function LineCard({
+function LineCardComponent({
   linha,
   onClick,
   onDetailsClick,
   isSelected = false,
   className,
-  ...props
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
 
-  // Verificar se é período de férias
+  // Verificar categoria da linha
   const isVacationLine = linha.categoriaDia === "feriasRecessos";
+  const isSaturdayLine = linha.categoriaDia === "sabado";
+  const isWeekdayLine = linha.categoriaDia === "diasUteis";
+
+  // Verificar período atual
   const isInVacationPeriod = shouldDisableRegularSchedules();
 
-  // Verificar se é fim de semana (sábado=6, domingo=0)
+  // Verificar dia da semana (domingo=0, sábado=6)
   const today = new Date().getDay();
-  const isWeekend = today === 0 || today === 6;
+  const isSaturday = today === 6;
+  const isSunday = today === 0;
+  const isWeekday = today >= 1 && today <= 5;
 
-  // Lógica de desabilitar horários durante férias:
-  // - Linhas de sábado e dias úteis: SEMPRE desabilitadas durante férias
-  // - Linhas de férias/recessos: desabilitadas apenas em fins de semana
+  // Lógica de quando cada categoria NÃO circula:
+  // - Linhas de dias úteis: não circulam em fins de semana ou durante período de férias
+  // - Linhas de sábado: não circulam fora do sábado ou durante período de férias
+  // - Linhas de férias: não circulam fora do período de férias ou em fins de semana
   const shouldDisableSchedules =
-    isInVacationPeriod && (!isVacationLine || isWeekend);
+    (isWeekdayLine && (!isWeekday || isInVacationPeriod)) ||
+    (isSaturdayLine && (!isSaturday || isInVacationPeriod)) ||
+    (isVacationLine && (!isInVacationPeriod || isSunday || isSaturday));
 
-  // Calcular horários
-  const { nextSchedule, previousSchedule, status, statusType } = useMemo(() => {
+  // Determinar mensagem de suspensão baseada na categoria
+  const getSuspendedMessage = (): string => {
+    if (isWeekdayLine) {
+      if (isInVacationPeriod) return "Linha suspensa durante férias";
+      if (isSaturday) return "Linha não circula aos sábados";
+      if (isSunday) return "Linha não circula aos domingos";
+    }
+    if (isSaturdayLine) {
+      if (isInVacationPeriod) return "Linha suspensa durante férias";
+      return "Linha circula apenas aos sábados";
+    }
+    if (isVacationLine) {
+      if (!isInVacationPeriod) return "Linha circula apenas durante férias";
+      if (isSaturday || isSunday) return "Linha não circula em fins de semana";
+    }
+    return "Linha não está circulando";
+  };
+
+  // Otimização: Memoizar o processamento pesado dos horários (parse + sort)
+  const schedulesInMinutes = useMemo(() => {
+    return parseSchedules(linha.horarios);
+  }, [linha.horarios]);
+
+  // Calcular status baseado no tempo atual
+  const { nextSchedule, previousSchedule, status, statusType } = (() => {
     if (shouldDisableSchedules) {
       return {
         nextSchedule: "Indisponível",
@@ -252,33 +286,52 @@ export function LineCard({
         statusType: "notRunning" as LineStatusType,
       };
     }
-    return calculateSchedules(linha.horarios);
-  }, [linha.horarios, shouldDisableSchedules]);
 
-  const handleDetailsClick = (e: React.MouseEvent) => {
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    return calculateStatus(schedulesInMinutes, currentMinutes);
+  })();
+
+  const handleCardClick = () => {
+    onClick(linha);
+  };
+
+  const handleDetailsClickInternal = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent({
       category: "Engajamento",
       action: "Abrir Card Detalhes",
       label: linha.nome,
     });
-    onDetailsClick();
+    onDetailsClick(linha);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick(linha);
+    }
   };
 
   return (
     <article
       data-slot="card"
       data-state={isSelected ? "selected" : undefined}
-      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ""}. Status: ${status}`}
+      aria-pressed={isSelected}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
       className={cn(
         lineCardVariants({ selected: isSelected }),
         "mb-3",
         className,
       )}
-      {...props}
     >
       {/* Header */}
-      <div data-slot="header" className="relative p-4 pb-3">
+      <div data-slot="header" className="relative w-full p-4 pb-3 text-left">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-1 items-start gap-3">
             <LineIcon color={linha.corHex} />
@@ -303,7 +356,7 @@ export function LineCard({
       {/* Body */}
       <div data-slot="body" className="px-4 pb-4">
         {shouldDisableSchedules ? (
-          <SuspendedNotice />
+          <SuspendedNotice message={getSuspendedMessage()} />
         ) : (
           <div className="mb-4 grid grid-cols-2 gap-3">
             <ScheduleDisplay label="Último Partiu" time={previousSchedule} />
@@ -313,8 +366,10 @@ export function LineCard({
 
         {/* Button */}
         <button
+          type="button"
+          aria-label={`Ver detalhes da linha ${linha.nome}`}
           data-slot="action"
-          onClick={handleDetailsClick}
+          onClick={handleDetailsClickInternal}
           className={detailsButtonVariants()}
           style={{ backgroundColor: linha.corHex }}
         >
@@ -324,3 +379,5 @@ export function LineCard({
     </article>
   );
 }
+
+export const LineCard = memo(LineCardComponent);

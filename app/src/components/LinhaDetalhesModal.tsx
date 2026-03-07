@@ -5,11 +5,12 @@
 
 import { useState, useMemo } from "react";
 import { tv } from "tailwind-variants";
-import { Clock, Map, MapPin, Bus } from "lucide-react";
+import { Clock, Map, MapPin, Bus, AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal";
 import type { Linha, Parada } from "../types/data.types";
 import { buscarParadasPorIds, timeToMinutes } from "../../lib/utils";
 import { useAnalytics, useSessionTiming } from "../hooks/useAnalytics";
+import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
 // ============================================================================
 // VARIANTS
@@ -71,11 +72,13 @@ export const stopIconContainerVariants = tv({
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-colors cursor-pointer",
+  base: "rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
   variants: {
     status: {
-      upcoming: "border-2 hover:scale-105 hover:shadow-md active:scale-95",
-      passed: "border border-card-border bg-card opacity-50 cursor-default",
+      upcoming:
+        "border-2 hover:scale-105 hover:shadow-md active:scale-95 cursor-pointer focus-visible:ring-brand-primary",
+      passed:
+        "border border-card-border bg-card opacity-50 cursor-default focus-visible:ring-card-border",
     },
   },
   defaultVariants: {
@@ -138,48 +141,69 @@ export function LinhaDetalhesModal({
   // Rastreia tempo que o usuário passa visualizando detalhes desta linha
   useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
 
-  // Buscar paradas do itinerário dinamicamente usando os IDs
-  const paradasDoItinerario = useMemo(
-    () => buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas),
-    [linha.itinerarioParadasIds, todasParadas],
-  );
+  // Verificar se a linha está circulando hoje
+  const isVacationLine = linha.categoriaDia === "feriasRecessos";
+  const isSaturdayLine = linha.categoriaDia === "sabado";
+  const isWeekdayLine = linha.categoriaDia === "diasUteis";
+  const isInVacationPeriod = shouldDisableRegularSchedules();
+  const today = new Date().getDay();
+  const isSaturday = today === 6;
+  const isSunday = today === 0;
+  const isWeekday = today >= 1 && today <= 5;
+
+  const isLineRunningToday =
+    (isWeekdayLine && isWeekday && !isInVacationPeriod) ||
+    (isSaturdayLine && isSaturday && !isInVacationPeriod) ||
+    (isVacationLine && isInVacationPeriod && !isSaturday && !isSunday);
+
+  // Mensagem de aviso quando a linha não está circulando
+  const getNotRunningMessage = (): string => {
+    if (isWeekdayLine) {
+      if (isInVacationPeriod) return "Esta linha não circula durante período de férias";
+      if (isSaturday) return "Esta linha não circula aos sábados";
+      if (isSunday) return "Esta linha não circula aos domingos";
+    }
+    if (isSaturdayLine) {
+      if (isInVacationPeriod) return "Esta linha não circula durante período de férias";
+      return "Esta linha circula apenas aos sábados";
+    }
+    if (isVacationLine) {
+      if (!isInVacationPeriod) return "Esta linha circula apenas durante período de férias";
+      if (isSaturday || isSunday) return "Esta linha não circula em fins de semana";
+    }
+    return "Esta linha não está circulando hoje";
+  };
+
+  // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
+  const paradasDoItinerario = useMemo(() => {
+    return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
+  }, [linha.itinerarioParadasIds, todasParadas]);
 
   // Calcular horários passados e futuros
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const horariosOrganizados = useMemo(
-  // Memoizar o processamento base dos horários (sem depender do tempo atual)
-  const horariosComMinutos = useMemo(
-    () =>
-      linha.horarios
-        .filter((h) => h && h.includes(":"))
-        .map((horario) => ({
-          horario,
-          minutos: timeToMinutes(horario),
-          passou: timeToMinutes(horario) < currentMinutes,
-        }))
-        .sort((a, b) => a.minutos - b.minutos),
-    [linha.horarios, currentMinutes],
-  );
+  // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
+  // Isso evita re-ordenar os horários a cada renderização quando o tempo muda
+  const baseHorarios = useMemo(() => {
+    return linha.horarios
+      .filter((h) => h && h.includes(":"))
+      .map((horario) => ({
+        horario,
+        minutos: timeToMinutes(horario),
+      }))
+      .sort((a, b) => a.minutos - b.minutos);
+  }, [linha.horarios]);
 
-  const proximos = horariosOrganizados.filter((h) => !h.passou);
-  const passados = horariosOrganizados.filter((h) => h.passou);
-        }))
-        .sort((a, b) => a.minutos - b.minutos),
-    [linha.horarios],
-  );
+  // ⚡ Bolt: Calcular status 'passou' O(N) separado com base no tempo atual
+  const horariosOrganizados = useMemo(() => {
+    return baseHorarios.map((h) => ({
+      ...h,
+      passou: h.minutos < currentMinutes,
+    }));
+  }, [baseHorarios, currentMinutes]);
 
-  // Organizar horários com base no tempo atual
-  const horariosOrganizados = useMemo(
-    () =>
-      horariosComMinutos.map((h) => ({
-        ...h,
-        passou: h.minutos < currentMinutes,
-      })),
-    [horariosComMinutos, currentMinutes],
-  );
-
+  // Memoizar listas filtradas derivadas
   const proximos = useMemo(
     () => horariosOrganizados.filter((h) => !h.passou),
     [horariosOrganizados],
@@ -247,9 +271,15 @@ export function LinhaDetalhesModal({
       {/* Tabs */}
       <div
         data-slot="tabs"
+        role="tablist"
+        aria-label="Opções de visualização"
         className="mb-6 flex gap-2 border-b border-card-border"
       >
         <button
+          role="tab"
+          aria-selected={tabAtiva === "itinerario"}
+          aria-controls="panel-itinerario"
+          id="tab-itinerario"
           onClick={() => handleTabChange("itinerario")}
           className={tabVariants({ active: tabAtiva === "itinerario" })}
           style={tabAtiva === "itinerario" ? { borderColor: linha.corHex } : {}}
@@ -258,6 +288,10 @@ export function LinhaDetalhesModal({
           Itinerário
         </button>
         <button
+          role="tab"
+          aria-selected={tabAtiva === "horarios"}
+          aria-controls="panel-horarios"
+          id="tab-horarios"
           onClick={() => handleTabChange("horarios")}
           className={tabVariants({ active: tabAtiva === "horarios" })}
           style={tabAtiva === "horarios" ? { borderColor: linha.corHex } : {}}
@@ -270,8 +304,12 @@ export function LinhaDetalhesModal({
       {/* Conteúdo das Tabs */}
       {tabAtiva === "itinerario" ? (
         <div
+          role="tabpanel"
+          id="panel-itinerario"
+          aria-labelledby="tab-itinerario"
+          tabIndex={0}
           data-slot="itinerary-tab"
-          className="relative animate-in fade-in-0 duration-200"
+          className="relative animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
         >
           {paradasDoItinerario.length > 0 ? (
             <div className="relative">
@@ -352,11 +390,30 @@ export function LinhaDetalhesModal({
         </div>
       ) : (
         <div
+          role="tabpanel"
+          id="panel-horarios"
+          aria-labelledby="tab-horarios"
+          tabIndex={0}
           data-slot="schedules-tab"
-          className="space-y-6 animate-in fade-in-0 duration-200"
+          className="space-y-6 animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
         >
-          {/* Próximos Horários */}
-          {proximos.length > 0 && (
+          {/* Aviso quando a linha não está circulando */}
+          {!isLineRunningToday && (
+            <div
+              data-slot="not-running-notice"
+              className="rounded-lg border border-amber-600/50 bg-amber-900/20 p-4"
+            >
+              <div className="flex items-center gap-3">
+                <AlertTriangle size={24} className="shrink-0 text-amber-400" />
+                <p className="text-sm font-medium text-amber-300">
+                  {getNotRunningMessage()}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Próximos Horários - só mostra quando a linha está circulando */}
+          {isLineRunningToday && proximos.length > 0 && (
             <div data-slot="upcoming-schedules">
               <h3
                 className="mb-3 flex items-center gap-2 text-lg font-semibold"
@@ -369,7 +426,16 @@ export function LinhaDetalhesModal({
                 {proximos.map(({ horario, minutos }, index) => (
                   <div
                     key={`proximo-${minutos}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Próximo horário às ${horario}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
                     className={scheduleCardVariants({ status: "upcoming" })}
                     style={{
                       borderColor: linha.corHex,
@@ -388,18 +454,17 @@ export function LinhaDetalhesModal({
             </div>
           )}
 
-          {/* Horários Passados */}
-          {passados.length > 0 && (
-            <div data-slot="passed-schedules">
+          {/* Horários (todos quando não está circulando, ou apenas passados quando está) */}
+          {!isLineRunningToday ? (
+            <div data-slot="all-schedules">
               <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
                 <Clock size={20} />
-                Horários Passados ({passados.length})
+                Todos os Horários ({horariosOrganizados.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {passados.map(({ horario, minutos }, index) => (
+                {horariosOrganizados.map(({ horario, minutos }, index) => (
                   <div
-                    key={`passado-${minutos}-${index}`}
-                    onClick={() => handleHorarioClick(horario)}
+                    key={`horario-${minutos}-${index}`}
                     className={scheduleCardVariants({ status: "passed" })}
                   >
                     <p className="text-lg font-semibold text-text-secondary">
@@ -409,15 +474,43 @@ export function LinhaDetalhesModal({
                 ))}
               </div>
             </div>
+          ) : (
+            passados.length > 0 && (
+            <div data-slot="passed-schedules">
+              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+                <Clock size={20} />
+                Horários Passados ({passados.length})
+              </h3>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                {passados.map(({ horario, minutos }, index) => (
+                  <div
+                    key={`passado-${minutos}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Horário passado às ${horario}`}
+                    onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
+                    className={scheduleCardVariants({ status: "passed" })}
+                  >
+                    <p className="text-lg font-semibold text-text-secondary">
+                      {horario}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            )
           )}
 
           {/* Resumo */}
           <div data-slot="summary" className={infoCardVariants()}>
             <p className="text-text-secondary">
-              Total de {horariosOrganizados.length} horários •{" "}
-              <span style={{ color: linha.corHex }}>
-                {proximos.length} restantes
-              </span>
+              Total de {horariosOrganizados.length} horários
             </p>
           </div>
         </div>
