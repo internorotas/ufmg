@@ -457,3 +457,39 @@ path.leaflet-ant-path {
   fill: none;
   animation: linear infinite leaflet-ant-path-animation;
 }
+
+/* ============================================================================
+   MOBILE VIEWPORT FIX
+   Resolve o problema da barra de endereço do Chrome mobile
+   que aparece/desaparece durante scroll, causando problemas de layout.
+   ============================================================================ */
+
+/* Altura dinâmica que considera a barra do navegador mobile */
+.h-screen-safe {
+  height: 100vh; /* Fallback para browsers antigos */
+  height: 100dvh; /* Dynamic viewport height - se ajusta à barra do browser */
+}
+
+.min-h-screen-safe {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.max-h-screen-safe {
+  max-height: 100vh;
+  max-height: 100dvh;
+}
+
+/* Garante que o body não tenha overflow indesejado no mobile */
+html,
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Fix para iOS Safari - previne bounce scroll */
+@supports (-webkit-touch-callout: none) {
+  .h-screen-safe {
+    height: -webkit-fill-available;
+  }
+}
