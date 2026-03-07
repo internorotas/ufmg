@@ -22,6 +22,7 @@ import { RotasService, type IRotasService } from "../services/RotasService";
  */
 export interface MapaRef {
   centralizarParada: (parada: Parada) => void;
+  centralizarCoordenada: (coords: [number, number], zoom?: number) => void;
 }
 
 /**
