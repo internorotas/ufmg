@@ -105,19 +105,24 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const shouldDisableSchedules =
     isInVacationPeriod && (!isVacationLine || isWeekend);
 
-  const horariosOrganizados = useMemo(() => {
+  // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
+  const baseHorarios = useMemo(() => {
     return linha.horarios
       .filter((time) => time && time.includes(":"))
-      .map((horario) => {
-        const minutes = timeToMinutes(horario);
-        return {
-          horario,
-          minutos: minutes,
-          passou: minutes < currentMinutes,
-        };
-      })
+      .map((horario) => ({
+        horario,
+        minutos: timeToMinutes(horario),
+      }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios, currentMinutes]);
+  }, [linha.horarios]);
+
+  // ⚡ Bolt: Calcular status 'passou' O(N) separado com base no tempo atual
+  const horariosOrganizados = useMemo(() => {
+    return baseHorarios.map((h) => ({
+      ...h,
+      passou: h.minutos < currentMinutes,
+    }));
+  }, [baseHorarios, currentMinutes]);
 
   const proximos = horariosOrganizados.filter((h) => !h.passou);
   const passados = horariosOrganizados.filter((h) => h.passou);
@@ -160,7 +165,6 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                   key={`proximo-${index}`}
                   className={scheduleCardVariants({ status: "upcoming" })}
                   tabIndex={0}
-                  role="button"
                   aria-label={`Próximo horário às ${horario}`}
                 >
                   <p className={scheduleTimeVariants({ status: "upcoming" })}>
@@ -184,6 +188,8 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                 <div
                   key={`passado-${index}`}
                   className={scheduleCardVariants({ status: "passed" })}
+                  tabIndex={0}
+                  aria-label={`Horário passado às ${horario}`}
                 >
                   <p className={scheduleTimeVariants({ status: "passed" })}>
                     {horario}

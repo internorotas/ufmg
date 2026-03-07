@@ -8,3 +8,7 @@
 
 **Learning:** Interactive UI cards (e.g., `<article>` in `LineCard.tsx` and schedule cards in `HorariosModal.tsx`) that contain nested interactive elements (like buttons) cannot safely use `role="button"` due to invalid HTML nesting rules, yet they are still primary targets for user interaction. Without explicit keyboard support (`tabIndex={0}`, `onKeyDown` handlers for Enter/Space, and visible focus states), keyboard users cannot interact with the main function of the card.
 **Action:** Always implement explicit keyboard accessibility (`tabIndex={0}`, `onKeyDown`, `aria-label`, and `focus-visible` styles) on interactive container elements that cannot use standard button roles, ensuring the core interaction path is available to all users.
+
+## 2025-03-05 - Keyboard Accessibility for Schedule Cards
+**Learning:** Schedule cards in `LinhaDetalhesModal` and `HorariosModal` were interactive (had `onClick`) but lacked keyboard accessibility. Adding `tabIndex={0}`, `role="button"`, `aria-label`, and `onKeyDown` ensures users navigating via keyboard can select schedules.
+**Action:** Always verify interactive elements (e.g. `div`s with `onClick`) have equivalent keyboard event handlers, roles, and focusability to maintain accessibility.
