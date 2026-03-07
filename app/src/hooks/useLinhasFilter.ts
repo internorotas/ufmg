@@ -44,17 +44,37 @@ interface UseLinhasFilterReturn {
 }
 
 /**
- * Determina a categoria inicial baseado no período especial (férias/recessos).
+ * Determina a categoria inicial baseado no período atual e dia da semana.
+ * 
+ * Regras:
+ * - Se está em período de férias E é dia útil → aba "feriasRecessos"
+ * - Se é sábado (e não está em período de férias) → aba "sabado"  
+ * - Caso contrário → aba "diasUteis" (padrão)
  */
 function getInitialCategory(linhasData: CategoriaLinhas): number {
+  const today = new Date().getDay(); // 0 = domingo, 6 = sábado
+  const isSaturday = today === 6;
+  const isWeekday = today >= 1 && today <= 5;
   const specialPeriod = getCurrentSpecialPeriod();
-  if (specialPeriod) {
+
+  // Se está em período de férias E é dia útil → mostrar aba de férias
+  if (specialPeriod && isWeekday) {
     const feriasIndex = linhasData.categoriasDias.findIndex(
       (cat) => cat.categoriaDia === "feriasRecessos",
     );
     return feriasIndex !== -1 ? feriasIndex : 0;
   }
-  return 0; // Dias úteis por padrão
+
+  // Se é sábado (e não está em período de férias) → mostrar aba de sábado
+  if (isSaturday && !specialPeriod) {
+    const sabadoIndex = linhasData.categoriasDias.findIndex(
+      (cat) => cat.categoriaDia === "sabado",
+    );
+    return sabadoIndex !== -1 ? sabadoIndex : 0;
+  }
+
+  // Padrão: dias úteis (índice 0)
+  return 0;
 }
 
 /**
