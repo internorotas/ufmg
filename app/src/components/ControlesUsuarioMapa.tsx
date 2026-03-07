@@ -126,7 +126,7 @@ export function ControlesUsuarioMapa({
       )}
 
       {/* FAB - Floating Action Button para centralizar */}
-      <div className="absolute bottom-6 right-4 z-1000">
+      <div className="fixed bottom-20 right-4 z-1000 md:bottom-6">
         <button
           type="button"
           onClick={handleCentralizar}
