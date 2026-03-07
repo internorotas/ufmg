@@ -302,12 +302,16 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
   }
 
   // Encontrar horário anterior
-  const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule < currentMinutes,
-  );
-  if (previousSchedules.length > 0) {
-    previousSchedule = minutesToTime(Math.max(...previousSchedules));
-  } else if (schedulesInMinutes.length > 0) {
+  let foundPrevious = false;
+  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
+    if (schedulesInMinutes[i] < currentMinutes) {
+      previousSchedule = minutesToTime(schedulesInMinutes[i]);
+      foundPrevious = true;
+      break;
+    }
+  }
+
+  if (!foundPrevious && schedulesInMinutes.length > 0) {
     // Se não há horários anteriores hoje, o anterior é o último de ontem
     previousSchedule = minutesToTime(
       schedulesInMinutes[schedulesInMinutes.length - 1],
@@ -317,9 +321,14 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
   return { nextSchedule, previousSchedule };
 }
 
+// ⚡ Bolt: Cache module-level para evitar reconstrução O(N) do Map a cada busca
+// Usando WeakMap para não impedir garbage collection caso o array original mude/suma
+const paradasCache = new WeakMap<object, Map<string, unknown>>();
+
 /**
  * Busca paradas do itinerário usando os IDs fornecidos
- * Utiliza um Map para otimizar a busca de O(N*M) para O(N+M)
+ * Utiliza um Map com cache (WeakMap) para otimizar a busca
+ * Evita recriar o dicionário de O(N) quando a lista global de paradas não muda
  * @param itinerarioParadasIds Array de IDs de paradas
  * @param todasParadas Array com todas as paradas disponíveis
  * @returns Array de paradas encontradas
@@ -328,13 +337,18 @@ export function buscarParadasPorIds<T extends { idParada: string }>(
   itinerarioParadasIds: string[],
   todasParadas: T[],
 ): T[] {
-  const paradasMap = new Map<string, T>();
-  for (const parada of todasParadas) {
-    paradasMap.set(parada.idParada, parada);
+  let paradasMap = paradasCache.get(todasParadas) as Map<string, T> | undefined;
+
+  if (!paradasMap) {
+    paradasMap = new Map<string, T>();
+    for (const parada of todasParadas) {
+      paradasMap.set(parada.idParada, parada);
+    }
+    paradasCache.set(todasParadas, paradasMap);
   }
 
   return itinerarioParadasIds
-    .map((idParada) => paradasMap.get(idParada))
+    .map((idParada) => paradasMap!.get(idParada))
     .filter((p): p is T => p !== undefined);
 }
 
