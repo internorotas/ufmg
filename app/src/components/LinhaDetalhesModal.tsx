@@ -5,11 +5,12 @@
 
 import { useState, useMemo } from "react";
 import { tv } from "tailwind-variants";
-import { Clock, Map, MapPin, Bus } from "lucide-react";
+import { Clock, Map, MapPin, Bus, AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal";
 import type { Linha, Parada } from "../types/data.types";
 import { buscarParadasPorIds, timeToMinutes } from "../../lib/utils";
 import { useAnalytics, useSessionTiming } from "../hooks/useAnalytics";
+import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
 // ============================================================================
 // VARIANTS
@@ -139,6 +140,39 @@ export function LinhaDetalhesModal({
 
   // Rastreia tempo que o usuário passa visualizando detalhes desta linha
   useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
+
+  // Verificar se a linha está circulando hoje
+  const isVacationLine = linha.categoriaDia === "feriasRecessos";
+  const isSaturdayLine = linha.categoriaDia === "sabado";
+  const isWeekdayLine = linha.categoriaDia === "diasUteis";
+  const isInVacationPeriod = shouldDisableRegularSchedules();
+  const today = new Date().getDay();
+  const isSaturday = today === 6;
+  const isSunday = today === 0;
+  const isWeekday = today >= 1 && today <= 5;
+
+  const isLineRunningToday =
+    (isWeekdayLine && isWeekday && !isInVacationPeriod) ||
+    (isSaturdayLine && isSaturday && !isInVacationPeriod) ||
+    (isVacationLine && isInVacationPeriod && !isSaturday && !isSunday);
+
+  // Mensagem de aviso quando a linha não está circulando
+  const getNotRunningMessage = (): string => {
+    if (isWeekdayLine) {
+      if (isInVacationPeriod) return "Esta linha não circula durante período de férias";
+      if (isSaturday) return "Esta linha não circula aos sábados";
+      if (isSunday) return "Esta linha não circula aos domingos";
+    }
+    if (isSaturdayLine) {
+      if (isInVacationPeriod) return "Esta linha não circula durante período de férias";
+      return "Esta linha circula apenas aos sábados";
+    }
+    if (isVacationLine) {
+      if (!isInVacationPeriod) return "Esta linha circula apenas durante período de férias";
+      if (isSaturday || isSunday) return "Esta linha não circula em fins de semana";
+    }
+    return "Esta linha não está circulando hoje";
+  };
 
   // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
   const paradasDoItinerario = useMemo(() => {
@@ -363,8 +397,23 @@ export function LinhaDetalhesModal({
           data-slot="schedules-tab"
           className="space-y-6 animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
         >
-          {/* Próximos Horários */}
-          {proximos.length > 0 && (
+          {/* Aviso quando a linha não está circulando */}
+          {!isLineRunningToday && (
+            <div
+              data-slot="not-running-notice"
+              className="rounded-lg border border-amber-600/50 bg-amber-900/20 p-4"
+            >
+              <div className="flex items-center gap-3">
+                <AlertTriangle size={24} className="shrink-0 text-amber-400" />
+                <p className="text-sm font-medium text-amber-300">
+                  {getNotRunningMessage()}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Próximos Horários - só mostra quando a linha está circulando */}
+          {isLineRunningToday && proximos.length > 0 && (
             <div data-slot="upcoming-schedules">
               <h3
                 className="mb-3 flex items-center gap-2 text-lg font-semibold"
@@ -405,8 +454,28 @@ export function LinhaDetalhesModal({
             </div>
           )}
 
-          {/* Horários Passados */}
-          {passados.length > 0 && (
+          {/* Horários (todos quando não está circulando, ou apenas passados quando está) */}
+          {!isLineRunningToday ? (
+            <div data-slot="all-schedules">
+              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+                <Clock size={20} />
+                Todos os Horários ({horariosOrganizados.length})
+              </h3>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                {horariosOrganizados.map(({ horario, minutos }, index) => (
+                  <div
+                    key={`horario-${minutos}-${index}`}
+                    className={scheduleCardVariants({ status: "passed" })}
+                  >
+                    <p className="text-lg font-semibold text-text-secondary">
+                      {horario}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            passados.length > 0 && (
             <div data-slot="passed-schedules">
               <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
                 <Clock size={20} />
@@ -435,15 +504,13 @@ export function LinhaDetalhesModal({
                 ))}
               </div>
             </div>
+            )
           )}
 
           {/* Resumo */}
           <div data-slot="summary" className={infoCardVariants()}>
             <p className="text-text-secondary">
-              Total de {horariosOrganizados.length} horários •{" "}
-              <span style={{ color: linha.corHex }}>
-                {proximos.length} restantes
-              </span>
+              Total de {horariosOrganizados.length} horários
             </p>
           </div>
         </div>
