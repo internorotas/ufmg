@@ -302,12 +302,16 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
   }
 
   // Encontrar horário anterior
-  const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule < currentMinutes,
-  );
-  if (previousSchedules.length > 0) {
-    previousSchedule = minutesToTime(Math.max(...previousSchedules));
-  } else if (schedulesInMinutes.length > 0) {
+  let foundPrevious = false;
+  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
+    if (schedulesInMinutes[i] < currentMinutes) {
+      previousSchedule = minutesToTime(schedulesInMinutes[i]);
+      foundPrevious = true;
+      break;
+    }
+  }
+
+  if (!foundPrevious && schedulesInMinutes.length > 0) {
     // Se não há horários anteriores hoje, o anterior é o último de ontem
     previousSchedule = minutesToTime(
       schedulesInMinutes[schedulesInMinutes.length - 1],
@@ -317,9 +321,14 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
   return { nextSchedule, previousSchedule };
 }
 
+// ⚡ Bolt: Cache module-level para evitar reconstrução O(N) do Map a cada busca
+// Usando WeakMap para não impedir garbage collection caso o array original mude/suma
+const paradasCache = new WeakMap<object, Map<string, unknown>>();
+
 /**
  * Busca paradas do itinerário usando os IDs fornecidos
- * Utiliza um Map para otimizar a busca de O(N*M) para O(N+M)
+ * Utiliza um Map com cache (WeakMap) para otimizar a busca
+ * Evita recriar o dicionário de O(N) quando a lista global de paradas não muda
  * @param itinerarioParadasIds Array de IDs de paradas
  * @param todasParadas Array com todas as paradas disponíveis
  * @returns Array de paradas encontradas
@@ -328,13 +337,18 @@ export function buscarParadasPorIds<T extends { idParada: string }>(
   itinerarioParadasIds: string[],
   todasParadas: T[],
 ): T[] {
-  const paradasMap = new Map<string, T>();
-  for (const parada of todasParadas) {
-    paradasMap.set(parada.idParada, parada);
+  let paradasMap = paradasCache.get(todasParadas) as Map<string, T> | undefined;
+
+  if (!paradasMap) {
+    paradasMap = new Map<string, T>();
+    for (const parada of todasParadas) {
+      paradasMap.set(parada.idParada, parada);
+    }
+    paradasCache.set(todasParadas, paradasMap);
   }
 
   return itinerarioParadasIds
-    .map((idParada) => paradasMap.get(idParada))
+    .map((idParada) => paradasMap!.get(idParada))
     .filter((p): p is T => p !== undefined);
 }
 
@@ -476,32 +490,66 @@ export function isNumberArray(value: unknown): value is number[] {
 }
 
 /**
- * Detecta e converte URLs em texto simples para links HTML
- * @param texto Texto que pode conter URLs
- * @returns Texto com URLs convertidas em tags <a>
+ * Escapa caracteres HTML perigosos para prevenir ataques de Cross-Site Scripting (XSS)
+ * @param texto Texto a ser escapado
+ * @returns Texto com caracteres perigosos escapados
  */
-export function converterUrlsEmLinks(texto: string): string {
-  // Regex melhorada para detectar URLs começando com http://, https:// ou www.
-  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
-
-  // Substitui URLs encontradas por tags <a>
-  return texto.replace(urlRegex, (url) => {
-    // Adiciona o protocolo http:// às URLs que começam com www.
-    let href = url.startsWith("www.") ? `http://${url}` : url;
-    if (href.endsWith(",") || href.endsWith("."))
-      href = href.substring(0, href.length - 1);
-    return `<a style='color:#2357b0; text-decoration:none;' href="${href}" target="_blank" rel="noopener noreferrer" onmouseover="this.style.opacity=0.75;" onmouseout="this.style.opacity=1;">${url}</a>`;
-  });
+export function escapeHtml(texto: string): string {
+  if (!texto) return "";
+  return texto
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 /**
- * formatar quebras de linha do texto original
- * transformar quebras de linha em tags <br/>
- * para garantir que a exibição mantenha a formatação esperada
+ * Detecta e converte URLs em texto simples para links HTML de forma segura
+ * @param texto Texto que pode conter URLs
+ * @returns Texto seguro com URLs convertidas em tags <a>
+ */
+export function converterUrlsEmLinks(texto: string): string {
+  if (!texto) return "";
+
+  // Regex melhorada para detectar URLs começando com http://, https:// ou www.
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+
+  // Divide o texto com base no regex, isolando as URLs para escapá-las individualmente
+  const parts = texto.split(urlRegex);
+
+  return parts
+    .map((part) => {
+      if (part && part.match(urlRegex)) {
+        let urlStr = part;
+        let suffix = "";
+
+        // Remove pontuação final para não incluir no link
+        if (urlStr.endsWith(",") || urlStr.endsWith(".")) {
+          suffix = urlStr.slice(-1);
+          urlStr = urlStr.slice(0, -1);
+        }
+
+        // Adiciona o protocolo http:// às URLs que começam com www.
+        const href = urlStr.startsWith("www.") ? `http://${urlStr}` : urlStr;
+
+        // Os atributos e o texto são construídos com segurança
+        return `<a style='color:#2357b0; text-decoration:none;' href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" onmouseover="this.style.opacity=0.75;" onmouseout="this.style.opacity=1;">${escapeHtml(urlStr)}</a>${suffix}`;
+      }
+      // Para o texto normal, apenas escapamos para evitar injeção de HTML/XSS
+      return escapeHtml(part);
+    })
+    .join("");
+}
+
+/**
+ * Formata quebras de linha do texto original,
+ * transformando quebras de linha em tags <br/> de forma segura (escapando HTML antes).
  * @param texto a ser convertido
- * @returns Texto substituindo as quebras de linha por tags <br/>
+ * @returns Texto substituindo as quebras de linha por tags <br/> com conteúdo escapado
  */
 export function formatarTextoComQuebras(texto: string) {
   if (!texto) return "";
-  return texto.replace(/\n/g, "<br/>");
+  // Proteção contra XSS: Escapamos o texto antes de injetar as tags <br/>
+  return escapeHtml(texto).replace(/\n/g, "<br/>");
 }
