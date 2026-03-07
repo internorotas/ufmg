@@ -130,11 +130,11 @@ function calculateStatus(
   }
 
   // Último que partiu
-  const previousSchedules = schedulesInMinutes.filter(
-    (schedule) => schedule <= currentMinutes,
-  );
-  if (previousSchedules.length > 0) {
-    previousSchedule = minutesToTime(Math.max(...previousSchedules));
+  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
+    if (schedulesInMinutes[i] <= currentMinutes) {
+      previousSchedule = minutesToTime(schedulesInMinutes[i]);
+      break;
+    }
   }
 
   return { nextSchedule, previousSchedule, status, statusType };
