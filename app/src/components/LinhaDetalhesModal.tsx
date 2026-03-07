@@ -368,6 +368,15 @@ export function LinhaDetalhesModal({
                   <div
                     key={`proximo-${minutos}-${index}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Próximo horário às ${horario}`}
                     className={scheduleCardVariants({ status: "upcoming" })}
                     style={{
                       borderColor: linha.corHex,
@@ -398,6 +407,15 @@ export function LinhaDetalhesModal({
                   <div
                     key={`passado-${minutos}-${index}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Horário passado às ${horario}`}
                     className={scheduleCardVariants({ status: "passed" })}
                   >
                     <p className="text-lg font-semibold text-text-secondary">
