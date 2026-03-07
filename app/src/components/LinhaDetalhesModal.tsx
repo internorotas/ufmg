@@ -71,11 +71,13 @@ export const stopIconContainerVariants = tv({
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-colors cursor-pointer",
+  base: "rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
   variants: {
     status: {
-      upcoming: "border-2 hover:scale-105 hover:shadow-md active:scale-95",
-      passed: "border border-card-border bg-card opacity-50 cursor-default",
+      upcoming:
+        "border-2 hover:scale-105 hover:shadow-md active:scale-95 cursor-pointer focus-visible:ring-brand-primary",
+      passed:
+        "border border-card-border bg-card opacity-50 cursor-default focus-visible:ring-card-border",
     },
   },
   defaultVariants: {
@@ -147,17 +149,25 @@ export function LinhaDetalhesModal({
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // Memoizar parsing e ordenação custosa dos horários
-  const horariosOrganizados = useMemo(() => {
+  // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
+  // Isso evita re-ordenar os horários a cada renderização quando o tempo muda
+  const baseHorarios = useMemo(() => {
     return linha.horarios
       .filter((h) => h && h.includes(":"))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
-        passou: timeToMinutes(horario) < currentMinutes,
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios, currentMinutes]);
+  }, [linha.horarios]);
+
+  // ⚡ Bolt: Calcular status 'passou' O(N) separado com base no tempo atual
+  const horariosOrganizados = useMemo(() => {
+    return baseHorarios.map((h) => ({
+      ...h,
+      passou: h.minutos < currentMinutes,
+    }));
+  }, [baseHorarios, currentMinutes]);
 
   // Memoizar listas filtradas derivadas
   const proximos = useMemo(
@@ -367,7 +377,16 @@ export function LinhaDetalhesModal({
                 {proximos.map(({ horario, minutos }, index) => (
                   <div
                     key={`proximo-${minutos}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Próximo horário às ${horario}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
                     className={scheduleCardVariants({ status: "upcoming" })}
                     style={{
                       borderColor: linha.corHex,
@@ -397,7 +416,16 @@ export function LinhaDetalhesModal({
                 {passados.map(({ horario, minutos }, index) => (
                   <div
                     key={`passado-${minutos}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Horário passado às ${horario}`}
                     onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
                     className={scheduleCardVariants({ status: "passed" })}
                   >
                     <p className="text-lg font-semibold text-text-secondary">
