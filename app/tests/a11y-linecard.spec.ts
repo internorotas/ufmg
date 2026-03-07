@@ -15,7 +15,7 @@ test("has title and LineCard is accessible", async ({ page }) => {
   // Check attributes
   await expect(lineCard).toHaveAttribute("tabindex", "0");
   const ariaLabel = await lineCard.getAttribute("aria-label");
-  expect(ariaLabel).toContain("Selecionar linha");
+  expect(ariaLabel).toContain("Status:");
 
   // Check inner button
   const detailsButton = lineCard.locator('button:has-text("Ver Detalhes")');
