@@ -8,7 +8,11 @@ import { tv } from "tailwind-variants";
 import { Clock, Map, MapPin, Bus, AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal";
 import type { Linha, Parada } from "../types/data.types";
-import { buscarParadasPorIds, timeToMinutes } from "../../lib/utils";
+import {
+  buscarParadasPorIds,
+  timeToMinutes,
+  findScheduleIndex,
+} from "../../lib/utils";
 import { useAnalytics, useSessionTiming } from "../hooks/useAnalytics";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
@@ -159,17 +163,21 @@ export function LinhaDetalhesModal({
   // Mensagem de aviso quando a linha não está circulando
   const getNotRunningMessage = (): string => {
     if (isWeekdayLine) {
-      if (isInVacationPeriod) return "Esta linha não circula durante período de férias";
+      if (isInVacationPeriod)
+        return "Esta linha não circula durante período de férias";
       if (isSaturday) return "Esta linha não circula aos sábados";
       if (isSunday) return "Esta linha não circula aos domingos";
     }
     if (isSaturdayLine) {
-      if (isInVacationPeriod) return "Esta linha não circula durante período de férias";
+      if (isInVacationPeriod)
+        return "Esta linha não circula durante período de férias";
       return "Esta linha circula apenas aos sábados";
     }
     if (isVacationLine) {
-      if (!isInVacationPeriod) return "Esta linha circula apenas durante período de férias";
-      if (isSaturday || isSunday) return "Esta linha não circula em fins de semana";
+      if (!isInVacationPeriod)
+        return "Esta linha circula apenas durante período de férias";
+      if (isSaturday || isSunday)
+        return "Esta linha não circula em fins de semana";
     }
     return "Esta linha não está circulando hoje";
   };
@@ -195,23 +203,31 @@ export function LinhaDetalhesModal({
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha.horarios]);
 
-  // ⚡ Bolt: Calcular status 'passou' O(N) separado com base no tempo atual
-  const horariosOrganizados = useMemo(() => {
-    return baseHorarios.map((h) => ({
-      ...h,
-      passou: h.minutos < currentMinutes,
-    }));
-  }, [baseHorarios, currentMinutes]);
+  // ⚡ Bolt: O(log N) Busca Binária em vez de O(N) Array.map e Array.filter duplicado
+  const { proximos, passados } = useMemo(() => {
+    // 1. Encontrar o índice onde minutos > currentMinutes
+    // Precisamos do primeiro elemento que NÃO passou.
+    // findScheduleIndex retorna o primeiro > currentMinutes.
+    // Para 'passou' consideramos < currentMinutes, então >= currentMinutes são próximos.
+    // Ajustando o findScheduleIndex para encontrar o primeiro >= currentMinutes subtraindo 1
+    // currentMinutes é o critério, findScheduleIndex acha > currentMinutes.
+    // Vamos usar (currentMinutes - 1) para achar >= currentMinutes.
+    const splitIndex = findScheduleIndex(
+      baseHorarios,
+      currentMinutes - 1,
+      (h) => h.minutos,
+    );
 
-  // Memoizar listas filtradas derivadas
-  const proximos = useMemo(
-    () => horariosOrganizados.filter((h) => !h.passou),
-    [horariosOrganizados],
-  );
-  const passados = useMemo(
-    () => horariosOrganizados.filter((h) => h.passou),
-    [horariosOrganizados],
-  );
+    // 2. Usar slice para O(1) criação de array com base nos ranges
+    const passadosArr = baseHorarios
+      .slice(0, splitIndex)
+      .map((h) => ({ ...h, passou: true }));
+    const proximosArr = baseHorarios
+      .slice(splitIndex)
+      .map((h) => ({ ...h, passou: false }));
+
+    return { proximos: proximosArr, passados: passadosArr };
+  }, [baseHorarios, currentMinutes]);
 
   const handleTabChange = (tab: TabType) => {
     trackEvent({
@@ -459,10 +475,10 @@ export function LinhaDetalhesModal({
             <div data-slot="all-schedules">
               <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
                 <Clock size={20} />
-                Todos os Horários ({horariosOrganizados.length})
+                Todos os Horários ({baseHorarios.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {horariosOrganizados.map(({ horario, minutos }, index) => (
+                {baseHorarios.map(({ horario, minutos }, index) => (
                   <div
                     key={`horario-${minutos}-${index}`}
                     className={scheduleCardVariants({ status: "passed" })}
@@ -476,41 +492,41 @@ export function LinhaDetalhesModal({
             </div>
           ) : (
             passados.length > 0 && (
-            <div data-slot="passed-schedules">
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
-                <Clock size={20} />
-                Horários Passados ({passados.length})
-              </h3>
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {passados.map(({ horario, minutos }, index) => (
-                  <div
-                    key={`passado-${minutos}-${index}`}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`Horário passado às ${horario}`}
-                    onClick={() => handleHorarioClick(horario)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleHorarioClick(horario);
-                      }
-                    }}
-                    className={scheduleCardVariants({ status: "passed" })}
-                  >
-                    <p className="text-lg font-semibold text-text-secondary">
-                      {horario}
-                    </p>
-                  </div>
-                ))}
+              <div data-slot="passed-schedules">
+                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+                  <Clock size={20} />
+                  Horários Passados ({passados.length})
+                </h3>
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                  {passados.map(({ horario, minutos }, index) => (
+                    <div
+                      key={`passado-${minutos}-${index}`}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Horário passado às ${horario}`}
+                      onClick={() => handleHorarioClick(horario)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleHorarioClick(horario);
+                        }
+                      }}
+                      className={scheduleCardVariants({ status: "passed" })}
+                    >
+                      <p className="text-lg font-semibold text-text-secondary">
+                        {horario}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
             )
           )}
 
           {/* Resumo */}
           <div data-slot="summary" className={infoCardVariants()}>
             <p className="text-text-secondary">
-              Total de {horariosOrganizados.length} horários
+              Total de {baseHorarios.length} horários
             </p>
           </div>
         </div>

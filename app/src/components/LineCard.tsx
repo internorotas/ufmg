@@ -7,7 +7,11 @@ import React, { memo, useMemo, type KeyboardEvent } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
 import { cn } from "../lib/utils";
-import { timeToMinutes, minutesToTime } from "../../lib/utils";
+import {
+  timeToMinutes,
+  minutesToTime,
+  findScheduleIndex,
+} from "../../lib/utils";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 import { LineStatusBadge, type LineStatusType } from "./ui/Badge";
@@ -115,9 +119,12 @@ function calculateStatus(
   let status = "Encerrado";
   let statusType: LineStatusType = "closed";
 
-  // Próximo horário
-  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
-  if (next !== undefined) {
+  // ⚡ Bolt: Usando Busca Binária O(log N) em vez de find/for-loop
+  const splitIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
+
+  // Próximo horário (splitIndex aponta para o primeiro > currentMinutes)
+  if (splitIndex < schedulesInMinutes.length) {
+    const next = schedulesInMinutes[splitIndex];
     nextSchedule = minutesToTime(next);
     const diffMinutes = next - currentMinutes;
     if (diffMinutes <= 15) {
@@ -129,11 +136,14 @@ function calculateStatus(
     }
   }
 
-  // Último que partiu
-  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
-    if (schedulesInMinutes[i] <= currentMinutes) {
-      previousSchedule = minutesToTime(schedulesInMinutes[i]);
-      break;
+  // Último que partiu (qualquer um antes do splitIndex que seja <= currentMinutes)
+  if (splitIndex > 0) {
+    // splitIndex - 1 é o maior elemento <= currentMinutes
+    for (let i = splitIndex - 1; i >= 0; i--) {
+      if (schedulesInMinutes[i] <= currentMinutes) {
+        previousSchedule = minutesToTime(schedulesInMinutes[i]);
+        break;
+      }
     }
   }
 

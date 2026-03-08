@@ -268,6 +268,37 @@ export function minutesToTime(minutes: number): string {
 }
 
 /**
+ * Encontra o índice de corte de um array ordenado de horários usando Busca Binária.
+ * @param schedules Array de objetos ou números ordenado (minutos desde meia-noite).
+ * @param currentMinutes O tempo atual em minutos.
+ * @param getMinutes Função opcional para extrair o valor em minutos do item.
+ * @returns O índice onde o schedule é maior que currentMinutes. Se todos forem menores, retorna o length do array.
+ */
+export function findScheduleIndex<T>(
+  schedules: T[],
+  currentMinutes: number,
+  getMinutes: (item: T) => number = (item) => item as unknown as number,
+): number {
+  let low = 0;
+  let high = schedules.length - 1;
+  let firstGreaterIndex = schedules.length;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const midMinutes = getMinutes(schedules[mid]);
+
+    if (midMinutes > currentMinutes) {
+      firstGreaterIndex = mid;
+      high = mid - 1; // Continuar buscando à esquerda por um índice menor
+    } else {
+      low = mid + 1; // Buscar à direita
+    }
+  }
+
+  return firstGreaterIndex;
+}
+
+/**
  * Calcula o próximo e o anterior horário com base no horário atual
  * @param horarios Array de horários no formato "HH:MM"
  * @returns Objeto com nextSchedule e previousSchedule
@@ -292,22 +323,31 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
   let nextSchedule = "--:--";
   let previousSchedule = "--:--";
 
-  // Encontrar próximo horário
-  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
-  if (next !== undefined) {
-    nextSchedule = minutesToTime(next);
+  // ⚡ Bolt: Usando Busca Binária O(log N) para encontrar o ponto de divisão em vez de O(N) find/for-loop
+  const splitIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
+
+  // Encontrar próximo horário (o primeiro no ou após o splitIndex que seja > currentMinutes)
+  // Como findScheduleIndex retorna o primeiro > currentMinutes, podemos usá-lo diretamente
+  if (splitIndex < schedulesInMinutes.length) {
+    nextSchedule = minutesToTime(schedulesInMinutes[splitIndex]);
   } else if (schedulesInMinutes.length > 0) {
     // Se não há mais horários hoje, o próximo é o primeiro de amanhã
     nextSchedule = minutesToTime(schedulesInMinutes[0]);
   }
 
-  // Encontrar horário anterior
+  // Encontrar horário anterior (o último antes do splitIndex que seja < currentMinutes)
   let foundPrevious = false;
-  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
-    if (schedulesInMinutes[i] < currentMinutes) {
-      previousSchedule = minutesToTime(schedulesInMinutes[i]);
-      foundPrevious = true;
-      break;
+  if (splitIndex > 0) {
+    // splitIndex é o primeiro maior que o current.
+    // splitIndex - 1 é <= current. Precisamos do estritamente menor que current.
+    // Para simplificar e evitar lógica complexa com schedules exatos iguais ao current time,
+    // o for-loop curto voltando do splitIndex-1 é suficiente e muito mais rápido que desde o final.
+    for (let i = splitIndex - 1; i >= 0; i--) {
+      if (schedulesInMinutes[i] < currentMinutes) {
+        previousSchedule = minutesToTime(schedulesInMinutes[i]);
+        foundPrevious = true;
+        break;
+      }
     }
   }
 
