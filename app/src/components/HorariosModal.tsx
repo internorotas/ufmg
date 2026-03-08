@@ -8,7 +8,7 @@ import { tv } from "tailwind-variants";
 import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal";
 import type { Linha } from "../types/data.types";
-import { timeToMinutes } from "../../lib/utils";
+import { timeToMinutes, findScheduleIndex } from "../../lib/utils";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
 // ============================================================================
@@ -116,16 +116,26 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha.horarios]);
 
-  // ⚡ Bolt: Calcular status 'passou' O(N) separado com base no tempo atual
-  const horariosOrganizados = useMemo(() => {
-    return baseHorarios.map((h) => ({
-      ...h,
-      passou: h.minutos < currentMinutes,
-    }));
-  }, [baseHorarios, currentMinutes]);
+  // ⚡ Bolt: O(log N) Busca Binária em vez de O(N) Array.map e Array.filter duplicado
+  const { proximos, passados } = useMemo(() => {
+    // findScheduleIndex acha o primeiro índice > currentMinutes - 1 (ou seja, >= currentMinutes)
+    const splitIndex = findScheduleIndex(
+      baseHorarios,
+      currentMinutes - 1,
+      (h) => h.minutos,
+    );
 
-  const proximos = horariosOrganizados.filter((h) => !h.passou);
-  const passados = horariosOrganizados.filter((h) => h.passou);
+    // slice(0, splitIndex) pega todos menores que currentMinutes (já passaram)
+    const passadosArr = baseHorarios
+      .slice(0, splitIndex)
+      .map((h) => ({ ...h, passou: true }));
+    // slice(splitIndex) pega todos maiores ou iguais a currentMinutes (próximos)
+    const proximosArr = baseHorarios
+      .slice(splitIndex)
+      .map((h) => ({ ...h, passou: false }));
+
+    return { proximos: proximosArr, passados: passadosArr };
+  }, [baseHorarios, currentMinutes]);
 
   return (
     <Modal
@@ -207,7 +217,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
             className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm"
           >
             <p className="text-center text-gray-300">
-              Total de {horariosOrganizados.length} horários •{" "}
+              Total de {baseHorarios.length} horários •{" "}
               <span className="text-green-400">
                 {proximos.length} restantes
               </span>
