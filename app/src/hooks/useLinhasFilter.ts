@@ -45,10 +45,10 @@ interface UseLinhasFilterReturn {
 
 /**
  * Determina a categoria inicial baseado no período atual e dia da semana.
- * 
+ *
  * Regras:
  * - Se está em período de férias E é dia útil → aba "feriasRecessos"
- * - Se é sábado (e não está em período de férias) → aba "sabado"  
+ * - Se é sábado (e não está em período de férias) → aba "sabado"
  * - Caso contrário → aba "diasUteis" (padrão)
  */
 function getInitialCategory(linhasData: CategoriaLinhas): number {
