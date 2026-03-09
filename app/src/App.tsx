@@ -60,10 +60,10 @@ function AppContent() {
     erro: erroLocalizacao,
     mostrarModalPermissao,
     mostrarModalLonge,
-    abrirModalPermissao,
     fecharModalPermissao,
     fecharModalLonge,
     iniciarRastreamento,
+    solicitarPermissaoNavegador,
   } = useLocalizacaoUsuario();
 
   useEffect(() => {
@@ -165,7 +165,7 @@ function AppContent() {
             localizacaoUsuario={localizacao}
             headingUsuario={heading}
             permissaoLocalizacao={permissaoConcedida}
-            onPedirLocalizacao={abrirModalPermissao}
+            onPedirLocalizacao={iniciarRastreamento}
           />
         </Suspense>
       </main>
@@ -203,7 +203,7 @@ function AppContent() {
               fullWidth
               disabled={carregandoLocalizacao}
               onClick={() => {
-                iniciarRastreamento();
+                solicitarPermissaoNavegador();
                 trackEvent({
                   category: "Engajamento",
                   action: "Localização Permitida",
