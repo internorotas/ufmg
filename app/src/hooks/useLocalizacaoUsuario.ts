@@ -6,10 +6,18 @@
  * - Orientação da bússola via DeviceOrientation API
  * - Controle de modais (permissão e distância)
  * - Cálculo de distância até a UFMG
+ *
+ * Proteções iOS/WebKit:
+ * - navigator.permissions.query({ name: 'geolocation' }) lança TypeError no Safari/WebKit;
+ *   toda chamada é envolta em try/catch — em caso de erro exibe o modal como fallback seguro.
+ * - DeviceOrientationEvent.requestPermission é necessário no iOS 13+; o cast duplo evita
+ *   erros de tipo pois a propriedade não consta nos tipos padrão do TypeScript.
+ * - webkitCompassHeading (iOS) fornece heading absoluto; alpha (Android) é convertido.
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { calcularDistanciaKm } from "../lib/utils";
+import { useAnalytics } from "./useAnalytics";
 
 /**
  * Coordenadas centrais do Campus UFMG (Pampulha)
@@ -20,6 +28,11 @@ export const COORDENADAS_UFMG: [number, number] = [-19.87055, -43.96775];
  * Distância máxima em km para considerar o usuário "perto" da UFMG
  */
 const DISTANCIA_MAXIMA_KM = 4;
+
+/** Extende DeviceOrientationEvent com a propriedade proprietária do WebKit/iOS. */
+type DeviceOrientationEventWebkit = DeviceOrientationEvent & {
+  webkitCompassHeading?: number;
+};
 
 /**
  * Interface de retorno do hook
@@ -41,12 +54,23 @@ export interface UseLocalizacaoUsuarioReturn {
   mostrarModalLonge: boolean;
   /** Abre o modal de permissão */
   abrirModalPermissao: () => void;
-  /** Fecha o modal de permissão */
+  /** Fecha o modal de permissão sem iniciar GPS */
   fecharModalPermissao: () => void;
   /** Fecha o modal de distância */
   fecharModalLonge: () => void;
-  /** Inicia o rastreamento de GPS (chamar após permissão do usuário) */
-  iniciarRastreamento: () => void;
+  /**
+   * Ponto de entrada principal. Verifica a Permissions API (com proteção
+   * para TypeError do WebKit/iOS) e age conforme o estado:
+   * - 'granted': inicia GPS diretamente via solicitarPermissaoNavegador()
+   * - 'prompt'/'denied' ou erro: exibe o modal informativo
+   */
+  iniciarRastreamento: () => Promise<void>;
+  /**
+   * Inicia efetivamente o watchPosition e o listener de orientação.
+   * Deve ser chamado pelo botão "Permitir" do modal ou quando a permissão
+   * já é conhecida como 'granted'.
+   */
+  solicitarPermissaoNavegador: () => Promise<void>;
 }
 
 /**
@@ -54,14 +78,13 @@ export interface UseLocalizacaoUsuarioReturn {
  *
  * @example
  * ```tsx
- * const { localizacao, heading, abrirModalPermissao } = useLocalizacaoUsuario();
+ * const { localizacao, heading, iniciarRastreamento } = useLocalizacaoUsuario();
  *
- * // Quando o usuário clicar no FAB:
- * if (!permissaoConcedida) {
- *   abrirModalPermissao();
- * } else {
- *   map.flyTo(localizacao, 17);
- * }
+ * // FAB: iniciarRastreamento verifica permissão e age conforme o estado
+ * <button onClick={iniciarRastreamento}>Minha localização</button>
+ *
+ * // Modal "Permitir": chama solicitarPermissaoNavegador diretamente
+ * <button onClick={solicitarPermissaoNavegador}>Permitir</button>
  * ```
  */
 export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
@@ -76,65 +99,61 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
   const [mostrarModalPermissao, setMostrarModalPermissao] = useState(false);
   const [mostrarModalLonge, setMostrarModalLonge] = useState(false);
 
-  // Refs para controle
+  const { trackEvent } = useAnalytics();
+
+  // Refs para controle de ciclo de vida — evitam closures desatualizadas
   const watchIdRef = useRef<number | null>(null);
   const bussolaCleanupRef = useRef<(() => void) | null>(null);
   const jaVerificouDistanciaRef = useRef(false);
   const melhorPrecisaoRef = useRef<number>(Infinity);
 
   /**
-   * Verifica se o usuário está longe da UFMG (apenas 1x por sessão)
+   * Verifica se o usuário está longe da UFMG (apenas 1x por sessão de rastreamento)
    */
-  const verificarDistancia = useCallback((lat: number, lng: number) => {
-    if (jaVerificouDistanciaRef.current) return;
+  const verificarDistancia = useCallback(
+    (lat: number, lng: number) => {
+      if (jaVerificouDistanciaRef.current) return;
+      jaVerificouDistanciaRef.current = true;
 
-    const distancia = calcularDistanciaKm(
-      lat,
-      lng,
-      COORDENADAS_UFMG[0],
-      COORDENADAS_UFMG[1],
-    );
+      const distancia = calcularDistanciaKm(
+        lat,
+        lng,
+        COORDENADAS_UFMG[0],
+        COORDENADAS_UFMG[1],
+      );
 
-    if (distancia > DISTANCIA_MAXIMA_KM) {
-      setMostrarModalLonge(true);
-    }
-
-    jaVerificouDistanciaRef.current = true;
-  }, []);
+      if (distancia > DISTANCIA_MAXIMA_KM) {
+        setMostrarModalLonge(true);
+        trackEvent({
+          category: "Engajamento",
+          action: "Usuário Longe da UFMG",
+          label: `${distancia.toFixed(1)}km`,
+        });
+      }
+    },
+    [trackEvent],
+  );
 
   /**
-   * Callback de sucesso do GPS
-   * Atualiza posição priorizando precisão boa
+   * Callback de sucesso do GPS — atualiza posição priorizando precisão boa
    */
   const onPosicaoRecebida = useCallback(
     (position: GeolocationPosition) => {
       const { latitude, longitude, accuracy } = position.coords;
 
-      // Sempre para o loading na primeira resposta
       setCarregando(false);
       setErro(null);
       setPermissaoConcedida(true);
 
-      // Limite de precisão aceitável em metros
-      // Posições com mais de 150m são muito imprecisas e podem confundir
-      const precisaoMaximaAceitavel = 150;
-
-      // Lógica simples:
-      // - Aceita qualquer posição com precisão razoável (< 150m)
-      // - Primeira leitura: aceita qualquer coisa para dar feedback rápido
+      // Aceita a primeira leitura (feedback imediato) ou leituras com boa precisão
       const primeiraLeitura = melhorPrecisaoRef.current === Infinity;
-      const precisaoAceitavel = accuracy <= precisaoMaximaAceitavel;
-
-      if (primeiraLeitura || precisaoAceitavel) {
+      if (primeiraLeitura || accuracy <= 150) {
         setLocalizacao([latitude, longitude]);
-
-        // Registra a melhor precisão obtida (para debug/futuro)
         if (accuracy < melhorPrecisaoRef.current) {
           melhorPrecisaoRef.current = accuracy;
         }
       }
 
-      // Verifica distância na primeira coordenada válida
       verificarDistancia(latitude, longitude);
     },
     [verificarDistancia],
@@ -152,7 +171,6 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
           "Permissão de localização negada. Verifique as configurações do navegador.",
         );
         setPermissaoConcedida(false);
-        // Reabre o modal para mostrar o erro
         setMostrarModalPermissao(true);
         break;
       case error.POSITION_UNAVAILABLE:
@@ -164,94 +182,152 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
         setMostrarModalPermissao(true);
         break;
       default:
-        setErro("Erro desconhecido de geolocalização");
+        setErro("Erro desconhecido de geolocalização.");
         setMostrarModalPermissao(true);
     }
   }, []);
 
   /**
-   * Inicia o listener da bússola (DeviceOrientation)
+   * Inicia o listener da bússola (DeviceOrientation API).
+   *
+   * iOS 13+: DeviceOrientationEvent.requestPermission é uma função nativa;
+   * deve ser chamada ANTES de adicionar o event listener.
+   * O cast duplo (unknown → tipo customizado) é necessário pois a API
+   * proprietária não está nos tipos padrão do TypeScript/DOM.
+   *
+   * @returns cleanup function ou null se bússola indisponível
    */
-  const iniciarBussola = useCallback(() => {
-    const handleOrientation = (event: DeviceOrientationEvent) => {
-      // webkitCompassHeading é específico do iOS
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const compassHeading = (event as any).webkitCompassHeading;
-
-      if (compassHeading !== undefined) {
-        // iOS: webkitCompassHeading já é a direção absoluta
-        setHeading(compassHeading);
-      } else if (event.alpha !== null) {
-        // Android/outros: alpha é relativo à orientação inicial
-        // Para direção absoluta, usamos deviceorientationabsolute quando disponível
-        setHeading(360 - event.alpha);
+  const iniciarBussola = useCallback(async (): Promise<(() => void) | null> => {
+    const handleOrientation = (event: Event) => {
+      const e = event as DeviceOrientationEventWebkit;
+      if (e.webkitCompassHeading !== undefined) {
+        // iOS: propriedade proprietária — heading absoluto em graus
+        setHeading(e.webkitCompassHeading);
+      } else if (e.alpha !== null && e.alpha !== undefined) {
+        // Android/desktop: alpha é rotação no sentido anti-horário; invertemos
+        setHeading(360 - e.alpha);
       }
     };
 
-    // Detecta suporte a deviceorientationabsolute (mais preciso no Android)
-    const supportsAbsolute =
-      typeof window !== "undefined" && "ondeviceorientationabsolute" in window;
+    // CRÍTICO iOS 13+: requestPermission deve ser chamado antes do addEventListener
+    const DeviceOrientation = DeviceOrientationEvent as unknown as {
+      requestPermission?: () => Promise<"granted" | "denied">;
+    };
 
+    if (typeof DeviceOrientation.requestPermission === "function") {
+      try {
+        const perm = await DeviceOrientation.requestPermission();
+        if (perm === "granted") {
+          window.addEventListener("deviceorientation", handleOrientation, true);
+          return () =>
+            window.removeEventListener(
+              "deviceorientation",
+              handleOrientation,
+              true,
+            );
+        }
+      } catch {
+        // Bússola indisponível neste dispositivo — GPS continua normalmente
+      }
+      return null;
+    }
+
+    // Android / desktop: deviceorientationabsolute fornece heading absoluto
+    // quando disponível; caso contrário usa deviceorientation
+    const supportsAbsolute = "ondeviceorientationabsolute" in window;
     const eventName = supportsAbsolute
       ? "deviceorientationabsolute"
       : "deviceorientation";
 
-    window.addEventListener(
-      eventName,
-      handleOrientation as EventListener,
-      true,
-    );
-
-    // Cleanup function
-    return () => {
+    window.addEventListener(eventName, handleOrientation as EventListener, true);
+    return () =>
       window.removeEventListener(
         eventName,
         handleOrientation as EventListener,
         true,
       );
-    };
   }, []);
 
   /**
-   * Inicia o rastreamento de GPS
+   * Inicia efetivamente o watchPosition e a bússola.
+   * Chamado diretamente quando a permissão já é 'granted', ou pelo botão
+   * "Permitir" do modal após confirmação do usuário.
    */
-  const iniciarRastreamento = useCallback(() => {
+  const solicitarPermissaoNavegador = useCallback(async () => {
     if (!navigator.geolocation) {
-      setErro("Geolocalização não suportada neste navegador");
+      setErro("Geolocalização não suportada neste navegador.");
       return;
     }
 
-    // Limpa erro anterior e inicia loading
+    setMostrarModalPermissao(false);
     setErro(null);
     setCarregando(true);
-
-    // Reseta a melhor precisão para nova sessão de rastreamento
     melhorPrecisaoRef.current = Infinity;
+    jaVerificouDistanciaRef.current = false;
 
     // Limpa watch anterior se existir
     if (watchIdRef.current !== null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
     }
 
-    // Fecha o modal imediatamente (navegador vai mostrar seu próprio prompt)
-    setMostrarModalPermissao(false);
-
-    // Inicia watch do GPS - o callback onPosicaoRecebida vai setar permissaoConcedida
     watchIdRef.current = navigator.geolocation.watchPosition(
       onPosicaoRecebida,
       onErroGPS,
       {
         enableHighAccuracy: true,
         timeout: 20000,
-        maximumAge: 0, // Sempre pedir posição fresca para máxima precisão
+        maximumAge: 0,
       },
     );
 
-    // Inicia bússola e armazena cleanup
-    bussolaCleanupRef.current = iniciarBussola();
+    const cleanup = await iniciarBussola();
+    if (cleanup) {
+      bussolaCleanupRef.current = cleanup;
+    }
   }, [onPosicaoRecebida, onErroGPS, iniciarBussola]);
 
-  // Cleanup ao desmontar
+  /**
+   * Ponto de entrada principal.
+   *
+   * Verifica o estado atual da permissão de geolocalização:
+   * - 'granted': inicia GPS diretamente sem exibir modal
+   * - 'prompt'/'denied': exibe modal informativo
+   *
+   * CRÍTICO iOS/WebKit: navigator.permissions.query({ name: 'geolocation' })
+   * lança TypeError no Safari. O catch trata esse caso exibindo o modal —
+   * comportamento correto e conservador para todos os navegadores.
+   */
+  const iniciarRastreamento = useCallback(async () => {
+    if (!navigator.geolocation) {
+      setErro("Geolocalização não suportada neste navegador.");
+      return;
+    }
+
+    if (navigator.permissions) {
+      try {
+        const status = await navigator.permissions.query({
+          name: "geolocation",
+        });
+
+        if (status.state === "granted") {
+          // Permissão já concedida anteriormente — pula o modal
+          await solicitarPermissaoNavegador();
+          return;
+        }
+
+        // "prompt" ou "denied" — exibe modal explicativo
+        setMostrarModalPermissao(true);
+      } catch {
+        // WebKit/iOS lança TypeError — exibe modal como fallback seguro
+        setMostrarModalPermissao(true);
+      }
+    } else {
+      // Navegador sem Permissions API — exibe modal
+      setMostrarModalPermissao(true);
+    }
+  }, [solicitarPermissaoNavegador]);
+
+  // Limpeza de recursos ao desmontar o componente
   useEffect(() => {
     return () => {
       if (watchIdRef.current !== null) {
@@ -263,18 +339,18 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
     };
   }, []);
 
-  // Funções de controle dos modais
-  const abrirModalPermissao = useCallback(() => {
-    setMostrarModalPermissao(true);
-  }, []);
-
-  const fecharModalPermissao = useCallback(() => {
-    setMostrarModalPermissao(false);
-  }, []);
-
-  const fecharModalLonge = useCallback(() => {
-    setMostrarModalLonge(false);
-  }, []);
+  const abrirModalPermissao = useCallback(
+    () => setMostrarModalPermissao(true),
+    [],
+  );
+  const fecharModalPermissao = useCallback(
+    () => setMostrarModalPermissao(false),
+    [],
+  );
+  const fecharModalLonge = useCallback(
+    () => setMostrarModalLonge(false),
+    [],
+  );
 
   return {
     localizacao,
@@ -288,5 +364,6 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
     fecharModalPermissao,
     fecharModalLonge,
     iniciarRastreamento,
+    solicitarPermissaoNavegador,
   };
 }

@@ -12,8 +12,9 @@
 import { useMap } from "react-leaflet";
 import { Marker } from "react-leaflet";
 import L from "leaflet";
-import { LocateFixed } from "lucide-react";
+import { CornerUpLeft , LocateFixed } from "lucide-react";
 import { cn } from "../lib/utils";
+import { COORDENADAS_UFMG } from "../hooks/useLocalizacaoUsuario";
 
 interface ControlesUsuarioMapaProps {
   /** Coordenadas atuais do usuário [lat, lng] */
@@ -98,6 +99,13 @@ export function ControlesUsuarioMapa({
   const map = useMap();
 
   /**
+   * Centraliza o mapa no campus da UFMG
+   */
+  const handleCentralizarUFMG = () => {
+    map.flyTo(COORDENADAS_UFMG, 15, { duration: 1 });
+  };
+
+  /**
    * Centraliza o mapa na localização do usuário
    */
   const handleCentralizar = () => {
@@ -125,8 +133,25 @@ export function ControlesUsuarioMapa({
         />
       )}
 
-      {/* FAB - Floating Action Button para centralizar */}
-      <div className="fixed bottom-6 right-4 z-1000 md:bottom-6">
+      {/* FABs - Floating Action Buttons */}
+      <div className="fixed bottom-6 right-4 z-1000 flex flex-col gap-2 md:bottom-6">
+        {/* Botão: centralizar no campus UFMG */}
+        <button
+          type="button"
+          onClick={handleCentralizarUFMG}
+          className={cn(
+            "flex h-12 w-12 items-center justify-center",
+            "rounded-full shadow-lg transition-all duration-200",
+            "bg-white hover:bg-gray-50 active:scale-95",
+            "focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2",
+          )}
+          aria-label="Centralizar mapa no campus UFMG"
+          title="Voltar para a UFMG"
+        >
+          <CornerUpLeft className="h-6 w-6 text-brand-primary" />
+        </button>
+
+        {/* Botão: centralizar na localização do usuário */}
         <button
           type="button"
           onClick={handleCentralizar}
