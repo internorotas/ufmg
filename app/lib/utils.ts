@@ -292,26 +292,33 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
   let nextSchedule = "--:--";
   let previousSchedule = "--:--";
 
-  // Encontrar próximo horário
-  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
-  if (next !== undefined) {
-    nextSchedule = minutesToTime(next);
+  // ⚡ Bolt: Usando busca binária O(log N) em vez de array.find O(N)
+  const nextIdx = findScheduleIndex(schedulesInMinutes, currentMinutes);
+
+  if (nextIdx < schedulesInMinutes.length) {
+    nextSchedule = minutesToTime(schedulesInMinutes[nextIdx]);
   } else if (schedulesInMinutes.length > 0) {
     // Se não há mais horários hoje, o próximo é o primeiro de amanhã
     nextSchedule = minutesToTime(schedulesInMinutes[0]);
   }
 
-  // Encontrar horário anterior
-  let foundPrevious = false;
-  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
-    if (schedulesInMinutes[i] < currentMinutes) {
-      previousSchedule = minutesToTime(schedulesInMinutes[i]);
-      foundPrevious = true;
-      break;
+  // O horário anterior é imediatamente antes do próximo índice
+  // Se nextIdx for 0, mas currentMinutes for maior ou igual ao primeiro (ou menor),
+  // e nós precisarmos do último de ontem:
+
+  let prevIdx = -1;
+  if (nextIdx > 0 && schedulesInMinutes[nextIdx - 1] < currentMinutes) {
+    prevIdx = nextIdx - 1;
+  } else {
+    // Caso especial, vamos verificar o último de fato se ele for menor
+    if (schedulesInMinutes[schedulesInMinutes.length - 1] < currentMinutes) {
+      prevIdx = schedulesInMinutes.length - 1;
     }
   }
 
-  if (!foundPrevious && schedulesInMinutes.length > 0) {
+  if (prevIdx !== -1) {
+    previousSchedule = minutesToTime(schedulesInMinutes[prevIdx]);
+  } else if (schedulesInMinutes.length > 0) {
     // Se não há horários anteriores hoje, o anterior é o último de ontem
     previousSchedule = minutesToTime(
       schedulesInMinutes[schedulesInMinutes.length - 1],
@@ -552,4 +559,38 @@ export function formatarTextoComQuebras(texto: string) {
   if (!texto) return "";
   // Proteção contra XSS: Escapamos o texto antes de injetar as tags <br/>
   return escapeHtml(texto).replace(/\n/g, "<br/>");
+}
+
+/**
+ * ⚡ Bolt: Encontra o índice do primeiro horário que é estritamente maior que o valor alvo.
+ * Usa busca binária O(log N) em vez de array.find() O(N).
+ * O array de entrada DEVE estar ordenado.
+ *
+ * Suporta tanto arrays de primitivos quanto de objetos, através do segundo parâmetro opcional (getter).
+ *
+ * @param sortedArray Array ordenado
+ * @param target Valor alvo
+ * @param getVal Função opcional para extrair o valor numérico de um item do array
+ * @returns Índice do primeiro elemento estritamente maior que o alvo, ou o tamanho do array se não houver
+ */
+export function findScheduleIndex<T>(
+  sortedArray: T[],
+  target: number,
+  getVal: (item: T) => number = (item) => item as unknown as number,
+): number {
+  let left = 0;
+  let right = sortedArray.length;
+
+  while (left < right) {
+    const mid = Math.floor((left + right) / 2);
+    const midVal = getVal(sortedArray[mid]);
+
+    if (midVal > target) {
+      right = mid;
+    } else {
+      left = mid + 1;
+    }
+  }
+
+  return left;
 }
