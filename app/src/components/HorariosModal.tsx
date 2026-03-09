@@ -8,7 +8,7 @@ import { tv } from "tailwind-variants";
 import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal";
 import type { Linha } from "../types/data.types";
-import { timeToMinutes } from "../../lib/utils";
+import { timeToMinutes, findScheduleIndex } from "../../lib/utils";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
 // ============================================================================
@@ -116,16 +116,23 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha.horarios]);
 
-  // ⚡ Bolt: Calcular status 'passou' O(N) separado com base no tempo atual
-  const horariosOrganizados = useMemo(() => {
-    return baseHorarios.map((h) => ({
-      ...h,
-      passou: h.minutos < currentMinutes,
-    }));
+  // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
+  // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
+  // Separamos os componentes "passado" e "futuro" para evitar realocação dos itens O(N)
+  const splitIndex = useMemo(() => {
+    // Busca binária para achar onde dividir usando um getter para evitar o .map() inicial.
+    // Usamos currentMinutes - 1 pois currentMinutes (agora) deve ser considerado 'proximo'
+    return findScheduleIndex(
+      baseHorarios,
+      currentMinutes - 1,
+      (h) => h.minutos,
+    );
   }, [baseHorarios, currentMinutes]);
 
-  const proximos = horariosOrganizados.filter((h) => !h.passou);
-  const passados = horariosOrganizados.filter((h) => h.passou);
+  // Zero-allocation das sublistas virtuais
+  const passados = baseHorarios.slice(0, splitIndex);
+  const proximos = baseHorarios.slice(splitIndex);
+  const todos = baseHorarios;
 
   return (
     <Modal
@@ -207,7 +214,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
             className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm"
           >
             <p className="text-center text-gray-300">
-              Total de {horariosOrganizados.length} horários •{" "}
+              Total de {todos.length} horários •{" "}
               <span className="text-green-400">
                 {proximos.length} restantes
               </span>
