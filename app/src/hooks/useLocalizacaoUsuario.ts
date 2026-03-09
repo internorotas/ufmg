@@ -209,14 +209,19 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       }
     };
 
-    // CRÍTICO iOS 13+: requestPermission deve ser chamado antes do addEventListener
-    const DeviceOrientation = DeviceOrientationEvent as unknown as {
-      requestPermission?: () => Promise<"granted" | "denied">;
-    };
+    // CRÍTICO iOS 13+: requestPermission deve ser chamado antes do addEventListener.
+    // Nunca acesse DeviceOrientationEvent do escopo global — no WebKit ele pode ser
+    // undefined ou lançar ReferenceError. Sempre via window para acesso seguro.
+    const isOrientationSupported =
+      typeof window !== "undefined" &&
+      window.DeviceOrientationEvent !== undefined;
+    const requestPermission = isOrientationSupported
+      ? (window.DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<"granted" | "denied"> }).requestPermission
+      : undefined;
 
-    if (typeof DeviceOrientation.requestPermission === "function") {
+    if (typeof requestPermission === "function") {
       try {
-        const perm = await DeviceOrientation.requestPermission();
+        const perm = await requestPermission();
         if (perm === "granted") {
           window.addEventListener("deviceorientation", handleOrientation, true);
           return () =>
