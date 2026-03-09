@@ -142,7 +142,7 @@ export function ControlesUsuarioMapa({
           className={cn(
             "flex h-12 w-12 items-center justify-center",
             "rounded-full shadow-lg transition-all duration-200",
-            "bg-white hover:bg-gray-50 active:scale-95",
+            "bg-blue-100 hover:bg-blue-200 active:scale-95",
             "focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2",
           )}
           aria-label="Centralizar mapa no campus UFMG"
