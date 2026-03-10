@@ -489,67 +489,70 @@ export function isNumberArray(value: unknown): value is number[] {
   return Array.isArray(value) && value.every((val) => !isNaN(Number(val)));
 }
 
-/**
- * Escapa caracteres HTML perigosos para prevenir ataques de Cross-Site Scripting (XSS)
- * @param texto Texto a ser escapado
- * @returns Texto com caracteres perigosos escapados
- */
-export function escapeHtml(texto: string): string {
-  if (!texto) return "";
-  return texto
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+import React from "react";
 
 /**
- * Detecta e converte URLs em texto simples para links HTML de forma segura
+ * Detecta e converte URLs em texto simples para elementos React,
+ * prevenindo ataques XSS ao não usar dangerouslySetInnerHTML.
  * @param texto Texto que pode conter URLs
- * @returns Texto seguro com URLs convertidas em tags <a>
+ * @returns Array de elementos React contendo links e texto normal
  */
-export function converterUrlsEmLinks(texto: string): string {
-  if (!texto) return "";
+export function converterUrlsEmLinks(texto: string): React.ReactNode[] {
+  if (!texto) return [];
 
   // Regex melhorada para detectar URLs começando com http://, https:// ou www.
   const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
 
-  // Divide o texto com base no regex, isolando as URLs para escapá-las individualmente
+  // Divide o texto com base no regex
   const parts = texto.split(urlRegex);
 
-  return parts
-    .map((part) => {
-      if (part && part.match(urlRegex)) {
-        let urlStr = part;
-        let suffix = "";
+  return parts.map((part, index) => {
+    if (part && part.match(urlRegex)) {
+      let urlStr = part;
+      let suffix = "";
 
-        // Remove pontuação final para não incluir no link
-        if (urlStr.endsWith(",") || urlStr.endsWith(".")) {
-          suffix = urlStr.slice(-1);
-          urlStr = urlStr.slice(0, -1);
-        }
-
-        // Adiciona o protocolo http:// às URLs que começam com www.
-        const href = urlStr.startsWith("www.") ? `http://${urlStr}` : urlStr;
-
-        // Os atributos e o texto são construídos com segurança
-        return `<a style='color:#2357b0; text-decoration:none;' href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" onmouseover="this.style.opacity=0.75;" onmouseout="this.style.opacity=1;">${escapeHtml(urlStr)}</a>${suffix}`;
+      // Remove pontuação final para não incluir no link
+      if (urlStr.endsWith(",") || urlStr.endsWith(".")) {
+        suffix = urlStr.slice(-1);
+        urlStr = urlStr.slice(0, -1);
       }
-      // Para o texto normal, apenas escapamos para evitar injeção de HTML/XSS
-      return escapeHtml(part);
-    })
-    .join("");
+
+      // Adiciona o protocolo http:// às URLs que começam com www.
+      const href = urlStr.startsWith("www.") ? `http://${urlStr}` : urlStr;
+
+      return (
+        <React.Fragment key={index}>
+          <a
+            className="text-internoRotas-azul-eletrico no-underline hover:opacity-75 transition-opacity"
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {urlStr}
+          </a>
+          {suffix}
+        </React.Fragment>
+      );
+    }
+    // Para o texto normal, o React automaticamente faz o escape contra XSS
+    return <React.Fragment key={index}>{part}</React.Fragment>;
+  });
 }
 
 /**
  * Formata quebras de linha do texto original,
- * transformando quebras de linha em tags <br/> de forma segura (escapando HTML antes).
+ * transformando quebras de linha em tags <br/> via React.
  * @param texto a ser convertido
- * @returns Texto substituindo as quebras de linha por tags <br/> com conteúdo escapado
+ * @returns Array de elementos React substituindo as quebras de linha por <br/>
  */
-export function formatarTextoComQuebras(texto: string) {
-  if (!texto) return "";
-  // Proteção contra XSS: Escapamos o texto antes de injetar as tags <br/>
-  return escapeHtml(texto).replace(/\n/g, "<br/>");
+export function formatarTextoComQuebras(texto: string): React.ReactNode[] {
+  if (!texto) return [];
+
+  const lines = texto.split(/\n/g);
+  return lines.map((line, index) => (
+    <React.Fragment key={index}>
+      {line}
+      {index < lines.length - 1 && <br />}
+    </React.Fragment>
+  ));
 }
