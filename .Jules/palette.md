@@ -12,3 +12,7 @@
 ## 2025-03-05 - Keyboard Accessibility for Schedule Cards
 **Learning:** Schedule cards in `LinhaDetalhesModal` and `HorariosModal` were interactive (had `onClick`) but lacked keyboard accessibility. Adding `tabIndex={0}`, `role="button"`, `aria-label`, and `onKeyDown` ensures users navigating via keyboard can select schedules.
 **Action:** Always verify interactive elements (e.g. `div`s with `onClick`) have equivalent keyboard event handlers, roles, and focusability to maintain accessibility.
+
+## 2025-03-09 - Remove interactive attributes from informational elements
+**Learning:** Adding interactive attributes like `tabIndex={0}`, `role="button"`, or `aria-label` to purely static, informational elements (like schedule cards) creates an accessibility anti-pattern. Screen readers may misinterpret these elements as actionable when they are not.
+**Action:** When designing or refactoring UI components, only apply interactive attributes to elements that actually support user interaction (e.g., clickable links, buttons, form inputs). Ensure static read-only data is accessible without artificial interactive wrappers.
