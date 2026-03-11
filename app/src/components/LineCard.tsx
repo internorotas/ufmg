@@ -7,7 +7,7 @@ import React, { memo, useMemo, type KeyboardEvent } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
 import { cn } from "../lib/utils";
-import { timeToMinutes, minutesToTime } from "../../lib/utils";
+import { timeToMinutes, minutesToTime, findScheduleIndex } from "../../lib/utils";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 import { LineStatusBadge, type LineStatusType } from "./ui/Badge";
@@ -115,9 +115,11 @@ function calculateStatus(
   let status = "Encerrado";
   let statusType: LineStatusType = "closed";
 
-  // Próximo horário
-  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
-  if (next !== undefined) {
+  // Próximo horário usando Busca Binária O(log N)
+  const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
+
+  if (nextIndex !== -1) {
+    const next = schedulesInMinutes[nextIndex];
     nextSchedule = minutesToTime(next);
     const diffMinutes = next - currentMinutes;
     if (diffMinutes <= 15) {
@@ -127,13 +129,23 @@ function calculateStatus(
       status = "Circulando";
       statusType = "running";
     }
-  }
 
-  // Último que partiu
-  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
-    if (schedulesInMinutes[i] <= currentMinutes) {
-      previousSchedule = minutesToTime(schedulesInMinutes[i]);
-      break;
+    // Último que partiu
+    let prevIndex = nextIndex - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] > currentMinutes) {
+      prevIndex--;
+    }
+    if (prevIndex >= 0) {
+      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
+    }
+  } else {
+    // Se não há próximo, o último que partiu é o último do array que seja menor ou igual ao tempo atual
+    let prevIndex = schedulesInMinutes.length - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] > currentMinutes) {
+      prevIndex--;
+    }
+    if (prevIndex >= 0) {
+      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
     }
   }
 
