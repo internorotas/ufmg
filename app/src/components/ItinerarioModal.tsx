@@ -3,6 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
+import { useMemo } from "react";
 import { tv } from "tailwind-variants";
 import { MapPin } from "lucide-react";
 import { Modal } from "./Modal";
@@ -77,11 +78,11 @@ export function ItinerarioModal({
   paradas,
   onParadaClick,
 }: ItinerarioModalProps) {
-  // Buscar paradas do itinerário
-  const paradasDoItinerario = buscarParadasPorIds(
-    linha.itinerarioParadasIds,
-    paradas,
-  );
+  // ⚡ Bolt: O(N*M) - Buscar paradas do itinerário
+  // Utilizar useMemo evita re-calcular esta busca na lista de paradas a cada render
+  const paradasDoItinerario = useMemo(() => {
+    return buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
+  }, [linha.itinerarioParadasIds, paradas]);
 
   const handleParadaClick = (parada: Parada) => {
     onParadaClick(parada);
