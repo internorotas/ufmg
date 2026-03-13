@@ -12,7 +12,7 @@
 import { useMap } from "react-leaflet";
 import { Marker } from "react-leaflet";
 import L from "leaflet";
-import { CornerUpLeft , LocateFixed } from "lucide-react";
+import { CornerUpLeft, LocateFixed } from "lucide-react";
 import { cn } from "../lib/utils";
 import { COORDENADAS_UFMG } from "../hooks/useLocalizacaoUsuario";
 
@@ -165,6 +165,11 @@ export function ControlesUsuarioMapa({
             "focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2",
           )}
           aria-label={
+            permissaoConcedida
+              ? "Centralizar mapa na minha localização"
+              : "Ativar localização"
+          }
+          title={
             permissaoConcedida
               ? "Centralizar mapa na minha localização"
               : "Ativar localização"
