@@ -12,7 +12,7 @@
 import { useMap } from "react-leaflet";
 import { Marker } from "react-leaflet";
 import L from "leaflet";
-import { CornerUpLeft , LocateFixed } from "lucide-react";
+import { CornerUpLeft, LocateFixed } from "lucide-react";
 import { cn } from "../lib/utils";
 import { COORDENADAS_UFMG } from "../hooks/useLocalizacaoUsuario";
 
