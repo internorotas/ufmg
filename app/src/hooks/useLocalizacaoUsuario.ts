@@ -216,7 +216,11 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       typeof window !== "undefined" &&
       window.DeviceOrientationEvent !== undefined;
     const requestPermission = isOrientationSupported
-      ? (window.DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<"granted" | "denied"> }).requestPermission
+      ? (
+          window.DeviceOrientationEvent as unknown as {
+            requestPermission?: () => Promise<"granted" | "denied">;
+          }
+        ).requestPermission
       : undefined;
 
     if (typeof requestPermission === "function") {
@@ -244,7 +248,11 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       ? "deviceorientationabsolute"
       : "deviceorientation";
 
-    window.addEventListener(eventName, handleOrientation as EventListener, true);
+    window.addEventListener(
+      eventName,
+      handleOrientation as EventListener,
+      true,
+    );
     return () =>
       window.removeEventListener(
         eventName,
@@ -352,10 +360,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
     () => setMostrarModalPermissao(false),
     [],
   );
-  const fecharModalLonge = useCallback(
-    () => setMostrarModalLonge(false),
-    [],
-  );
+  const fecharModalLonge = useCallback(() => setMostrarModalLonge(false), []);
 
   return {
     localizacao,

@@ -11,3 +11,6 @@
 ## $(date +%Y-%m-%d) - Avoiding Test Degradation for Performance
 **Learning:** When changing test code to accommodate performance fixes (e.g. dynamic text changes or timing), ensure that the rigor of the test is maintained. Weakening specific accessibility tests (like changing a string match to a simple truthiness check) is unacceptable, even if it allows the performance PR to pass tests quickly. Use regex matching or targeted logic instead.
 **Action:** Before changing a failing test, verify whether the original assertion is valid. If the output string changed due to legitimate logic, update the test using a precise regex instead of broad checks like `.toBeTruthy()`.
+## 2024-05-25 - ItinerarioModal Re-renders
+**Learning:** Found a missing memoization in `ItinerarioModal.tsx` for `buscarParadasPorIds`. Similar to what was fixed in `LinhaDetalhesModal.tsx`, this caused O(N*M) lookups on every re-render of the modal component.
+**Action:** Consistently apply `useMemo` to expensive array lookup operations like `buscarParadasPorIds` across all modal components to ensure smooth performance during React render cycles.
