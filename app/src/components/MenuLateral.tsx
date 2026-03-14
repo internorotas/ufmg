@@ -267,6 +267,8 @@ export function MenuLateral({
               variant="ghost"
               size="sm"
               className="rounded-lg p-2 text-white hover:bg-white/20 md:hidden"
+              aria-label="Fechar menu"
+              title="Fechar menu"
             >
               <ArrowLeft size={24} />
             </Button>

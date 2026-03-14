@@ -12,3 +12,7 @@
 ## 2025-03-05 - Keyboard Accessibility for Schedule Cards
 **Learning:** Schedule cards in `LinhaDetalhesModal` and `HorariosModal` were interactive (had `onClick`) but lacked keyboard accessibility. Adding `tabIndex={0}`, `role="button"`, `aria-label`, and `onKeyDown` ensures users navigating via keyboard can select schedules.
 **Action:** Always verify interactive elements (e.g. `div`s with `onClick`) have equivalent keyboard event handlers, roles, and focusability to maintain accessibility.
+
+## 2025-03-05 - False Affordances & Icon-Only Tooltips
+**Learning:** Purely informational UI elements (like the read-only schedule cards in `HorariosModal`) should never receive interactive classes (like `hover:scale`, `cursor-pointer`, `focus-visible:ring`) or focusability (`tabIndex={0}`). Adding these creates "false affordances", confusing keyboard and screen reader users. Additionally, icon-only buttons need a native `title` attribute matching their `aria-label` to provide an accessible tooltip for sighted mouse users.
+**Action:** Always verify if an element is actually actionable before adding interactive states, and ensure all icon-only buttons pair `aria-label` with `title`.
