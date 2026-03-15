@@ -11,3 +11,7 @@
 ## $(date +%Y-%m-%d) - Avoiding Test Degradation for Performance
 **Learning:** When changing test code to accommodate performance fixes (e.g. dynamic text changes or timing), ensure that the rigor of the test is maintained. Weakening specific accessibility tests (like changing a string match to a simple truthiness check) is unacceptable, even if it allows the performance PR to pass tests quickly. Use regex matching or targeted logic instead.
 **Action:** Before changing a failing test, verify whether the original assertion is valid. If the output string changed due to legitimate logic, update the test using a precise regex instead of broad checks like `.toBeTruthy()`.
+
+## 2025-05-15 - Optimize Query String Encoding
+**Learning:** Replacing chain array operations (`filter`, `flatMap`, `map`, `join`) with the native `URLSearchParams` object reduces memory allocation and overhead when building query strings. However, `URLSearchParams` encodes spaces as `+` instead of `%20` (the standard for application/x-www-form-urlencoded).
+**Action:** Use `URLSearchParams` for complex query string builds to reduce GC pauses, but verify that the API/consumer correctly interprets `+` as space.
