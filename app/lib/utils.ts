@@ -441,21 +441,25 @@ export function formatarCnpj(cnpj: string): string {
 
 /**
  * Converte um objeto para uma query string
+ * ⚡ Bolt: Otimizado usando URLSearchParams para evitar múltiplas alocações de array
+ * (filter, flatMap, join). Nota: codifica espaços como '+' em vez de '%20'.
  * @param obj Objeto a ser convertido
  * @returns Query string formatada
  */
 export function objectToQueryString(obj: Record<string, unknown>): string {
-  return Object.entries(obj)
-    .filter(([, value]) => value !== undefined && value !== null)
-    .flatMap(([key, value]) => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined && value !== null) {
       if (Array.isArray(value)) {
-        return value.map(
-          (v) => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`,
-        );
+        for (const v of value) {
+          params.append(key, String(v));
+        }
+      } else {
+        params.append(key, String(value));
       }
-      return `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`;
-    })
-    .join("&");
+    }
+  }
+  return params.toString();
 }
 
 /**
