@@ -11,3 +11,7 @@
 ## $(date +%Y-%m-%d) - Avoiding Test Degradation for Performance
 **Learning:** When changing test code to accommodate performance fixes (e.g. dynamic text changes or timing), ensure that the rigor of the test is maintained. Weakening specific accessibility tests (like changing a string match to a simple truthiness check) is unacceptable, even if it allows the performance PR to pass tests quickly. Use regex matching or targeted logic instead.
 **Action:** Before changing a failing test, verify whether the original assertion is valid. If the output string changed due to legitimate logic, update the test using a precise regex instead of broad checks like `.toBeTruthy()`.
+
+## 2024-05-24 - Unnecessary Map Constructions in Renders
+**Learning:** Found that an array mapping operation (`buscarParadasPorIds`) which inherently constructs new arrays based on an ID array and a full stop list was not memoized in `ItinerarioModal.tsx`. Even if the underlying search leverages an efficient WeakMap caching, repeatedly allocating these mapped arrays inside render loops for modals is unnecessary work.
+**Action:** When filtering or mapping lists across references (like finding objects for an ID list) inside a React component, consistently wrap these function calls with `useMemo`, depending strictly on the ID list and object array, ensuring O(M) mapping operations only run when the actual data sets change.
