@@ -227,6 +227,7 @@ export function MenuLateral({
           variant="primary"
           size="lg"
           className="gap-3 rounded-full px-6 shadow-lg"
+          title="Ver Linhas"
         >
           <span className="flex items-center gap-2">
             <Menu size={24} />
@@ -267,6 +268,8 @@ export function MenuLateral({
               variant="ghost"
               size="sm"
               className="rounded-lg p-2 text-white hover:bg-white/20 md:hidden"
+              aria-label="Fechar menu"
+              title="Fechar menu"
             >
               <ArrowLeft size={24} />
             </Button>
