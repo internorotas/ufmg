@@ -12,3 +12,7 @@
 ## 2025-03-05 - Keyboard Accessibility for Schedule Cards
 **Learning:** Schedule cards in `LinhaDetalhesModal` and `HorariosModal` were interactive (had `onClick`) but lacked keyboard accessibility. Adding `tabIndex={0}`, `role="button"`, `aria-label`, and `onKeyDown` ensures users navigating via keyboard can select schedules.
 **Action:** Always verify interactive elements (e.g. `div`s with `onClick`) have equivalent keyboard event handlers, roles, and focusability to maintain accessibility.
+
+## 2025-03-16 - Title Attributes for Icon-Only Buttons
+**Learning:** In addition to `aria-label`s (which provide accessibility for screen readers), icon-only buttons need a `title` attribute to provide a native tooltip on hover. This is crucial for sighted mouse users to understand the button's action without guessing.
+**Action:** Always include a `title` attribute that matches the `aria-label` on buttons that consist solely of an icon (e.g. `<LocateFixed />`, `<ArrowLeft />`, `<DialogClose />`).
