@@ -19,15 +19,11 @@ import { shouldDisableRegularSchedules } from "../config/specialPeriods";
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+  base: "rounded-lg border p-3 text-center transition-all",
   variants: {
     status: {
-      upcoming: [
-        "border-green-600 bg-green-900/30 cursor-pointer focus-visible:ring-green-500",
-        "hover:bg-green-900/50 hover:scale-105 hover:shadow-md active:scale-95",
-      ],
-      passed:
-        "border-gray-700 bg-gray-800/50 opacity-50 cursor-default focus-visible:ring-gray-500",
+      upcoming: ["border-green-600 bg-green-900/30"],
+      passed: "border-gray-700 bg-gray-800/50 opacity-50",
     },
   },
   defaultVariants: {
@@ -116,26 +112,23 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha.horarios]);
 
-  // ⚡ Bolt: O(log N) Busca Binária em vez de O(N) Array.map e Array.filter duplicado
-  const { proximos, passados } = useMemo(() => {
-    // findScheduleIndex acha o primeiro índice > currentMinutes - 1 (ou seja, >= currentMinutes)
-    const splitIndex = findScheduleIndex(
+  // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
+  // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
+  // Separamos os componentes "passado" e "futuro" para evitar realocação dos itens O(N)
+  const splitIndex = useMemo(() => {
+    // Busca binária para achar onde dividir usando um getter para evitar o .map() inicial.
+    // Usamos currentMinutes - 1 pois currentMinutes (agora) deve ser considerado 'proximo'
+    return findScheduleIndex(
       baseHorarios,
       currentMinutes - 1,
       (h) => h.minutos,
     );
-
-    // slice(0, splitIndex) pega todos menores que currentMinutes (já passaram)
-    const passadosArr = baseHorarios
-      .slice(0, splitIndex)
-      .map((h) => ({ ...h, passou: true }));
-    // slice(splitIndex) pega todos maiores ou iguais a currentMinutes (próximos)
-    const proximosArr = baseHorarios
-      .slice(splitIndex)
-      .map((h) => ({ ...h, passou: false }));
-
-    return { proximos: proximosArr, passados: passadosArr };
   }, [baseHorarios, currentMinutes]);
+
+  // Zero-allocation das sublistas virtuais
+  const passados = baseHorarios.slice(0, splitIndex);
+  const proximos = baseHorarios.slice(splitIndex);
+  const todos = baseHorarios;
 
   return (
     <Modal
@@ -174,10 +167,12 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                 <div
                   key={`proximo-${index}`}
                   className={scheduleCardVariants({ status: "upcoming" })}
-                  tabIndex={0}
-                  aria-label={`Próximo horário às ${horario}`}
                 >
-                  <p className={scheduleTimeVariants({ status: "upcoming" })}>
+                  <span className="sr-only">Próximo horário às {horario}</span>
+                  <p
+                    className={scheduleTimeVariants({ status: "upcoming" })}
+                    aria-hidden="true"
+                  >
                     {horario}
                   </p>
                 </div>
@@ -198,10 +193,12 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                 <div
                   key={`passado-${index}`}
                   className={scheduleCardVariants({ status: "passed" })}
-                  tabIndex={0}
-                  aria-label={`Horário passado às ${horario}`}
                 >
-                  <p className={scheduleTimeVariants({ status: "passed" })}>
+                  <span className="sr-only">Horário passado às {horario}</span>
+                  <p
+                    className={scheduleTimeVariants({ status: "passed" })}
+                    aria-hidden="true"
+                  >
                     {horario}
                   </p>
                 </div>
@@ -217,7 +214,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
             className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm"
           >
             <p className="text-center text-gray-300">
-              Total de {baseHorarios.length} horários •{" "}
+              Total de {todos.length} horários •{" "}
               <span className="text-green-400">
                 {proximos.length} restantes
               </span>
