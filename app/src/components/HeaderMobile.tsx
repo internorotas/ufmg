@@ -80,6 +80,7 @@ export function HeaderMobile({
         onClick={toggleMenu}
         className={menuButtonVariants()}
         aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
+        title={isMenuOpen ? "Fechar menu" : "Abrir menu"}
         aria-expanded={isMenuOpen}
       >
         {isMenuOpen ? <X className="size-7" /> : <Menu className="size-7" />}
