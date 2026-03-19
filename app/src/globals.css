@@ -217,7 +217,28 @@ body {
 }
 
 .leaflet-popup-content p {
+  margin: 0 !important;
   color: var(--text-secondary) !important;
+}
+
+.leaflet-popup-close-button {
+  top: 6px !important;
+  right: 6px !important;
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  font-size: 20px !important;
+  border-radius: 9999px;
+  color: var(--text-secondary) !important;
+  background: transparent;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--text-primary) !important;
+  background-color: var(--card-hover);
 }
 
 /* Dialog/Modal Backdrop - Ensure it covers everything including Leaflet */
