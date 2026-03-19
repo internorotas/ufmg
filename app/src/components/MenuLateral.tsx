@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Menu, ArrowLeft } from "lucide-react";
 import { useLinhasFilter } from "../hooks/useLinhasFilter";
@@ -143,7 +143,17 @@ function CategoryTabs({
  * />
  * ```
  */
-export function MenuLateral({
+/**
+ * ⚡ Bolt: Otimização de Performance
+ *
+ * O que: Memoização do componente MenuLateral com React.memo()
+ * Por que: Este componente recebia renders em cascata desnecessários do App.tsx
+ * (devido a atualizações frequentes de geolocalização), apesar de suas props
+ * (linhasData, todasParadas) serem estáveis (memoizadas no RotasProvider).
+ * Impacto: Previne re-renders dispendiosos na árvore do MenuLateral e seus
+ * múltiplos componentes filhos (LineCard), melhorando a responsividade.
+ */
+export const MenuLateral = React.memo(function MenuLateral({
   linhasData,
   todasParadas,
   onLinhaSelect,
@@ -339,4 +349,4 @@ export function MenuLateral({
       )}
     </>
   );
-}
+});
