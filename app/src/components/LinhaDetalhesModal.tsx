@@ -359,7 +359,7 @@ export function LinhaDetalhesModal({
                           {parada.nome}
                         </h4>
 
-                        {isFirst && (
+                        {(isFirst || isLast) && (
                           <p className="mt-0.5 text-xs text-text-secondary">
                             Ponto de Origem/Destino
                           </p>
@@ -376,6 +376,15 @@ export function LinhaDetalhesModal({
                             style={{ color: linha.corHex }}
                           >
                             Partida
+                          </span>
+                        )}
+
+                        {isLast && (
+                          <span
+                            className="mt-1 inline-block px-0 text-xs font-semibold"
+                            style={{ color: linha.corHex }}
+                          >
+                            Chegada
                           </span>
                         )}
                       </div>

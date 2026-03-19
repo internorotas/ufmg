@@ -105,7 +105,10 @@ export function ItinerarioModal({
               const isLast = index === paradasDoItinerario.length - 1;
 
               return (
-                <div key={parada.idParada} className="relative flex">
+                <div
+                  key={`${parada.idParada}-${index}`}
+                  className="relative flex"
+                >
                   {/* Linha conectora vertical tracejada */}
                   {!isLast && (
                     <div
@@ -135,7 +138,7 @@ export function ItinerarioModal({
                         {parada.nome}
                       </h4>
 
-                      {isFirst && (
+                      {(isFirst || isLast) && (
                         <p className="mt-0.5 text-xs text-text-secondary">
                           Ponto de Origem/Destino
                         </p>
@@ -152,6 +155,15 @@ export function ItinerarioModal({
                           style={{ color: linha.corHex }}
                         >
                           Partida
+                        </span>
+                      )}
+
+                      {isLast && (
+                        <span
+                          className="mt-1 inline-block px-0 text-xs font-semibold"
+                          style={{ color: linha.corHex }}
+                        >
+                          Chegada
                         </span>
                       )}
                     </div>
