@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
+/* Garante que html/body/#root preencham 100% da viewport — crítico para iOS/WebKit */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
 /*
   Design System - Interno Rotas
   Based on Tailwind CSS v4
@@ -171,10 +179,9 @@ body {
   font-family: var(--font-poppins);
   background: var(--background);
   color: var(--text-primary);
-  /* Transição suave para troca de tema */
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  height: 100%;
+  width: 100%;
+  /* REMOVIDA: transition de background/color causa colapso de renderização no WebKit */
 }
 
 /* Scrollbar Personalizada */
@@ -456,4 +463,17 @@ body {
 path.leaflet-ant-path {
   fill: none;
   animation: linear infinite leaflet-ant-path-animation;
+}
+
+/* ============================================================================
+   MOBILE VIEWPORT FIX
+   Resolve o problema da barra de endereço do Chrome mobile
+   que aparece/desaparece durante scroll, causando problemas de layout.
+   ============================================================================ */
+
+/* Garante que o body não tenha overflow indesejado no mobile */
+html,
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
 }

@@ -5,12 +5,19 @@
  * - MapMarkers: Renderização dos marcadores de paradas
  * - MapRoute: Renderização da rota animada
  * - MapControls: Controles de visualização (zoom, centralização)
+ * - ControlesUsuarioMapa: Localização do usuário e FAB
  *
  * Atualizado para React 19: ref como prop (sem forwardRef)
  */
 
-import { MapContainer, TileLayer } from "react-leaflet";
-import { useEffect, useImperativeHandle, useRef, type Ref } from "react";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import {
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useCallback,
+  type Ref,
+} from "react";
 import { Parada, Linha } from "../types/data.types";
 import { useAnalytics } from "../hooks/useAnalytics";
 
@@ -23,15 +30,25 @@ import {
   ChangeView,
   CenterOnParada,
 } from "./map";
+import { ControlesUsuarioMapa } from "./ControlesUsuarioMapa";
 
 export interface MapaRef {
   centralizarParada: (parada: Parada) => void;
+  centralizarCoordenada: (coords: [number, number], zoom?: number) => void;
 }
 
 interface MapaProps {
   todasParadas: Parada[];
   linhaSelecionada: Linha | null;
   paradaSelecionada: Parada | null;
+  /** Coordenadas do usuário [lat, lng] */
+  localizacaoUsuario?: [number, number] | null;
+  /** Direção da bússola em graus (0 = Norte) */
+  headingUsuario?: number | null;
+  /** Se a permissão de GPS foi concedida */
+  permissaoLocalizacao?: boolean;
+  /** Callback para abrir modal de permissão */
+  onPedirLocalizacao?: () => void;
   /** Ref para expor métodos do mapa (React 19 - ref como prop) */
   ref?: Ref<MapaRef>;
 }
@@ -44,7 +61,7 @@ const MAP_CONFIG = {
   zoom: 15,
   tileUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
 };
 
 /**
@@ -53,10 +70,42 @@ const MAP_CONFIG = {
  *
  * React 19: ref é recebida diretamente como prop, sem necessidade de forwardRef.
  */
+/**
+ * Componente interno para gerenciar imperativeHandle
+ * Precisa estar dentro do MapContainer para usar useMap()
+ */
+function MapImperativeHandler({
+  mapaRef,
+  destacarParada,
+}: {
+  mapaRef: Ref<MapaRef> | undefined;
+  destacarParada: (parada: Parada) => void;
+}) {
+  const map = useMap();
+
+  const centralizarCoordenada = useCallback(
+    (coords: [number, number], zoom = 15) => {
+      map.flyTo(coords, zoom, { duration: 1 });
+    },
+    [map],
+  );
+
+  useImperativeHandle(mapaRef, () => ({
+    centralizarParada: destacarParada,
+    centralizarCoordenada,
+  }));
+
+  return null;
+}
+
 export function Mapa({
   todasParadas,
   linhaSelecionada,
   paradaSelecionada,
+  localizacaoUsuario,
+  headingUsuario,
+  permissaoLocalizacao = false,
+  onPedirLocalizacao,
   ref,
 }: MapaProps) {
   const { trackTiming } = useAnalytics();
@@ -82,11 +131,6 @@ export function Mapa({
       label: "Initial Map Render",
     });
   }, [trackTiming]);
-
-  // Expõe método para centralizar em uma parada
-  useImperativeHandle(ref, () => ({
-    centralizarParada: destacarParada,
-  }));
 
   return (
     <MapContainer
@@ -117,6 +161,19 @@ export function Mapa({
         paradaDestacadaId={paradaDestacadaId}
         onMarkerRef={handleMarkerRef}
       />
+
+      {/* Controles de localização do usuário */}
+      {onPedirLocalizacao && (
+        <ControlesUsuarioMapa
+          localizacao={localizacaoUsuario ?? null}
+          heading={headingUsuario ?? null}
+          permissaoConcedida={permissaoLocalizacao}
+          onPedirLocalizacao={onPedirLocalizacao}
+        />
+      )}
+
+      {/* Handler para imperative ref (precisa estar dentro do MapContainer) */}
+      <MapImperativeHandler mapaRef={ref} destacarParada={destacarParada} />
     </MapContainer>
   );
 }
