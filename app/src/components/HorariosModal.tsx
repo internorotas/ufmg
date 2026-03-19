@@ -19,15 +19,11 @@ import { shouldDisableRegularSchedules } from "../config/specialPeriods";
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+  base: "rounded-lg border p-3 text-center transition-all",
   variants: {
     status: {
-      upcoming: [
-        "border-green-600 bg-green-900/30 cursor-pointer focus-visible:ring-green-500",
-        "hover:bg-green-900/50 hover:scale-105 hover:shadow-md active:scale-95",
-      ],
-      passed:
-        "border-gray-700 bg-gray-800/50 opacity-50 cursor-default focus-visible:ring-gray-500",
+      upcoming: ["border-green-600 bg-green-900/30"],
+      passed: "border-gray-700 bg-gray-800/50 opacity-50",
     },
   },
   defaultVariants: {
@@ -171,10 +167,12 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                 <div
                   key={`proximo-${index}`}
                   className={scheduleCardVariants({ status: "upcoming" })}
-                  tabIndex={0}
-                  aria-label={`Próximo horário às ${horario}`}
                 >
-                  <p className={scheduleTimeVariants({ status: "upcoming" })}>
+                  <span className="sr-only">Próximo horário às {horario}</span>
+                  <p
+                    className={scheduleTimeVariants({ status: "upcoming" })}
+                    aria-hidden="true"
+                  >
                     {horario}
                   </p>
                 </div>
@@ -195,10 +193,12 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                 <div
                   key={`passado-${index}`}
                   className={scheduleCardVariants({ status: "passed" })}
-                  tabIndex={0}
-                  aria-label={`Horário passado às ${horario}`}
                 >
-                  <p className={scheduleTimeVariants({ status: "passed" })}>
+                  <span className="sr-only">Horário passado às {horario}</span>
+                  <p
+                    className={scheduleTimeVariants({ status: "passed" })}
+                    aria-hidden="true"
+                  >
                     {horario}
                   </p>
                 </div>
