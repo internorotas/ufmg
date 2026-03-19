@@ -14,7 +14,7 @@ import { Button } from "./components/ui/Button";
 import { MapPin, Navigation } from "lucide-react";
 import type { Linha, Parada } from "./types/data.types";
 
-import { AdminLayout } from './components/admin/AdminLayout';
+import { AdminLayout } from "./components/admin/AdminLayout";
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
 const Mapa = lazy(() =>
@@ -258,7 +258,7 @@ function AppContent() {
  * @returns {JSX.Element} O componente principal da aplicação renderizado.
  */
 export function App() {
-  if (import.meta.env.DEV && window.location.search.includes('admin=true')) {
+  if (import.meta.env.DEV && window.location.search.includes("admin=true")) {
     return (
       <ThemeProvider>
         <AdminLayout />

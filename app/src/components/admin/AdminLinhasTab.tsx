@@ -1,9 +1,16 @@
-import { useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, Popup, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import { CategoriaLinhas, Linha, Parada } from '../../types/data.types';
-import L, { DragEndEvent } from 'leaflet';
-import icon from '../../assets/marker.svg';
+import { useMemo, useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Polyline,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { CategoriaLinhas, Linha, Parada } from "../../types/data.types";
+import L, { DragEndEvent } from "leaflet";
+import icon from "../../assets/marker.svg";
 
 const stationIcon = L.icon({
   iconUrl: icon,
@@ -14,25 +21,25 @@ const stationIcon = L.icon({
 
 // Create a small custom icon for vertices
 const vertexIcon = L.divIcon({
-  className: 'custom-vertex-icon',
+  className: "custom-vertex-icon",
   html: '<div style="width:10px;height:10px;background:white;border:2px solid black;border-radius:50%"></div>',
   iconSize: [14, 14],
   iconAnchor: [7, 7],
 });
 
-function RouteEditorEvents({ 
-  enabled, 
-  onAddPoint 
-}: { 
-  enabled: boolean, 
-  onAddPoint: (latlng: [number, number]) => void 
+function RouteEditorEvents({
+  enabled,
+  onAddPoint,
+}: {
+  enabled: boolean;
+  onAddPoint: (latlng: [number, number]) => void;
 }) {
   useMapEvents({
     click(e) {
       if (enabled) {
         onAddPoint([e.latlng.lat, e.latlng.lng]);
       }
-    }
+    },
   });
   return null;
 }
@@ -42,24 +49,31 @@ export function AdminLinhasTab({
   setLinhasData,
   paradas,
   setActiveTab,
-  onExport
+  onExport,
 }: {
   linhasData: CategoriaLinhas;
   setLinhasData: (l: CategoriaLinhas) => void;
   paradas: Parada[];
-  setActiveTab: (tab: 'paradas' | 'linhas') => void;
+  setActiveTab: (tab: "paradas" | "linhas") => void;
   onExport: () => void;
 }) {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [drawMode, setDrawMode] = useState(false);
   const [activeCategoryIdx, setActiveCategoryIdx] = useState(0);
-  const [itinerarioDrafts, setItinerarioDrafts] = useState<Record<string, string>>({});
-  const [horariosDrafts, setHorariosDrafts] = useState<Record<string, string>>({});
+  const [itinerarioDrafts, setItinerarioDrafts] = useState<
+    Record<string, string>
+  >({});
+  const [horariosDrafts, setHorariosDrafts] = useState<Record<string, string>>(
+    {},
+  );
 
   // Helper flatten to get the active line
   const activeCategory = linhasData.categoriasDias[activeCategoryIdx];
-  const selectedLinha = activeCategory?.linhas.find(l => l.idRota === selectedRouteId) || null;
-  const selectedLinhaKey = selectedLinha ? `${activeCategoryIdx}-${selectedLinha.idRota}` : null;
+  const selectedLinha =
+    activeCategory?.linhas.find((l) => l.idRota === selectedRouteId) || null;
+  const selectedLinhaKey = selectedLinha
+    ? `${activeCategoryIdx}-${selectedLinha.idRota}`
+    : null;
   const uniqueParadas = useMemo(() => {
     const byId = new Map<string, Parada>();
     for (const parada of paradas) {
@@ -71,19 +85,22 @@ export function AdminLinhasTab({
   }, [paradas]);
 
   const itinerarioInput = selectedLinhaKey
-    ? itinerarioDrafts[selectedLinhaKey] ?? selectedLinha?.itinerarioParadasIds.join(', ') ?? ''
-    : '';
+    ? (itinerarioDrafts[selectedLinhaKey] ??
+      selectedLinha?.itinerarioParadasIds.join(", ") ??
+      "")
+    : "";
   const horariosInput = selectedLinhaKey
-    ? horariosDrafts[selectedLinhaKey] ?? JSON.stringify(selectedLinha?.horarios ?? [], null, 2)
-    : '[]';
+    ? (horariosDrafts[selectedLinhaKey] ??
+      JSON.stringify(selectedLinha?.horarios ?? [], null, 2))
+    : "[]";
 
   const handleUpdateLinha = (updated: Linha) => {
     const newCategories = [...linhasData.categoriasDias];
     newCategories[activeCategoryIdx] = {
       ...newCategories[activeCategoryIdx],
-      linhas: newCategories[activeCategoryIdx].linhas.map(l => 
-        l.idRota === updated.idRota ? updated : l
-      )
+      linhas: newCategories[activeCategoryIdx].linhas.map((l) =>
+        l.idRota === updated.idRota ? updated : l,
+      ),
     };
     setLinhasData({ categoriasDias: newCategories });
   };
@@ -98,15 +115,17 @@ export function AdminLinhasTab({
 
   const handleDeleteVertex = (idx: number) => {
     if (!selectedLinha) return;
-    const newCoords = selectedLinha.coordenadasTrajeto.filter((_, i) => i !== idx);
+    const newCoords = selectedLinha.coordenadasTrajeto.filter(
+      (_, i) => i !== idx,
+    );
     handleUpdateLinha({ ...selectedLinha, coordenadasTrajeto: newCoords });
   };
 
   const handleAddPoint = (point: [number, number]) => {
     if (!selectedLinha) return;
-    handleUpdateLinha({ 
-      ...selectedLinha, 
-      coordenadasTrajeto: [...selectedLinha.coordenadasTrajeto, point] 
+    handleUpdateLinha({
+      ...selectedLinha,
+      coordenadasTrajeto: [...selectedLinha.coordenadasTrajeto, point],
     });
   };
 
@@ -123,26 +142,28 @@ export function AdminLinhasTab({
             Export All
           </button>
         </div>
-        
+
         {/* Tabs inside sidebar */}
         <div className="flex border-b border-card-border bg-card">
           <button
             className={`flex-1 py-3 text-center font-medium text-text-secondary hover:text-text-primary`}
-            onClick={() => setActiveTab('paradas')}
+            onClick={() => setActiveTab("paradas")}
           >
             Paradas
           </button>
           <button
             className={`flex-1 py-3 text-center font-medium border-b-2 border-brand-primary text-brand-primary`}
-            onClick={() => setActiveTab('linhas')}
+            onClick={() => setActiveTab("linhas")}
           >
             Linhas
           </button>
         </div>
 
         <div className="p-4 border-b border-card-border">
-          <label className="block text-sm font-bold text-text-primary mb-1">Categoria (Dia)</label>
-          <select 
+          <label className="block text-sm font-bold text-text-primary mb-1">
+            Categoria (Dia)
+          </label>
+          <select
             value={activeCategoryIdx}
             onChange={(e) => {
               setActiveCategoryIdx(Number(e.target.value));
@@ -151,112 +172,166 @@ export function AdminLinhasTab({
             className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
           >
             {linhasData.categoriasDias.map((cat, idx) => (
-              <option key={cat.id} value={idx}>{cat.displayName}</option>
+              <option key={cat.id} value={idx}>
+                {cat.displayName}
+              </option>
             ))}
           </select>
         </div>
-        
+
         <div className="p-4 border-b border-card-border">
-          <label className="block text-sm font-bold text-text-primary mb-1">Selecionar Linha</label>
-          <select 
-            value={selectedRouteId || ''}
+          <label className="block text-sm font-bold text-text-primary mb-1">
+            Selecionar Linha
+          </label>
+          <select
+            value={selectedRouteId || ""}
             onChange={(e) => setSelectedRouteId(e.target.value)}
             className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
           >
             <option value="">-- Selecione --</option>
-            {activeCategory?.linhas.map(l => (
-              <option key={l.idRota} value={l.idRota}>{l.nome} ({l.linha})</option>
+            {activeCategory?.linhas.map((l) => (
+              <option key={l.idRota} value={l.idRota}>
+                {l.nome} ({l.linha})
+              </option>
             ))}
           </select>
         </div>
 
         <div className="p-4 flex-1 overflow-y-auto w-full bg-sidebar">
           {!selectedLinha ? (
-            <p className="text-text-secondary text-sm">Selecione uma linha para editar seu trajeto, dados e horários.</p>
+            <p className="text-text-secondary text-sm">
+              Selecione uma linha para editar seu trajeto, dados e horários.
+            </p>
           ) : (
             <div className="flex flex-col gap-3">
               <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-lg text-text-primary">Editando {selectedLinha.nome}</span>
-                <button 
-                  onClick={() => setDrawMode(!drawMode)} 
-                  className={`px-3 py-1 rounded text-sm font-medium ${drawMode ? 'bg-warning-bg text-warning-text border border-warning-border' : 'bg-info-bg text-info-text border border-info-border'}`}
+                <span className="font-bold text-lg text-text-primary">
+                  Editando {selectedLinha.nome}
+                </span>
+                <button
+                  onClick={() => setDrawMode(!drawMode)}
+                  className={`px-3 py-1 rounded text-sm font-medium ${drawMode ? "bg-warning-bg text-warning-text border border-warning-border" : "bg-info-bg text-info-text border border-info-border"}`}
                 >
-                  {drawMode ? 'Parar Desenho' : 'Desenhar Rota'}
+                  {drawMode ? "Parar Desenho" : "Desenhar Rota"}
                 </button>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">ID da Rota</label>
-                <input 
-                  type="text" 
+                <label className="block text-sm font-bold text-text-primary mb-1">
+                  ID da Rota
+                </label>
+                <input
+                  type="text"
                   value={selectedLinha.idRota}
-                  onChange={(e) => handleUpdateLinha({...selectedLinha, idRota: e.target.value})}
+                  onChange={(e) =>
+                    handleUpdateLinha({
+                      ...selectedLinha,
+                      idRota: e.target.value,
+                    })
+                  }
                   className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                 />
               </div>
-              
+
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block text-sm font-bold text-text-primary mb-1">Número</label>
-                  <input 
-                    type="number" 
+                  <label className="block text-sm font-bold text-text-primary mb-1">
+                    Número
+                  </label>
+                  <input
+                    type="number"
                     value={selectedLinha.linha}
-                    onChange={(e) => handleUpdateLinha({...selectedLinha, linha: Number(e.target.value)})}
+                    onChange={(e) =>
+                      handleUpdateLinha({
+                        ...selectedLinha,
+                        linha: Number(e.target.value),
+                      })
+                    }
                     className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-bold text-text-primary mb-1">Cor Hex</label>
-                  <input 
-                    type="text" 
+                  <label className="block text-sm font-bold text-text-primary mb-1">
+                    Cor Hex
+                  </label>
+                  <input
+                    type="text"
                     value={selectedLinha.corHex}
-                    onChange={(e) => handleUpdateLinha({...selectedLinha, corHex: e.target.value})}
+                    onChange={(e) =>
+                      handleUpdateLinha({
+                        ...selectedLinha,
+                        corHex: e.target.value,
+                      })
+                    }
                     className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">Nome</label>
-                <input 
-                  type="text" 
+                <label className="block text-sm font-bold text-text-primary mb-1">
+                  Nome
+                </label>
+                <input
+                  type="text"
                   value={selectedLinha.nome}
-                  onChange={(e) => handleUpdateLinha({...selectedLinha, nome: e.target.value})}
+                  onChange={(e) =>
+                    handleUpdateLinha({
+                      ...selectedLinha,
+                      nome: e.target.value,
+                    })
+                  }
                   className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">IDs das Paradas (Ordenadas por vírgula)</label>
-                <textarea 
+                <label className="block text-sm font-bold text-text-primary mb-1">
+                  IDs das Paradas (Ordenadas por vírgula)
+                </label>
+                <textarea
                   rows={6}
                   value={itinerarioInput}
                   onChange={(e) => {
                     const text = e.target.value;
                     if (selectedLinhaKey) {
-                      setItinerarioDrafts((prev) => ({ ...prev, [selectedLinhaKey]: text }));
+                      setItinerarioDrafts((prev) => ({
+                        ...prev,
+                        [selectedLinhaKey]: text,
+                      }));
                     }
-                    const parsed = text.split(',').map((s) => s.trim()).filter(Boolean);
-                    handleUpdateLinha({ ...selectedLinha, itinerarioParadasIds: parsed });
+                    const parsed = text
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean);
+                    handleUpdateLinha({
+                      ...selectedLinha,
+                      itinerarioParadasIds: parsed,
+                    });
                   }}
                   className="w-full min-h-32 border border-input-border bg-input text-text-primary p-3 rounded text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">Horários (JSON Array)</label>
-                <textarea 
+                <label className="block text-sm font-bold text-text-primary mb-1">
+                  Horários (JSON Array)
+                </label>
+                <textarea
                   rows={8}
                   value={horariosInput}
                   onChange={(e) => {
                     const text = e.target.value;
                     if (selectedLinhaKey) {
-                      setHorariosDrafts((prev) => ({ ...prev, [selectedLinhaKey]: text }));
+                      setHorariosDrafts((prev) => ({
+                        ...prev,
+                        [selectedLinhaKey]: text,
+                      }));
                     }
                     try {
                       const val = JSON.parse(text);
                       if (Array.isArray(val)) {
-                        handleUpdateLinha({...selectedLinha, horarios: val});
+                        handleUpdateLinha({ ...selectedLinha, horarios: val });
                       }
                     } catch {
                       // ignore parse errors while typing
@@ -284,31 +359,33 @@ export function AdminLinhasTab({
           <RouteEditorEvents enabled={drawMode} onAddPoint={handleAddPoint} />
 
           {/* Render all paradas so you can see them while drawing routes */}
-          {uniqueParadas.map(p => (
-            <Marker 
-              key={p.idParada} 
+          {uniqueParadas.map((p) => (
+            <Marker
+              key={p.idParada}
               position={p.coordenadas}
               icon={stationIcon}
             >
-              <Popup>{p.nome} ({p.idParada})</Popup>
+              <Popup>
+                {p.nome} ({p.idParada})
+              </Popup>
             </Marker>
           ))}
-          
+
           {selectedLinha && (
             <>
-              <Polyline 
-                positions={selectedLinha.coordenadasTrajeto} 
-                pathOptions={{ color: selectedLinha.corHex, weight: 4 }} 
+              <Polyline
+                positions={selectedLinha.coordenadasTrajeto}
+                pathOptions={{ color: selectedLinha.corHex, weight: 4 }}
               />
               {selectedLinha.coordenadasTrajeto.map((coord, idx) => (
-                <Marker 
+                <Marker
                   key={idx}
                   position={coord}
                   icon={vertexIcon}
                   draggable={true}
                   eventHandlers={{
                     dragend: (e) => handleDragVertex(idx, e),
-                    click: () => handleDeleteVertex(idx)
+                    click: () => handleDeleteVertex(idx),
                   }}
                 >
                   <Popup>Vértice {idx}. Clique para excluir.</Popup>

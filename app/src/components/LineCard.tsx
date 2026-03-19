@@ -7,7 +7,11 @@ import React, { memo, useMemo, type KeyboardEvent } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
 import { cn } from "../lib/utils";
-import { timeToMinutes, minutesToTime, findScheduleIndex } from "../../lib/utils";
+import {
+  timeToMinutes,
+  minutesToTime,
+  findScheduleIndex,
+} from "../../lib/utils";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 import { LineStatusBadge, type LineStatusType } from "./ui/Badge";

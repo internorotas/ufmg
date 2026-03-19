@@ -71,7 +71,7 @@ const data: CategoriaLinhas = {
             "P34",
             "P30",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -290,7 +290,7 @@ const data: CategoriaLinhas = {
             "P26",
             "P27",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -505,7 +505,7 @@ const data: CategoriaLinhas = {
             "P26",
             "P27",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -748,7 +748,7 @@ const data: CategoriaLinhas = {
             "P46",
             "P30",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -931,7 +931,7 @@ const data: CategoriaLinhas = {
             "P46",
             "P30",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -1124,7 +1124,7 @@ const data: CategoriaLinhas = {
             "P46",
             "P30",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -1367,7 +1367,7 @@ const data: CategoriaLinhas = {
             "P26",
             "P27",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -1540,7 +1540,7 @@ const data: CategoriaLinhas = {
             "P26",
             "P27",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -1752,7 +1752,7 @@ const data: CategoriaLinhas = {
             "P26",
             "P27",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -1984,7 +1984,7 @@ const data: CategoriaLinhas = {
             "P26",
             "P27",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -2227,7 +2227,7 @@ const data: CategoriaLinhas = {
             "P46",
             "P30",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -2430,7 +2430,7 @@ const data: CategoriaLinhas = {
             "P26",
             "P27",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],
@@ -2656,7 +2656,7 @@ const data: CategoriaLinhas = {
             "P46",
             "P30",
             "P28",
-            "P29"
+            "P29",
           ],
           coordenadasTrajeto: [
             [-19.86203, -43.96243],

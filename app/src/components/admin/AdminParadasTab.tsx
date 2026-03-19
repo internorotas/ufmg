@@ -1,10 +1,16 @@
-import { useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import L, { DragEndEvent } from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { Parada, CategoriaLinhas } from '../../types/data.types';
+import { useMemo, useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+} from "react-leaflet";
+import L, { DragEndEvent } from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { Parada, CategoriaLinhas } from "../../types/data.types";
 
-import icon from '../../assets/marker.svg';
+import icon from "../../assets/marker.svg";
 
 const stationIcon = L.icon({
   iconUrl: icon,
@@ -26,12 +32,12 @@ export function AdminParadasTab({
   setParadas,
   linhasData,
   setActiveTab,
-  onExport
+  onExport,
 }: {
   paradas: Parada[];
   setParadas: (p: Parada[]) => void;
   linhasData: CategoriaLinhas;
-  setActiveTab: (tab: 'paradas' | 'linhas') => void;
+  setActiveTab: (tab: "paradas" | "linhas") => void;
   onExport: () => void;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -45,28 +51,32 @@ export function AdminParadasTab({
     return Array.from(byId.values());
   }, [paradas]);
 
-  const selectedParada = paradas.find(p => p.idParada === selectedId) || null;
+  const selectedParada = paradas.find((p) => p.idParada === selectedId) || null;
 
   const handleDragEnd = (id: string, e: DragEndEvent) => {
     const latLng = e.target.getLatLng();
-    setParadas(paradas.map(p => 
-      p.idParada === id ? { ...p, coordenadas: [latLng.lat, latLng.lng] } : p
-    ));
+    setParadas(
+      paradas.map((p) =>
+        p.idParada === id ? { ...p, coordenadas: [latLng.lat, latLng.lng] } : p,
+      ),
+    );
   };
 
   const handleUpdate = (updated: Parada) => {
-    setParadas(paradas.map(p => p.idParada === updated.idParada ? updated : p));
+    setParadas(
+      paradas.map((p) => (p.idParada === updated.idParada ? updated : p)),
+    );
   };
 
   const handleAdd = () => {
     const newId = `p_new_${Date.now()}`;
     const newParada: Parada = {
       idParada: newId,
-      nome: 'Nova Parada',
+      nome: "Nova Parada",
       linhasAtendidas: [],
-      categoria: 'padrao',
-      descricao: '',
-      coordenadas: [-19.8690, -43.9660], // default UFMG center
+      categoria: "padrao",
+      descricao: "",
+      coordenadas: [-19.869, -43.966], // default UFMG center
     };
     setParadas([...paradas, newParada]);
     setSelectedId(newId);
@@ -74,7 +84,7 @@ export function AdminParadasTab({
 
   const handleDelete = () => {
     if (!selectedId) return;
-    setParadas(paradas.filter(p => p.idParada !== selectedId));
+    setParadas(paradas.filter((p) => p.idParada !== selectedId));
     setSelectedId(null);
   };
 
@@ -91,18 +101,18 @@ export function AdminParadasTab({
             Export All
           </button>
         </div>
-        
+
         {/* Tabs inside sidebar */}
         <div className="flex border-b border-card-border bg-card">
           <button
             className={`flex-1 py-3 text-center font-medium border-b-2 border-brand-primary text-brand-primary`}
-            onClick={() => setActiveTab('paradas')}
+            onClick={() => setActiveTab("paradas")}
           >
             Paradas
           </button>
           <button
             className={`flex-1 py-3 text-center font-medium text-text-secondary hover:text-text-primary`}
-            onClick={() => setActiveTab('linhas')}
+            onClick={() => setActiveTab("linhas")}
           >
             Linhas
           </button>
@@ -110,55 +120,90 @@ export function AdminParadasTab({
 
         <div className="p-4 flex-1 overflow-y-auto w-full bg-sidebar">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-text-primary">Gerenciar Paradas</h2>
-            <button onClick={handleAdd} className="bg-success-bg border border-success-border text-success-text px-3 py-1 rounded text-sm hover:opacity-90">
+            <h2 className="text-lg font-bold text-text-primary">
+              Gerenciar Paradas
+            </h2>
+            <button
+              onClick={handleAdd}
+              className="bg-success-bg border border-success-border text-success-text px-3 py-1 rounded text-sm hover:opacity-90"
+            >
               + Adicionar
             </button>
           </div>
 
           {!selectedParada ? (
-            <p className="text-text-secondary text-sm">Selecione uma parada no mapa ou crie uma nova.</p>
+            <p className="text-text-secondary text-sm">
+              Selecione uma parada no mapa ou crie uma nova.
+            </p>
           ) : (
             <div className="flex flex-col gap-3">
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">ID (Obrigatório)</label>
-                <input 
-                  type="text" 
+                <label className="block text-sm font-bold text-text-primary mb-1">
+                  ID (Obrigatório)
+                </label>
+                <input
+                  type="text"
                   value={selectedParada.idParada}
-                  onChange={(e) => handleUpdate({...selectedParada, idParada: e.target.value})}
+                  onChange={(e) =>
+                    handleUpdate({
+                      ...selectedParada,
+                      idParada: e.target.value,
+                    })
+                  }
                   className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">Nome</label>
-                <input 
-                  type="text" 
+                <label className="block text-sm font-bold text-text-primary mb-1">
+                  Nome
+                </label>
+                <input
+                  type="text"
                   value={selectedParada.nome}
-                  onChange={(e) => handleUpdate({...selectedParada, nome: e.target.value})}
+                  onChange={(e) =>
+                    handleUpdate({ ...selectedParada, nome: e.target.value })
+                  }
                   className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">Descrição</label>
-                <input 
-                  type="text" 
-                  value={selectedParada.descricao || ''}
-                  onChange={(e) => handleUpdate({...selectedParada, descricao: e.target.value})}
+                <label className="block text-sm font-bold text-text-primary mb-1">
+                  Descrição
+                </label>
+                <input
+                  type="text"
+                  value={selectedParada.descricao || ""}
+                  onChange={(e) =>
+                    handleUpdate({
+                      ...selectedParada,
+                      descricao: e.target.value,
+                    })
+                  }
                   className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">Linhas (separadas por vírgula)</label>
-                <input 
-                  type="text" 
-                  value={selectedParada.linhasAtendidas.join(', ')}
-                  onChange={(e) => handleUpdate({...selectedParada, linhasAtendidas: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})}
+                <label className="block text-sm font-bold text-text-primary mb-1">
+                  Linhas (separadas por vírgula)
+                </label>
+                <input
+                  type="text"
+                  value={selectedParada.linhasAtendidas.join(", ")}
+                  onChange={(e) =>
+                    handleUpdate({
+                      ...selectedParada,
+                      linhasAtendidas: e.target.value
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter(Boolean),
+                    })
+                  }
                   className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                 />
               </div>
 
               <div className="mt-4 pt-4 border-t border-card-border">
-                <button 
+                <button
                   onClick={handleDelete}
                   className="w-full bg-warning-bg border border-warning-border text-warning-text py-2 rounded text-sm font-bold hover:opacity-90"
                 >
@@ -167,7 +212,6 @@ export function AdminParadasTab({
               </div>
             </div>
           )}
-
         </div>
       </div>
 
@@ -182,34 +226,41 @@ export function AdminParadasTab({
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {uniqueParadas.map(p => (
-            <Marker 
-              key={p.idParada} 
+          {uniqueParadas.map((p) => (
+            <Marker
+              key={p.idParada}
               position={p.coordenadas}
               icon={p.idParada === selectedId ? highlightedIcon : stationIcon}
               draggable={true}
               eventHandlers={{
                 dragend: (e) => handleDragEnd(p.idParada, e),
-                click: () => setSelectedId(p.idParada)
+                click: () => setSelectedId(p.idParada),
               }}
             >
-              <Popup>{p.nome} ({p.idParada})</Popup>
+              <Popup>
+                {p.nome} ({p.idParada})
+              </Popup>
             </Marker>
           ))}
-          {linhasData.categoriasDias.flatMap((cd, categoryIdx) => cd.linhas.map((linha) => ({ linha, categoryIdx }))).map(({ linha, categoryIdx }) => (
-            linha.coordenadasTrajeto.length > 0 && (
-              <Polyline 
-                key={`${categoryIdx}-${linha.idRota}`} 
-                positions={linha.coordenadasTrajeto} 
-                pathOptions={{ 
-                  color: linha.corHex, 
-                  weight: 3, 
-                  opacity: 0.5, 
-                  dashArray: '5, 5' 
-                }} 
-              />
+          {linhasData.categoriasDias
+            .flatMap((cd, categoryIdx) =>
+              cd.linhas.map((linha) => ({ linha, categoryIdx })),
             )
-          ))}
+            .map(
+              ({ linha, categoryIdx }) =>
+                linha.coordenadasTrajeto.length > 0 && (
+                  <Polyline
+                    key={`${categoryIdx}-${linha.idRota}`}
+                    positions={linha.coordenadasTrajeto}
+                    pathOptions={{
+                      color: linha.corHex,
+                      weight: 3,
+                      opacity: 0.5,
+                      dashArray: "5, 5",
+                    }}
+                  />
+                ),
+            )}
         </MapContainer>
       </div>
     </>
