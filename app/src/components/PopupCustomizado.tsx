@@ -13,6 +13,8 @@ import type { Parada, Linha } from "../types/data.types";
 import { DisclaimerEstimativa } from "./DisclaimerEstimativa";
 import { PrevisaoBadge } from "./PrevisaoBadge";
 import { useRotasData } from "../contexts/RotasContext";
+import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
+import { getCurrentSpecialPeriod } from "../config/specialPeriods";
 
 // ============================================================================
 // VARIANTS
@@ -56,6 +58,16 @@ function normalizarNomeLinha(nomeLinha: string): string {
     .replace(/\s*\(.*?\)\s*/g, "")
     .trim()
     .toLowerCase();
+}
+
+function obterCategoriaDiaAtual(): string {
+  const today = new Date().getDay(); // 0 = domingo, 6 = sábado
+  const isSaturday = today === 6;
+  const isWeekday = today >= 1 && today <= 5;
+  const specialPeriod = getCurrentSpecialPeriod();
+  if (specialPeriod && isWeekday) return "feriasRecessos";
+  if (isSaturday && !specialPeriod) return "sabado";
+  return "diasUteis";
 }
 
 // ============================================================================
@@ -110,24 +122,46 @@ export function PopupCustomizado({
     const candidatas = linhasPorNomeNormalizado.get(chave) ?? [];
     if (candidatas.length === 0) return null;
 
-    const comTrajetoNaParada = candidatas.find(
+    // Filtra apenas linhas do dia atual (dias úteis, sábado ou férias)
+    const categoriaDiaAtual = obterCategoriaDiaAtual();
+    const candidatasDoDia = candidatas.filter(
+      (l) => l.categoriaDia === categoriaDiaAtual,
+    );
+    const pool = candidatasDoDia.length > 0 ? candidatasDoDia : candidatas;
+
+    // Candidatas que possuem esta parada no trajeto detalhado
+    const candidatasNaParada = pool.filter(
       (linha) =>
-        Boolean(linha.trajetoDetalhado?.length) &&
+        linha.trajetoDetalhado?.some((t) => t.idParada === idParadaAtual) ??
+        false,
+    );
+
+    if (candidatasNaParada.length === 0) {
+      // Fallback: parada no itinerário mas sem trajetoDetalhado
+      const atendeParada = pool.find((linha) =>
         linha.itinerarioParadasIds.includes(idParadaAtual),
-    );
-    if (comTrajetoNaParada) return comTrajetoNaParada;
+      );
+      return atendeParada ?? pool[0] ?? null;
+    }
 
-    const atendeParada = candidatas.find((linha) =>
-      linha.itinerarioParadasIds.includes(idParadaAtual),
-    );
-    if (atendeParada) return atendeParada;
+    if (candidatasNaParada.length === 1) {
+      return candidatasNaParada[0];
+    }
 
-    const comTrajeto = candidatas.find((linha) =>
-      Boolean(linha.trajetoDetalhado?.length),
-    );
-    if (comTrajeto) return comTrajeto;
-
-    return candidatas[0] ?? null;
+    // Múltiplos sublinhas servem esta parada: escolhe o com chegada mais próxima
+    let melhor: Linha = candidatasNaParada[0];
+    let melhorMinutos = Infinity;
+    for (const candidata of candidatasNaParada) {
+      const previsao = calcularPrevisaoChegada(candidata, idParadaAtual);
+      if (
+        previsao?.proximoOnibus &&
+        previsao.proximoOnibus.minutosFaltantes < melhorMinutos
+      ) {
+        melhorMinutos = previsao.proximoOnibus.minutosFaltantes;
+        melhor = candidata;
+      }
+    }
+    return melhor;
   };
 
   return (
