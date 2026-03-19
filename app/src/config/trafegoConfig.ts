@@ -6,13 +6,18 @@ export interface PeriodoTrafego {
 
 export const CONFIG_TRAFEGO: PeriodoTrafego[] = [
   {
+    inicioMinutos: 420,
+    fimMinutos: 510,
+    multiplicador: 1.2,
+  },
+  {
     inicioMinutos: 690,
-    fimMinutos: 780,
+    fimMinutos: 810,
     multiplicador: 1.15,
   },
   {
     inicioMinutos: 1020,
-    fimMinutos: 1110,
+    fimMinutos: 1125,
     multiplicador: 1.3,
   },
 ];
