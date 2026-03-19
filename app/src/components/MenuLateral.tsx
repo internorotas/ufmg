@@ -227,6 +227,7 @@ export function MenuLateral({
           variant="primary"
           size="lg"
           className="gap-3 rounded-full px-6 shadow-lg"
+          title="Ver Linhas"
         >
           <span className="flex items-center gap-2">
             <Menu size={24} />
