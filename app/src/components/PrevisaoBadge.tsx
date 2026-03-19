@@ -9,7 +9,7 @@ interface PrevisaoBadgeProps {
 export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
   const previsao = usePrevisaoChegada(linha, idParada);
 
-  if (!previsao) {
+  if (!previsao || !previsao.proximoOnibus) {
     return (
       <span
         className="rounded-full px-2 py-0.5 text-[11px] font-medium"
@@ -23,35 +23,57 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
     );
   }
 
-  if (previsao.minutosFaltantes < 1) {
+  const { proximoOnibus, onibusAnterior, isTrafegoIntenso } = previsao;
+
+  if (proximoOnibus.minutosFaltantes < 1) {
     return (
-      <span
-        className="rounded-full px-2 py-0.5 text-xs font-bold animate-pulse"
-        style={{
-          backgroundColor: "var(--success-bg)",
-          color: "var(--success-text)",
-        }}
-        title={`Saida de origem: ${previsao.horarioSaidaOrigem} | Chegada estimada: ${previsao.horarioChegada}`}
-      >
-        Chegando agora
-      </span>
+      <div className="flex flex-col items-end gap-1">
+        <span
+          className={`rounded-full px-2 py-0.5 text-xs font-bold ${isTrafegoIntenso ? "text-amber-600" : "animate-pulse"}`}
+          style={{
+            backgroundColor: isTrafegoIntenso
+              ? "var(--warning-bg)"
+              : "var(--success-bg)",
+            color: isTrafegoIntenso ? "#d97706" : "var(--success-text)",
+          }}
+          title={`Chegada estimada: ${proximoOnibus.horarioChegada}`}
+        >
+          {isTrafegoIntenso ? "Chegando agora (Transito intenso)" : "Chegando agora"}
+        </span>
+
+        {onibusAnterior ? (
+          <span className="text-[10px] text-gray-500">
+            Ultimo onibus passou ha {onibusAnterior.minutosQuePassou} min
+          </span>
+        ) : null}
+      </div>
     );
   }
 
-  const isUrgent = previsao.minutosFaltantes <= 15;
+  const isUrgent = proximoOnibus.minutosFaltantes <= 15;
   const bgVar = isUrgent ? "--success-bg" : "--warning-bg";
   const textVar = isUrgent ? "--success-text" : "--warning-text";
 
   return (
-    <span
-      className="rounded-full px-2 py-0.5 text-xs font-bold"
-      style={{
-        backgroundColor: `var(${bgVar})`,
-        color: `var(${textVar})`,
-      }}
-      title={`Saida de origem: ${previsao.horarioSaidaOrigem} | Chegada estimada: ${previsao.horarioChegada}`}
-    >
-      Chega em {previsao.minutosFaltantes}m
-    </span>
+    <div className="flex flex-col items-end gap-1">
+      <span
+        className={`rounded-full px-2 py-0.5 text-xs font-bold ${isTrafegoIntenso ? "text-amber-600 font-bold" : ""}`}
+        style={{
+          backgroundColor: isTrafegoIntenso ? "var(--warning-bg)" : `var(${bgVar})`,
+          color: isTrafegoIntenso ? "#d97706" : `var(${textVar})`,
+        }}
+        title={`Chegada estimada: ${proximoOnibus.horarioChegada}`}
+      >
+        {isTrafegoIntenso
+          ? `Chega em ${proximoOnibus.minutosFaltantes}m (Transito intenso)`
+          : `Chega em ${proximoOnibus.minutosFaltantes}m`}
+      </span>
+
+      {onibusAnterior ? (
+        <span className="text-[10px] text-gray-500">
+          Ultimo onibus passou ha {onibusAnterior.minutosQuePassou} min
+        </span>
+      ) : null}
+    </div>
   );
 }
