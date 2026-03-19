@@ -50,7 +50,7 @@ export function usePrevisaoChegada(
   const isTrafegoIntenso = multiplicador > 1.0;
 
   let proximoOnibus: ProximoOnibus | null = null;
-  let onibusAnterior: OnibusAnterior | null = null;
+  let ultimaChegadaPassada: number | null = null;
 
   for (let index = 0; index < linha.horarios.length; index++) {
     const horarioSaidaOrigem = linha.horarios[index];
@@ -59,26 +59,25 @@ export function usePrevisaoChegada(
 
     const chegadaPrevistaMinutos = saidaMinutos + tempoViagemReal;
 
+    if (chegadaPrevistaMinutos <= horaAtualMinutos) {
+      ultimaChegadaPassada = chegadaPrevistaMinutos;
+    }
+
     if (chegadaPrevistaMinutos >= horaAtualMinutos) {
       proximoOnibus = {
         horarioChegada: converterMinutosParaHora(chegadaPrevistaMinutos),
         minutosFaltantes: Math.max(0, chegadaPrevistaMinutos - horaAtualMinutos),
       };
 
-      const horarioAnterior = linha.horarios[index - 1];
-      if (horarioAnterior) {
-        const saidaAnteriorMinutos = converterHoraParaMinutos(horarioAnterior);
-        if (!Number.isNaN(saidaAnteriorMinutos)) {
-          const chegadaAnteriorMinutos = saidaAnteriorMinutos + tempoViagemReal;
-          const minutosQuePassou = horaAtualMinutos - chegadaAnteriorMinutos;
-
-          if (minutosQuePassou >= 0 && minutosQuePassou <= 15) {
-            onibusAnterior = { minutosQuePassou };
-          }
-        }
-      }
-
       break;
+    }
+  }
+
+  let onibusAnterior: OnibusAnterior | null = null;
+  if (ultimaChegadaPassada !== null) {
+    const minutosQuePassou = horaAtualMinutos - ultimaChegadaPassada;
+    if (minutosQuePassou >= 0 && minutosQuePassou <= 15) {
+      onibusAnterior = { minutosQuePassou };
     }
   }
 
