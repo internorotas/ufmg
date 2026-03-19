@@ -60,6 +60,21 @@ function normalizarNomeLinha(nomeLinha: string): string {
     .toLowerCase();
 }
 
+// Sublinhas que indicam período de operação (não variante de rota)
+const SUBLINHAS_CALENDARIO = ["Sábado", "Férias e Recessos"];
+
+/**
+ * Retorna o nome de exibição da linha com a sublinha de rota (se houver),
+ * ignorando sublinhas que indicam apenas o período do calendário.
+ */
+function getNomeExibicao(linha: Linha | null, nomeLinha: string): string {
+  if (!linha) return nomeLinha.replace(/\s*\(Todas\)\s*/gi, "").trim();
+  if (linha.sublinha && !SUBLINHAS_CALENDARIO.includes(linha.sublinha)) {
+    return `${linha.nome} · ${linha.sublinha}`;
+  }
+  return linha.nome;
+}
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -207,9 +222,15 @@ export function PopupCustomizado({
                     key={nomeLinha}
                     className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
                   >
-                    <span className={lineBadgeVariants()} title={nomeLinha}>
+                    <span
+                      className={cn(lineBadgeVariants(), "border-l-[3px]")}
+                      title={nomeLinha}
+                      style={
+                        linha ? { borderLeftColor: linha.corHex } : undefined
+                      }
+                    >
                       <span className="whitespace-normal wrap-break-word text-left">
-                        {nomeLinha}
+                        {getNomeExibicao(linha, nomeLinha)}
                       </span>
                     </span>
                     {linha ? (
