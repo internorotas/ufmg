@@ -9,7 +9,10 @@ import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal";
 import type { Linha } from "../types/data.types";
 import { timeToMinutes, findScheduleIndex } from "../../lib/utils";
-import { shouldDisableRegularSchedules } from "../config/specialPeriods";
+import {
+  shouldDisableRegularSchedules,
+  isLineAvailableToday,
+} from "../config/specialPeriods";
 
 // ============================================================================
 // VARIANTS
@@ -88,18 +91,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   // Verificar se devemos desabilitar os horários
-  const isVacationLine = linha.categoriaDia === "feriasRecessos";
-  const isInVacationPeriod = shouldDisableRegularSchedules();
-
-  // Verificar se é fim de semana (sábado=6, domingo=0)
-  const today = now.getDay();
-  const isWeekend = today === 0 || today === 6;
-
-  // Lógica de desabilitar horários durante férias:
-  // - Linhas de sábado e dias úteis: SEMPRE desabilitadas durante férias
-  // - Linhas de férias/recessos: desabilitadas apenas em fins de semana
-  const shouldDisableSchedules =
-    isInVacationPeriod && (!isVacationLine || isWeekend);
+  const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
 
   // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
   const baseHorarios = useMemo(() => {

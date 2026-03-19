@@ -46,7 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="flex items-center justify-center h-screen min-h-[100dvh] w-screen bg-gray-100 text-gray-800">
+          <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
             <div className="text-center p-8 bg-white rounded-lg shadow-xl max-w-md">
               <h2 className="text-2xl font-bold mb-4 text-red-600">
                 😔 Ops! Algo deu errado

@@ -14,7 +14,7 @@ import { DisclaimerEstimativa } from "./DisclaimerEstimativa";
 import { PrevisaoBadge } from "./PrevisaoBadge";
 import { useRotasData } from "../contexts/RotasContext";
 import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
-import { getCurrentSpecialPeriod } from "../config/specialPeriods";
+import { obterCategoriaDiaAtual } from "../config/specialPeriods";
 
 // ============================================================================
 // VARIANTS
@@ -58,16 +58,6 @@ function normalizarNomeLinha(nomeLinha: string): string {
     .replace(/\s*\(.*?\)\s*/g, "")
     .trim()
     .toLowerCase();
-}
-
-function obterCategoriaDiaAtual(): string {
-  const today = new Date().getDay(); // 0 = domingo, 6 = sábado
-  const isSaturday = today === 6;
-  const isWeekday = today >= 1 && today <= 5;
-  const specialPeriod = getCurrentSpecialPeriod();
-  if (specialPeriod && isWeekday) return "feriasRecessos";
-  if (isSaturday && !specialPeriod) return "sabado";
-  return "diasUteis";
 }
 
 // ============================================================================
@@ -210,11 +200,11 @@ export function PopupCustomizado({
               <span>Previsão</span>
             </div>
             <div className="space-y-1">
-              {parada.linhasAtendidas.map((nomeLinha, index) => {
+              {parada.linhasAtendidas.map((nomeLinha) => {
                 const linha = resolverLinhaPorNome(nomeLinha, parada.idParada);
                 return (
                   <div
-                    key={index}
+                    key={nomeLinha}
                     className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
                   >
                     <span className={lineBadgeVariants()} title={nomeLinha}>
