@@ -263,6 +263,33 @@ export function timeToMinutes(time: string): number {
 }
 
 /**
+ * Encontra o índice do próximo horário em um array de minutos ordenado (Busca Binária O(log N))
+ * @param sortedMinutes Array de minutos ordenado
+ * @param targetMinutes Minutos atuais
+ * @returns O índice do próximo horário, ou -1 se não houver
+ */
+export function findScheduleIndex(
+  sortedMinutes: number[],
+  targetMinutes: number,
+): number {
+  let left = 0;
+  let right = sortedMinutes.length - 1;
+  let result = -1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (sortedMinutes[mid] > targetMinutes) {
+      result = mid;
+      right = mid - 1; // Continuar buscando à esquerda por um horário mais cedo
+    } else {
+      left = mid + 1;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Converte minutos desde meia-noite de volta para formato "HH:MM"
  * @param minutes Número de minutos desde meia-noite
  * @returns Horário no formato "HH:MM"
@@ -300,30 +327,44 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
   let nextSchedule = "--:--";
   let previousSchedule = "--:--";
 
-  // Encontrar próximo horário
-  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
-  if (next !== undefined) {
-    nextSchedule = minutesToTime(next);
-  } else if (schedulesInMinutes.length > 0) {
+  // Encontrar próximo horário usando Busca Binária (O(log N))
+  const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
+
+  if (nextIndex !== -1) {
+    nextSchedule = minutesToTime(schedulesInMinutes[nextIndex]);
+
+    // O horário anterior é o estritamente menor que currentMinutes
+    let prevIndex = nextIndex - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] >= currentMinutes) {
+      prevIndex--;
+    }
+
+    if (prevIndex >= 0) {
+      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
+    } else {
+      // nextIndex == 0, ou seja, o próximo é o primeiro horário do dia.
+      // Portanto, não há anterior hoje.
+      previousSchedule = minutesToTime(
+        schedulesInMinutes[schedulesInMinutes.length - 1],
+      );
+    }
+  } else {
     // Se não há mais horários hoje, o próximo é o primeiro de amanhã
     nextSchedule = minutesToTime(schedulesInMinutes[0]);
-  }
 
-  // Encontrar horário anterior
-  let foundPrevious = false;
-  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
-    if (schedulesInMinutes[i] < currentMinutes) {
-      previousSchedule = minutesToTime(schedulesInMinutes[i]);
-      foundPrevious = true;
-      break;
+    // O anterior deve ser o último horário que for estritamente menor que currentMinutes
+    // Que geralmente é o último horário do array
+    let prevIndex = schedulesInMinutes.length - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] >= currentMinutes) {
+      prevIndex--;
     }
-  }
-
-  if (!foundPrevious && schedulesInMinutes.length > 0) {
-    // Se não há horários anteriores hoje, o anterior é o último de ontem
-    previousSchedule = minutesToTime(
-      schedulesInMinutes[schedulesInMinutes.length - 1],
-    );
+    if (prevIndex >= 0) {
+      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
+    } else {
+      previousSchedule = minutesToTime(
+        schedulesInMinutes[schedulesInMinutes.length - 1],
+      );
+    }
   }
 
   return { nextSchedule, previousSchedule };
