@@ -231,6 +231,28 @@ export const MenuLateral = React.memo(function MenuLateral({
 
   return (
     <>
+      {/* Mobile Floating Logo */}
+      <div
+        className="fixed left-1/2 top-4 z-1001 -translate-x-1/2 md:hidden"
+        aria-hidden={isMenuVisible}
+      >
+        <div
+          className={`transition-all duration-300 ${
+            isMenuVisible
+              ? "pointer-events-none translate-x-20 opacity-0"
+              : "translate-x-0 opacity-100"
+          }`}
+        >
+          <div className="rounded-2xl bg-brand-primary px-4 py-2 shadow-lg backdrop-blur-sm">
+            <img
+              src={logo}
+              alt="Logo Interno Rotas"
+              className="h-8 w-auto"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Mobile Trigger Button */}
       <div className="fixed bottom-6 left-1/2 z-1001 -translate-x-1/2 md:hidden">
         <Button
