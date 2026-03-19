@@ -244,11 +244,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           }`}
         >
           <div className="rounded-2xl bg-brand-primary px-4 py-2 shadow-lg backdrop-blur-sm">
-            <img
-              src={logo}
-              alt="Logo Interno Rotas"
-              className="h-8 w-auto"
-            />
+            <img src={logo} alt="Logo Interno Rotas" className="h-8 w-auto" />
           </div>
         </div>
       </div>
