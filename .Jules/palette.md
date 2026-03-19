@@ -13,6 +13,6 @@
 **Learning:** Schedule cards in `LinhaDetalhesModal` and `HorariosModal` were interactive (had `onClick`) but lacked keyboard accessibility. Adding `tabIndex={0}`, `role="button"`, `aria-label`, and `onKeyDown` ensures users navigating via keyboard can select schedules.
 **Action:** Always verify interactive elements (e.g. `div`s with `onClick`) have equivalent keyboard event handlers, roles, and focusability to maintain accessibility.
 
-## 2024-05-17 - Missing native tooltip for icon-only map centering button
-**Learning:** In the `ControlesUsuarioMapa.tsx` component, the "LocateFixed" icon-only button used to center the map only had an `aria-label`, leaving sighted mouse users without a native tooltip on hover. It's crucial for icon-only interactive controls to use the `title` attribute matching the `aria-label` to benefit all users.
-**Action:** When adding `aria-label` to icon-only buttons for screen readers, also add the same text as a `title` attribute to provide a native hover tooltip.
+## 2025-03-16 - Title Attributes for Icon-Only Buttons
+**Learning:** In addition to `aria-label`s (which provide accessibility for screen readers), icon-only buttons need a `title` attribute to provide a native tooltip on hover. This is crucial for sighted mouse users to understand the button's action without guessing.
+**Action:** Always include a `title` attribute that matches the `aria-label` on buttons that consist solely of an icon (e.g. `<LocateFixed />`, `<ArrowLeft />`, `<DialogClose />`).
