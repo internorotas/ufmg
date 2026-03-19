@@ -3,11 +3,21 @@ import {
   converterHoraParaMinutos,
   converterMinutosParaHora,
 } from "../lib/utils";
+import { obterMultiplicadorTrafego } from "../config/trafegoConfig";
 
-export interface PrevisaoChegadaResultado {
+interface ProximoOnibus {
   horarioChegada: string;
   minutosFaltantes: number;
-  horarioSaidaOrigem: string;
+}
+
+interface OnibusAnterior {
+  minutosQuePassou: number;
+}
+
+export interface PrevisaoChegadaResultado {
+  proximoOnibus: ProximoOnibus | null;
+  onibusAnterior: OnibusAnterior | null;
+  isTrafegoIntenso: boolean;
 }
 
 export function usePrevisaoChegada(
@@ -20,11 +30,11 @@ export function usePrevisaoChegada(
   }
   if (!linha.horarios || linha.horarios.length === 0) return null;
 
-  let tempoViagemAteAqui = 0;
+  let tempoViagemBase = 0;
   let paradaEncontrada = false;
 
   for (const trecho of linha.trajetoDetalhado) {
-    tempoViagemAteAqui += trecho.tempoDoAnteriorMinutos;
+    tempoViagemBase += trecho.tempoDoAnteriorMinutos;
     if (trecho.idParada === idParadaAtual) {
       paradaEncontrada = true;
       break;
@@ -34,22 +44,47 @@ export function usePrevisaoChegada(
   if (!paradaEncontrada) return null;
 
   const agora = new Date();
-  const minutosAtuais = agora.getHours() * 60 + agora.getMinutes();
+  const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
+  const multiplicador = obterMultiplicadorTrafego(horaAtualMinutos);
+  const tempoViagemReal = Math.round(tempoViagemBase * multiplicador);
+  const isTrafegoIntenso = multiplicador > 1.0;
 
-  for (const horarioSaidaOrigem of linha.horarios) {
+  let proximoOnibus: ProximoOnibus | null = null;
+  let onibusAnterior: OnibusAnterior | null = null;
+
+  for (let index = 0; index < linha.horarios.length; index++) {
+    const horarioSaidaOrigem = linha.horarios[index];
     const saidaMinutos = converterHoraParaMinutos(horarioSaidaOrigem);
     if (Number.isNaN(saidaMinutos)) continue;
 
-    const chegadaPrevistaMinutos = saidaMinutos + tempoViagemAteAqui;
+    const chegadaPrevistaMinutos = saidaMinutos + tempoViagemReal;
 
-    if (chegadaPrevistaMinutos >= minutosAtuais) {
-      return {
+    if (chegadaPrevistaMinutos >= horaAtualMinutos) {
+      proximoOnibus = {
         horarioChegada: converterMinutosParaHora(chegadaPrevistaMinutos),
-        minutosFaltantes: Math.max(0, chegadaPrevistaMinutos - minutosAtuais),
-        horarioSaidaOrigem,
+        minutosFaltantes: Math.max(0, chegadaPrevistaMinutos - horaAtualMinutos),
       };
+
+      const horarioAnterior = linha.horarios[index - 1];
+      if (horarioAnterior) {
+        const saidaAnteriorMinutos = converterHoraParaMinutos(horarioAnterior);
+        if (!Number.isNaN(saidaAnteriorMinutos)) {
+          const chegadaAnteriorMinutos = saidaAnteriorMinutos + tempoViagemReal;
+          const minutosQuePassou = horaAtualMinutos - chegadaAnteriorMinutos;
+
+          if (minutosQuePassou >= 0 && minutosQuePassou <= 15) {
+            onibusAnterior = { minutosQuePassou };
+          }
+        }
+      }
+
+      break;
     }
   }
 
-  return null;
+  return {
+    proximoOnibus,
+    onibusAnterior,
+    isTrafegoIntenso,
+  };
 }
