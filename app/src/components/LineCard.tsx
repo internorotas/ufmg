@@ -15,6 +15,7 @@ import {
 import { useAnalytics } from "../hooks/useAnalytics";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 import { LineStatusBadge, type LineStatusType } from "./ui/Badge";
+import { PrevisaoBadge } from "./PrevisaoBadge";
 import type { Linha } from "../types/data.types";
 
 // ============================================================================
@@ -76,6 +77,8 @@ export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
   onDetailsClick: (linha: Linha) => void;
   /** Se o card está selecionado */
   isSelected?: boolean;
+  /** Parada selecionada para calculo de ETA */
+  idParada?: string;
   /** Classe CSS adicional */
   className?: string;
 }
@@ -242,6 +245,7 @@ function LineCardComponent({
   onClick,
   onDetailsClick,
   isSelected = false,
+  idParada,
   className,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
@@ -360,6 +364,12 @@ function LineCardComponent({
                   {linha.sublinha}
                 </p>
               )}
+
+              {idParada && linha.trajetoDetalhado?.length ? (
+                <div className="mt-2">
+                  <PrevisaoBadge linha={linha} idParada={idParada} />
+                </div>
+              ) : null}
             </div>
           </div>
           <div className="flex items-center gap-2">

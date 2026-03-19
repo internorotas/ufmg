@@ -4,11 +4,15 @@
  */
 
 import type { ComponentProps } from "react";
+import { useMemo } from "react";
 import { Popup } from "react-leaflet";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, MapPin } from "lucide-react";
 import { cn } from "../lib/utils";
-import type { Parada } from "../types/data.types";
+import type { Parada, Linha } from "../types/data.types";
+import { DisclaimerEstimativa } from "./DisclaimerEstimativa";
+import { PrevisaoBadge } from "./PrevisaoBadge";
+import { useRotasData } from "../contexts/RotasContext";
 
 // ============================================================================
 // VARIANTS
@@ -18,21 +22,21 @@ import type { Parada } from "../types/data.types";
  * Variantes do container do popup
  */
 export const popupContainerVariants = tv({
-  base: "min-w-[220px]",
+  base: "min-w-[220px] max-w-[330px]",
 });
 
 /**
  * Variantes do header do popup
  */
 export const popupHeaderVariants = tv({
-  base: "mb-3 flex items-start gap-2",
+  base: "mb-2 flex items-start gap-2",
 });
 
 /**
  * Variantes da seção de linhas
  */
 export const popupLinesSectionVariants = tv({
-  base: "mt-3 border-t border-card-border pt-3",
+  base: "mt-2 border-t border-card-border pt-2",
 });
 
 /**
@@ -40,10 +44,19 @@ export const popupLinesSectionVariants = tv({
  */
 export const lineBadgeVariants = tv({
   base: [
-    "rounded px-2 py-1 text-xs font-medium",
-    "bg-internoRotas-azul-eletrico text-white",
+    "inline-flex min-h-[2.5rem] w-full items-center rounded-md border px-2 py-1.5 text-[11px] font-semibold leading-tight",
+    "border-card-border bg-card text-text-primary",
   ],
 });
+
+function normalizarNomeLinha(nomeLinha: string): string {
+  return nomeLinha
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s*\(.*?\)\s*/g, "")
+    .trim()
+    .toLowerCase();
+}
 
 // ============================================================================
 // TYPES
@@ -73,6 +86,50 @@ export function PopupCustomizado({
   className,
   ...props
 }: PopupCustomizadoProps) {
+  const { linhasData } = useRotasData();
+
+  // Mapear nome de linha para lista de objetos Linha e suportar aliases como "(Todas)"
+  const linhasPorNomeNormalizado = useMemo(() => {
+    const mapa = new Map<string, Linha[]>();
+    linhasData.categoriasDias.forEach((categoria) => {
+      categoria.linhas.forEach((linha) => {
+        const chave = normalizarNomeLinha(linha.nome);
+        const linhas = mapa.get(chave) ?? [];
+        linhas.push(linha);
+        mapa.set(chave, linhas);
+      });
+    });
+    return mapa;
+  }, [linhasData]);
+
+  const resolverLinhaPorNome = (
+    nomeLinhaParada: string,
+    idParadaAtual: string,
+  ): Linha | null => {
+    const chave = normalizarNomeLinha(nomeLinhaParada);
+    const candidatas = linhasPorNomeNormalizado.get(chave) ?? [];
+    if (candidatas.length === 0) return null;
+
+    const comTrajetoNaParada = candidatas.find(
+      (linha) =>
+        Boolean(linha.trajetoDetalhado?.length) &&
+        linha.itinerarioParadasIds.includes(idParadaAtual),
+    );
+    if (comTrajetoNaParada) return comTrajetoNaParada;
+
+    const atendeParada = candidatas.find((linha) =>
+      linha.itinerarioParadasIds.includes(idParadaAtual),
+    );
+    if (atendeParada) return atendeParada;
+
+    const comTrajeto = candidatas.find((linha) =>
+      Boolean(linha.trajetoDetalhado?.length),
+    );
+    if (comTrajeto) return comTrajeto;
+
+    return candidatas[0] ?? null;
+  };
+
   return (
     <Popup
       className={cn("popup-customizado", className)}
@@ -96,13 +153,17 @@ export function PopupCustomizado({
           </div>
         </div>
 
+        <div className="mt-1">
+          <DisclaimerEstimativa />
+        </div>
+
         {/* Linhas Atendidas */}
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
           <div
             data-slot="lines-section"
             className={popupLinesSectionVariants()}
           >
-            <div className="mb-2 flex items-center gap-2">
+            <div className="mb-1.5 flex items-center gap-2">
               <Bus className="text-internoRotas-azul-eletrico" size={16} />
               <p className="text-xs font-semibold text-text-primary">
                 {parada.linhasAtendidas.length} linha
@@ -110,12 +171,43 @@ export function PopupCustomizado({
                 {parada.linhasAtendidas.length === 1 ? "" : "m"} aqui:
               </p>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {parada.linhasAtendidas.map((nomeLinha, index) => (
-                <span key={index} className={lineBadgeVariants()}>
-                  {nomeLinha}
-                </span>
-              ))}
+            <div className="mb-1 grid grid-cols-[1fr_auto] gap-2 px-1 text-[10px] font-semibold uppercase tracking-wide text-text-tertiary">
+              <span>Linha</span>
+              <span>Previsão</span>
+            </div>
+            <div className="space-y-1">
+              {parada.linhasAtendidas.map((nomeLinha, index) => {
+                const linha = resolverLinhaPorNome(nomeLinha, parada.idParada);
+                return (
+                  <div
+                    key={index}
+                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
+                  >
+                    <span className={lineBadgeVariants()} title={nomeLinha}>
+                      <span className="whitespace-normal wrap-break-word text-left">
+                        {nomeLinha}
+                      </span>
+                    </span>
+                    {linha ? (
+                      <PrevisaoBadge
+                        linha={linha}
+                        idParada={parada.idParada}
+                        compacto
+                      />
+                    ) : (
+                      <span
+                        className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+                        style={{
+                          backgroundColor: "var(--neutral-bg)",
+                          color: "var(--neutral-text)",
+                        }}
+                      >
+                        Sem previsão
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -124,7 +216,7 @@ export function PopupCustomizado({
         {parada.descricao && parada.descricao !== parada.nome && (
           <div
             data-slot="description"
-            className="mt-3 border-t border-card-border pt-3"
+            className="mt-2 border-t border-card-border pt-2"
           >
             <p className="text-xs italic text-text-secondary">
               {parada.descricao}

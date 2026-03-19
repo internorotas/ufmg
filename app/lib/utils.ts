@@ -39,6 +39,22 @@ export function minutesToTime(minutes: number): string {
 }
 
 /**
+ * Alias para timeToMinutes - converte "HH:MM" para minutos desde meia-noite.
+ * Compatível com o padrão de nomenclatura do projeto.
+ */
+export function converterHoraParaMinutos(horaString: string): number {
+  return timeToMinutes(horaString);
+}
+
+/**
+ * Alias para minutesToTime - converte minutos desde meia-noite para "HH:MM".
+ * Compatível com o padrão de nomenclatura do projeto.
+ */
+export function converterMinutosParaHora(minutosTotais: number): string {
+  return minutesToTime(minutosTotais);
+}
+
+/**
  * Encontra o indice do primeiro horario estritamente maior que o alvo.
  * Retorna o tamanho do array quando nao existir horario futuro.
  */
