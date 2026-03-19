@@ -140,8 +140,6 @@ export function LinhaOnibus({
         <button
           onClick={onLinhaClick}
           className={`${lineHeaderVariants()} ${bgColor}`}
-          aria-label={`Ver detalhes da linha ${linha.nome}`}
-          title={`Ver detalhes da linha ${linha.nome}`}
         >
           <div className="text-left">
             <h1 className="text-base">{linha.nome}</h1>
@@ -189,8 +187,6 @@ export function LinhaOnibus({
               <button
                 onClick={handleItinerarioToggle}
                 className={actionButtonVariants({ intent: "primary" })}
-                aria-label={`Ver itinerário da linha ${linha.nome}`}
-                title="Ver Itinerário"
               >
                 <Map size={18} />
                 Itinerário
@@ -198,8 +194,6 @@ export function LinhaOnibus({
               <button
                 onClick={handleHorariosToggle}
                 className={actionButtonVariants({ intent: "secondary" })}
-                aria-label={`Ver mais horários da linha ${linha.nome}`}
-                title="Mais Horários"
               >
                 <Clock size={18} />
                 Mais Horários

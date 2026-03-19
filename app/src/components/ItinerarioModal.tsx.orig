@@ -82,7 +82,10 @@ export function ItinerarioModal({
   // Buscar paradas do itinerário
   // ⚡ Bolt: Memoized the array mapping and lookup across the ID list
   const paradasDoItinerario = useMemo(() => {
-    return buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
+    return buscarParadasPorIds(
+      linha.itinerarioParadasIds,
+      paradas,
+    );
   }, [linha.itinerarioParadasIds, paradas]);
 
   const handleParadaClick = (parada: Parada) => {
@@ -105,10 +108,7 @@ export function ItinerarioModal({
               const isLast = index === paradasDoItinerario.length - 1;
 
               return (
-                <div
-                  key={`${parada.idParada}-${index}`}
-                  className="relative flex"
-                >
+                <div key={parada.idParada} className="relative flex">
                   {/* Linha conectora vertical tracejada */}
                   {!isLast && (
                     <div
@@ -123,8 +123,6 @@ export function ItinerarioModal({
                   <button
                     onClick={() => handleParadaClick(parada)}
                     className={stopButtonVariants()}
-                    aria-label={`Ver localização da parada ${parada.nome} no mapa`}
-                    title={`Ver localização da parada ${parada.nome} no mapa`}
                   >
                     {/* Ícone de localização com círculo */}
                     <div
@@ -140,7 +138,7 @@ export function ItinerarioModal({
                         {parada.nome}
                       </h4>
 
-                      {(isFirst || isLast) && (
+                      {isFirst && (
                         <p className="mt-0.5 text-xs text-text-secondary">
                           Ponto de Origem/Destino
                         </p>
@@ -157,15 +155,6 @@ export function ItinerarioModal({
                           style={{ color: linha.corHex }}
                         >
                           Partida
-                        </span>
-                      )}
-
-                      {isLast && (
-                        <span
-                          className="mt-1 inline-block px-0 text-xs font-semibold"
-                          style={{ color: linha.corHex }}
-                        >
-                          Chegada
                         </span>
                       )}
                     </div>
