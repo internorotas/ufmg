@@ -78,10 +78,14 @@ export function ItinerarioModal({
   paradas,
   onParadaClick,
 }: ItinerarioModalProps) {
-  // ⚡ Bolt: O(N*M) - Buscar paradas do itinerário
-  // Utilizar useMemo evita re-calcular esta busca na lista de paradas a cada render
+  // ⚡ Bolt: Memoize O(N*M) lookup para evitar recalculação em cada render
+  // Buscar paradas do itinerário
+  // ⚡ Bolt: Memoized the array mapping and lookup across the ID list
   const paradasDoItinerario = useMemo(() => {
-    return buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
+    return buscarParadasPorIds(
+      linha.itinerarioParadasIds,
+      paradas,
+    );
   }, [linha.itinerarioParadasIds, paradas]);
 
   const handleParadaClick = (parada: Parada) => {
