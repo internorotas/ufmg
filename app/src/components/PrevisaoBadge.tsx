@@ -38,7 +38,7 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
           }}
           title={`Chegada estimada: ${proximoOnibus.horarioChegada}`}
         >
-          {isTrafegoIntenso ? "Chegando agora (Transito intenso)" : "Chegando agora"}
+          {isTrafegoIntenso ? "(Transito intenso) Chegando agora" : "Chegando agora"}
         </span>
 
         {onibusAnterior ? (
@@ -65,7 +65,7 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
         title={`Chegada estimada: ${proximoOnibus.horarioChegada}`}
       >
         {isTrafegoIntenso
-          ? `Chega em ${proximoOnibus.minutosFaltantes}m (Transito intenso)`
+          ? `(Transito intenso) Chega em ${proximoOnibus.minutosFaltantes}m`
           : `Chega em ${proximoOnibus.minutosFaltantes}m`}
       </span>
 
