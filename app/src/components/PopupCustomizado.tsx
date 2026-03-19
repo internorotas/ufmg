@@ -44,7 +44,7 @@ export const popupLinesSectionVariants = tv({
  */
 export const lineBadgeVariants = tv({
   base: [
-    "inline-flex items-center rounded-md border px-2 py-1 text-[11px] font-semibold leading-tight",
+    "inline-flex min-h-[2.5rem] w-full items-start rounded-md border px-2 py-1.5 text-[11px] font-semibold leading-tight",
     "border-card-border bg-card text-text-primary",
   ],
 });
@@ -187,7 +187,9 @@ export function PopupCustomizado({
                       className={lineBadgeVariants()}
                       title={nomeLinha}
                     >
-                      <span className="truncate">{nomeLinha}</span>
+                      <span className="whitespace-normal wrap-break-word text-left">
+                        {nomeLinha}
+                      </span>
                     </span>
                     {linha ? (
                       <PrevisaoBadge linha={linha} idParada={parada.idParada} />
