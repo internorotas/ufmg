@@ -173,7 +173,7 @@ export function PopupCustomizado({
             </div>
             <div className="mb-1 grid grid-cols-[1fr_auto] gap-2 px-1 text-[10px] font-semibold uppercase tracking-wide text-text-tertiary">
               <span>Linha</span>
-              <span>Previsao</span>
+              <span>Previsão</span>
             </div>
             <div className="space-y-1">
               {parada.linhasAtendidas.map((nomeLinha, index) => {
@@ -201,7 +201,7 @@ export function PopupCustomizado({
                           color: "var(--neutral-text)",
                         }}
                       >
-                        Sem previsao
+                        Sem previsão
                       </span>
                     )}
                   </div>
