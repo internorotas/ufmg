@@ -8,7 +8,11 @@ import { tv } from "tailwind-variants";
 import { Clock, Map, MapPin, Bus, AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal";
 import type { Linha, Parada } from "../types/data.types";
-import { buscarParadasPorIds, timeToMinutes } from "../../lib/utils";
+import {
+  buscarParadasPorIds,
+  timeToMinutes,
+  findScheduleIndex,
+} from "../../lib/utils";
 import { useAnalytics, useSessionTiming } from "../hooks/useAnalytics";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 
@@ -199,23 +203,23 @@ export function LinhaDetalhesModal({
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha.horarios]);
 
-  // ⚡ Bolt: Calcular status 'passou' O(N) separado com base no tempo atual
-  const horariosOrganizados = useMemo(() => {
-    return baseHorarios.map((h) => ({
-      ...h,
-      passou: h.minutos < currentMinutes,
-    }));
+  // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
+  // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
+  // Separamos os componentes "passado" e "futuro" para evitar realocação dos itens O(N)
+  const splitIndex = useMemo(() => {
+    // Busca binária para achar onde dividir usando um getter para evitar o .map() inicial.
+    // Usamos currentMinutes - 1 pois currentMinutes (agora) deve ser considerado 'proximo'
+    return findScheduleIndex(
+      baseHorarios,
+      currentMinutes - 1,
+      (h) => h.minutos,
+    );
   }, [baseHorarios, currentMinutes]);
 
-  // Memoizar listas filtradas derivadas
-  const proximos = useMemo(
-    () => horariosOrganizados.filter((h) => !h.passou),
-    [horariosOrganizados],
-  );
-  const passados = useMemo(
-    () => horariosOrganizados.filter((h) => h.passou),
-    [horariosOrganizados],
-  );
+  // Zero-allocation das sublistas virtuais
+  const passados = baseHorarios.slice(0, splitIndex);
+  const proximos = baseHorarios.slice(splitIndex);
+  const todos = baseHorarios;
 
   const handleTabChange = (tab: TabType) => {
     trackEvent({
@@ -463,10 +467,10 @@ export function LinhaDetalhesModal({
             <div data-slot="all-schedules">
               <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
                 <Clock size={20} />
-                Todos os Horários ({horariosOrganizados.length})
+                Todos os Horários ({todos.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {horariosOrganizados.map(({ horario, minutos }, index) => (
+                {todos.map(({ horario, minutos }, index) => (
                   <div
                     key={`horario-${minutos}-${index}`}
                     className={scheduleCardVariants({ status: "passed" })}
@@ -514,7 +518,7 @@ export function LinhaDetalhesModal({
           {/* Resumo */}
           <div data-slot="summary" className={infoCardVariants()}>
             <p className="text-text-secondary">
-              Total de {horariosOrganizados.length} horários
+              Total de {todos.length} horários
             </p>
           </div>
         </div>

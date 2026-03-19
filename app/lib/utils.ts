@@ -606,3 +606,37 @@ export function formatarTextoComQuebras(texto: string) {
   // Proteção contra XSS: Escapamos o texto antes de injetar as tags <br/>
   return escapeHtml(texto).replace(/\n/g, "<br/>");
 }
+
+/**
+ * ⚡ Bolt: Encontra o índice do primeiro horário que é estritamente maior que o valor alvo.
+ * Usa busca binária O(log N) em vez de array.find() O(N).
+ * O array de entrada DEVE estar ordenado.
+ *
+ * Suporta tanto arrays de primitivos quanto de objetos, através do segundo parâmetro opcional (getter).
+ *
+ * @param sortedArray Array ordenado
+ * @param target Valor alvo
+ * @param getVal Função opcional para extrair o valor numérico de um item do array
+ * @returns Índice do primeiro elemento estritamente maior que o alvo, ou o tamanho do array se não houver
+ */
+export function findScheduleIndex<T>(
+  sortedArray: T[],
+  target: number,
+  getVal: (item: T) => number = (item) => item as unknown as number,
+): number {
+  let left = 0;
+  let right = sortedArray.length;
+
+  while (left < right) {
+    const mid = Math.floor((left + right) / 2);
+    const midVal = getVal(sortedArray[mid]);
+
+    if (midVal > target) {
+      right = mid;
+    } else {
+      left = mid + 1;
+    }
+  }
+
+  return left;
+}
