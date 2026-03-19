@@ -13,6 +13,6 @@
 **Learning:** Schedule cards in `LinhaDetalhesModal` and `HorariosModal` were interactive (had `onClick`) but lacked keyboard accessibility. Adding `tabIndex={0}`, `role="button"`, `aria-label`, and `onKeyDown` ensures users navigating via keyboard can select schedules.
 **Action:** Always verify interactive elements (e.g. `div`s with `onClick`) have equivalent keyboard event handlers, roles, and focusability to maintain accessibility.
 
-## 2025-03-05 - False Affordances & Icon-Only Tooltips
-**Learning:** Purely informational UI elements (like the read-only schedule cards in `HorariosModal`) should never receive interactive classes (like `hover:scale`, `cursor-pointer`, `focus-visible:ring`) or focusability (`tabIndex={0}`). Adding these creates "false affordances", confusing keyboard and screen reader users. Additionally, icon-only buttons need a native `title` attribute matching their `aria-label` to provide an accessible tooltip for sighted mouse users.
-**Action:** Always verify if an element is actually actionable before adding interactive states, and ensure all icon-only buttons pair `aria-label` with `title`.
+## 2025-03-16 - Title Attributes for Icon-Only Buttons
+**Learning:** In addition to `aria-label`s (which provide accessibility for screen readers), icon-only buttons need a `title` attribute to provide a native tooltip on hover. This is crucial for sighted mouse users to understand the button's action without guessing.
+**Action:** Always include a `title` attribute that matches the `aria-label` on buttons that consist solely of an icon (e.g. `<LocateFixed />`, `<ArrowLeft />`, `<DialogClose />`).
