@@ -22,21 +22,21 @@ import { useRotasData } from "../contexts/RotasContext";
  * Variantes do container do popup
  */
 export const popupContainerVariants = tv({
-  base: "min-w-[220px]",
+  base: "min-w-[220px] max-w-[330px]",
 });
 
 /**
  * Variantes do header do popup
  */
 export const popupHeaderVariants = tv({
-  base: "mb-3 flex items-start gap-2",
+  base: "mb-2 flex items-start gap-2",
 });
 
 /**
  * Variantes da seção de linhas
  */
 export const popupLinesSectionVariants = tv({
-  base: "mt-3 border-t border-card-border pt-3",
+  base: "mt-2 border-t border-card-border pt-2",
 });
 
 /**
@@ -44,10 +44,19 @@ export const popupLinesSectionVariants = tv({
  */
 export const lineBadgeVariants = tv({
   base: [
-    "rounded px-2 py-1 text-xs font-medium",
-    "bg-internoRotas-azul-eletrico text-white",
+    "inline-flex items-center rounded-md border px-2 py-1 text-[11px] font-semibold leading-tight",
+    "border-card-border bg-card text-text-primary",
   ],
 });
+
+function normalizarNomeLinha(nomeLinha: string): string {
+  return nomeLinha
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s*\(.*?\)\s*/g, "")
+    .trim()
+    .toLowerCase();
+}
 
 // ============================================================================
 // TYPES
@@ -79,16 +88,21 @@ export function PopupCustomizado({
 }: PopupCustomizadoProps) {
   const { linhasData } = useRotasData();
 
-  // Mapear nome de linha para objeto Linha (memoizado)
-  const linhasPorNome = useMemo(() => {
+  // Mapear nome de linha para objeto Linha (memoizado) e suportar aliases como "(Todas)"
+  const linhasPorNomeNormalizado = useMemo(() => {
     const mapa = new Map<string, Linha>();
     linhasData.categoriasDias.forEach((categoria) => {
       categoria.linhas.forEach((linha) => {
-        mapa.set(linha.nome, linha);
+        mapa.set(normalizarNomeLinha(linha.nome), linha);
       });
     });
     return mapa;
   }, [linhasData]);
+
+  const resolverLinhaPorNome = (nomeLinhaParada: string): Linha | null => {
+    const chave = normalizarNomeLinha(nomeLinhaParada);
+    return linhasPorNomeNormalizado.get(chave) ?? null;
+  };
 
   return (
     <Popup
@@ -113,7 +127,7 @@ export function PopupCustomizado({
           </div>
         </div>
 
-        <div className="mb-2 mt-2">
+        <div className="mt-1">
           <DisclaimerEstimativa />
         </div>
 
@@ -123,7 +137,7 @@ export function PopupCustomizado({
             data-slot="lines-section"
             className={popupLinesSectionVariants()}
           >
-            <div className="mb-2 flex items-center gap-2">
+            <div className="mb-1.5 flex items-center gap-2">
               <Bus className="text-internoRotas-azul-eletrico" size={16} />
               <p className="text-xs font-semibold text-text-primary">
                 {parada.linhasAtendidas.length} linha
@@ -131,17 +145,36 @@ export function PopupCustomizado({
                 {parada.linhasAtendidas.length === 1 ? "" : "m"} aqui:
               </p>
             </div>
-            <div className="space-y-1.5">
+            <div className="mb-1 grid grid-cols-[1fr_auto] gap-2 px-1 text-[10px] font-semibold uppercase tracking-wide text-text-tertiary">
+              <span>Linha</span>
+              <span>Previsao</span>
+            </div>
+            <div className="space-y-1">
               {parada.linhasAtendidas.map((nomeLinha, index) => {
-                const linha = linhasPorNome.get(nomeLinha);
+                const linha = resolverLinhaPorNome(nomeLinha);
                 return (
                   <div
                     key={index}
-                    className="flex items-center justify-between gap-2"
+                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
                   >
-                    <span className={lineBadgeVariants()}>{nomeLinha}</span>
-                    {linha && (
+                    <span
+                      className={lineBadgeVariants()}
+                      title={nomeLinha}
+                    >
+                      <span className="truncate">{nomeLinha}</span>
+                    </span>
+                    {linha ? (
                       <PrevisaoBadge linha={linha} idParada={parada.idParada} />
+                    ) : (
+                      <span
+                        className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+                        style={{
+                          backgroundColor: "var(--neutral-bg)",
+                          color: "var(--neutral-text)",
+                        }}
+                      >
+                        Sem previsao
+                      </span>
                     )}
                   </div>
                 );
@@ -154,7 +187,7 @@ export function PopupCustomizado({
         {parada.descricao && parada.descricao !== parada.nome && (
           <div
             data-slot="description"
-            className="mt-3 border-t border-card-border pt-3"
+            className="mt-2 border-t border-card-border pt-2"
           >
             <p className="text-xs italic text-text-secondary">
               {parada.descricao}
