@@ -88,7 +88,10 @@ export function usePrevisaoChegada(
 
   let onibusAnterior: OnibusAnterior | null = null;
   if (ultimaChegadaPassada !== null) {
-    const minutosQuePassou = Math.max(0, horaAtualMinutos - ultimaChegadaPassada);
+    const minutosQuePassou = Math.max(
+      0,
+      horaAtualMinutos - ultimaChegadaPassada,
+    );
     if (minutosQuePassou >= 0 && minutosQuePassou <= 15) {
       onibusAnterior = { minutosQuePassou };
     }

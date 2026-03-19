@@ -44,7 +44,8 @@ export function converterMinutosParaHora(minutosTotais: number): string {
   if (!Number.isFinite(minutosTotais)) return "--:--";
 
   const minutosNoDia = 24 * 60;
-  const valorNormalizado = ((Math.floor(minutosTotais) % minutosNoDia) + minutosNoDia) % minutosNoDia;
+  const valorNormalizado =
+    ((Math.floor(minutosTotais) % minutosNoDia) + minutosNoDia) % minutosNoDia;
   const horas = Math.floor(valorNormalizado / 60);
   const minutos = valorNormalizado % 60;
 
