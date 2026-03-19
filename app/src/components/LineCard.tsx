@@ -365,7 +365,9 @@ function LineCardComponent({
                 </p>
               )}
 
-              {idParada && linha.trajetoDetalhado?.length ? (
+              {idParada &&
+              linha.trajetoDetalhado?.length &&
+              linha.itinerarioParadasIds.includes(idParada) ? (
                 <div className="mt-2">
                   <PrevisaoBadge linha={linha} idParada={idParada} />
                 </div>
