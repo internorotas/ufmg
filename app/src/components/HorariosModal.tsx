@@ -161,7 +161,11 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                   key={`proximo-${index}`}
                   className={scheduleCardVariants({ status: "upcoming" })}
                 >
-                  <p className={scheduleTimeVariants({ status: "upcoming" })}>
+                  <span className="sr-only">Próximo horário às {horario}</span>
+                  <p
+                    className={scheduleTimeVariants({ status: "upcoming" })}
+                    aria-hidden="true"
+                  >
                     {horario}
                   </p>
                 </div>
@@ -183,7 +187,11 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                   key={`passado-${index}`}
                   className={scheduleCardVariants({ status: "passed" })}
                 >
-                  <p className={scheduleTimeVariants({ status: "passed" })}>
+                  <span className="sr-only">Horário passado às {horario}</span>
+                  <p
+                    className={scheduleTimeVariants({ status: "passed" })}
+                    aria-hidden="true"
+                  >
                     {horario}
                   </p>
                 </div>
