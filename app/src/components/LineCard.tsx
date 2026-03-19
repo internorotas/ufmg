@@ -13,7 +13,10 @@ import {
   findScheduleIndex,
 } from "../../lib/utils";
 import { useAnalytics } from "../hooks/useAnalytics";
-import { shouldDisableRegularSchedules } from "../config/specialPeriods";
+import {
+  isLineAvailableToday,
+  getLinhaNotRunningMessage,
+} from "../config/specialPeriods";
 import { LineStatusBadge, type LineStatusType } from "./ui/Badge";
 import { PrevisaoBadge } from "./PrevisaoBadge";
 import type { Linha } from "../types/data.types";
@@ -250,46 +253,9 @@ function LineCardComponent({
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
 
-  // Verificar categoria da linha
-  const isVacationLine = linha.categoriaDia === "feriasRecessos";
-  const isSaturdayLine = linha.categoriaDia === "sabado";
-  const isWeekdayLine = linha.categoriaDia === "diasUteis";
-
-  // Verificar período atual
-  const isInVacationPeriod = shouldDisableRegularSchedules();
-
-  // Verificar dia da semana (domingo=0, sábado=6)
-  const today = new Date().getDay();
-  const isSaturday = today === 6;
-  const isSunday = today === 0;
-  const isWeekday = today >= 1 && today <= 5;
-
-  // Lógica de quando cada categoria NÃO circula:
-  // - Linhas de dias úteis: não circulam em fins de semana ou durante período de férias
-  // - Linhas de sábado: não circulam fora do sábado ou durante período de férias
-  // - Linhas de férias: não circulam fora do período de férias ou em fins de semana
-  const shouldDisableSchedules =
-    (isWeekdayLine && (!isWeekday || isInVacationPeriod)) ||
-    (isSaturdayLine && (!isSaturday || isInVacationPeriod)) ||
-    (isVacationLine && (!isInVacationPeriod || isSunday || isSaturday));
-
-  // Determinar mensagem de suspensão baseada na categoria
-  const getSuspendedMessage = (): string => {
-    if (isWeekdayLine) {
-      if (isInVacationPeriod) return "Linha suspensa durante férias";
-      if (isSaturday) return "Linha não circula aos sábados";
-      if (isSunday) return "Linha não circula aos domingos";
-    }
-    if (isSaturdayLine) {
-      if (isInVacationPeriod) return "Linha suspensa durante férias";
-      return "Linha circula apenas aos sábados";
-    }
-    if (isVacationLine) {
-      if (!isInVacationPeriod) return "Linha circula apenas durante férias";
-      if (isSaturday || isSunday) return "Linha não circula em fins de semana";
-    }
-    return "Linha não está circulando";
-  };
+  const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
+  const getSuspendedMessage = () =>
+    getLinhaNotRunningMessage(linha.categoriaDia);
 
   // Otimização: Memoizar o processamento pesado dos horários (parse + sort)
   const schedulesInMinutes = useMemo(() => {

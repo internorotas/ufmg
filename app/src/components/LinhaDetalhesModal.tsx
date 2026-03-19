@@ -14,7 +14,10 @@ import {
   findScheduleIndex,
 } from "../../lib/utils";
 import { useAnalytics, useSessionTiming } from "../hooks/useAnalytics";
-import { shouldDisableRegularSchedules } from "../config/specialPeriods";
+import {
+  isLineAvailableToday,
+  getLinhaNotRunningMessage,
+} from "../config/specialPeriods";
 import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
 
 // ============================================================================
@@ -146,42 +149,9 @@ export function LinhaDetalhesModal({
   // Rastreia tempo que o usuário passa visualizando detalhes desta linha
   useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
 
-  // Verificar se a linha está circulando hoje
-  const isVacationLine = linha.categoriaDia === "feriasRecessos";
-  const isSaturdayLine = linha.categoriaDia === "sabado";
-  const isWeekdayLine = linha.categoriaDia === "diasUteis";
-  const isInVacationPeriod = shouldDisableRegularSchedules();
-  const today = new Date().getDay();
-  const isSaturday = today === 6;
-  const isSunday = today === 0;
-  const isWeekday = today >= 1 && today <= 5;
-
-  const isLineRunningToday =
-    (isWeekdayLine && isWeekday && !isInVacationPeriod) ||
-    (isSaturdayLine && isSaturday && !isInVacationPeriod) ||
-    (isVacationLine && isInVacationPeriod && !isSaturday && !isSunday);
-
-  // Mensagem de aviso quando a linha não está circulando
-  const getNotRunningMessage = (): string => {
-    if (isWeekdayLine) {
-      if (isInVacationPeriod)
-        return "Esta linha não circula durante período de férias";
-      if (isSaturday) return "Esta linha não circula aos sábados";
-      if (isSunday) return "Esta linha não circula aos domingos";
-    }
-    if (isSaturdayLine) {
-      if (isInVacationPeriod)
-        return "Esta linha não circula durante período de férias";
-      return "Esta linha circula apenas aos sábados";
-    }
-    if (isVacationLine) {
-      if (!isInVacationPeriod)
-        return "Esta linha circula apenas durante período de férias";
-      if (isSaturday || isSunday)
-        return "Esta linha não circula em fins de semana";
-    }
-    return "Esta linha não está circulando hoje";
-  };
+  const isLineRunningToday = isLineAvailableToday(linha.categoriaDia);
+  const getNotRunningMessage = () =>
+    getLinhaNotRunningMessage(linha.categoriaDia);
 
   // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
   const paradasDoItinerario = useMemo(() => {
@@ -322,15 +292,15 @@ export function LinhaDetalhesModal({
         >
           {paradasDoItinerario.length > 0 ? (
             <div className="relative">
-              {paradasDoItinerario.map((parada, index) => {
-                const isFirst = index === 0;
-                const isLast = index === paradasDoItinerario.length - 1;
+              {paradasDoItinerario.map((parada) => {
+                const isFirst =
+                  parada.idParada === paradasDoItinerario[0]?.idParada;
+                const isLast =
+                  parada.idParada ===
+                  paradasDoItinerario[paradasDoItinerario.length - 1]?.idParada;
 
                 return (
-                  <div
-                    key={`${parada.idParada}-${index}`}
-                    className="relative flex"
-                  >
+                  <div key={parada.idParada} className="relative flex">
                     {/* Linha conectora vertical tracejada */}
                     {!isLast && (
                       <div
@@ -398,48 +368,59 @@ export function LinhaDetalhesModal({
                             parada.idParada,
                           );
                           if (!previsao || !previsao.proximoOnibus) return null;
-                          const { proximoOnibus, onibusAnterior, isTrafegoIntenso } = previsao;
+                          const {
+                            proximoOnibus,
+                            onibusAnterior,
+                            isTrafegoIntenso,
+                          } = previsao;
                           const minutos = proximoOnibus.minutosFaltantes;
 
-                          const badgeBg = minutos < 1
-                            ? "var(--success-bg)"
-                            : isTrafegoIntenso
-                              ? "var(--warning-bg)"
-                              : minutos <= 15
-                                ? "var(--success-bg)"
-                                : "var(--warning-bg)";
+                          const badgeBg =
+                            minutos < 1
+                              ? "var(--success-bg)"
+                              : isTrafegoIntenso
+                                ? "var(--warning-bg)"
+                                : minutos <= 15
+                                  ? "var(--success-bg)"
+                                  : "var(--warning-bg)";
 
-                          const badgeText = minutos < 1
-                            ? "var(--success-text)"
-                            : isTrafegoIntenso
-                              ? "#d97706"
-                              : minutos <= 15
-                                ? "var(--success-text)"
-                                : "var(--warning-text)";
+                          const badgeText =
+                            minutos < 1
+                              ? "var(--success-text)"
+                              : isTrafegoIntenso
+                                ? "#d97706"
+                                : minutos <= 15
+                                  ? "var(--success-text)"
+                                  : "var(--warning-text)";
 
-                          const textoChegada = minutos < 1
-                            ? "Chega agora"
-                            : minutos < 60
-                              ? `~${minutos} min · ${proximoOnibus.horarioChegada}`
-                              : (() => {
-                                  const h = Math.floor(minutos / 60);
-                                  const m = minutos % 60;
-                                  return m === 0
-                                    ? `~${h}h · ${proximoOnibus.horarioChegada}`
-                                    : `~${h}h ${m}min · ${proximoOnibus.horarioChegada}`;
-                                })();
+                          const textoChegada =
+                            minutos < 1
+                              ? "Chega agora"
+                              : minutos < 60
+                                ? `~${minutos} min · ${proximoOnibus.horarioChegada}`
+                                : (() => {
+                                    const h = Math.floor(minutos / 60);
+                                    const m = minutos % 60;
+                                    return m === 0
+                                      ? `~${h}h · ${proximoOnibus.horarioChegada}`
+                                      : `~${h}h ${m}min · ${proximoOnibus.horarioChegada}`;
+                                  })();
 
                           return (
                             <div className="mt-1.5 flex flex-col gap-0.5">
                               <span
                                 className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
-                                style={{ backgroundColor: badgeBg, color: badgeText }}
+                                style={{
+                                  backgroundColor: badgeBg,
+                                  color: badgeText,
+                                }}
                               >
                                 {textoChegada}
                               </span>
                               {onibusAnterior && (
                                 <span className="text-[10px] text-text-tertiary">
-                                  Último passou há {onibusAnterior.minutosQuePassou} min
+                                  Último passou há{" "}
+                                  {onibusAnterior.minutosQuePassou} min
                                 </span>
                               )}
                             </div>

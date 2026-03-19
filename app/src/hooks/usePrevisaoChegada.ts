@@ -53,6 +53,11 @@ export function calcularPrevisaoChegada(
   const isTrafegoIntenso = multiplicador > 1.0;
   const horariosSaida = linha.horarios;
 
+  // Limites para lidar com virada de meia-noite
+  const MINUTOS_DIA = 1440;
+  const HORA_INICIO_VIRADA = 22 * 60; // 22h: considerado "fim do dia"
+  const HORA_MAX_AMANHA = 2 * 60; // até 02h: ainda pertence ao turno anterior
+
   let proximoOnibus: ProximoOnibus | null = null;
   let ultimaChegadaPassada: number | null = null;
 
@@ -62,27 +67,28 @@ export function calcularPrevisaoChegada(
 
     let chegadaPrevistaMinutos = saidaMinutos + tempoViagemReal;
 
-    // Ajuste se passar das 24h (1440 minutos)
-    if (chegadaPrevistaMinutos >= 1440) {
-      chegadaPrevistaMinutos -= 1440;
+    // Ajuste se passar das 24h
+    if (chegadaPrevistaMinutos >= MINUTOS_DIA) {
+      chegadaPrevistaMinutos -= MINUTOS_DIA;
     }
 
-    // Lidando com a virada (ex: sao 23h50 e o onibus chega 00h10)
-    const ajusteHoraAtual = horaAtualMinutos;
+    // Lidar com virada de dia: se é quase meia-noite e o ônibus chega após a meia-noite
     let ajusteChegada = chegadaPrevistaMinutos;
-
-    if (horaAtualMinutos > 1320 && chegadaPrevistaMinutos < 120) {
-      ajusteChegada += 1440; // Adiciona 24h virtualmente so para a comparacao
+    if (
+      horaAtualMinutos > HORA_INICIO_VIRADA &&
+      chegadaPrevistaMinutos < HORA_MAX_AMANHA
+    ) {
+      ajusteChegada += MINUTOS_DIA;
     }
 
-    if (ajusteChegada <= ajusteHoraAtual) {
+    if (ajusteChegada <= horaAtualMinutos) {
       ultimaChegadaPassada = ajusteChegada;
     }
 
-    if (ajusteChegada >= ajusteHoraAtual) {
+    if (ajusteChegada >= horaAtualMinutos) {
       proximoOnibus = {
         horarioChegada: converterMinutosParaHora(chegadaPrevistaMinutos),
-        minutosFaltantes: Math.max(0, ajusteChegada - ajusteHoraAtual),
+        minutosFaltantes: Math.max(0, ajusteChegada - horaAtualMinutos),
       };
 
       break;
