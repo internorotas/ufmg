@@ -43,7 +43,7 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
 
         {onibusAnterior ? (
           <span className="text-[10px] text-gray-500">
-            Ultimo onibus passou ha {onibusAnterior.minutosQuePassou} min
+            Ultimo passou ha {onibusAnterior.minutosQuePassou} min
           </span>
         ) : null}
       </div>
@@ -71,7 +71,7 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
 
       {onibusAnterior ? (
         <span className="text-[10px] text-gray-500">
-          Ultimo onibus passou ha {onibusAnterior.minutosQuePassou} min
+          Ultimo passou ha {onibusAnterior.minutosQuePassou} min
         </span>
       ) : null}
     </div>
