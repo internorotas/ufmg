@@ -28,8 +28,13 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   // Iniciar com dark mode como padrão, verificando localStorage
   const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    return savedTheme || "dark";
+    // try/catch necessário: Safari em modo privado lança SecurityError ao acessar localStorage
+    try {
+      const savedTheme = localStorage.getItem("theme") as Theme | null;
+      return savedTheme || "dark";
+    } catch {
+      return "dark";
+    }
   });
 
   useEffect(() => {
@@ -41,8 +46,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       root.classList.remove("dark");
     }
 
-    // Salvar no localStorage
-    localStorage.setItem("theme", theme);
+    // try/catch necessário: Safari em modo privado lança SecurityError ao gravar
+    try {
+      localStorage.setItem("theme", theme);
+    } catch {
+      // Silencioso — tema funciona normalmente na sessão, apenas não persiste
+    }
 
     // Definir user property no Google Analytics
     if (GA_MEASUREMENT_ID) {

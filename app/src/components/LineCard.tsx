@@ -7,11 +7,7 @@ import React, { memo, useMemo, type KeyboardEvent } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
 import { cn } from "../lib/utils";
-import {
-  timeToMinutes,
-  minutesToTime,
-  findScheduleIndex,
-} from "../../lib/utils";
+import { timeToMinutes, minutesToTime, findScheduleIndex } from "../../lib/utils";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { shouldDisableRegularSchedules } from "../config/specialPeriods";
 import { LineStatusBadge, type LineStatusType } from "./ui/Badge";
@@ -119,12 +115,11 @@ function calculateStatus(
   let status = "Encerrado";
   let statusType: LineStatusType = "closed";
 
-  // ⚡ Bolt: Usando busca binária O(log N) em vez de iterações O(N)
-  const nextIdx = findScheduleIndex(schedulesInMinutes, currentMinutes);
+  // Próximo horário usando Busca Binária O(log N)
+  const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
 
-  // Próximo horário
-  if (nextIdx < schedulesInMinutes.length) {
-    const next = schedulesInMinutes[nextIdx];
+  if (nextIndex !== -1) {
+    const next = schedulesInMinutes[nextIndex];
     nextSchedule = minutesToTime(next);
     const diffMinutes = next - currentMinutes;
     if (diffMinutes <= 15) {
@@ -134,21 +129,24 @@ function calculateStatus(
       status = "Circulando";
       statusType = "running";
     }
-  }
 
-  // Último que partiu (imediatamente anterior ao próximo horário)
-  // findScheduleIndex retorna o primeiro > alvo, então nextIdx - 1 será <= alvo
-  if (nextIdx > 0) {
-    previousSchedule = minutesToTime(schedulesInMinutes[nextIdx - 1]);
-  } else if (
-    schedulesInMinutes.length > 0 &&
-    schedulesInMinutes[schedulesInMinutes.length - 1] <= currentMinutes
-  ) {
-    // Caso especial onde nextIdx = 0, mas queremos ver se há um passado válido hoje
-    // (Geralmente não ocorre pois findScheduleIndex não retornaria 0 se houvesse elementos menores)
-    previousSchedule = minutesToTime(
-      schedulesInMinutes[schedulesInMinutes.length - 1],
-    );
+    // Último que partiu
+    let prevIndex = nextIndex - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] > currentMinutes) {
+      prevIndex--;
+    }
+    if (prevIndex >= 0) {
+      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
+    }
+  } else {
+    // Se não há próximo, o último que partiu é o último do array que seja menor ou igual ao tempo atual
+    let prevIndex = schedulesInMinutes.length - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] > currentMinutes) {
+      prevIndex--;
+    }
+    if (prevIndex >= 0) {
+      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
+    }
   }
 
   return { nextSchedule, previousSchedule, status, statusType };

@@ -250,8 +250,43 @@ export function getInitials(name?: string): string {
  * @returns Número de minutos desde meia-noite
  */
 export function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(":").map(Number);
+  // ⚡ Bolt: Otimização de performance (evita alocações de array do split e map)
+  // Muito mais rápido para o processamento de milhares de horários nas listas
+  if (!time) return NaN;
+  const colonIndex = time.indexOf(":");
+  if (colonIndex === -1) return NaN;
+
+  const hours = Number(time.slice(0, colonIndex));
+  const minutes = Number(time.slice(colonIndex + 1));
+
   return hours * 60 + minutes;
+}
+
+/**
+ * Encontra o índice do próximo horário em um array de minutos ordenado (Busca Binária O(log N))
+ * @param sortedMinutes Array de minutos ordenado
+ * @param targetMinutes Minutos atuais
+ * @returns O índice do próximo horário, ou -1 se não houver
+ */
+export function findScheduleIndex(
+  sortedMinutes: number[],
+  targetMinutes: number,
+): number {
+  let left = 0;
+  let right = sortedMinutes.length - 1;
+  let result = -1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (sortedMinutes[mid] > targetMinutes) {
+      result = mid;
+      right = mid - 1; // Continuar buscando à esquerda por um horário mais cedo
+    } else {
+      left = mid + 1;
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -292,37 +327,44 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
   let nextSchedule = "--:--";
   let previousSchedule = "--:--";
 
-  // ⚡ Bolt: Usando busca binária O(log N) em vez de array.find O(N)
-  const nextIdx = findScheduleIndex(schedulesInMinutes, currentMinutes);
+  // Encontrar próximo horário usando Busca Binária (O(log N))
+  const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
 
-  if (nextIdx < schedulesInMinutes.length) {
-    nextSchedule = minutesToTime(schedulesInMinutes[nextIdx]);
-  } else if (schedulesInMinutes.length > 0) {
+  if (nextIndex !== -1) {
+    nextSchedule = minutesToTime(schedulesInMinutes[nextIndex]);
+
+    // O horário anterior é o estritamente menor que currentMinutes
+    let prevIndex = nextIndex - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] >= currentMinutes) {
+      prevIndex--;
+    }
+
+    if (prevIndex >= 0) {
+      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
+    } else {
+      // nextIndex == 0, ou seja, o próximo é o primeiro horário do dia.
+      // Portanto, não há anterior hoje.
+      previousSchedule = minutesToTime(
+        schedulesInMinutes[schedulesInMinutes.length - 1],
+      );
+    }
+  } else {
     // Se não há mais horários hoje, o próximo é o primeiro de amanhã
     nextSchedule = minutesToTime(schedulesInMinutes[0]);
-  }
 
-  // O horário anterior é imediatamente antes do próximo índice
-  // Se nextIdx for 0, mas currentMinutes for maior ou igual ao primeiro (ou menor),
-  // e nós precisarmos do último de ontem:
-
-  let prevIdx = -1;
-  if (nextIdx > 0 && schedulesInMinutes[nextIdx - 1] < currentMinutes) {
-    prevIdx = nextIdx - 1;
-  } else {
-    // Caso especial, vamos verificar o último de fato se ele for menor
-    if (schedulesInMinutes[schedulesInMinutes.length - 1] < currentMinutes) {
-      prevIdx = schedulesInMinutes.length - 1;
+    // O anterior deve ser o último horário que for estritamente menor que currentMinutes
+    // Que geralmente é o último horário do array
+    let prevIndex = schedulesInMinutes.length - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] >= currentMinutes) {
+      prevIndex--;
     }
-  }
-
-  if (prevIdx !== -1) {
-    previousSchedule = minutesToTime(schedulesInMinutes[prevIdx]);
-  } else if (schedulesInMinutes.length > 0) {
-    // Se não há horários anteriores hoje, o anterior é o último de ontem
-    previousSchedule = minutesToTime(
-      schedulesInMinutes[schedulesInMinutes.length - 1],
-    );
+    if (prevIndex >= 0) {
+      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
+    } else {
+      previousSchedule = minutesToTime(
+        schedulesInMinutes[schedulesInMinutes.length - 1],
+      );
+    }
   }
 
   return { nextSchedule, previousSchedule };
@@ -448,21 +490,25 @@ export function formatarCnpj(cnpj: string): string {
 
 /**
  * Converte um objeto para uma query string
+ * ⚡ Bolt: Otimizado usando URLSearchParams para evitar múltiplas alocações de array
+ * (filter, flatMap, join). Nota: codifica espaços como '+' em vez de '%20'.
  * @param obj Objeto a ser convertido
  * @returns Query string formatada
  */
 export function objectToQueryString(obj: Record<string, unknown>): string {
-  return Object.entries(obj)
-    .filter(([, value]) => value !== undefined && value !== null)
-    .flatMap(([key, value]) => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined && value !== null) {
       if (Array.isArray(value)) {
-        return value.map(
-          (v) => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`,
-        );
+        for (const v of value) {
+          params.append(key, String(v));
+        }
+      } else {
+        params.append(key, String(value));
       }
-      return `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`;
-    })
-    .join("&");
+    }
+  }
+  return params.toString();
 }
 
 /**
