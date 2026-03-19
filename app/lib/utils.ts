@@ -303,6 +303,37 @@ export function minutesToTime(minutes: number): string {
 }
 
 /**
+ * Encontra o índice de corte de um array ordenado de horários usando Busca Binária.
+ * @param schedules Array de objetos ou números ordenado (minutos desde meia-noite).
+ * @param currentMinutes O tempo atual em minutos.
+ * @param getMinutes Função opcional para extrair o valor em minutos do item.
+ * @returns O índice onde o schedule é maior que currentMinutes. Se todos forem menores, retorna o length do array.
+ */
+export function findScheduleIndex<T>(
+  schedules: T[],
+  currentMinutes: number,
+  getMinutes: (item: T) => number = (item) => item as unknown as number,
+): number {
+  let low = 0;
+  let high = schedules.length - 1;
+  let firstGreaterIndex = schedules.length;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const midMinutes = getMinutes(schedules[mid]);
+
+    if (midMinutes > currentMinutes) {
+      firstGreaterIndex = mid;
+      high = mid - 1; // Continuar buscando à esquerda por um índice menor
+    } else {
+      low = mid + 1; // Buscar à direita
+    }
+  }
+
+  return firstGreaterIndex;
+}
+
+/**
  * Calcula o próximo e o anterior horário com base no horário atual
  * @param horarios Array de horários no formato "HH:MM"
  * @returns Objeto com nextSchedule e previousSchedule
