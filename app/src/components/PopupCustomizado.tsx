@@ -88,20 +88,46 @@ export function PopupCustomizado({
 }: PopupCustomizadoProps) {
   const { linhasData } = useRotasData();
 
-  // Mapear nome de linha para objeto Linha (memoizado) e suportar aliases como "(Todas)"
+  // Mapear nome de linha para lista de objetos Linha e suportar aliases como "(Todas)"
   const linhasPorNomeNormalizado = useMemo(() => {
-    const mapa = new Map<string, Linha>();
+    const mapa = new Map<string, Linha[]>();
     linhasData.categoriasDias.forEach((categoria) => {
       categoria.linhas.forEach((linha) => {
-        mapa.set(normalizarNomeLinha(linha.nome), linha);
+        const chave = normalizarNomeLinha(linha.nome);
+        const linhas = mapa.get(chave) ?? [];
+        linhas.push(linha);
+        mapa.set(chave, linhas);
       });
     });
     return mapa;
   }, [linhasData]);
 
-  const resolverLinhaPorNome = (nomeLinhaParada: string): Linha | null => {
+  const resolverLinhaPorNome = (
+    nomeLinhaParada: string,
+    idParadaAtual: string,
+  ): Linha | null => {
     const chave = normalizarNomeLinha(nomeLinhaParada);
-    return linhasPorNomeNormalizado.get(chave) ?? null;
+    const candidatas = linhasPorNomeNormalizado.get(chave) ?? [];
+    if (candidatas.length === 0) return null;
+
+    const comTrajetoNaParada = candidatas.find(
+      (linha) =>
+        Boolean(linha.trajetoDetalhado?.length) &&
+        linha.itinerarioParadasIds.includes(idParadaAtual),
+    );
+    if (comTrajetoNaParada) return comTrajetoNaParada;
+
+    const atendeParada = candidatas.find((linha) =>
+      linha.itinerarioParadasIds.includes(idParadaAtual),
+    );
+    if (atendeParada) return atendeParada;
+
+    const comTrajeto = candidatas.find((linha) =>
+      Boolean(linha.trajetoDetalhado?.length),
+    );
+    if (comTrajeto) return comTrajeto;
+
+    return candidatas[0] ?? null;
   };
 
   return (
@@ -151,7 +177,7 @@ export function PopupCustomizado({
             </div>
             <div className="space-y-1">
               {parada.linhasAtendidas.map((nomeLinha, index) => {
-                const linha = resolverLinhaPorNome(nomeLinha);
+                const linha = resolverLinhaPorNome(nomeLinha, parada.idParada);
                 return (
                   <div
                     key={index}
