@@ -4,11 +4,15 @@
  */
 
 import type { ComponentProps } from "react";
+import { useMemo } from "react";
 import { Popup } from "react-leaflet";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, MapPin } from "lucide-react";
 import { cn } from "../lib/utils";
-import type { Parada } from "../types/data.types";
+import type { Parada, Linha } from "../types/data.types";
+import { DisclaimerEstimativa } from "./DisclaimerEstimativa";
+import { PrevisaoBadge } from "./PrevisaoBadge";
+import { useRotasData } from "../contexts/RotasContext";
 
 // ============================================================================
 // VARIANTS
@@ -73,6 +77,19 @@ export function PopupCustomizado({
   className,
   ...props
 }: PopupCustomizadoProps) {
+  const { linhasData } = useRotasData();
+
+  // Mapear nome de linha para objeto Linha (memoizado)
+  const linhasPorNome = useMemo(() => {
+    const mapa = new Map<string, Linha>();
+    linhasData.categoriasDias.forEach((categoria) => {
+      categoria.linhas.forEach((linha) => {
+        mapa.set(linha.nome, linha);
+      });
+    });
+    return mapa;
+  }, [linhasData]);
+
   return (
     <Popup
       className={cn("popup-customizado", className)}
@@ -96,6 +113,10 @@ export function PopupCustomizado({
           </div>
         </div>
 
+        <div className="mb-2 mt-2">
+          <DisclaimerEstimativa />
+        </div>
+
         {/* Linhas Atendidas */}
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
           <div
@@ -110,12 +131,21 @@ export function PopupCustomizado({
                 {parada.linhasAtendidas.length === 1 ? "" : "m"} aqui:
               </p>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {parada.linhasAtendidas.map((nomeLinha, index) => (
-                <span key={index} className={lineBadgeVariants()}>
-                  {nomeLinha}
-                </span>
-              ))}
+            <div className="space-y-1.5">
+              {parada.linhasAtendidas.map((nomeLinha, index) => {
+                const linha = linhasPorNome.get(nomeLinha);
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-2"
+                  >
+                    <span className={lineBadgeVariants()}>{nomeLinha}</span>
+                    {linha && (
+                      <PrevisaoBadge linha={linha} idParada={parada.idParada} />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
