@@ -20,11 +20,14 @@ export interface PrevisaoChegadaResultado {
   isTrafegoIntenso: boolean;
 }
 
-export function usePrevisaoChegada(
-  linha: Linha | null,
-  idParadaAtual: string | null,
+/**
+ * Função pura que calcula a previsão de chegada de uma linha em uma parada.
+ * Pode ser chamada fora de contexto React (sem hook).
+ */
+export function calcularPrevisaoChegada(
+  linha: Linha,
+  idParadaAtual: string,
 ): PrevisaoChegadaResultado | null {
-  if (!linha || !idParadaAtual) return null;
   if (!linha.trajetoDetalhado || linha.trajetoDetalhado.length === 0) {
     return null;
   }
@@ -102,4 +105,12 @@ export function usePrevisaoChegada(
     onibusAnterior,
     isTrafegoIntenso,
   };
+}
+
+export function usePrevisaoChegada(
+  linha: Linha | null,
+  idParadaAtual: string | null,
+): PrevisaoChegadaResultado | null {
+  if (!linha || !idParadaAtual) return null;
+  return calcularPrevisaoChegada(linha, idParadaAtual);
 }
