@@ -33,7 +33,7 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
           color: "var(--neutral-text)",
         }}
       >
-        Sem previsao
+        Sem previsão
       </span>
     );
   }
@@ -53,12 +53,12 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
           }}
           title={`Chegada estimada: ${proximoOnibus.horarioChegada}`}
         >
-          {isTrafegoIntenso ? "(Transito intenso) Chegando agora" : "Chegando agora"}
+          {isTrafegoIntenso ? "(Trânsito intenso) Chegando agora" : "Chegando agora"}
         </span>
 
         {onibusAnterior ? (
           <span className="text-[10px] text-gray-500">
-            Ultimo passou ha {onibusAnterior.minutosQuePassou} min
+            Último passou há {onibusAnterior.minutosQuePassou} min
           </span>
         ) : null}
       </div>
@@ -80,13 +80,13 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
         title={`Chegada estimada: ${proximoOnibus.horarioChegada}`}
       >
         {isTrafegoIntenso
-          ? `(Transito intenso) Chega em ${formatarTempo(proximoOnibus.minutosFaltantes)}`
+          ? `(Trânsito intenso) Chega em ${formatarTempo(proximoOnibus.minutosFaltantes)}`
           : `Chega em ${formatarTempo(proximoOnibus.minutosFaltantes)}`}
       </span>
 
       {onibusAnterior ? (
         <span className="text-[10px] text-gray-500">
-          Ultimo passou ha {onibusAnterior.minutosQuePassou} min
+          Último passou há {onibusAnterior.minutosQuePassou} min
         </span>
       ) : null}
     </div>
