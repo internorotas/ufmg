@@ -250,7 +250,15 @@ export function getInitials(name?: string): string {
  * @returns Número de minutos desde meia-noite
  */
 export function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(":").map(Number);
+  // ⚡ Bolt: Otimização de performance (evita alocações de array do split e map)
+  // Muito mais rápido para o processamento de milhares de horários nas listas
+  if (!time) return NaN;
+  const colonIndex = time.indexOf(":");
+  if (colonIndex === -1) return NaN;
+
+  const hours = Number(time.slice(0, colonIndex));
+  const minutes = Number(time.slice(colonIndex + 1));
+
   return hours * 60 + minutes;
 }
 
