@@ -64,8 +64,8 @@ export function PrevisaoBadge({
           <span className="inline-flex min-w-0 items-center gap-1">
             <span className={compacto ? "truncate" : ""}>
               {isTrafegoIntenso
-                ? "(Trânsito intenso) Chegando agora"
-                : "Chegando agora"}
+                ? "(Trânsito intenso) Chega agora"
+                : "Chega agora"}
             </span>
             <Info size={12} aria-hidden="true" />
           </span>
@@ -84,15 +84,17 @@ export function PrevisaoBadge({
   const bgVar = isUrgent ? "--success-bg" : "--warning-bg";
   const textVar = isUrgent ? "--success-text" : "--warning-text";
   const textoPrevisao = compacto
-    ? `Chegando em ~${formatarDuracao(proximoOnibus.minutosFaltantes)}`
-    : `Chegando em aproximadamente ${formatarDuracao(proximoOnibus.minutosFaltantes)}`;
+    ? `Chega em ~${formatarDuracao(proximoOnibus.minutosFaltantes)}`
+    : `Chega em aproximadamente ${formatarDuracao(proximoOnibus.minutosFaltantes)}`;
 
   return (
     <div className="flex min-w-0 flex-col items-end gap-1">
       <span
         className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${isTrafegoIntenso ? "text-amber-600 font-bold" : ""} ${compacto ? "max-w-[170px]" : ""}`}
         style={{
-          backgroundColor: isTrafegoIntenso ? "var(--warning-bg)" : `var(${bgVar})`,
+          backgroundColor: isTrafegoIntenso
+            ? "var(--warning-bg)"
+            : `var(${bgVar})`,
           color: isTrafegoIntenso ? "#d97706" : `var(${textVar})`,
         }}
         title={textoTooltip}
@@ -103,7 +105,6 @@ export function PrevisaoBadge({
               ? `(Trânsito intenso) ${textoPrevisao}`
               : textoPrevisao}
           </span>
-          <Info size={12} aria-hidden="true" />
         </span>
       </span>
 
