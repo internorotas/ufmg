@@ -344,6 +344,8 @@ export function LinhaDetalhesModal({
                     <button
                       onClick={() => handleParadaClick(parada)}
                       className={stopButtonVariants()}
+                      aria-label={`Ver localização da parada ${parada.nome} no mapa`}
+                      title={`Ver localização da parada ${parada.nome} no mapa`}
                     >
                       {/* Ícone de localização com círculo */}
                       <div

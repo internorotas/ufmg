@@ -82,7 +82,10 @@ export function ItinerarioModal({
   // Buscar paradas do itinerário
   // ⚡ Bolt: Memoized the array mapping and lookup across the ID list
   const paradasDoItinerario = useMemo(() => {
-    return buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
+    return buscarParadasPorIds(
+      linha.itinerarioParadasIds,
+      paradas,
+    );
   }, [linha.itinerarioParadasIds, paradas]);
 
   const handleParadaClick = (parada: Parada) => {
@@ -120,8 +123,6 @@ export function ItinerarioModal({
                   <button
                     onClick={() => handleParadaClick(parada)}
                     className={stopButtonVariants()}
-                    aria-label={`Ver localização da parada ${parada.nome} no mapa`}
-                    title={`Ver localização da parada ${parada.nome} no mapa`}
                   >
                     {/* Ícone de localização com círculo */}
                     <div
