@@ -169,6 +169,11 @@ export function ControlesUsuarioMapa({
               ? "Centralizar mapa na minha localização"
               : "Ativar localização"
           }
+          title={
+            permissaoConcedida
+              ? "Centralizar mapa na minha localização"
+              : "Ativar localização"
+          }
         >
           <LocateFixed className="h-6 w-6 text-white" />
         </button>
