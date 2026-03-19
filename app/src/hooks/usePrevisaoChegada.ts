@@ -33,24 +33,33 @@ export function calcularPrevisaoChegada(
   }
   if (!linha.horarios || linha.horarios.length === 0) return null;
 
-  let tempoViagemBase = 0;
+  const agora = new Date();
+  const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
+  const multiplicadorTrafego = obterMultiplicadorTrafego(horaAtualMinutos);
+
+  let tempoViagemReal = 0;
   let paradaEncontrada = false;
 
   for (const trecho of linha.trajetoDetalhado) {
-    tempoViagemBase += trecho.tempoDoAnteriorMinutos;
+    const tempoBase = trecho.tempoDoAnteriorMinutos;
+    // Trechos externos ao campus sofrem o impacto do trânsito; internos usam tempo nominal.
+    if (trecho.isTrechoExterno) {
+      tempoViagemReal += tempoBase * multiplicadorTrafego;
+    } else {
+      tempoViagemReal += tempoBase;
+    }
     if (trecho.idParada === idParadaAtual) {
       paradaEncontrada = true;
       break;
     }
   }
 
+  // Arredonda o tempo final para não termos minutos quebrados
+  tempoViagemReal = Math.round(tempoViagemReal);
+
   if (!paradaEncontrada) return null;
 
-  const agora = new Date();
-  const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
-  const multiplicador = obterMultiplicadorTrafego(horaAtualMinutos);
-  const tempoViagemReal = Math.round(tempoViagemBase * multiplicador);
-  const isTrafegoIntenso = multiplicador > 1.0;
+  const isTrafegoIntenso = multiplicadorTrafego > 1.0;
   const horariosSaida = linha.horarios;
 
   // Limites para lidar com virada de meia-noite
