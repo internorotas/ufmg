@@ -23,6 +23,35 @@ export function cn(...inputs: ClassValue[]): string {
 }
 
 /**
+ * Converte horario no formato HH:MM em minutos desde meia-noite.
+ */
+export function converterHoraParaMinutos(horaString: string): number {
+  if (!horaString) return NaN;
+
+  const [horasTexto, minutosTexto] = horaString.split(":");
+  const horas = Number(horasTexto);
+  const minutos = Number(minutosTexto);
+
+  if (Number.isNaN(horas) || Number.isNaN(minutos)) return NaN;
+
+  return horas * 60 + minutos;
+}
+
+/**
+ * Converte minutos desde meia-noite para HH:MM com padding de zeros.
+ */
+export function converterMinutosParaHora(minutosTotais: number): string {
+  if (!Number.isFinite(minutosTotais)) return "--:--";
+
+  const minutosNoDia = 24 * 60;
+  const valorNormalizado = ((Math.floor(minutosTotais) % minutosNoDia) + minutosNoDia) % minutosNoDia;
+  const horas = Math.floor(valorNormalizado / 60);
+  const minutos = valorNormalizado % 60;
+
+  return `${horas.toString().padStart(2, "0")}:${minutos.toString().padStart(2, "0")}`;
+}
+
+/**
  * Calcula a distância em quilômetros entre duas coordenadas geográficas
  * usando a fórmula de Haversine.
  *

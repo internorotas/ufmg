@@ -18,6 +18,7 @@ import { SearchEmptyState } from "./ui/EmptyState";
 import { Tabs, TabsList, TabsTrigger } from "./ui/Tabs";
 import { SearchInput } from "./ui/Input";
 import { Button } from "./ui/Button";
+import { useRotasSelection } from "../contexts/RotasContext";
 import type { Linha, CategoriaLinhas, Parada } from "../types/data.types";
 import logo from "../assets/logo-horizontal-transparente.svg";
 
@@ -160,6 +161,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   onParadaClick,
   linhaSelecionada,
 }: MenuLateralProps) {
+  const { paradaSelecionada } = useRotasSelection();
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
     null,
@@ -321,6 +323,7 @@ export const MenuLateral = React.memo(function MenuLateral({
                 onClick={handleCardClick}
                 onDetailsClick={handleDetailsClick}
                 isSelected={linhaSelecionada?.idRota === linha.idRota}
+                idParada={paradaSelecionada?.idParada}
               />
             ))
           ) : (
