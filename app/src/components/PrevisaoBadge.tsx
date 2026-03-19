@@ -1,14 +1,16 @@
 import type { Linha } from "../types/data.types";
+import { Info } from "lucide-react";
 import { usePrevisaoChegada } from "../hooks/usePrevisaoChegada";
 
 interface PrevisaoBadgeProps {
   linha: Linha;
   idParada: string;
+  compacto?: boolean;
 }
 
-function formatarTempo(minutos: number): string {
+function formatarDuracao(minutos: number): string {
   if (minutos <= 59) {
-    return `${minutos}m`;
+    return `${minutos} min`;
   }
 
   const horas = Math.floor(minutos / 60);
@@ -18,11 +20,17 @@ function formatarTempo(minutos: number): string {
     return `${horas}h`;
   }
 
-  return `${horas}h ${minutosRestantes}m`;
+  return `${horas}h ${minutosRestantes}min`;
 }
 
-export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
+export function PrevisaoBadge({
+  linha,
+  idParada,
+  compacto = false,
+}: PrevisaoBadgeProps) {
   const previsao = usePrevisaoChegada(linha, idParada);
+  const textoTooltip =
+    "Horário estimado com base no cronograma oficial. Sem rastreamento via GPS.";
 
   if (!previsao || !previsao.proximoOnibus) {
     return (
@@ -42,18 +50,25 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
 
   if (proximoOnibus.minutosFaltantes < 1) {
     return (
-      <div className="flex flex-col items-end gap-1">
+      <div className="flex min-w-0 flex-col items-end gap-1">
         <span
-          className={`rounded-full px-2 py-0.5 text-xs font-bold ${isTrafegoIntenso ? "text-amber-600" : "animate-pulse"}`}
+          className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${isTrafegoIntenso ? "text-amber-600" : ""} ${compacto ? "max-w-[170px]" : ""}`}
           style={{
             backgroundColor: isTrafegoIntenso
               ? "var(--warning-bg)"
               : "var(--success-bg)",
             color: isTrafegoIntenso ? "#d97706" : "var(--success-text)",
           }}
-          title={`Chegada estimada: ${proximoOnibus.horarioChegada}`}
+          title={textoTooltip}
         >
-          {isTrafegoIntenso ? "(Trânsito intenso) Chegando agora" : "Chegando agora"}
+          <span className="inline-flex min-w-0 items-center gap-1">
+            <span className={compacto ? "truncate" : ""}>
+              {isTrafegoIntenso
+                ? "(Trânsito intenso) Chegando agora"
+                : "Chegando agora"}
+            </span>
+            <Info size={12} aria-hidden="true" />
+          </span>
         </span>
 
         {onibusAnterior ? (
@@ -68,20 +83,28 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
   const isUrgent = proximoOnibus.minutosFaltantes <= 15;
   const bgVar = isUrgent ? "--success-bg" : "--warning-bg";
   const textVar = isUrgent ? "--success-text" : "--warning-text";
+  const textoPrevisao = compacto
+    ? `Chegando em ~${formatarDuracao(proximoOnibus.minutosFaltantes)}`
+    : `Chegando em aproximadamente ${formatarDuracao(proximoOnibus.minutosFaltantes)}`;
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex min-w-0 flex-col items-end gap-1">
       <span
-        className={`rounded-full px-2 py-0.5 text-xs font-bold ${isTrafegoIntenso ? "text-amber-600 font-bold" : ""}`}
+        className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${isTrafegoIntenso ? "text-amber-600 font-bold" : ""} ${compacto ? "max-w-[170px]" : ""}`}
         style={{
           backgroundColor: isTrafegoIntenso ? "var(--warning-bg)" : `var(${bgVar})`,
           color: isTrafegoIntenso ? "#d97706" : `var(${textVar})`,
         }}
-        title={`Chegada estimada: ${proximoOnibus.horarioChegada}`}
+        title={textoTooltip}
       >
-        {isTrafegoIntenso
-          ? `(Trânsito intenso) Chega em ${formatarTempo(proximoOnibus.minutosFaltantes)}`
-          : `Chega em ${formatarTempo(proximoOnibus.minutosFaltantes)}`}
+        <span className="inline-flex min-w-0 items-center gap-1">
+          <span className={compacto ? "truncate" : ""}>
+            {isTrafegoIntenso
+              ? `(Trânsito intenso) ${textoPrevisao}`
+              : textoPrevisao}
+          </span>
+          <Info size={12} aria-hidden="true" />
+        </span>
       </span>
 
       {onibusAnterior ? (
