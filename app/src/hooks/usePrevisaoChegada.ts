@@ -48,25 +48,38 @@ export function usePrevisaoChegada(
   const multiplicador = obterMultiplicadorTrafego(horaAtualMinutos);
   const tempoViagemReal = Math.round(tempoViagemBase * multiplicador);
   const isTrafegoIntenso = multiplicador > 1.0;
+  const horariosSaida = linha.horarios;
 
   let proximoOnibus: ProximoOnibus | null = null;
   let ultimaChegadaPassada: number | null = null;
 
-  for (let index = 0; index < linha.horarios.length; index++) {
-    const horarioSaidaOrigem = linha.horarios[index];
-    const saidaMinutos = converterHoraParaMinutos(horarioSaidaOrigem);
+  for (let i = 0; i < horariosSaida.length; i++) {
+    const saidaMinutos = converterHoraParaMinutos(horariosSaida[i]);
     if (Number.isNaN(saidaMinutos)) continue;
 
-    const chegadaPrevistaMinutos = saidaMinutos + tempoViagemReal;
+    let chegadaPrevistaMinutos = saidaMinutos + tempoViagemReal;
 
-    if (chegadaPrevistaMinutos <= horaAtualMinutos) {
-      ultimaChegadaPassada = chegadaPrevistaMinutos;
+    // Ajuste se passar das 24h (1440 minutos)
+    if (chegadaPrevistaMinutos >= 1440) {
+      chegadaPrevistaMinutos -= 1440;
     }
 
-    if (chegadaPrevistaMinutos >= horaAtualMinutos) {
+    // Lidando com a virada (ex: sao 23h50 e o onibus chega 00h10)
+    const ajusteHoraAtual = horaAtualMinutos;
+    let ajusteChegada = chegadaPrevistaMinutos;
+
+    if (horaAtualMinutos > 1320 && chegadaPrevistaMinutos < 120) {
+      ajusteChegada += 1440; // Adiciona 24h virtualmente so para a comparacao
+    }
+
+    if (ajusteChegada <= ajusteHoraAtual) {
+      ultimaChegadaPassada = ajusteChegada;
+    }
+
+    if (ajusteChegada >= ajusteHoraAtual) {
       proximoOnibus = {
         horarioChegada: converterMinutosParaHora(chegadaPrevistaMinutos),
-        minutosFaltantes: Math.max(0, chegadaPrevistaMinutos - horaAtualMinutos),
+        minutosFaltantes: Math.max(0, ajusteChegada - ajusteHoraAtual),
       };
 
       break;
@@ -75,7 +88,7 @@ export function usePrevisaoChegada(
 
   let onibusAnterior: OnibusAnterior | null = null;
   if (ultimaChegadaPassada !== null) {
-    const minutosQuePassou = horaAtualMinutos - ultimaChegadaPassada;
+    const minutosQuePassou = Math.max(0, horaAtualMinutos - ultimaChegadaPassada);
     if (minutosQuePassou >= 0 && minutosQuePassou <= 15) {
       onibusAnterior = { minutosQuePassou };
     }
