@@ -183,10 +183,7 @@ export function PopupCustomizado({
                     key={index}
                     className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
                   >
-                    <span
-                      className={lineBadgeVariants()}
-                      title={nomeLinha}
-                    >
+                    <span className={lineBadgeVariants()} title={nomeLinha}>
                       <span className="whitespace-normal wrap-break-word text-left">
                         {nomeLinha}
                       </span>

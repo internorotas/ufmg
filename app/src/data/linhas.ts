@@ -237,84 +237,84 @@ const data: CategoriaLinhas = {
           trajetoDetalhado: [
             // 1. Escola de Música (Ida) - Ponto Inicial
             { idParada: "P01", tempoDoAnteriorMinutos: 0 },
-            
+
             // 2. Belas Artes (Ida)
             { idParada: "P02", tempoDoAnteriorMinutos: 1 },
-            
+
             // 3. CAD 2 - Letras - Ciência da Informação - FAFICH (Ida)
             { idParada: "P03", tempoDoAnteriorMinutos: 1 },
-            
+
             // 4. Reitoria - FACE (Ida)
             { idParada: "P04", tempoDoAnteriorMinutos: 1 },
-            
+
             // 5. Praça de Serviços – Biblioteca Universitária – Reitoria (Ida)
             { idParada: "P05", tempoDoAnteriorMinutos: 1 },
-            
+
             // 6. Unidade Administrativa III
             { idParada: "P06", tempoDoAnteriorMinutos: 1 },
-            
+
             // 7. Unidade Administrativa II (Ida)
             { idParada: "P07", tempoDoAnteriorMinutos: 1 },
-            
+
             // 8. Av. Antônio Abrahão Caram (Ida) - Trecho de saída do campus
             { idParada: "P08", tempoDoAnteriorMinutos: 3 },
-            
+
             // 9. Centro Esportivo Universitário - CEU (Ida)
             { idParada: "P09", tempoDoAnteriorMinutos: 1 },
-            
+
             // 10. Veterinária (Lado de Fora) - CEU (Ida)
             { idParada: "P10", tempoDoAnteriorMinutos: 1 },
-            
+
             // 11. Centro de Treinamento Esportivo - CTE (Ida)
             { idParada: "P11", tempoDoAnteriorMinutos: 1 },
-            
+
             // 12. Av. Presidente Carlos Luz (McDonald's) (Ida) - Retorno Externo
             { idParada: "P12", tempoDoAnteriorMinutos: 3 },
-            
+
             // 13. EEFFTO (Volta) - Entrando no campus novamente
             { idParada: "P13", tempoDoAnteriorMinutos: 2 },
-            
+
             // 14. Odontologia (Volta)
             { idParada: "P14", tempoDoAnteriorMinutos: 1 },
-            
+
             // 15. Veterinária - Estação Ecológica (Volta)
             { idParada: "P15", tempoDoAnteriorMinutos: 1 },
-            
+
             // 16. Farmácia - ICB (Volta)
             { idParada: "P16", tempoDoAnteriorMinutos: 1 },
-            
+
             // 17. Bandejão 2 - IGC (Volta)
             { idParada: "P17", tempoDoAnteriorMinutos: 1 },
-            
+
             // 18. Química (Ida CDTN)
             { idParada: "P18", tempoDoAnteriorMinutos: 1 },
-            
+
             // 19. CDTN (Ida)
             { idParada: "P19", tempoDoAnteriorMinutos: 1 },
-            
+
             // 20. Centro de Pesquisas Hidráulicas - CPH (Ida)
             { idParada: "P20", tempoDoAnteriorMinutos: 1 },
-            
+
             // 21. Ponto Final Linha 9502 (Ida)
             { idParada: "P21", tempoDoAnteriorMinutos: 1 },
-            
+
             // 22. Química (Volta ICEx)
             { idParada: "P22", tempoDoAnteriorMinutos: 1 },
-            
+
             // 23. ICEx - Engenharia (Volta)
             { idParada: "P23", tempoDoAnteriorMinutos: 1 },
-            
+
             // 24. CAD 2 - Letras - Ciência da Informação - FAFICH (Volta)
             { idParada: "P34", tempoDoAnteriorMinutos: 2 },
-            
+
             // 25. Reitoria - FACE (Volta)
             { idParada: "P30", tempoDoAnteriorMinutos: 1 },
-            
+
             // 26. Belas Artes (Volta)
             { idParada: "P28", tempoDoAnteriorMinutos: 1 },
-            
+
             // 27. Escola de Música (Volta) - Retorno ao fim
-            { idParada: "P29", tempoDoAnteriorMinutos: 1 }
+            { idParada: "P29", tempoDoAnteriorMinutos: 1 },
           ],
         },
         {
