@@ -342,6 +342,7 @@ function DialogClose({
       onClick={handleClick}
       className={cn(dialogCloseVariants(), className)}
       aria-label={ariaLabel}
+      title={ariaLabel}
       {...props}
     >
       {children ?? <X className="size-6" />}
