@@ -30,6 +30,7 @@ export function timeToMinutes(time: string): number {
  * Converte minutos desde meia-noite para formato HH:MM.
  */
 export function minutesToTime(minutes: number): string {
+  if (minutes === undefined || isNaN(minutes)) return "--:--";
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
   return `${hours.toString().padStart(2, "0")}:${mins
@@ -88,7 +89,7 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
 
   const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
 
-  if (nextIndex !== -1) {
+  if (nextIndex < schedulesInMinutes.length) {
     nextSchedule = minutesToTime(schedulesInMinutes[nextIndex]);
 
     let prevIndex = nextIndex - 1;

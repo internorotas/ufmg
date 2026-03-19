@@ -118,7 +118,7 @@ function calculateStatus(
   // Próximo horário usando Busca Binária O(log N)
   const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
 
-  if (nextIndex !== -1) {
+  if (nextIndex < schedulesInMinutes.length) {
     const next = schedulesInMinutes[nextIndex];
     nextSchedule = minutesToTime(next);
     const diffMinutes = next - currentMinutes;
