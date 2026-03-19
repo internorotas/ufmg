@@ -6,6 +6,21 @@ interface PrevisaoBadgeProps {
   idParada: string;
 }
 
+function formatarTempo(minutos: number): string {
+  if (minutos <= 59) {
+    return `${minutos}m`;
+  }
+
+  const horas = Math.floor(minutos / 60);
+  const minutosRestantes = minutos % 60;
+
+  if (minutosRestantes === 0) {
+    return `${horas}h`;
+  }
+
+  return `${horas}h ${minutosRestantes}m`;
+}
+
 export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
   const previsao = usePrevisaoChegada(linha, idParada);
 
@@ -65,8 +80,8 @@ export function PrevisaoBadge({ linha, idParada }: PrevisaoBadgeProps) {
         title={`Chegada estimada: ${proximoOnibus.horarioChegada}`}
       >
         {isTrafegoIntenso
-          ? `(Transito intenso) Chega em ${proximoOnibus.minutosFaltantes}m`
-          : `Chega em ${proximoOnibus.minutosFaltantes}m`}
+          ? `(Transito intenso) Chega em ${formatarTempo(proximoOnibus.minutosFaltantes)}`
+          : `Chega em ${formatarTempo(proximoOnibus.minutosFaltantes)}`}
       </span>
 
       {onibusAnterior ? (
