@@ -43,6 +43,7 @@ export const tabVariants = tv({
   base: [
     "flex items-center gap-2 px-4 py-3 font-semibold transition-all duration-200 cursor-pointer",
     "hover:bg-card-hover/50 rounded-t-lg",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-inset",
   ],
   variants: {
     active: {
@@ -59,7 +60,7 @@ export const tabVariants = tv({
  * Variantes do botão de parada
  */
 export const stopButtonVariants = tv({
-  base: "group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2",
+  base: "group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
 });
 
 /**
