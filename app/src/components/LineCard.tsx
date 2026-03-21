@@ -6,7 +6,7 @@
 import React, { memo, useMemo, type KeyboardEvent } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn, obterHorariosLinhaNoDia, obterStatusLinha } from "../lib/utils";
 import {
   timeToMinutes,
   minutesToTime,
@@ -68,8 +68,6 @@ export const detailsButtonVariants = tv({
 interface ScheduleResult {
   nextSchedule: string;
   previousSchedule: string;
-  status: string;
-  statusType: LineStatusType;
 }
 
 export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
@@ -104,11 +102,7 @@ function parseSchedules(horarios: string[]): number[] {
     .sort((a, b) => a - b);
 }
 
-/**
- * Calcula o status com base nos horários já processados e no tempo atual.
- * Esta operação é barata (O(N)) e pode rodar em cada render para garantir frescor.
- */
-function calculateStatus(
+function calculateSchedules(
   schedulesInMinutes: number[],
   currentMinutes: number,
 ): ScheduleResult {
@@ -116,51 +110,24 @@ function calculateStatus(
     return {
       nextSchedule: "--:--",
       previousSchedule: "--:--",
-      status: "Sem Horários",
-      statusType: "closed",
     };
   }
 
   let nextSchedule = "--:--";
   let previousSchedule = "--:--";
-  let status = "Encerrado";
-  let statusType: LineStatusType = "closed";
 
-  // Próximo horário usando Busca Binária O(log N)
   const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
 
   if (nextIndex < schedulesInMinutes.length) {
-    const next = schedulesInMinutes[nextIndex];
-    nextSchedule = minutesToTime(next);
-    const diffMinutes = next - currentMinutes;
-    if (diffMinutes <= 15) {
-      status = `Próximo às ${nextSchedule}`;
-      statusType = "upcoming";
-    } else {
-      status = "Circulando";
-      statusType = "running";
-    }
-
-    // Último que partiu
-    let prevIndex = nextIndex - 1;
-    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] > currentMinutes) {
-      prevIndex--;
-    }
-    if (prevIndex >= 0) {
-      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
-    }
-  } else {
-    // Se não há próximo, o último que partiu é o último do array que seja menor ou igual ao tempo atual
-    let prevIndex = schedulesInMinutes.length - 1;
-    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] > currentMinutes) {
-      prevIndex--;
-    }
-    if (prevIndex >= 0) {
-      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
-    }
+    nextSchedule = minutesToTime(schedulesInMinutes[nextIndex]);
   }
 
-  return { nextSchedule, previousSchedule, status, statusType };
+  const prevIndex = nextIndex - 1;
+  if (prevIndex >= 0 && prevIndex < schedulesInMinutes.length) {
+    previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
+  }
+
+  return { nextSchedule, previousSchedule };
 }
 
 // ============================================================================
@@ -258,26 +225,37 @@ function LineCardComponent({
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
   const getSuspendedMessage = () =>
     getLinhaNotRunningMessage(linha.categoriaDia);
+  const statusLinha = obterStatusLinha(linha, now);
 
   // Otimização: Memoizar o processamento pesado dos horários (parse + sort)
   const schedulesInMinutes = useMemo(() => {
-    return parseSchedules(linha.horarios);
-  }, [linha.horarios]);
+    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+    return parseSchedules(horariosDoDia);
+  }, [linha, now]);
 
   // Calcular status baseado no tempo atual
-  const { nextSchedule, previousSchedule, status, statusType } = (() => {
-    if (shouldDisableSchedules) {
-      return {
-        nextSchedule: "Indisponível",
-        previousSchedule: "Indisponível",
-        status: "Não Circulando",
-        statusType: "notRunning" as LineStatusType,
-      };
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const { nextSchedule, previousSchedule } = calculateSchedules(
+    schedulesInMinutes,
+    currentMinutes,
+  );
+
+  const status =
+    shouldDisableSchedules || statusLinha.id === "NAO_CIRCULA_HOJE"
+      ? "Não Circulando"
+      : statusLinha.texto;
+
+  const statusType: LineStatusType = (() => {
+    if (shouldDisableSchedules || statusLinha.id === "NAO_CIRCULA_HOJE") {
+      return "notRunning";
     }
-
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-    return calculateStatus(schedulesInMinutes, currentMinutes);
+    if (statusLinha.id === "AGUARDANDO_PRIMEIRA_SAIDA") {
+      return "upcoming";
+    }
+    if (statusLinha.id === "CIRCULANDO") {
+      return "running";
+    }
+    return "closed";
   })();
 
   const handleCardClick = () => {
@@ -350,8 +328,12 @@ function LineCardComponent({
 
       {/* Body */}
       <div data-slot="body" className="px-4 pb-4">
-        {shouldDisableSchedules ? (
-          <SuspendedNotice message={getSuspendedMessage()} />
+        {shouldDisableSchedules || statusLinha.id === "NAO_CIRCULA_HOJE" ? (
+          <SuspendedNotice
+            message={
+              shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto
+            }
+          />
         ) : (
           <div className="mb-4 grid grid-cols-2 gap-3">
             <ScheduleDisplay label="Último Partiu" time={previousSchedule} />
