@@ -4,11 +4,11 @@
  */
 
 import type { ComponentProps } from "react";
-import { useMemo } from "react";
 import { Popup } from "react-leaflet";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, MapPin } from "lucide-react";
 import { cn } from "../lib/utils";
+import { normalizarNomeLinha } from "../../lib/utils";
 import type { Parada, Linha } from "../types/data.types";
 import { DisclaimerEstimativa } from "./DisclaimerEstimativa";
 import { PrevisaoBadge } from "./PrevisaoBadge";
@@ -51,13 +51,19 @@ export const lineBadgeVariants = tv({
   ],
 });
 
-function normalizarNomeLinha(nomeLinha: string): string {
-  return nomeLinha
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s*\(.*?\)\s*/g, "")
-    .trim()
-    .toLowerCase();
+// Sublinhas que indicam período de operação (não variante de rota)
+const SUBLINHAS_CALENDARIO = ["Sábado", "Férias e Recessos"];
+
+/**
+ * Retorna o nome de exibição da linha com a sublinha de rota (se houver),
+ * ignorando sublinhas que indicam apenas o período do calendário.
+ */
+function getNomeExibicao(linha: Linha | null, nomeLinha: string): string {
+  if (!linha) return nomeLinha.replace(/\s*\(Todas\)\s*/gi, "").trim();
+  if (linha.sublinha && !SUBLINHAS_CALENDARIO.includes(linha.sublinha)) {
+    return `${linha.nome} · ${linha.sublinha}`;
+  }
+  return linha.nome;
 }
 
 // Sublinhas que indicam período de operação (não variante de rota)
@@ -103,28 +109,14 @@ export function PopupCustomizado({
   className,
   ...props
 }: PopupCustomizadoProps) {
-  const { linhasData } = useRotasData();
-
-  // Mapear nome de linha para lista de objetos Linha e suportar aliases como "(Todas)"
-  const linhasPorNomeNormalizado = useMemo(() => {
-    const mapa = new Map<string, Linha[]>();
-    linhasData.categoriasDias.forEach((categoria) => {
-      categoria.linhas.forEach((linha) => {
-        const chave = normalizarNomeLinha(linha.nome);
-        const linhas = mapa.get(chave) ?? [];
-        linhas.push(linha);
-        mapa.set(chave, linhas);
-      });
-    });
-    return mapa;
-  }, [linhasData]);
+  const { rotasService } = useRotasData();
 
   const resolverLinhaPorNome = (
     nomeLinhaParada: string,
     idParadaAtual: string,
   ): Linha | null => {
     const chave = normalizarNomeLinha(nomeLinhaParada);
-    const candidatas = linhasPorNomeNormalizado.get(chave) ?? [];
+    const candidatas = rotasService.getLinhasPorNomeNormalizado(chave);
     if (candidatas.length === 0) return null;
 
     // Filtra apenas linhas do dia atual (dias úteis, sábado ou férias)
