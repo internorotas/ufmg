@@ -13,6 +13,7 @@ import {
   findScheduleIndex,
 } from "../../lib/utils";
 import { useAnalytics } from "../hooks/useAnalytics";
+import { useCurrentTime } from "../hooks/useCurrentTime";
 import {
   isLineAvailableToday,
   getLinhaNotRunningMessage,
@@ -252,6 +253,7 @@ function LineCardComponent({
   className,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
+  const now = useCurrentTime();
 
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
   const getSuspendedMessage = () =>
@@ -273,7 +275,6 @@ function LineCardComponent({
       };
     }
 
-    const now = new Date();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
     return calculateStatus(schedulesInMinutes, currentMinutes);

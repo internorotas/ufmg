@@ -13,6 +13,7 @@ import {
   shouldDisableRegularSchedules,
   isLineAvailableToday,
 } from "../config/specialPeriods";
+import { useCurrentTime } from "../hooks/useCurrentTime";
 
 // ============================================================================
 // VARIANTS
@@ -87,7 +88,7 @@ export interface HorariosModalProps {
  * ```
  */
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
-  const now = new Date();
+  const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   // Verificar se devemos desabilitar os horários

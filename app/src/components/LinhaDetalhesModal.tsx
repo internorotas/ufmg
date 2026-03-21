@@ -19,6 +19,7 @@ import {
   getLinhaNotRunningMessage,
 } from "../config/specialPeriods";
 import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
+import { useCurrentTime } from "../hooks/useCurrentTime";
 
 // ============================================================================
 // VARIANTS
@@ -149,6 +150,9 @@ export function LinhaDetalhesModal({
   // Rastreia tempo que o usuário passa visualizando detalhes desta linha
   useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
 
+  const now = useCurrentTime();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
   const isLineRunningToday = isLineAvailableToday(linha.categoriaDia);
   const getNotRunningMessage = () =>
     getLinhaNotRunningMessage(linha.categoriaDia);
@@ -157,10 +161,6 @@ export function LinhaDetalhesModal({
   const paradasDoItinerario = useMemo(() => {
     return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
   }, [linha.itinerarioParadasIds, todasParadas]);
-
-  // Calcular horários passados e futuros
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
   // Isso evita re-ordenar os horários a cada renderização quando o tempo muda
@@ -366,6 +366,7 @@ export function LinhaDetalhesModal({
                           const previsao = calcularPrevisaoChegada(
                             linha,
                             parada.idParada,
+                            now,
                           );
                           if (!previsao || !previsao.proximoOnibus) return null;
                           const {
