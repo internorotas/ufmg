@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import logo from '../assets/logo-horizontal-transparente.svg';
 import { useRotasSelection } from '../contexts/RotasContext';
+import { useAnalytics } from '../hooks/useAnalytics';
 import { useLinhasFilter } from '../hooks/useLinhasFilter';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 import { DisclaimerBanner } from './DisclaimerBanner';
@@ -157,10 +158,12 @@ export const MenuLateral = React.memo(function MenuLateral({
   onParadaClick,
   linhaSelecionada,
 }: MenuLateralProps) {
+  const { trackEvent } = useAnalytics();
   const { paradaSelecionada } = useRotasSelection();
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const lastListSummaryRef = useRef<string>('');
 
   // Initialize state based on environment
   const [shortcutLabel] = useState(() => {
@@ -172,12 +175,32 @@ export const MenuLateral = React.memo(function MenuLateral({
 
   const {
     searchTerm,
+    debouncedSearchTerm,
     setSearchTerm,
     categoriaAtiva,
+    categoriaAtual,
     linhasFiltradas,
     hasResults,
     handleCategoriaChange,
   } = useLinhasFilter(linhasData);
+
+  useEffect(() => {
+    const categoria = categoriaAtual?.displayName || 'desconhecida';
+    const summary = `${categoria}|${debouncedSearchTerm}|${linhasFiltradas.length}`;
+
+    if (summary === lastListSummaryRef.current) {
+      return;
+    }
+
+    lastListSummaryRef.current = summary;
+
+    trackEvent({
+      category: 'Navegação Principal',
+      action: 'Resumo Lista Linhas',
+      label: `categoria=${categoria};busca=${debouncedSearchTerm || 'vazio'};resultado=${linhasFiltradas.length}`,
+      value: linhasFiltradas.length,
+    });
+  }, [categoriaAtual?.displayName, debouncedSearchTerm, linhasFiltradas.length, trackEvent]);
 
   // Keyboard shortcut listener
   useEffect(() => {
@@ -201,17 +224,30 @@ export const MenuLateral = React.memo(function MenuLateral({
 
   const handleCardClick = useCallback(
     (linha: Linha) => {
+      trackEvent({
+        category: 'Engajamento',
+        action: 'Selecionar Linha no Menu',
+        label: `${linha.nome} | categoria=${categoriaAtual?.displayName || 'desconhecida'}`,
+      });
       onLinhaSelect(linha);
       if (window.innerWidth < 768) {
         setMenuVisible(false);
       }
     },
-    [onLinhaSelect],
+    [categoriaAtual?.displayName, onLinhaSelect, trackEvent],
   );
 
-  const handleDetailsClick = useCallback((linha: Linha) => {
-    setLinhaDetalhesAberta(linha);
-  }, []);
+  const handleDetailsClick = useCallback(
+    (linha: Linha) => {
+      trackEvent({
+        category: 'Engajamento',
+        action: 'Abrir Detalhes pelo Menu',
+        label: linha.nome,
+      });
+      setLinhaDetalhesAberta(linha);
+    },
+    [trackEvent],
+  );
 
   const handleParadaClickWrapper = (parada: Parada) => {
     onParadaClick(parada);
@@ -244,7 +280,14 @@ export const MenuLateral = React.memo(function MenuLateral({
       <div className="fixed bottom-6 left-1/2 z-1001 -translate-x-1/2 md:hidden">
         <Button
           data-slot="mobile-trigger"
-          onClick={() => setMenuVisible(true)}
+          onClick={() => {
+            trackEvent({
+              category: 'UI Interaction',
+              action: 'Abrir Menu Mobile',
+              label: 'botao-ver-linhas',
+            });
+            setMenuVisible(true);
+          }}
           variant="primary"
           size="lg"
           className="gap-3 rounded-full px-6 shadow-lg"
@@ -262,7 +305,14 @@ export const MenuLateral = React.memo(function MenuLateral({
         <button
           type="button"
           data-slot="backdrop"
-          onClick={() => setMenuVisible(false)}
+          onClick={() => {
+            trackEvent({
+              category: 'UI Interaction',
+              action: 'Fechar Menu Mobile',
+              label: 'backdrop',
+            });
+            setMenuVisible(false);
+          }}
           aria-label="Fechar menu"
           className="fixed inset-0 z-1002 animate-fade-in bg-backdrop backdrop-blur-sm cursor-pointer md:hidden"
         />
@@ -287,7 +337,14 @@ export const MenuLateral = React.memo(function MenuLateral({
             <ThemeToggle />
             <Button
               data-slot="close"
-              onClick={() => setMenuVisible(false)}
+              onClick={() => {
+                trackEvent({
+                  category: 'UI Interaction',
+                  action: 'Fechar Menu Mobile',
+                  label: 'botao-fechar-header',
+                });
+                setMenuVisible(false);
+              }}
               variant="ghost"
               size="sm"
               className="rounded-lg p-2 text-white hover:bg-white/20 md:hidden"
@@ -352,7 +409,14 @@ export const MenuLateral = React.memo(function MenuLateral({
       {linhaDetalhesAberta && (
         <LinhaDetalhesModal
           isOpen={true}
-          onClose={() => setLinhaDetalhesAberta(null)}
+          onClose={() => {
+            trackEvent({
+              category: 'Engajamento Detalhes',
+              action: 'Fechar Modal Detalhes Linha',
+              label: linhaDetalhesAberta.nome,
+            });
+            setLinhaDetalhesAberta(null);
+          }}
           linha={linhaDetalhesAberta}
           todasParadas={todasParadas}
           onParadaClick={handleParadaClickWrapper}

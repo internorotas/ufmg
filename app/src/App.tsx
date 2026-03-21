@@ -7,7 +7,7 @@ import { Modal } from './components/Modal';
 import { Button } from './components/ui/Button';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { useAnalytics } from './hooks/useAnalytics';
+import { useAnalytics, useAnalyticsAutoTracking } from './hooks/useAnalytics';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
@@ -46,6 +46,7 @@ function AppContent() {
   } = useRotas();
 
   const { trackEvent, trackPageView } = useAnalytics();
+  useAnalyticsAutoTracking();
 
   // Hook de localização do usuário
   const {
