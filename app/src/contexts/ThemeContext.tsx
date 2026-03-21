@@ -1,5 +1,5 @@
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
-import ReactGA from 'react-ga4';
+import { ga4Analytics } from '../services/analytics';
 
 type Theme = 'light' | 'dark';
 
@@ -49,7 +49,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     // Definir user property no Google Analytics
     if (GA_MEASUREMENT_ID) {
-      ReactGA.set({ user_theme: theme });
+      ga4Analytics.setUserProperty('user_theme', theme);
     }
   }, [theme]);
 
