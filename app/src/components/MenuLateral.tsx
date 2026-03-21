@@ -23,10 +23,6 @@ import { SearchInput } from './ui/Input';
 import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
 import { VacationBanner } from './VacationBanner';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do container sidebar
  */
@@ -35,7 +31,6 @@ export const sidebarVariants = tv({
     'fixed inset-y-0 left-0 z-[1003] flex flex-col',
     'w-[85vw] max-w-md md:relative md:w-1/2',
     'border-r border-card-border/50 text-text-primary',
-    // Glassmorphism effect
     'bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150',
     'shadow-2xl md:shadow-none',
     'transform transition-transform duration-300',
@@ -68,10 +63,6 @@ export const categoryTabVariants = tv({
   ],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
   linhasData: CategoriaLinhas;
   todasParadas: Parada[];
@@ -80,10 +71,6 @@ export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
   linhaSelecionada: Linha | null;
 }
 
-// ============================================================================
-// SUBCOMPONENTS
-// ============================================================================
-
 interface CategoryTabsProps {
   categories: CategoriaLinhas['categoriasDias'];
   activeIndex: number;
@@ -91,7 +78,6 @@ interface CategoryTabsProps {
 }
 
 function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) {
-  // Converte id numérico para string para o Tabs component
   const activeValue = String(categories[activeIndex]?.id ?? '');
 
   const handleValueChange = (value: string) => {
@@ -123,10 +109,6 @@ function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) 
   );
 }
 
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
 /**
  * Menu lateral que exibe lista de linhas de ônibus com busca e categorias.
  *
@@ -140,16 +122,6 @@ function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) 
  *   linhaSelecionada={selectedLinha}
  * />
  * ```
- */
-/**
- * ⚡ Bolt: Otimização de Performance
- *
- * O que: Memoização do componente MenuLateral com React.memo()
- * Por que: Este componente recebia renders em cascata desnecessários do App.tsx
- * (devido a atualizações frequentes de geolocalização), apesar de suas props
- * (linhasData, todasParadas) serem estáveis (memoizadas no RotasProvider).
- * Impacto: Previne re-renders dispendiosos na árvore do MenuLateral e seus
- * múltiplos componentes filhos (LineCard), melhorando a responsividade.
  */
 export const MenuLateral = React.memo(function MenuLateral({
   linhasData,
@@ -165,7 +137,6 @@ export const MenuLateral = React.memo(function MenuLateral({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const lastListSummaryRef = useRef<string>('');
 
-  // Initialize state based on environment
   const [shortcutLabel] = useState(() => {
     if (typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform)) {
       return '⌘K';
@@ -202,16 +173,12 @@ export const MenuLateral = React.memo(function MenuLateral({
     });
   }, [categoriaAtual?.displayName, debouncedSearchTerm, linhasFiltradas.length, trackEvent]);
 
-  // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         searchInputRef.current?.focus();
 
-        // If mobile menu is closed, open it to show search (optional,
-        // but helpful if search is inside menu)
         if (window.innerWidth < 768) {
           setMenuVisible(true);
         }
@@ -258,7 +225,6 @@ export const MenuLateral = React.memo(function MenuLateral({
 
   return (
     <>
-      {/* Mobile Floating Logo */}
       <div
         className="fixed left-1/2 top-4 z-1001 -translate-x-1/2 md:hidden"
         aria-hidden={isMenuVisible}
@@ -276,7 +242,6 @@ export const MenuLateral = React.memo(function MenuLateral({
         </div>
       </div>
 
-      {/* Mobile Trigger Button */}
       <div className="fixed bottom-6 left-1/2 z-1001 -translate-x-1/2 md:hidden">
         <Button
           data-slot="mobile-trigger"
@@ -300,7 +265,6 @@ export const MenuLateral = React.memo(function MenuLateral({
         </Button>
       </div>
 
-      {/* Backdrop */}
       {isMenuVisible && (
         <button
           type="button"
@@ -318,13 +282,11 @@ export const MenuLateral = React.memo(function MenuLateral({
         />
       )}
 
-      {/* Sidebar */}
       <aside
         data-slot="sidebar"
         data-state={isMenuVisible ? 'open' : 'closed'}
         className={sidebarVariants({ visible: isMenuVisible })}
       >
-        {/* Header */}
         <header
           data-slot="header"
           className="flex shrink-0 items-center justify-between bg-brand-primary p-2 shadow-sm"
@@ -356,7 +318,6 @@ export const MenuLateral = React.memo(function MenuLateral({
           </div>
         </header>
 
-        {/* Search */}
         <div className="shrink-0 border-b border-card-border bg-background-secondary p-2 lg:p-4">
           <SearchInput
             ref={searchInputRef}
@@ -367,14 +328,12 @@ export const MenuLateral = React.memo(function MenuLateral({
           />
         </div>
 
-        {/* Category Tabs */}
         <CategoryTabs
           categories={linhasData.categoriasDias}
           activeIndex={categoriaAtiva}
           onSelect={handleCategoriaChange}
         />
 
-        {/* Lines List */}
         <nav
           data-slot="list"
           className="flex-1 overflow-y-auto bg-background p-4"
@@ -401,11 +360,9 @@ export const MenuLateral = React.memo(function MenuLateral({
           <DisclaimerBanner />
         </nav>
 
-        {/* Footer */}
         <MenuFooter />
       </aside>
 
-      {/* Details Modal */}
       {linhaDetalhesAberta && (
         <LinhaDetalhesModal
           isOpen={true}

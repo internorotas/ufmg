@@ -10,10 +10,6 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do botão de tema
  */
@@ -41,20 +37,12 @@ export const themeToggleVariants = tv({
   },
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface ThemeToggleProps
   extends Omit<ComponentProps<'button'>, 'children'>,
     VariantProps<typeof themeToggleVariants> {
   /** Tamanho do ícone em pixels */
   iconSize?: number;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Botão que permite ao usuário alternar entre os temas claro e escuro.

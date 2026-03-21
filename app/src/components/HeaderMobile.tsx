@@ -9,10 +9,6 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import logo from '../assets/logo-natal-horizontal.svg';
 import { cn } from '../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do header mobile
  */
@@ -36,20 +32,12 @@ export const menuButtonVariants = tv({
   ],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface HeaderMobileProps
   extends Omit<ComponentProps<'header'>, 'children'>,
     VariantProps<typeof headerMobileVariants> {
   isMenuOpen: boolean;
   toggleMenu: () => void;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Cabeçalho mobile com logo e botão de menu.

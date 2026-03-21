@@ -7,10 +7,8 @@ import {
   type TimingEvent,
 } from '../services/analytics';
 
-// Re-exporta os tipos para compatibilidade
 export type { AnalyticsEvent, EventCategory, TimingEvent };
 
-// Serviço de analytics injetável (permite trocar implementação)
 let analyticsService: IAnalyticsService = ga4Analytics;
 
 /**
@@ -85,7 +83,6 @@ export function useSessionTiming(label: string, category: EventCategory = 'Sessi
 
       const sessionDuration = Date.now() - startTimeRef.current;
 
-      // Só rastreia se a sessão durou mais de 1 segundo (evita cliques acidentais)
       if (sessionDuration > 1000) {
         trackTiming({
           name: 'Session Duration',
@@ -197,7 +194,6 @@ export function useAnalyticsAutoTracking() {
 
     trackNavigationTimings(trackTiming);
 
-    // Aguarda o carregamento para resumo de recursos e métricas de memória.
     const onLoad = () => {
       trackResourceSummary(trackEvent);
       if ('memory' in performance) {

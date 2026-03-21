@@ -12,10 +12,6 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 import { Button } from './Button';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do container de empty state
  */
@@ -50,10 +46,6 @@ export const emptyStateIconVariants = tv({
   },
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface EmptyStateProps
   extends ComponentProps<'div'>,
     VariantProps<typeof emptyStateVariants> {
@@ -74,10 +66,6 @@ export interface EmptyStateProps
     onClick: () => void;
   };
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Componente de empty state genérico
@@ -138,9 +126,7 @@ export function EmptyState({
   );
 }
 
-// ============================================================================
 // PRESET EMPTY STATES
-// ============================================================================
 
 /**
  * Empty state para busca sem resultados

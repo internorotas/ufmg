@@ -10,10 +10,6 @@ import type { ComponentProps, ReactNode } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do botão usando tailwind-variants
  */
@@ -75,10 +71,6 @@ export const buttonVariants = tv({
   },
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   /** Ícone à esquerda do texto */
   leftIcon?: ReactNode;
@@ -87,10 +79,6 @@ export interface ButtonProps extends ComponentProps<'button'>, VariantProps<type
   /** Estado de carregamento */
   loading?: boolean;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Componente de botão com múltiplas variantes e estados.
@@ -159,9 +147,7 @@ export function Button({
   );
 }
 
-// ============================================================================
 // SUB-COMPONENTS
-// ============================================================================
 
 /**
  * Grupo de botões com espaçamento consistente

@@ -11,10 +11,6 @@ import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do botão de parada
  */
@@ -36,10 +32,6 @@ export const infoCardVariants = tv({
   base: ['rounded-lg border p-4 text-center text-sm', 'border-card-border bg-card'],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface ItinerarioModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -47,10 +39,6 @@ export interface ItinerarioModalProps {
   paradas: Parada[];
   onParadaClick: (parada: Parada) => void;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Modal que exibe o itinerário de uma linha de ônibus.
@@ -73,9 +61,6 @@ export function ItinerarioModal({
   paradas,
   onParadaClick,
 }: ItinerarioModalProps) {
-  // ⚡ Bolt: Memoize O(N*M) lookup para evitar recalculação em cada render
-  // Buscar paradas do itinerário
-  // ⚡ Bolt: Memoized the array mapping and lookup across the ID list
   const paradasDoItinerario = useMemo(() => {
     return buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
   }, [linha.itinerarioParadasIds, paradas]);
@@ -97,7 +82,6 @@ export function ItinerarioModal({
 
               return (
                 <div key={parada.idParada} className="relative flex">
-                  {/* Linha conectora vertical tracejada */}
                   {!isLast && (
                     <div
                       className="absolute left-2.75 top-7 h-full w-0.5"
@@ -115,7 +99,6 @@ export function ItinerarioModal({
                     aria-label={`Ver localização da parada ${parada.nome} no mapa`}
                     title={`Ver localização da parada ${parada.nome} no mapa`}
                   >
-                    {/* Ícone de localização com círculo */}
                     <div
                       className={stopIconContainerVariants()}
                       style={{ backgroundColor: `${linha.corHex}20` }}
@@ -123,7 +106,6 @@ export function ItinerarioModal({
                       <MapPin size={18} style={{ color: linha.corHex }} />
                     </div>
 
-                    {/* Conteúdo da parada */}
                     <div className="min-w-0 flex-1 pt-0.5">
                       <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
                         {parada.nome}

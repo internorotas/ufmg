@@ -1,7 +1,4 @@
-/**
- * Utilitários para o Design System
- * Interno Rotas - UFMG
- */
+/** Utilitários compartilhados de estilo, tempo e regras operacionais de linhas. */
 
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -9,10 +6,9 @@ import type { Linha } from '../types/data.types';
 
 /**
  * Mescla classes CSS usando clsx e tailwind-merge.
- * Útil para combinar classes condicionais e evitar conflitos do Tailwind.
  *
- * @param inputs - Classes CSS a serem mescladas
- * @returns String com as classes mescladas e sem duplicatas
+ * @param inputs Classes CSS estáticas e condicionais.
+ * @returns String única com classes normalizadas sem conflito de utilitários Tailwind.
  *
  * @example
  * ```tsx
@@ -24,12 +20,10 @@ export function cn(...inputs: ClassValue[]): string {
 }
 
 /**
- * Converte horario no formato HH:MM em minutos desde meia-noite.
+ * Converte horário `HH:MM` em minutos desde meia-noite.
  *
- * ⚡ Bolt: Substituímos .split(":") por .indexOf(":") e .slice() para evitar
- * alocações de array intermediários, que causam pressão de memória quando
- * executadas milhares de vezes em loops de processamento de horários.
- * Impacto: ~2-3x mais rápido em grandes datasets.
+ * @param horaString Horário no formato textual `HH:MM`.
+ * @returns Total de minutos desde `00:00` ou `NaN` quando o formato é inválido.
  */
 export function converterHoraParaMinutos(horaString: string): number {
   if (!horaString) return NaN;
@@ -46,7 +40,10 @@ export function converterHoraParaMinutos(horaString: string): number {
 }
 
 /**
- * Converte minutos desde meia-noite para HH:MM com padding de zeros.
+ * Converte minutos desde meia-noite para `HH:MM` com normalização cíclica de 24h.
+ *
+ * @param minutosTotais Valor absoluto ou relativo em minutos.
+ * @returns Horário formatado em `HH:MM` ou `--:--` para entrada inválida.
  */
 export function converterMinutosParaHora(minutosTotais: number): string {
   if (!Number.isFinite(minutosTotais)) return '--:--';
@@ -94,6 +91,10 @@ function linhaCirculaNoDiaCategoria(linha: Linha, dataAtual: Date): boolean {
 /**
  * Retorna os horários válidos da linha para o dia atual.
  * Suporta formato legado (array) e formato por dia (objeto).
+ *
+ * @param linha Linha com estrutura de horários legada ou segmentada por dia.
+ * @param dataAtual Data usada para escolher o conjunto de horários vigente.
+ * @returns Lista de horários válidos para o dia, já filtrada por formato.
  */
 export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[] {
   const horariosBrutos = linha.horarios as unknown;
@@ -122,7 +123,11 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
 }
 
 /**
- * Retorna o status de operação da linha para o momento atual.
+ * Calcula status operacional da linha no instante atual.
+ *
+ * @param linha Linha a ser classificada.
+ * @param dataAtual Data/hora de referência.
+ * @returns Identificador técnico, texto de exibição e severidade visual do status.
  */
 export function obterStatusLinha(
   linha: Linha,
@@ -172,11 +177,11 @@ export function obterStatusLinha(
  * Calcula a distância em quilômetros entre duas coordenadas geográficas
  * usando a fórmula de Haversine.
  *
- * @param lat1 - Latitude do ponto 1
- * @param lon1 - Longitude do ponto 1
- * @param lat2 - Latitude do ponto 2
- * @param lon2 - Longitude do ponto 2
- * @returns Distância em quilômetros
+ * @param lat1 Latitude do ponto 1.
+ * @param lon1 Longitude do ponto 1.
+ * @param lat2 Latitude do ponto 2.
+ * @param lon2 Longitude do ponto 2.
+ * @returns Distância em quilômetros.
  *
  * @example
  * ```ts
