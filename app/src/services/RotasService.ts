@@ -13,6 +13,7 @@ import type {
   CategoriaLinhas,
   DadosLinhas,
 } from "../types/data.types";
+import { normalizarNomeLinha } from "../../lib/utils";
 
 /**
  * Interface que define o contrato do serviço de rotas.
@@ -25,6 +26,7 @@ export interface IRotasService {
   getTodasParadas(): Parada[];
   getParadaById(idParada: string): Parada | null;
   getCategorias(): DadosLinhas[];
+  getLinhasPorNomeNormalizado(nomeNormalizado: string): Linha[];
 }
 
 /**
@@ -36,20 +38,28 @@ class RotasServiceImpl implements IRotasService {
   private readonly paradasCache: Parada[];
   private readonly linhasMap: Map<string, Linha>;
   private readonly paradasMap: Map<string, Parada>;
+  private readonly linhasPorNomeNormalizadoMap: Map<string, Linha[]>;
 
   constructor() {
     // Inicializa os caches
     this.linhasCache = linhasData;
     this.paradasCache = paradasData.paradas;
 
-    // Cria mapas para acesso O(1) por ID
+    // Cria mapas para acesso O(1) por ID e Nome Normalizado
     this.linhasMap = new Map();
     this.paradasMap = new Map();
+    this.linhasPorNomeNormalizadoMap = new Map();
 
     // Popula o mapa de linhas
     this.linhasCache.categoriasDias.forEach((categoria) => {
       categoria.linhas.forEach((linha) => {
         this.linhasMap.set(linha.idRota, linha);
+
+        // Popula mapa O(1) por nome normalizado
+        const chaveNormalizada = normalizarNomeLinha(linha.nome);
+        const linhasNormalizadas = this.linhasPorNomeNormalizadoMap.get(chaveNormalizada) ?? [];
+        linhasNormalizadas.push(linha);
+        this.linhasPorNomeNormalizadoMap.set(chaveNormalizada, linhasNormalizadas);
       });
     });
 
@@ -103,6 +113,14 @@ class RotasServiceImpl implements IRotasService {
    */
   getParadaById(idParada: string): Parada | null {
     return this.paradasMap.get(idParada) ?? null;
+  }
+
+  /**
+   * Retorna uma lista de linhas pelo nome normalizado
+   * @param nomeNormalizado - O nome da linha em letras minúsculas e sem acentos
+   */
+  getLinhasPorNomeNormalizado(nomeNormalizado: string): Linha[] {
+    return this.linhasPorNomeNormalizadoMap.get(nomeNormalizado) ?? [];
   }
 }
 
