@@ -85,6 +85,7 @@ export function AdminParadasTab({
         <div className="p-4 border-b border-card-border flex justify-between items-center bg-card">
           <h1 className="text-xl font-bold text-text-primary">Admin Panel</h1>
           <button
+            type="button"
             onClick={onExport}
             className="px-4 py-2 bg-brand-primary text-text-inverse rounded hover:opacity-90 text-sm font-medium"
           >
@@ -95,12 +96,14 @@ export function AdminParadasTab({
         {/* Tabs inside sidebar */}
         <div className="flex border-b border-card-border bg-card">
           <button
+            type="button"
             className={`flex-1 py-3 text-center font-medium border-b-2 border-brand-primary text-brand-primary`}
             onClick={() => setActiveTab('paradas')}
           >
             Paradas
           </button>
           <button
+            type="button"
             className={`flex-1 py-3 text-center font-medium text-text-secondary hover:text-text-primary`}
             onClick={() => setActiveTab('linhas')}
           >
@@ -112,6 +115,7 @@ export function AdminParadasTab({
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-text-primary">Gerenciar Paradas</h2>
             <button
+              type="button"
               onClick={handleAdd}
               className="bg-success-bg border border-success-border text-success-text px-3 py-1 rounded text-sm hover:opacity-90"
             >
@@ -126,10 +130,14 @@ export function AdminParadasTab({
           ) : (
             <div className="flex flex-col gap-3">
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">
+                <label
+                  htmlFor="admin-paradas-id"
+                  className="block text-sm font-bold text-text-primary mb-1"
+                >
                   ID (Obrigatório)
                 </label>
                 <input
+                  id="admin-paradas-id"
                   type="text"
                   value={selectedParada.idParada}
                   onChange={(e) =>
@@ -142,8 +150,14 @@ export function AdminParadasTab({
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">Nome</label>
+                <label
+                  htmlFor="admin-paradas-nome"
+                  className="block text-sm font-bold text-text-primary mb-1"
+                >
+                  Nome
+                </label>
                 <input
+                  id="admin-paradas-nome"
                   type="text"
                   value={selectedParada.nome}
                   onChange={(e) => handleUpdate({ ...selectedParada, nome: e.target.value })}
@@ -151,8 +165,14 @@ export function AdminParadasTab({
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">Descrição</label>
+                <label
+                  htmlFor="admin-paradas-descricao"
+                  className="block text-sm font-bold text-text-primary mb-1"
+                >
+                  Descrição
+                </label>
                 <input
+                  id="admin-paradas-descricao"
                   type="text"
                   value={selectedParada.descricao || ''}
                   onChange={(e) =>
@@ -165,10 +185,14 @@ export function AdminParadasTab({
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">
+                <label
+                  htmlFor="admin-paradas-linhas"
+                  className="block text-sm font-bold text-text-primary mb-1"
+                >
                   Linhas (separadas por vírgula)
                 </label>
                 <input
+                  id="admin-paradas-linhas"
                   type="text"
                   value={selectedParada.linhasAtendidas.join(', ')}
                   onChange={(e) =>
@@ -186,6 +210,7 @@ export function AdminParadasTab({
 
               <div className="mt-4 pt-4 border-t border-card-border">
                 <button
+                  type="button"
                   onClick={handleDelete}
                   className="w-full bg-warning-bg border border-warning-border text-warning-text py-2 rounded text-sm font-bold hover:opacity-90"
                 >

@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { AlertTriangle, Bus, Clock, Map, MapPin } from 'lucide-react';
+import { AlertTriangle, Bus, Clock, Map as MapIcon, MapPin } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { buscarParadasPorIds, findScheduleIndex, timeToMinutes } from '../../lib/utils';
@@ -153,8 +153,9 @@ export function LinhaDetalhesModal({
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
 
     return horariosDoDia
-      .filter((h) => h && h.includes(':'))
-      .map((horario) => ({
+      .filter((h) => h?.includes(':'))
+      .map((horario, idx) => ({
+        id: `${horario}-${idx}`,
         horario,
         minutos: timeToMinutes(horario),
       }))
@@ -231,6 +232,7 @@ export function LinhaDetalhesModal({
         className="mb-6 flex gap-2 border-b border-card-border"
       >
         <button
+          type="button"
           role="tab"
           aria-selected={tabAtiva === 'itinerario'}
           aria-controls="panel-itinerario"
@@ -239,10 +241,11 @@ export function LinhaDetalhesModal({
           className={tabVariants({ active: tabAtiva === 'itinerario' })}
           style={tabAtiva === 'itinerario' ? { borderColor: linha.corHex } : {}}
         >
-          <Map size={20} />
+          <MapIcon size={20} />
           Itinerário
         </button>
         <button
+          type="button"
           role="tab"
           aria-selected={tabAtiva === 'horarios'}
           aria-controls="panel-horarios"
@@ -262,7 +265,6 @@ export function LinhaDetalhesModal({
           role="tabpanel"
           id="panel-itinerario"
           aria-labelledby="tab-itinerario"
-          tabIndex={0}
           data-slot="itinerary-tab"
           className="relative animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
         >
@@ -287,6 +289,7 @@ export function LinhaDetalhesModal({
                     )}
 
                     <button
+                      type="button"
                       onClick={() => handleParadaClick(parada)}
                       className={stopButtonVariants()}
                       aria-label={`Ver localização da parada ${parada.nome} no mapa`}
@@ -411,7 +414,6 @@ export function LinhaDetalhesModal({
           role="tabpanel"
           id="panel-horarios"
           aria-labelledby="tab-horarios"
-          tabIndex={0}
           data-slot="schedules-tab"
           className="space-y-6 animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
         >
@@ -439,11 +441,10 @@ export function LinhaDetalhesModal({
                 Próximos Horários ({proximos.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {proximos.map(({ horario, minutos }, index) => (
-                  <div
-                    key={`proximo-${minutos}-${index}`}
-                    role="button"
-                    tabIndex={0}
+                {proximos.map(({ horario, id }) => (
+                  <button
+                    type="button"
+                    key={`proximo-${id}`}
                     aria-label={`Próximo horário às ${horario}`}
                     onClick={() => handleHorarioClick(horario)}
                     onKeyDown={(e) => {
@@ -461,7 +462,7 @@ export function LinhaDetalhesModal({
                     <p className="text-xl font-bold" style={{ color: linha.corHex }}>
                       {horario}
                     </p>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -475,11 +476,8 @@ export function LinhaDetalhesModal({
                 Todos os Horários ({todos.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {todos.map(({ horario, minutos }, index) => (
-                  <div
-                    key={`horario-${minutos}-${index}`}
-                    className={scheduleCardVariants({ status: 'passed' })}
-                  >
+                {todos.map(({ horario, id }) => (
+                  <div key={`horario-${id}`} className={scheduleCardVariants({ status: 'passed' })}>
                     <p className="text-lg font-semibold text-text-secondary">{horario}</p>
                   </div>
                 ))}
@@ -493,11 +491,10 @@ export function LinhaDetalhesModal({
                   Horários Passados ({passados.length})
                 </h3>
                 <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                  {passados.map(({ horario, minutos }, index) => (
-                    <div
-                      key={`passado-${minutos}-${index}`}
-                      role="button"
-                      tabIndex={0}
+                  {passados.map(({ horario, id }) => (
+                    <button
+                      type="button"
+                      key={`passado-${id}`}
                       aria-label={`Horário passado às ${horario}`}
                       onClick={() => handleHorarioClick(horario)}
                       onKeyDown={(e) => {
@@ -509,7 +506,7 @@ export function LinhaDetalhesModal({
                       className={scheduleCardVariants({ status: 'passed' })}
                     >
                       <p className="text-lg font-semibold text-text-secondary">{horario}</p>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>

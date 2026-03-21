@@ -33,12 +33,28 @@ export class GA4AnalyticsService implements IAnalyticsService {
       return;
     }
 
-    ReactGA.initialize(this.measurementId!);
+    if (!this.measurementId) {
+      return;
+    }
+
+    ReactGA.initialize(this.measurementId);
     this.initialized = true;
   }
 
+  private ensureInitialized(): boolean {
+    if (!this.isEnabled) {
+      return false;
+    }
+
+    if (!this.initialized) {
+      this.initialize();
+    }
+
+    return this.initialized;
+  }
+
   trackEvent(event: AnalyticsEvent): void {
-    if (!this.isEnabled) return;
+    if (!this.ensureInitialized()) return;
 
     ReactGA.event({
       category: event.category,
@@ -49,7 +65,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
   }
 
   trackPageView(event?: PageViewEvent): void {
-    if (!this.isEnabled) return;
+    if (!this.ensureInitialized()) return;
 
     ReactGA.send({
       hitType: 'pageview',
@@ -59,13 +75,13 @@ export class GA4AnalyticsService implements IAnalyticsService {
   }
 
   setUserProperty(property: string, value: string): void {
-    if (!this.isEnabled) return;
+    if (!this.ensureInitialized()) return;
 
     ReactGA.set({ [property]: value });
   }
 
   trackTiming(timing: TimingEvent): void {
-    if (!this.isEnabled) return;
+    if (!this.ensureInitialized()) return;
 
     ReactGA.event({
       category: timing.category || 'Performance',
@@ -76,7 +92,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
   }
 
   trackError(error: Error, fatal: boolean = false): void {
-    if (!this.isEnabled) return;
+    if (!this.ensureInitialized()) return;
 
     ReactGA.event({
       category: 'Erro',

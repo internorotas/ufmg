@@ -259,9 +259,11 @@ export const MenuLateral = React.memo(function MenuLateral({
 
       {/* Backdrop */}
       {isMenuVisible && (
-        <div
+        <button
+          type="button"
           data-slot="backdrop"
           onClick={() => setMenuVisible(false)}
+          aria-label="Fechar menu"
           className="fixed inset-0 z-1002 animate-fade-in bg-backdrop backdrop-blur-sm cursor-pointer md:hidden"
         />
       )}

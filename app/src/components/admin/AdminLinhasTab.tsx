@@ -117,6 +117,7 @@ export function AdminLinhasTab({
         <div className="p-4 border-b border-card-border flex justify-between items-center bg-card">
           <h1 className="text-xl font-bold text-text-primary">Admin Panel</h1>
           <button
+            type="button"
             onClick={onExport}
             className="px-4 py-2 bg-brand-primary text-text-inverse rounded hover:opacity-90 text-sm font-medium"
           >
@@ -127,12 +128,14 @@ export function AdminLinhasTab({
         {/* Tabs inside sidebar */}
         <div className="flex border-b border-card-border bg-card">
           <button
+            type="button"
             className={`flex-1 py-3 text-center font-medium text-text-secondary hover:text-text-primary`}
             onClick={() => setActiveTab('paradas')}
           >
             Paradas
           </button>
           <button
+            type="button"
             className={`flex-1 py-3 text-center font-medium border-b-2 border-brand-primary text-brand-primary`}
             onClick={() => setActiveTab('linhas')}
           >
@@ -141,8 +144,14 @@ export function AdminLinhasTab({
         </div>
 
         <div className="p-4 border-b border-card-border">
-          <label className="block text-sm font-bold text-text-primary mb-1">Categoria (Dia)</label>
+          <label
+            htmlFor="admin-linhas-categoria"
+            className="block text-sm font-bold text-text-primary mb-1"
+          >
+            Categoria (Dia)
+          </label>
           <select
+            id="admin-linhas-categoria"
             value={activeCategoryIdx}
             onChange={(e) => {
               setActiveCategoryIdx(Number(e.target.value));
@@ -159,8 +168,14 @@ export function AdminLinhasTab({
         </div>
 
         <div className="p-4 border-b border-card-border">
-          <label className="block text-sm font-bold text-text-primary mb-1">Selecionar Linha</label>
+          <label
+            htmlFor="admin-linhas-rota"
+            className="block text-sm font-bold text-text-primary mb-1"
+          >
+            Selecionar Linha
+          </label>
           <select
+            id="admin-linhas-rota"
             value={selectedRouteId || ''}
             onChange={(e) => setSelectedRouteId(e.target.value)}
             className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
@@ -186,6 +201,7 @@ export function AdminLinhasTab({
                   Editando {selectedLinha.nome}
                 </span>
                 <button
+                  type="button"
                   onClick={() => setDrawMode(!drawMode)}
                   className={`px-3 py-1 rounded text-sm font-medium ${drawMode ? 'bg-warning-bg text-warning-text border border-warning-border' : 'bg-info-bg text-info-text border border-info-border'}`}
                 >
@@ -194,8 +210,14 @@ export function AdminLinhasTab({
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">ID da Rota</label>
+                <label
+                  htmlFor="admin-linhas-id-rota"
+                  className="block text-sm font-bold text-text-primary mb-1"
+                >
+                  ID da Rota
+                </label>
                 <input
+                  id="admin-linhas-id-rota"
                   type="text"
                   value={selectedLinha.idRota}
                   onChange={(e) =>
@@ -210,8 +232,14 @@ export function AdminLinhasTab({
 
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block text-sm font-bold text-text-primary mb-1">Número</label>
+                  <label
+                    htmlFor="admin-linhas-numero"
+                    className="block text-sm font-bold text-text-primary mb-1"
+                  >
+                    Número
+                  </label>
                   <input
+                    id="admin-linhas-numero"
                     type="number"
                     value={selectedLinha.linha}
                     onChange={(e) =>
@@ -224,8 +252,14 @@ export function AdminLinhasTab({
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-bold text-text-primary mb-1">Cor Hex</label>
+                  <label
+                    htmlFor="admin-linhas-cor"
+                    className="block text-sm font-bold text-text-primary mb-1"
+                  >
+                    Cor Hex
+                  </label>
                   <input
+                    id="admin-linhas-cor"
                     type="text"
                     value={selectedLinha.corHex}
                     onChange={(e) =>
@@ -240,8 +274,14 @@ export function AdminLinhasTab({
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">Nome</label>
+                <label
+                  htmlFor="admin-linhas-nome"
+                  className="block text-sm font-bold text-text-primary mb-1"
+                >
+                  Nome
+                </label>
                 <input
+                  id="admin-linhas-nome"
                   type="text"
                   value={selectedLinha.nome}
                   onChange={(e) =>
@@ -255,10 +295,14 @@ export function AdminLinhasTab({
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">
+                <label
+                  htmlFor="admin-linhas-itinerario"
+                  className="block text-sm font-bold text-text-primary mb-1"
+                >
                   IDs das Paradas (Ordenadas por vírgula)
                 </label>
                 <textarea
+                  id="admin-linhas-itinerario"
                   rows={6}
                   value={itinerarioInput}
                   onChange={(e) => {
@@ -283,10 +327,14 @@ export function AdminLinhasTab({
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">
+                <label
+                  htmlFor="admin-linhas-horarios"
+                  className="block text-sm font-bold text-text-primary mb-1"
+                >
                   Horários (JSON Array)
                 </label>
                 <textarea
+                  id="admin-linhas-horarios"
                   rows={8}
                   value={horariosInput}
                   onChange={(e) => {
@@ -340,7 +388,7 @@ export function AdminLinhasTab({
               />
               {selectedLinha.coordenadasTrajeto.map((coord, idx) => (
                 <Marker
-                  key={idx}
+                  key={`coord-${coord[0]}-${coord[1]}`}
                   position={coord}
                   icon={vertexIcon}
                   draggable={true}

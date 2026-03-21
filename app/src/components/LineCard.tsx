@@ -4,7 +4,8 @@
  */
 
 import { Bus, ChevronRight, Clock } from 'lucide-react';
-import React, { type KeyboardEvent, memo, useMemo } from 'react';
+import type React from 'react';
+import { memo, useMemo } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { findScheduleIndex, minutesToTime, timeToMinutes } from '../../lib/utils';
 import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
@@ -88,7 +89,7 @@ function parseSchedules(horarios: string[]): number[] {
   if (!horarios || horarios.length === 0) return [];
 
   return horarios
-    .filter((time) => time && time.includes(':'))
+    .filter((time) => time?.includes(':'))
     .map(timeToMinutes)
     .sort((a, b) => a - b);
 }
@@ -253,7 +254,7 @@ function LineCardComponent({
     onDetailsClick(linha);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+  const handleCardKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onClick(linha);
@@ -264,12 +265,9 @@ function LineCardComponent({
     <article
       data-slot="card"
       data-state={isSelected ? 'selected' : undefined}
-      role="button"
-      tabIndex={0}
       aria-label={`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ''}. Status: ${status}`}
-      aria-pressed={isSelected}
       onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
+      onKeyDown={handleCardKeyDown}
       className={cn(lineCardVariants({ selected: isSelected }), 'mb-3', className)}
     >
       {/* Header */}

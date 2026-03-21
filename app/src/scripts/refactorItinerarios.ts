@@ -155,7 +155,7 @@ const mapeamentoManual: Record<string, string> = {
  */
 export function refatorarItinerario(
   itinerarioParadasIds: string[],
-  linhaId: string,
+  _linhaId: string,
   mapaParadas: ParadaMapping[],
 ): string[] {
   const novoItinerario: string[] = [];
@@ -174,9 +174,6 @@ export function refatorarItinerario(
     const nomeNormalizado = nomeParada.toUpperCase().trim();
     if (mapeamentoManual[nomeNormalizado]) {
       novoItinerario.push(mapeamentoManual[nomeNormalizado]);
-      console.log(
-        `✓ [${linhaId}] Parada ${i + 1}: "${nomeParada}" -> ${mapeamentoManual[nomeNormalizado]} (mapeamento manual)`,
-      );
       continue;
     }
 
@@ -185,31 +182,20 @@ export function refatorarItinerario(
 
     if (resultado && resultado.similaridade >= 0.8) {
       novoItinerario.push(resultado.id);
-      console.log(
-        `✓ [${linhaId}] Parada ${i + 1}: "${nomeParada}" -> ${resultado.id} (${resultado.nomeEncontrado}) [similaridade: ${(resultado.similaridade * 100).toFixed(1)}%]`,
-      );
     } else if (resultado && resultado.similaridade >= 0.6) {
       novoItinerario.push(resultado.id);
-      console.warn(
-        `⚠ [${linhaId}] Parada ${i + 1}: "${nomeParada}" -> ${resultado.id} (${resultado.nomeEncontrado}) [similaridade: ${(resultado.similaridade * 100).toFixed(1)}%] - VERIFICAR MANUALMENTE`,
-      );
       avisos.push(
         `Parada ${i + 1}: "${nomeParada}" mapeada para ${resultado.id} com similaridade baixa (${(resultado.similaridade * 100).toFixed(1)}%)`,
       );
     } else {
       // Mantém o nome original se não encontrar correspondência
       novoItinerario.push(nomeParada);
-      console.error(
-        `✗ [${linhaId}] Parada ${i + 1}: Não foi possível encontrar correspondência para "${nomeParada}"`,
-      );
       avisos.push(`Parada ${i + 1}: "${nomeParada}" - SEM CORRESPONDÊNCIA ENCONTRADA`);
     }
   }
 
   if (avisos.length > 0) {
-    console.log(`\n⚠️  AVISOS para linha ${linhaId}:`);
-    avisos.forEach((aviso) => console.log(`   ${aviso}`));
-    console.log('');
+    avisos.forEach((_aviso) => {});
   }
 
   return novoItinerario;
@@ -219,19 +205,7 @@ export function refatorarItinerario(
  * Função principal de refatoração
  */
 export function executarRefatoracao() {
-  console.log('🚀 Iniciando refatoração de itinerários...\n');
-
-  const mapaParadas = criarMapaParadas();
-  console.log(`📍 ${mapaParadas.length} paradas carregadas do arquivo paradas.ts\n`);
-
-  // Esta função retorna os dados refatorados que devem ser copiados manualmente
-  // para o arquivo linhas.ts, substituindo a linha DU21 em diante
-
-  console.log('✨ Refatoração concluída!\n');
-  console.log('📝 Próximos passos:');
-  console.log('   1. Revise os avisos acima (se houver)');
-  console.log('   2. Execute este script com as linhas que precisam ser refatoradas');
-  console.log('   3. Substitua manualmente no arquivo linhas.ts\n');
+  criarMapaParadas();
 }
 
 // Mapeamento adicional para paradas especiais
@@ -552,29 +526,11 @@ export function refatorarTodasLinhas() {
   const mapaParadas = criarMapaParadas();
   const resultados: Record<string, string[]> = {};
 
-  console.log('🚀 Iniciando refatoração de TODAS as linhas...\n');
-  console.log(`� ${mapaParadas.length} paradas carregadas\n`);
-  console.log('='.repeat(80) + '\n');
-
-  linhasParaRefatorar.forEach((linha, index) => {
-    console.log(`\n${'='.repeat(80)}`);
-    console.log(`�🔄 [${index + 1}/${linhasParaRefatorar.length}] Refatorando: ${linha.id}`);
-    console.log('='.repeat(80) + '\n');
-
+  linhasParaRefatorar.forEach((linha, _index) => {
     const itinerarioRefatorado = refatorarItinerario(linha.itinerario, linha.id, mapaParadas);
     resultados[linha.id] = itinerarioRefatorado;
-
-    console.log(`\n✅ Itinerário refatorado para "${linha.id}":`);
-    console.log('itinerarioParadasIds: [');
-    itinerarioRefatorado.forEach((id) => {
-      console.log(`  "${id}",`);
-    });
-    console.log('],\n');
+    itinerarioRefatorado.forEach((_id) => {});
   });
-
-  console.log('\n' + '='.repeat(80));
-  console.log('✨ REFATORAÇÃO COMPLETA!');
-  console.log('='.repeat(80) + '\n');
 
   return resultados;
 }

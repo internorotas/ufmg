@@ -132,7 +132,7 @@ export interface DialogPortalProps {
 }
 
 export interface DialogBackdropProps
-  extends ComponentProps<'div'>,
+  extends ComponentProps<'button'>,
     VariantProps<typeof dialogBackdropVariants> {}
 
 export interface DialogPopupProps
@@ -227,19 +227,20 @@ function DialogPortal({ container, children }: DialogPortalProps) {
 function DialogBackdrop({ className, onClick, ...props }: DialogBackdropProps) {
   const { open, onOpenChange } = useDialogContext();
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onOpenChange(false);
     onClick?.(e);
   };
 
   return (
-    <div
+    <button
+      type="button"
       data-slot="dialog-backdrop"
       data-state={open ? 'open' : 'closed'}
       onClick={handleClick}
       className={cn(dialogBackdropVariants(), className)}
-      aria-hidden="true"
+      aria-label="Fechar diálogo"
       {...props}
     />
   );

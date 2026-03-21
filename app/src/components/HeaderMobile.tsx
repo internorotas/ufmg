@@ -67,6 +67,7 @@ export function HeaderMobile({ isMenuOpen, toggleMenu, className, ...props }: He
       </div>
 
       <button
+        type="button"
         onClick={toggleMenu}
         className={menuButtonVariants()}
         aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}

@@ -50,9 +50,7 @@ export function AntPathComponent({ coordinates, options }: AntPathProps) {
 
     try {
       map.fitBounds(antPath.getBounds(), { padding: [50, 50] });
-    } catch (e) {
-      console.warn('Could not fit bounds for AntPath', e);
-    }
+    } catch (_e) {}
 
     // Cleanup function: remove a layer quando o componente desmonta ou muda
     return () => {

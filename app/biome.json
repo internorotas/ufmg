@@ -18,7 +18,12 @@
       "recommended": true,
       "style": {
         "useConst": "error",
-        "noNonNullAssertion": "warn"
+        "noNonNullAssertion": "warn",
+        "useImportType": "warn"
+      },
+      "complexity": {
+        "useOptionalChain": "warn",
+        "noImportantStyles": "off"
       },
       "suspicious": {
         "noExplicitAny": "warn",

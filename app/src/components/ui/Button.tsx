@@ -197,7 +197,6 @@ export function ButtonGroup({ children, className, orientation, gap, ...props }:
     <div
       data-slot="button-group"
       className={cn(buttonGroupVariants({ orientation, gap }), className)}
-      role="group"
       {...props}
     >
       {children}
