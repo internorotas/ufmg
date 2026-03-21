@@ -10,9 +10,7 @@ import { tv, type VariantProps } from "tailwind-variants";
 import { Search, X } from "lucide-react";
 import { cn } from "../../lib/utils";
 
-// ============================================================================
 // VARIANTS
-// ============================================================================
 
 /**
  * Variantes do input base
@@ -69,9 +67,7 @@ export const inputContainerVariants = tv({
   },
 });
 
-// ============================================================================
 // TYPES
-// ============================================================================
 
 export interface InputProps
   extends
@@ -87,9 +83,7 @@ export interface InputProps
   fullWidth?: boolean;
 }
 
-// ============================================================================
 // COMPONENT
-// ============================================================================
 
 /**
  * Componente de input com suporte a ícones e estados
@@ -169,9 +163,7 @@ export function Input({
   );
 }
 
-// ============================================================================
 // SEARCH INPUT PRESET
-// ============================================================================
 
 export interface SearchInputProps extends Omit<
   ComponentProps<"input">,
