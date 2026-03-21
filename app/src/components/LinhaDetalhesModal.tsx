@@ -14,7 +14,9 @@ import {
   findScheduleIndex,
 } from "../../lib/utils";
 import { useAnalytics, useSessionTiming } from "../hooks/useAnalytics";
-import { shouldDisableRegularSchedules } from "../config/specialPeriods";
+import { obterHorariosLinhaNoDia, obterStatusLinha } from "../lib/utils";
+import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
+import { useCurrentTime } from "../hooks/useCurrentTime";
 
 // ============================================================================
 // VARIANTS
@@ -43,6 +45,7 @@ export const tabVariants = tv({
   base: [
     "flex items-center gap-2 px-4 py-3 font-semibold transition-all duration-200 cursor-pointer",
     "hover:bg-card-hover/50 rounded-t-lg",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-inset",
   ],
   variants: {
     active: {
@@ -59,7 +62,7 @@ export const tabVariants = tv({
  * Variantes do botão de parada
  */
 export const stopButtonVariants = tv({
-  base: "group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2",
+  base: "group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
 });
 
 /**
@@ -145,63 +148,30 @@ export function LinhaDetalhesModal({
   // Rastreia tempo que o usuário passa visualizando detalhes desta linha
   useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
 
-  // Verificar se a linha está circulando hoje
-  const isVacationLine = linha.categoriaDia === "feriasRecessos";
-  const isSaturdayLine = linha.categoriaDia === "sabado";
-  const isWeekdayLine = linha.categoriaDia === "diasUteis";
-  const isInVacationPeriod = shouldDisableRegularSchedules();
-  const today = new Date().getDay();
-  const isSaturday = today === 6;
-  const isSunday = today === 0;
-  const isWeekday = today >= 1 && today <= 5;
+  const now = useCurrentTime();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const statusLinha = obterStatusLinha(linha, now);
 
-  const isLineRunningToday =
-    (isWeekdayLine && isWeekday && !isInVacationPeriod) ||
-    (isSaturdayLine && isSaturday && !isInVacationPeriod) ||
-    (isVacationLine && isInVacationPeriod && !isSaturday && !isSunday);
-
-  // Mensagem de aviso quando a linha não está circulando
-  const getNotRunningMessage = (): string => {
-    if (isWeekdayLine) {
-      if (isInVacationPeriod)
-        return "Esta linha não circula durante período de férias";
-      if (isSaturday) return "Esta linha não circula aos sábados";
-      if (isSunday) return "Esta linha não circula aos domingos";
-    }
-    if (isSaturdayLine) {
-      if (isInVacationPeriod)
-        return "Esta linha não circula durante período de férias";
-      return "Esta linha circula apenas aos sábados";
-    }
-    if (isVacationLine) {
-      if (!isInVacationPeriod)
-        return "Esta linha circula apenas durante período de férias";
-      if (isSaturday || isSunday)
-        return "Esta linha não circula em fins de semana";
-    }
-    return "Esta linha não está circulando hoje";
-  };
+  const isLineRunningToday = statusLinha.id !== "NAO_CIRCULA_HOJE";
 
   // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
   const paradasDoItinerario = useMemo(() => {
     return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
   }, [linha.itinerarioParadasIds, todasParadas]);
 
-  // Calcular horários passados e futuros
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
   // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
   // Isso evita re-ordenar os horários a cada renderização quando o tempo muda
   const baseHorarios = useMemo(() => {
-    return linha.horarios
+    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+
+    return horariosDoDia
       .filter((h) => h && h.includes(":"))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios]);
+  }, [linha, now]);
 
   // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
   // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
@@ -321,15 +291,15 @@ export function LinhaDetalhesModal({
         >
           {paradasDoItinerario.length > 0 ? (
             <div className="relative">
-              {paradasDoItinerario.map((parada, index) => {
-                const isFirst = index === 0;
-                const isLast = index === paradasDoItinerario.length - 1;
+              {paradasDoItinerario.map((parada) => {
+                const isFirst =
+                  parada.idParada === paradasDoItinerario[0]?.idParada;
+                const isLast =
+                  parada.idParada ===
+                  paradasDoItinerario[paradasDoItinerario.length - 1]?.idParada;
 
                 return (
-                  <div
-                    key={`${parada.idParada}-${index}`}
-                    className="relative flex"
-                  >
+                  <div key={parada.idParada} className="relative flex">
                     {/* Linha conectora vertical tracejada */}
                     {!isLast && (
                       <div
@@ -389,6 +359,73 @@ export function LinhaDetalhesModal({
                             Chegada
                           </span>
                         )}
+
+                        {/* Previsão de chegada nesta parada */}
+                        {(() => {
+                          const previsao = calcularPrevisaoChegada(
+                            linha,
+                            parada.idParada,
+                            now,
+                          );
+                          if (!previsao || !previsao.proximoOnibus) return null;
+                          const {
+                            proximoOnibus,
+                            onibusAnterior,
+                            isTrafegoIntenso,
+                          } = previsao;
+                          const minutos = proximoOnibus.minutosFaltantes;
+
+                          const badgeBg =
+                            minutos < 1
+                              ? "var(--success-bg)"
+                              : isTrafegoIntenso
+                                ? "var(--warning-bg)"
+                                : minutos <= 15
+                                  ? "var(--success-bg)"
+                                  : "var(--warning-bg)";
+
+                          const badgeText =
+                            minutos < 1
+                              ? "var(--success-text)"
+                              : isTrafegoIntenso
+                                ? "#d97706"
+                                : minutos <= 15
+                                  ? "var(--success-text)"
+                                  : "var(--warning-text)";
+
+                          const textoChegada =
+                            minutos < 1
+                              ? "Chega agora"
+                              : minutos < 60
+                                ? `~${minutos} min · ${proximoOnibus.horarioChegada}`
+                                : (() => {
+                                    const h = Math.floor(minutos / 60);
+                                    const m = minutos % 60;
+                                    return m === 0
+                                      ? `~${h}h · ${proximoOnibus.horarioChegada}`
+                                      : `~${h}h ${m}min · ${proximoOnibus.horarioChegada}`;
+                                  })();
+
+                          return (
+                            <div className="mt-1.5 flex flex-col gap-0.5">
+                              <span
+                                className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+                                style={{
+                                  backgroundColor: badgeBg,
+                                  color: badgeText,
+                                }}
+                              >
+                                {textoChegada}
+                              </span>
+                              {onibusAnterior && (
+                                <span className="text-[10px] text-text-tertiary">
+                                  Último passou há{" "}
+                                  {onibusAnterior.minutosQuePassou} min
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </button>
                   </div>
@@ -425,7 +462,7 @@ export function LinhaDetalhesModal({
               <div className="flex items-center gap-3">
                 <AlertTriangle size={24} className="shrink-0 text-amber-400" />
                 <p className="text-sm font-medium text-amber-300">
-                  {getNotRunningMessage()}
+                  {statusLinha.texto}
                 </p>
               </div>
             </div>

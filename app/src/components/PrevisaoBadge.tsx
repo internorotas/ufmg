@@ -1,5 +1,4 @@
 import type { Linha } from "../types/data.types";
-import { Info } from "lucide-react";
 import { usePrevisaoChegada } from "../hooks/usePrevisaoChegada";
 
 interface PrevisaoBadgeProps {
@@ -29,9 +28,6 @@ export function PrevisaoBadge({
   compacto = false,
 }: PrevisaoBadgeProps) {
   const previsao = usePrevisaoChegada(linha, idParada);
-  const textoTooltip =
-    "Horário estimado com base no cronograma oficial. Sem rastreamento via GPS.";
-
   if (!previsao || !previsao.proximoOnibus) {
     return (
       <span
@@ -46,28 +42,20 @@ export function PrevisaoBadge({
     );
   }
 
-  const { proximoOnibus, onibusAnterior, isTrafegoIntenso } = previsao;
+  const { proximoOnibus, onibusAnterior } = previsao;
 
   if (proximoOnibus.minutosFaltantes < 1) {
     return (
       <div className="flex min-w-0 flex-col items-end gap-1">
         <span
-          className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${isTrafegoIntenso ? "text-amber-600" : ""} ${compacto ? "max-w-[170px]" : ""}`}
+          className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${compacto ? "max-w-42.5" : ""}`}
           style={{
-            backgroundColor: isTrafegoIntenso
-              ? "var(--warning-bg)"
-              : "var(--success-bg)",
-            color: isTrafegoIntenso ? "#d97706" : "var(--success-text)",
+            backgroundColor: "var(--success-bg)",
+            color: "var(--success-text)",
           }}
-          title={textoTooltip}
         >
           <span className="inline-flex min-w-0 items-center gap-1">
-            <span className={compacto ? "truncate" : ""}>
-              {isTrafegoIntenso
-                ? "(Trânsito intenso) Chega agora"
-                : "Chega agora"}
-            </span>
-            <Info size={12} aria-hidden="true" />
+            <span className={compacto ? "truncate" : ""}>Chega agora</span>
           </span>
         </span>
 
@@ -90,21 +78,14 @@ export function PrevisaoBadge({
   return (
     <div className="flex min-w-0 flex-col items-end gap-1">
       <span
-        className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${isTrafegoIntenso ? "text-amber-600 font-bold" : ""} ${compacto ? "max-w-[170px]" : ""}`}
+        className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${compacto ? "max-w-42.5" : ""}`}
         style={{
-          backgroundColor: isTrafegoIntenso
-            ? "var(--warning-bg)"
-            : `var(${bgVar})`,
-          color: isTrafegoIntenso ? "#d97706" : `var(${textVar})`,
+          backgroundColor: `var(${bgVar})`,
+          color: `var(${textVar})`,
         }}
-        title={textoTooltip}
       >
         <span className="inline-flex min-w-0 items-center gap-1">
-          <span className={compacto ? "truncate" : ""}>
-            {isTrafegoIntenso
-              ? `(Trânsito intenso) ${textoPrevisao}`
-              : textoPrevisao}
-          </span>
+          <span className={compacto ? "truncate" : ""}>{textoPrevisao}</span>
         </span>
       </span>
 

@@ -6,14 +6,18 @@
 import React, { memo, useMemo, type KeyboardEvent } from "react";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, Clock, ChevronRight } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn, obterHorariosLinhaNoDia, obterStatusLinha } from "../lib/utils";
 import {
   timeToMinutes,
   minutesToTime,
   findScheduleIndex,
 } from "../../lib/utils";
 import { useAnalytics } from "../hooks/useAnalytics";
-import { shouldDisableRegularSchedules } from "../config/specialPeriods";
+import { useCurrentTime } from "../hooks/useCurrentTime";
+import {
+  isLineAvailableToday,
+  getLinhaNotRunningMessage,
+} from "../config/specialPeriods";
 import { LineStatusBadge, type LineStatusType } from "./ui/Badge";
 import { PrevisaoBadge } from "./PrevisaoBadge";
 import type { Linha } from "../types/data.types";
@@ -54,6 +58,7 @@ export const detailsButtonVariants = tv({
     "w-full py-2.5 rounded-lg text-white font-semibold cursor-pointer",
     "text-xs md:text-sm shadow-sm",
     "hover:brightness-110 active:scale-[0.97] transition-all duration-150",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary",
   ],
 });
 
@@ -64,8 +69,6 @@ export const detailsButtonVariants = tv({
 interface ScheduleResult {
   nextSchedule: string;
   previousSchedule: string;
-  status: string;
-  statusType: LineStatusType;
 }
 
 export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
@@ -100,11 +103,7 @@ function parseSchedules(horarios: string[]): number[] {
     .sort((a, b) => a - b);
 }
 
-/**
- * Calcula o status com base nos horários já processados e no tempo atual.
- * Esta operação é barata (O(N)) e pode rodar em cada render para garantir frescor.
- */
-function calculateStatus(
+function calculateSchedules(
   schedulesInMinutes: number[],
   currentMinutes: number,
 ): ScheduleResult {
@@ -112,51 +111,24 @@ function calculateStatus(
     return {
       nextSchedule: "--:--",
       previousSchedule: "--:--",
-      status: "Sem Horários",
-      statusType: "closed",
     };
   }
 
   let nextSchedule = "--:--";
   let previousSchedule = "--:--";
-  let status = "Encerrado";
-  let statusType: LineStatusType = "closed";
 
-  // Próximo horário usando Busca Binária O(log N)
   const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
 
   if (nextIndex < schedulesInMinutes.length) {
-    const next = schedulesInMinutes[nextIndex];
-    nextSchedule = minutesToTime(next);
-    const diffMinutes = next - currentMinutes;
-    if (diffMinutes <= 15) {
-      status = `Próximo às ${nextSchedule}`;
-      statusType = "upcoming";
-    } else {
-      status = "Circulando";
-      statusType = "running";
-    }
-
-    // Último que partiu
-    let prevIndex = nextIndex - 1;
-    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] > currentMinutes) {
-      prevIndex--;
-    }
-    if (prevIndex >= 0) {
-      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
-    }
-  } else {
-    // Se não há próximo, o último que partiu é o último do array que seja menor ou igual ao tempo atual
-    let prevIndex = schedulesInMinutes.length - 1;
-    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] > currentMinutes) {
-      prevIndex--;
-    }
-    if (prevIndex >= 0) {
-      previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
-    }
+    nextSchedule = minutesToTime(schedulesInMinutes[nextIndex]);
   }
 
-  return { nextSchedule, previousSchedule, status, statusType };
+  const prevIndex = nextIndex - 1;
+  if (prevIndex >= 0 && prevIndex < schedulesInMinutes.length) {
+    previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
+  }
+
+  return { nextSchedule, previousSchedule };
 }
 
 // ============================================================================
@@ -249,68 +221,42 @@ function LineCardComponent({
   className,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
+  const now = useCurrentTime();
 
-  // Verificar categoria da linha
-  const isVacationLine = linha.categoriaDia === "feriasRecessos";
-  const isSaturdayLine = linha.categoriaDia === "sabado";
-  const isWeekdayLine = linha.categoriaDia === "diasUteis";
-
-  // Verificar período atual
-  const isInVacationPeriod = shouldDisableRegularSchedules();
-
-  // Verificar dia da semana (domingo=0, sábado=6)
-  const today = new Date().getDay();
-  const isSaturday = today === 6;
-  const isSunday = today === 0;
-  const isWeekday = today >= 1 && today <= 5;
-
-  // Lógica de quando cada categoria NÃO circula:
-  // - Linhas de dias úteis: não circulam em fins de semana ou durante período de férias
-  // - Linhas de sábado: não circulam fora do sábado ou durante período de férias
-  // - Linhas de férias: não circulam fora do período de férias ou em fins de semana
-  const shouldDisableSchedules =
-    (isWeekdayLine && (!isWeekday || isInVacationPeriod)) ||
-    (isSaturdayLine && (!isSaturday || isInVacationPeriod)) ||
-    (isVacationLine && (!isInVacationPeriod || isSunday || isSaturday));
-
-  // Determinar mensagem de suspensão baseada na categoria
-  const getSuspendedMessage = (): string => {
-    if (isWeekdayLine) {
-      if (isInVacationPeriod) return "Linha suspensa durante férias";
-      if (isSaturday) return "Linha não circula aos sábados";
-      if (isSunday) return "Linha não circula aos domingos";
-    }
-    if (isSaturdayLine) {
-      if (isInVacationPeriod) return "Linha suspensa durante férias";
-      return "Linha circula apenas aos sábados";
-    }
-    if (isVacationLine) {
-      if (!isInVacationPeriod) return "Linha circula apenas durante férias";
-      if (isSaturday || isSunday) return "Linha não circula em fins de semana";
-    }
-    return "Linha não está circulando";
-  };
+  const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
+  const getSuspendedMessage = () =>
+    getLinhaNotRunningMessage(linha.categoriaDia);
+  const statusLinha = obterStatusLinha(linha, now);
 
   // Otimização: Memoizar o processamento pesado dos horários (parse + sort)
   const schedulesInMinutes = useMemo(() => {
-    return parseSchedules(linha.horarios);
-  }, [linha.horarios]);
+    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+    return parseSchedules(horariosDoDia);
+  }, [linha, now]);
 
   // Calcular status baseado no tempo atual
-  const { nextSchedule, previousSchedule, status, statusType } = (() => {
-    if (shouldDisableSchedules) {
-      return {
-        nextSchedule: "Indisponível",
-        previousSchedule: "Indisponível",
-        status: "Não Circulando",
-        statusType: "notRunning" as LineStatusType,
-      };
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const { nextSchedule, previousSchedule } = calculateSchedules(
+    schedulesInMinutes,
+    currentMinutes,
+  );
+
+  const status =
+    shouldDisableSchedules || statusLinha.id === "NAO_CIRCULA_HOJE"
+      ? "Não Circulando"
+      : statusLinha.texto;
+
+  const statusType: LineStatusType = (() => {
+    if (shouldDisableSchedules || statusLinha.id === "NAO_CIRCULA_HOJE") {
+      return "notRunning";
     }
-
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-    return calculateStatus(schedulesInMinutes, currentMinutes);
+    if (statusLinha.id === "AGUARDANDO_PRIMEIRA_SAIDA") {
+      return "upcoming";
+    }
+    if (statusLinha.id === "CIRCULANDO") {
+      return "running";
+    }
+    return "closed";
   })();
 
   const handleCardClick = () => {
@@ -365,7 +311,9 @@ function LineCardComponent({
                 </p>
               )}
 
-              {idParada && linha.trajetoDetalhado?.length ? (
+              {idParada &&
+              linha.trajetoDetalhado?.length &&
+              linha.itinerarioParadasIds.includes(idParada) ? (
                 <div className="mt-2">
                   <PrevisaoBadge linha={linha} idParada={idParada} />
                 </div>
@@ -381,8 +329,12 @@ function LineCardComponent({
 
       {/* Body */}
       <div data-slot="body" className="px-4 pb-4">
-        {shouldDisableSchedules ? (
-          <SuspendedNotice message={getSuspendedMessage()} />
+        {shouldDisableSchedules || statusLinha.id === "NAO_CIRCULA_HOJE" ? (
+          <SuspendedNotice
+            message={
+              shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto
+            }
+          />
         ) : (
           <div className="mb-4 grid grid-cols-2 gap-3">
             <ScheduleDisplay label="Último Partiu" time={previousSchedule} />

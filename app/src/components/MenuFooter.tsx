@@ -120,7 +120,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
         </a>
 
         {/* Botão Versão Antiga */}
-        <a
+        {/* <a
           href="https://ufmg-pi.vercel.app/"
           target="_blank"
           rel="noopener noreferrer"
@@ -130,7 +130,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           className={footerButtonVariants({ intent: "ghost" })}
         >
           Versão Antiga
-        </a>
+        </a> */}
       </div>
 
       {/* Desenvolvido por */}
