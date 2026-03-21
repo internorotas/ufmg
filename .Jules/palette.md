@@ -16,3 +16,7 @@
 ## 2025-03-16 - Title Attributes for Icon-Only Buttons
 **Learning:** In addition to `aria-label`s (which provide accessibility for screen readers), icon-only buttons need a `title` attribute to provide a native tooltip on hover. This is crucial for sighted mouse users to understand the button's action without guessing.
 **Action:** Always include a `title` attribute that matches the `aria-label` on buttons that consist solely of an icon (e.g. `<LocateFixed />`, `<ArrowLeft />`, `<DialogClose />`).
+
+## 2024-05-19 - Focus-visible styles on SearchInput clear button
+**Learning:** Icon-only interactive buttons within complex components (like the `SearchInput` component) might easily miss focus states if they are nested inside an absolute positioned overlay. Adding Tailwind classes like `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary` fixes keyboard accessibility visibility.
+**Action:** When auditing custom form controls, specifically test keyboard navigation to ensure all child interactive elements (like clear buttons, password toggles) have visible focus indicators.

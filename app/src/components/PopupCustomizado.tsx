@@ -81,6 +81,21 @@ function getNomeExibicao(linha: Linha | null, nomeLinha: string): string {
   return linha.nome;
 }
 
+// Sublinhas que indicam período de operação (não variante de rota)
+const SUBLINHAS_CALENDARIO = ["Sábado", "Férias e Recessos"];
+
+/**
+ * Retorna o nome de exibição da linha com a sublinha de rota (se houver),
+ * ignorando sublinhas que indicam apenas o período do calendário.
+ */
+function getNomeExibicao(linha: Linha | null, nomeLinha: string): string {
+  if (!linha) return nomeLinha.replace(/\s*\(Todas\)\s*/gi, "").trim();
+  if (linha.sublinha && !SUBLINHAS_CALENDARIO.includes(linha.sublinha)) {
+    return `${linha.nome} · ${linha.sublinha}`;
+  }
+  return linha.nome;
+}
+
 // ============================================================================
 // TYPES
 // ============================================================================
