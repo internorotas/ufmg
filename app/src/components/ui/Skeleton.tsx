@@ -10,10 +10,6 @@ import type { ComponentProps } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do skeleton base
  */
@@ -40,10 +36,6 @@ export const skeletonVariants = tv({
   },
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface SkeletonProps
   extends ComponentProps<'div'>,
     VariantProps<typeof skeletonVariants> {
@@ -52,10 +44,6 @@ export interface SkeletonProps
   /** Altura do skeleton */
   height?: string | number;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Skeleton base para loading states
@@ -90,9 +78,7 @@ export function Skeleton({
   );
 }
 
-// ============================================================================
 // PRESET SKELETONS
-// ============================================================================
 
 /**
  * Skeleton para texto

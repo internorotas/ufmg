@@ -29,23 +29,18 @@ export interface MapaRef {
  * Interface que define o formato do contexto de rotas.
  */
 interface RotasContextData {
-  // Dados
   linhasData: CategoriaLinhas;
   todasParadas: Parada[];
 
-  // Estado de seleção
   linhaSelecionada: Linha | null;
   paradaSelecionada: Parada | null;
 
-  // Ações
   selecionarLinha: (linha: Linha) => void;
   selecionarParada: (parada: Parada) => void;
   limparSelecao: () => void;
 
-  // Referência do Mapa
   mapaRef: React.RefObject<MapaRef | null>;
 
-  // Serviço de dados (para acesso direto se necessário)
   rotasService: IRotasService;
 }
 
@@ -74,18 +69,14 @@ interface RotasProviderProps {
  * ```
  */
 export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: RotasProviderProps) {
-  // Estado de seleção
   const [linhaSelecionada, setLinhaSelecionada] = useState<Linha | null>(null);
   const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(null);
 
-  // Referência do mapa para centralização
   const mapaRef = useRef<MapaRef | null>(null);
 
-  // Dados memoizados do serviço
   const linhasData = useMemo(() => RotasService.getTodasLinhas(), []);
   const todasParadas = useMemo(() => RotasService.getTodasParadas(), []);
 
-  // Ação: Selecionar uma linha
   const selecionarLinha = useCallback(
     (linha: Linha) => {
       setLinhaSelecionada(linha);
@@ -94,7 +85,6 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
     [onLinhaSelect],
   );
 
-  // Ação: Selecionar uma parada (também centraliza no mapa)
   const selecionarParada = useCallback(
     (parada: Parada) => {
       setParadaSelecionada(parada);
@@ -104,32 +94,21 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
     [onParadaSelect],
   );
 
-  // Ação: Limpar seleção
   const limparSelecao = useCallback(() => {
     setLinhaSelecionada(null);
     setParadaSelecionada(null);
   }, []);
 
-  // Valor memoizado do contexto para evitar re-renders desnecessários
   const contextValue = useMemo<RotasContextData>(
     () => ({
-      // Dados
       linhasData,
       todasParadas,
-
-      // Estado
       linhaSelecionada,
       paradaSelecionada,
-
-      // Ações
       selecionarLinha,
       selecionarParada,
       limparSelecao,
-
-      // Referência
       mapaRef,
-
-      // Serviço
       rotasService: RotasService,
     }),
     [

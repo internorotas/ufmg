@@ -15,7 +15,6 @@ import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import { useAnalytics } from '../hooks/useAnalytics';
 import type { Linha, Parada } from '../types/data.types';
 import { ControlesUsuarioMapa } from './ControlesUsuarioMapa';
-// Componentes extraídos (Strategy/Composition Pattern)
 import {
   CenterOnParada,
   ChangeView,
@@ -63,10 +62,6 @@ const MAP_CONFIG = {
  *
  * React 19: ref é recebida diretamente como prop, sem necessidade de forwardRef.
  */
-/**
- * Componente interno para gerenciar imperativeHandle
- * Precisa estar dentro do MapContainer para usar useMap()
- */
 function MapImperativeHandler({
   mapaRef,
   destacarParada,
@@ -104,13 +99,10 @@ export function Mapa({
   const { trackTiming } = useAnalytics();
   const mapLoadStartRef = useRef<number>(0);
 
-  // Hook para gerenciar marcadores
   const { paradaDestacadaId, handleMarkerRef, destacarParada } = useMapMarkers();
 
-  // Hook para calcular bounds da rota
   const bounds = useRouteBounds(linhaSelecionada);
 
-  // Rastreia o tempo de carregamento do mapa
   useEffect(() => {
     if (mapLoadStartRef.current === 0) {
       mapLoadStartRef.current = Date.now();
@@ -130,28 +122,21 @@ export function Mapa({
       zoom={MAP_CONFIG.zoom}
       className="h-full w-full"
       zoomControl={true}
-      whenReady={() => {
-        // Map is ready
-      }}
+      whenReady={() => {}}
     >
-      {/* Camada de tiles */}
       <TileLayer url={MAP_CONFIG.tileUrl} attribution={MAP_CONFIG.attribution} />
 
-      {/* Controles de visualização */}
       <ChangeView bounds={bounds} />
       <CenterOnParada parada={paradaSelecionada} />
 
-      {/* Rota animada da linha selecionada */}
       <MapRoute linha={linhaSelecionada} />
 
-      {/* Marcadores de paradas */}
       <MapMarkers
         paradas={todasParadas}
         paradaDestacadaId={paradaDestacadaId}
         onMarkerRef={handleMarkerRef}
       />
 
-      {/* Controles de localização do usuário */}
       {onPedirLocalizacao && (
         <ControlesUsuarioMapa
           localizacao={localizacaoUsuario ?? null}
@@ -161,7 +146,6 @@ export function Mapa({
         />
       )}
 
-      {/* Handler para imperative ref (precisa estar dentro do MapContainer) */}
       <MapImperativeHandler mapaRef={ref} destacarParada={destacarParada} />
     </MapContainer>
   );

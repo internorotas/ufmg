@@ -10,10 +10,6 @@ import type { ComponentProps, ReactNode } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do card root
  */
@@ -141,10 +137,6 @@ export const cardFooterVariants = tv({
   },
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface CardProps
   extends Omit<ComponentProps<'div'>, 'ref'>,
     VariantProps<typeof cardVariants> {
@@ -189,9 +181,7 @@ export interface CardFooterProps
   children: ReactNode;
 }
 
-// ============================================================================
 // COMPONENTS
-// ============================================================================
 
 /**
  * Card root - Container principal do card

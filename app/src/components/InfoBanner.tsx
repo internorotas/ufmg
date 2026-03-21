@@ -8,10 +8,6 @@ import type { ComponentProps } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do banner
  */
@@ -30,17 +26,9 @@ export const bannerVariants = tv({
   },
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface InfoBannerProps
   extends ComponentProps<'div'>,
     VariantProps<typeof bannerVariants> {}
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Banner informativo sobre a saída dos ônibus.

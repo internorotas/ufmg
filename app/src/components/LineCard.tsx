@@ -16,10 +16,6 @@ import type { Linha } from '../types/data.types';
 import { PrevisaoBadge } from './PrevisaoBadge';
 import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 
-// ============================================================================
-// VARIANTS - Definição de estilos com tailwind-variants
-// ============================================================================
-
 /**
  * Variantes do card principal
  */
@@ -53,10 +49,6 @@ export const detailsButtonVariants = tv({
   ],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 interface ScheduleResult {
   nextSchedule: string;
   previousSchedule: string;
@@ -76,10 +68,6 @@ export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
   /** Classe CSS adicional */
   className?: string;
 }
-
-// ============================================================================
-// HELPERS
-// ============================================================================
 
 /**
  * Analisa e ordena os horários em minutos.
@@ -118,10 +106,6 @@ function calculateSchedules(schedulesInMinutes: number[], currentMinutes: number
 
   return { nextSchedule, previousSchedule };
 }
-
-// ============================================================================
-// SUBCOMPONENTS
-// ============================================================================
 
 interface LineIconProps {
   color: string;
@@ -179,10 +163,6 @@ function SuspendedNotice({ message }: SuspendedNoticeProps) {
   );
 }
 
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
 /**
  * Card que exibe informações sobre uma linha de ônibus.
  * Otimizado com React.memo para evitar re-renderizações desnecessárias.
@@ -212,13 +192,11 @@ function LineCardComponent({
   const getSuspendedMessage = () => getLinhaNotRunningMessage(linha.categoriaDia);
   const statusLinha = obterStatusLinha(linha, now);
 
-  // Otimização: Memoizar o processamento pesado dos horários (parse + sort)
   const schedulesInMinutes = useMemo(() => {
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
     return parseSchedules(horariosDoDia);
   }, [linha, now]);
 
-  // Calcular status baseado no tempo atual
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const { nextSchedule, previousSchedule } = calculateSchedules(schedulesInMinutes, currentMinutes);
 
@@ -275,7 +253,6 @@ function LineCardComponent({
       onKeyDown={handleCardKeyDown}
       className={cn(lineCardVariants({ selected: isSelected }), 'mb-3', className)}
     >
-      {/* Header */}
       <div data-slot="header" className="relative w-full p-4 pb-3 text-left">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-1 items-start gap-3">
@@ -304,7 +281,6 @@ function LineCardComponent({
         </div>
       </div>
 
-      {/* Body */}
       <div data-slot="body" className="px-4 pb-4">
         {shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE' ? (
           <SuspendedNotice
@@ -317,7 +293,6 @@ function LineCardComponent({
           </div>
         )}
 
-        {/* Button */}
         <button
           type="button"
           aria-label={`Ver detalhes da linha ${linha.nome}`}

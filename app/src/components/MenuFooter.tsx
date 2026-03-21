@@ -9,10 +9,6 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import { useExternalLinkTracking } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do container do footer
  */
@@ -54,17 +50,9 @@ export const creditLinkVariants = tv({
   ],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface MenuFooterProps
   extends ComponentProps<'div'>,
     VariantProps<typeof footerContainerVariants> {}
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Menu de rodapé com links para contato, projeto e créditos.

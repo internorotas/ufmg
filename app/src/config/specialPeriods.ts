@@ -14,30 +14,16 @@ export interface SpecialPeriod {
 }
 
 /**
- * Lista de períodos especiais configurados
- *
- * Para adicionar um novo período de férias:
- * 1. Adicione um novo objeto ao array com as datas
- * 2. Defina isActive como true para o período atual
- * 3. Certifique-se de desativar (isActive: false) os períodos anteriores
+ * Lista de períodos especiais configurados para operação diferenciada.
  */
 export const SPECIAL_PERIODS: SpecialPeriod[] = [
   {
     name: 'Férias de Verão 2025/2026',
     description: 'Período de férias e recessos',
-    startDate: new Date(2025, 11, 15), // Mês é 0-indexed: 11 = dezembro
-    endDate: new Date(2026, 2, 1), // Mês é 0-indexed: 2 = março
-    isActive: true, // Defina como false para desativar
+    startDate: new Date(2025, 11, 15),
+    endDate: new Date(2026, 2, 1),
+    isActive: true,
   },
-  // Adicione novos períodos aqui conforme necessário
-  // Exemplo:
-  // {
-  //   name: "Férias de Verão 2026/2027",
-  //   description: "Período de férias e recessos",
-  //   startDate: new Date(2026, 11, 15), // Mês 11 = dezembro
-  //   endDate: new Date(2027, 2, 1), // Mês 2 = março
-  //   isActive: false,
-  // },
 ];
 
 /**
@@ -46,7 +32,7 @@ export const SPECIAL_PERIODS: SpecialPeriod[] = [
  */
 export function getCurrentSpecialPeriod(): SpecialPeriod | null {
   const now = new Date();
-  now.setHours(0, 0, 0, 0); // Normaliza para início do dia
+  now.setHours(0, 0, 0, 0);
 
   for (const period of SPECIAL_PERIODS) {
     if (!period.isActive) continue;
@@ -71,7 +57,7 @@ export function getCurrentSpecialPeriod(): SpecialPeriod | null {
  */
 export function isWeekday(): boolean {
   const today = new Date().getDay();
-  return today >= 1 && today <= 5; // 1 = segunda, 5 = sexta
+  return today >= 1 && today <= 5;
 }
 
 /**

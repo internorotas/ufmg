@@ -9,10 +9,6 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import { getCurrentSpecialPeriod, isWeekday } from '../config/specialPeriods';
 import { cn } from '../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do banner de férias
  */
@@ -24,17 +20,9 @@ export const vacationBannerVariants = tv({
   ],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface VacationBannerProps
   extends ComponentProps<'div'>,
     VariantProps<typeof vacationBannerVariants> {}
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Banner informativo durante períodos de férias e recessos.

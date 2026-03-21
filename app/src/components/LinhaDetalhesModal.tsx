@@ -14,10 +14,6 @@ import { obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do container do título
  */
@@ -91,10 +87,6 @@ export const infoCardVariants = tv({
   base: ['rounded-lg border p-4 text-center text-sm', 'border-card-border bg-card'],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface LinhaDetalhesModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -104,10 +96,6 @@ export interface LinhaDetalhesModalProps {
 }
 
 type TabType = 'itinerario' | 'horarios';
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Modal que exibe informações detalhadas sobre uma linha de ônibus.
@@ -133,7 +121,6 @@ export function LinhaDetalhesModal({
   const [tabAtiva, setTabAtiva] = useState<TabType>('itinerario');
   const { trackEvent } = useAnalytics();
 
-  // Rastreia tempo que o usuário passa visualizando detalhes desta linha
   useSessionTiming(`Linha: ${linha.nome}`, 'Engajamento Detalhes');
 
   const now = useCurrentTime();
@@ -142,13 +129,10 @@ export function LinhaDetalhesModal({
 
   const isLineRunningToday = statusLinha.id !== 'NAO_CIRCULA_HOJE';
 
-  // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
   const paradasDoItinerario = useMemo(() => {
     return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
   }, [linha.itinerarioParadasIds, todasParadas]);
 
-  // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
-  // Isso evita re-ordenar os horários a cada renderização quando o tempo muda
   const baseHorarios = useMemo(() => {
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
 
@@ -162,16 +146,10 @@ export function LinhaDetalhesModal({
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha, now]);
 
-  // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
-  // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
-  // Separamos os componentes "passado" e "futuro" para evitar realocação dos itens O(N)
   const splitIndex = useMemo(() => {
-    // Busca binária para achar onde dividir usando um getter para evitar o .map() inicial.
-    // Usamos currentMinutes - 1 pois currentMinutes (agora) deve ser considerado 'proximo'
     return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
   }, [baseHorarios, currentMinutes]);
 
-  // Zero-allocation das sublistas virtuais
   const passados = baseHorarios.slice(0, splitIndex);
   const proximos = baseHorarios.slice(splitIndex);
   const todos = baseHorarios;
@@ -224,7 +202,6 @@ export function LinhaDetalhesModal({
       }
       size="2xl"
     >
-      {/* Tabs */}
       <div
         data-slot="tabs"
         role="tablist"
@@ -259,7 +236,6 @@ export function LinhaDetalhesModal({
         </button>
       </div>
 
-      {/* Conteúdo das Tabs */}
       {tabAtiva === 'itinerario' ? (
         <div
           role="tabpanel"
@@ -277,7 +253,6 @@ export function LinhaDetalhesModal({
 
                 return (
                   <div key={parada.idParada} className="relative flex">
-                    {/* Linha conectora vertical tracejada */}
                     {!isLast && (
                       <div
                         className="absolute left-2.75 top-7 h-full w-0.5"
@@ -295,7 +270,6 @@ export function LinhaDetalhesModal({
                       aria-label={`Ver localização da parada ${parada.nome} no mapa`}
                       title={`Ver localização da parada ${parada.nome} no mapa`}
                     >
-                      {/* Ícone de localização com círculo */}
                       <div
                         className={stopIconContainerVariants()}
                         style={{ backgroundColor: `${linha.corHex}20` }}
@@ -303,7 +277,6 @@ export function LinhaDetalhesModal({
                         <MapPin size={18} style={{ color: linha.corHex }} />
                       </div>
 
-                      {/* Conteúdo da parada */}
                       <div className="min-w-0 flex-1 pt-0.5">
                         <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
                           {parada.nome}
@@ -336,7 +309,6 @@ export function LinhaDetalhesModal({
                           </span>
                         )}
 
-                        {/* Previsão de chegada nesta parada */}
                         {(() => {
                           const previsao = calcularPrevisaoChegada(linha, parada.idParada, now);
                           if (!previsao || !previsao.proximoOnibus) return null;

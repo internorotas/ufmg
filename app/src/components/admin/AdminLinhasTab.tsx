@@ -112,7 +112,7 @@ export function AdminLinhasTab({
 
   return (
     <>
-      <div className="w-96 flex flex-col bg-sidebar shadow-lg z-[1000] h-full overflow-hidden border-r border-card-border">
+      <div className="w-96 flex flex-col bg-sidebar shadow-lg z-1000 h-full overflow-hidden border-r border-card-border">
         {/* Header Options */}
         <div className="p-4 border-b border-card-border flex justify-between items-center bg-card">
           <h1 className="text-xl font-bold text-text-primary">Admin Panel</h1>

@@ -8,15 +8,21 @@ import {
 import type { Linha } from '../types/data.types';
 import { useCurrentTime } from './useCurrentTime';
 
+/** Próximo ônibus estimado para a parada consultada. */
 interface ProximoOnibus {
   horarioChegada: string;
   minutosFaltantes: number;
 }
 
+/** Último ônibus que já passou recentemente na parada consultada. */
 interface OnibusAnterior {
   minutosQuePassou: number;
 }
 
+/**
+ * Estrutura de retorno do motor de ETA.
+ * O resultado é intencionalmente compacto para facilitar uso em cards e modais.
+ */
 export interface PrevisaoChegadaResultado {
   proximoOnibus: ProximoOnibus | null;
   onibusAnterior: OnibusAnterior | null;
@@ -24,8 +30,15 @@ export interface PrevisaoChegadaResultado {
 }
 
 /**
- * Função pura que calcula a previsão de chegada de uma linha em uma parada.
- * Pode ser chamada fora de contexto React (sem hook).
+ * Calcula a ETA para uma parada específica a partir da grade de horários da linha.
+ *
+ * A função existe para manter a regra de negócio isolada de React, permitindo
+ * reutilização em hooks, testes e fluxos de renderização sem efeitos colaterais.
+ *
+ * @param linha Linha cuja previsão será calculada.
+ * @param idParadaAtual ID da parada de destino dentro do trajeto da linha.
+ * @param agora Data/hora de referência para o cálculo; padrão é o horário atual.
+ * @returns Estrutura de previsão com próximo ônibus, último ônibus recente e flag de tráfego.
  */
 export function calcularPrevisaoChegada(
   linha: Linha,
@@ -58,16 +71,14 @@ export function calcularPrevisaoChegada(
     }
   }
 
-  // Arredonda o tempo final para não termos minutos quebrados
   tempoViagemReal = Math.round(tempoViagemReal);
 
   if (!paradaEncontrada) return null;
 
   const isTrafegoIntenso = multiplicadorTrafego > 1.0;
-  // Limites para lidar com virada de meia-noite
   const MINUTOS_DIA = 1440;
-  const HORA_INICIO_VIRADA = 22 * 60; // 22h: considerado "fim do dia"
-  const HORA_MAX_AMANHA = 2 * 60; // até 02h: ainda pertence ao turno anterior
+  const HORA_INICIO_VIRADA = 22 * 60;
+  const HORA_MAX_AMANHA = 2 * 60;
 
   let proximoOnibus: ProximoOnibus | null = null;
   let ultimaChegadaPassada: number | null = null;
@@ -78,12 +89,11 @@ export function calcularPrevisaoChegada(
 
     let chegadaPrevistaMinutos = saidaMinutos + tempoViagemReal;
 
-    // Ajuste se passar das 24h
     if (chegadaPrevistaMinutos >= MINUTOS_DIA) {
       chegadaPrevistaMinutos -= MINUTOS_DIA;
     }
 
-    // Lidar com virada de dia: se é quase meia-noite e o ônibus chega após a meia-noite
+    // Regras para evitar ETA negativa na virada da meia-noite.
     let ajusteChegada = chegadaPrevistaMinutos;
     if (horaAtualMinutos > HORA_INICIO_VIRADA && chegadaPrevistaMinutos < HORA_MAX_AMANHA) {
       ajusteChegada += MINUTOS_DIA;
@@ -118,6 +128,13 @@ export function calcularPrevisaoChegada(
   };
 }
 
+/**
+ * Hook de conveniência para calcular ETA reativa com base no relógio do app.
+ *
+ * @param linha Linha selecionada ou `null` quando nenhuma linha está ativa.
+ * @param idParadaAtual ID da parada selecionada ou `null` quando não há parada ativa.
+ * @returns Resultado da previsão ou `null` quando não há dados suficientes.
+ */
 export function usePrevisaoChegada(
   linha: Linha | null,
   idParadaAtual: string | null,

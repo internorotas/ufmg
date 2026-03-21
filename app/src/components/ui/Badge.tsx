@@ -10,10 +10,6 @@ import type { ComponentProps, ReactNode } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do badge usando tailwind-variants
  */
@@ -64,10 +60,6 @@ export const badgeVariants = tv({
   },
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface BadgeProps extends ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
   /** Ícone à esquerda */
   leftIcon?: ReactNode;
@@ -76,10 +68,6 @@ export interface BadgeProps extends ComponentProps<'span'>, VariantProps<typeof 
   /** Conteúdo do badge */
   children: ReactNode;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Componente de badge para status e labels
@@ -132,9 +120,7 @@ export function Badge({
   );
 }
 
-// ============================================================================
 // PRESET BADGES
-// ============================================================================
 
 /**
  * Badge de status de operação da linha

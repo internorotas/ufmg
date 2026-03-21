@@ -10,8 +10,6 @@ import { type ComponentProps, forwardRef, type ReactNode } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 
-// VARIANTS
-
 /**
  * Variantes do input base
  */
@@ -67,8 +65,6 @@ export const inputContainerVariants = tv({
   },
 });
 
-// TYPES
-
 export interface InputProps
   extends Omit<ComponentProps<'input'>, 'size'>,
     Omit<VariantProps<typeof inputVariants>, 'hasLeftIcon' | 'hasRightIcon'> {
@@ -81,8 +77,6 @@ export interface InputProps
   /** Container full width */
   fullWidth?: boolean;
 }
-
-// COMPONENT
 
 /**
  * Componente de input com suporte a ícones e estados

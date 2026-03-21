@@ -13,10 +13,6 @@ import { obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
 import type { Linha } from '../types/data.types';
 import { Modal } from './Modal';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do card de horário
  */
@@ -56,19 +52,11 @@ export const suspensionAlertVariants = tv({
   base: ['rounded-lg border p-4 text-center', 'border-yellow-600 bg-yellow-900/30'],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface HorariosModalProps {
   isOpen: boolean;
   onClose: () => void;
   linha: Linha;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Modal que exibe os horários de uma linha de ônibus.
@@ -90,7 +78,6 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
 
   const shouldDisableSchedules = statusLinha.id === 'NAO_CIRCULA_HOJE';
 
-  // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
   const baseHorarios = useMemo(() => {
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
 
@@ -103,16 +90,10 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha, now]);
 
-  // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
-  // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
-  // Separamos os componentes "passado" e "futuro" para evitar realocação dos itens O(N)
   const splitIndex = useMemo(() => {
-    // Busca binária para achar onde dividir usando um getter para evitar o .map() inicial.
-    // Usamos currentMinutes - 1 pois currentMinutes (agora) deve ser considerado 'proximo'
     return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
   }, [baseHorarios, currentMinutes]);
 
-  // Zero-allocation das sublistas virtuais
   const passados = baseHorarios.slice(0, splitIndex);
   const proximos = baseHorarios.slice(splitIndex);
   const todos = baseHorarios;
@@ -155,7 +136,6 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={`Horários - ${linha.nome}`} size="md">
       <div className="space-y-6">
-        {/* Aviso de Horários Suspensos */}
         {shouldDisableSchedules && (
           <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
             <p className="mb-2 font-semibold text-yellow-300">
@@ -166,7 +146,6 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {/* Próximos Horários */}
         {!shouldDisableSchedules && proximos.length > 0 && (
           <div data-slot="upcoming-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
@@ -189,7 +168,6 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {/* Horários Passados */}
         {!shouldDisableSchedules && passados.length > 0 && (
           <div data-slot="passed-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
@@ -212,7 +190,6 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {/* Informação Extra */}
         {!shouldDisableSchedules && (
           <div data-slot="summary" className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm">
             <p className="text-center text-gray-300">

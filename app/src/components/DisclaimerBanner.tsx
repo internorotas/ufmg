@@ -8,10 +8,6 @@ import type { ComponentProps } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../lib/utils';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do banner de disclaimer
  */
@@ -31,17 +27,9 @@ export const contactButtonVariants = tv({
   ],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface DisclaimerBannerProps
   extends ComponentProps<'div'>,
     VariantProps<typeof disclaimerBannerVariants> {}
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Banner de aviso com informações de contato da Divisão de Transportes.

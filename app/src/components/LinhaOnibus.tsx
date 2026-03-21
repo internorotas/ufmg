@@ -12,10 +12,6 @@ import type { Linha, Parada } from '../types/data.types';
 import { HorariosModal } from './HorariosModal';
 import { ItinerarioModal } from './ItinerarioModal';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do card da linha
  */
@@ -59,10 +55,6 @@ export const suspensionAlertVariants = tv({
   base: ['mb-4 rounded-lg border p-4 text-center', 'border-red-600 bg-red-900/30'],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface LinhaOnibusProps {
   linha: Linha;
   onLinhaClick: () => void;
@@ -70,10 +62,6 @@ export interface LinhaOnibusProps {
   paradas: Parada[];
   onParadaClick: (parada: Parada) => void;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Card de linha de ônibus com informações de horário e ações.

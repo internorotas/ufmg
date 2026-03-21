@@ -11,10 +11,6 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../lib/utils';
 import { Dialog, dialogPopupVariants } from './ui/Dialog';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do header
  */
@@ -25,7 +21,6 @@ export const modalHeaderVariants = tv({
   ],
 });
 
-// Re-export variants for backward compatibility
 export { dialogPopupVariants as modalContentVariants };
 
 export const modalOverlayVariants = tv({
@@ -44,10 +39,6 @@ export const modalCloseButtonVariants = tv({
   ],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface ModalProps
   extends Omit<ComponentProps<'div'>, 'title'>,
     VariantProps<typeof dialogPopupVariants> {
@@ -60,10 +51,6 @@ export interface ModalProps
   /** Conteúdo do modal */
   children: ReactNode;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Componente de modal genérico usando Dialog headless.
@@ -86,7 +73,6 @@ export function Modal({ isOpen, onClose, title, children, size, className, ...pr
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Popup size={size} className={cn(className)} {...props}>
-          {/* Header */}
           <div data-slot="header" className={modalHeaderVariants()}>
             {typeof title === 'string' ? (
               <Dialog.Title>{title}</Dialog.Title>
@@ -96,7 +82,6 @@ export function Modal({ isOpen, onClose, title, children, size, className, ...pr
             <Dialog.Close aria-label="Fechar modal" />
           </div>
 
-          {/* Content */}
           <div data-slot="body" className="flex-1 overflow-y-auto rounded-b-xl bg-modal p-4">
             {children}
           </div>

@@ -16,10 +16,6 @@ import type { Linha, Parada } from '../types/data.types';
 import { DisclaimerEstimativa } from './DisclaimerEstimativa';
 import { PrevisaoBadge } from './PrevisaoBadge';
 
-// ============================================================================
-// VARIANTS
-// ============================================================================
-
 /**
  * Variantes do container do popup
  */
@@ -66,19 +62,11 @@ function getNomeExibicao(linha: Linha | null, nomeLinha: string): string {
   return linha.nome;
 }
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface PopupCustomizadoProps
   extends Omit<ComponentProps<typeof Popup>, 'children'>,
     VariantProps<typeof popupContainerVariants> {
   parada: Parada;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Popup customizado para marcador de parada de ônibus no mapa.
@@ -132,7 +120,6 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
   return (
     <Popup className={cn('popup-customizado', className)} minWidth={220} {...props}>
       <div data-slot="container" className={popupContainerVariants()}>
-        {/* Cabeçalho */}
         <div data-slot="header" className={popupHeaderVariants()}>
           <MapPin className="mt-1 shrink-0 text-internoRotas-laranja-ambar" size={22} />
           <div>
@@ -145,7 +132,6 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
           <DisclaimerEstimativa />
         </div>
 
-        {/* Linhas Atendidas */}
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
           <div data-slot="lines-section" className={popupLinesSectionVariants()}>
             <div className="mb-1.5 flex items-center gap-2">
@@ -197,7 +183,6 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
           </div>
         )}
 
-        {/* Descrição */}
         {parada.descricao && parada.descricao !== parada.nome && (
           <div data-slot="description" className="mt-2 border-t border-card-border pt-2">
             <p className="text-xs italic text-text-secondary">{parada.descricao}</p>

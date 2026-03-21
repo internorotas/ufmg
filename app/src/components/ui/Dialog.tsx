@@ -21,10 +21,6 @@ import { createPortal } from 'react-dom';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 
-// ============================================================================
-// CONTEXT
-// ============================================================================
-
 interface DialogContextValue {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -41,10 +37,6 @@ function useDialogContext() {
   }
   return context;
 }
-
-// ============================================================================
-// VARIANTS
-// ============================================================================
 
 /**
  * Variantes do backdrop
@@ -111,10 +103,6 @@ export const dialogCloseVariants = tv({
   ],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface DialogRootProps {
   /** Se o dialog está aberto */
   open: boolean;
@@ -154,10 +142,6 @@ export interface DialogCloseProps
   'aria-label'?: string;
 }
 
-// ============================================================================
-// COMPONENTS
-// ============================================================================
-
 /**
  * Root - Container principal que gerencia o estado do dialog
  *
@@ -179,7 +163,6 @@ function DialogRoot({ open, onOpenChange, children }: DialogRootProps) {
   const titleId = useId();
   const descriptionId = useId();
 
-  // Bloquear scroll quando aberto
   useEffect(() => {
     if (open) {
       const originalOverflow = document.body.style.overflow;
@@ -190,7 +173,6 @@ function DialogRoot({ open, onOpenChange, children }: DialogRootProps) {
     }
   }, [open]);
 
-  // Fechar com ESC
   useEffect(() => {
     if (!open) return;
 
@@ -254,7 +236,7 @@ function DialogPopup({ size, className, children, ...props }: DialogPopupProps) 
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-[2000] flex items-center justify-center p-4"
+      className="pointer-events-none fixed inset-0 z-2000 flex items-center justify-center p-4"
       role="presentation"
     >
       <div
@@ -341,9 +323,7 @@ function DialogClose({
   );
 }
 
-// ============================================================================
 // COMPOUND EXPORT
-// ============================================================================
 
 /**
  * Dialog - Compound component para modals/diálogos

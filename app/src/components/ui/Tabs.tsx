@@ -10,9 +10,7 @@ import { type ComponentProps, createContext, type ReactNode, useContext, useStat
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 
-// ============================================================================
 // CONTEXT
-// ============================================================================
 
 interface TabsContextValue {
   activeValue: string;
@@ -28,10 +26,6 @@ function useTabsContext() {
   }
   return context;
 }
-
-// ============================================================================
-// VARIANTS
-// ============================================================================
 
 /**
  * Variantes do container de tabs
@@ -115,10 +109,6 @@ export const tabsContentVariants = tv({
   ],
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface TabsProps
   extends Omit<ComponentProps<'div'>, 'defaultValue'>,
     VariantProps<typeof tabsVariants> {
@@ -155,9 +145,7 @@ export interface TabsContentProps extends ComponentProps<'div'> {
   children: ReactNode;
 }
 
-// ============================================================================
 // COMPONENTS
-// ============================================================================
 
 /**
  * Container principal das tabs
