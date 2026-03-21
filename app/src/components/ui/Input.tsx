@@ -10,9 +10,7 @@ import { tv, type VariantProps } from "tailwind-variants";
 import { Search, X } from "lucide-react";
 import { cn } from "../../lib/utils";
 
-// ============================================================================
 // VARIANTS
-// ============================================================================
 
 /**
  * Variantes do input base
@@ -69,9 +67,7 @@ export const inputContainerVariants = tv({
   },
 });
 
-// ============================================================================
 // TYPES
-// ============================================================================
 
 export interface InputProps
   extends
@@ -87,9 +83,7 @@ export interface InputProps
   fullWidth?: boolean;
 }
 
-// ============================================================================
 // COMPONENT
-// ============================================================================
 
 /**
  * Componente de input com suporte a ícones e estados
@@ -169,9 +163,7 @@ export function Input({
   );
 }
 
-// ============================================================================
 // SEARCH INPUT PRESET
-// ============================================================================
 
 export interface SearchInputProps extends Omit<
   ComponentProps<"input">,
@@ -258,7 +250,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             data-slot="clear-button"
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background"
             aria-label="Limpar busca"
             title="Limpar busca"
           >
