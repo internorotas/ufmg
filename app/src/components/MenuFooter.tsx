@@ -6,7 +6,7 @@
 import { Heart } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { useExternalLinkTracking } from '../hooks/useAnalytics';
+import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
 
 /**
@@ -63,10 +63,10 @@ export interface MenuFooterProps
  * ```
  */
 export function MenuFooter({ className, ...props }: MenuFooterProps) {
-  const { trackExternalLink } = useExternalLinkTracking();
+  const analytics = useAnalytics();
 
-  const handleLinkClick = (label: string, url: string) => {
-    trackExternalLink(url, label);
+  const handleLinkClick = (platform: string) => {
+    analytics.trackEvent('click_outbound_link', { platform });
   };
 
   return (
@@ -77,7 +77,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           href="https://forms.gle/5e9MHq9pp1p8T5Px5"
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => handleLinkClick('Contato', 'https://forms.gle/5e9MHq9pp1p8T5Px5')}
+          onClick={() => handleLinkClick('Contato')}
           className={footerButtonVariants({ intent: 'danger' })}
         >
           Contato
@@ -88,7 +88,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           href="https://github.com/internorotas/ufmg"
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => handleLinkClick('Sobre o Projeto', 'https://github.com/internorotas/ufmg')}
+          onClick={() => handleLinkClick('Sobre o Projeto')}
           className={footerButtonVariants({ intent: 'primary' })}
         >
           Sobre
@@ -113,7 +113,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
         href="https://github.com/igormartins4"
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => handleLinkClick('Dev Profile', 'https://github.com/igormartins4')}
+        onClick={() => handleLinkClick('Dev Profile')}
         className={creditLinkVariants()}
       >
         Desenvolvido com{' '}

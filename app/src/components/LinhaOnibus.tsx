@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { calculateNextAndPreviousSchedule } from '../../lib/utils';
 import { shouldDisableRegularSchedules } from '../config/specialPeriods';
+import { useAnalytics } from '../hooks/useAnalytics';
 import type { Linha, Parada } from '../types/data.types';
 import { HorariosModal } from './HorariosModal';
 import { ItinerarioModal } from './ItinerarioModal';
@@ -84,6 +85,7 @@ export function LinhaOnibus({
   paradas,
   onParadaClick,
 }: LinhaOnibusProps) {
+  const analytics = useAnalytics();
   const [isItinerarioVisible, setItinerarioVisible] = useState(false);
   const [isHorariosVisible, setHorariosVisible] = useState(false);
 
@@ -110,12 +112,19 @@ export function LinhaOnibus({
 
   const handleItinerarioToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
+    analytics.trackEvent('open_itinerario_modal', { linha: linha.nome });
     setItinerarioVisible(true);
   };
 
   const handleHorariosToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
+    analytics.trackEvent('open_horarios_modal', { linha: linha.nome });
     setHorariosVisible(true);
+  };
+
+  const handleExpandLineCard = () => {
+    analytics.trackEvent('expand_line_card', { linha: linha.nome });
+    onLinhaClick();
   };
 
   return (
@@ -123,7 +132,7 @@ export function LinhaOnibus({
       <div data-slot="line-card" className={lineCardContainerVariants()}>
         <button
           type="button"
-          onClick={onLinhaClick}
+          onClick={handleExpandLineCard}
           className={`${lineHeaderVariants()} ${bgColor}`}
           aria-label={`Ver detalhes da linha ${linha.nome}`}
           title={`Ver detalhes da linha ${linha.nome}`}
