@@ -4,11 +4,11 @@
  */
 
 import type { ComponentProps } from "react";
-import { useMemo } from "react";
 import { Popup } from "react-leaflet";
 import { tv, type VariantProps } from "tailwind-variants";
 import { Bus, MapPin } from "lucide-react";
 import { cn } from "../lib/utils";
+import { normalizarNomeLinha } from "../../lib/utils";
 import type { Parada, Linha } from "../types/data.types";
 import { DisclaimerEstimativa } from "./DisclaimerEstimativa";
 import { PrevisaoBadge } from "./PrevisaoBadge";
@@ -49,15 +49,6 @@ export const lineBadgeVariants = tv({
   ],
 });
 
-function normalizarNomeLinha(nomeLinha: string): string {
-  return nomeLinha
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s*\(.*?\)\s*/g, "")
-    .trim()
-    .toLowerCase();
-}
-
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -86,28 +77,14 @@ export function PopupCustomizado({
   className,
   ...props
 }: PopupCustomizadoProps) {
-  const { linhasData } = useRotasData();
-
-  // Mapear nome de linha para lista de objetos Linha e suportar aliases como "(Todas)"
-  const linhasPorNomeNormalizado = useMemo(() => {
-    const mapa = new Map<string, Linha[]>();
-    linhasData.categoriasDias.forEach((categoria) => {
-      categoria.linhas.forEach((linha) => {
-        const chave = normalizarNomeLinha(linha.nome);
-        const linhas = mapa.get(chave) ?? [];
-        linhas.push(linha);
-        mapa.set(chave, linhas);
-      });
-    });
-    return mapa;
-  }, [linhasData]);
+  const { rotasService } = useRotasData();
 
   const resolverLinhaPorNome = (
     nomeLinhaParada: string,
     idParadaAtual: string,
   ): Linha | null => {
     const chave = normalizarNomeLinha(nomeLinhaParada);
-    const candidatas = linhasPorNomeNormalizado.get(chave) ?? [];
+    const candidatas = rotasService.getLinhasPorNomeNormalizado(chave);
     if (candidatas.length === 0) return null;
 
     const comTrajetoNaParada = candidatas.find(

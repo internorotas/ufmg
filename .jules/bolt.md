@@ -8,10 +8,14 @@
 **Learning:** Found a specific codebase bottleneck in `LinhaDetalhesModal.tsx` where expensive array operations (searching for stops via IDs and parsing/sorting schedule strings) were not memoized. As a result, simply switching between the "Itinerário" and "Todos os Horários" tabs was re-executing O(N*M) lookups and re-sorting arrays on every tab change render.
 **Action:** Always wrap derived data calculations that involve sorting or deep array lookups (like `buscarParadasPorIds`) in `useMemo`, particularly in Modals that have internal state variables (like active tabs) that trigger frequent re-renders.
 
-## $(date +%Y-%m-%d) - Avoiding Test Degradation for Performance
+## 2024-05-25 - Avoiding Test Degradation for Performance
 **Learning:** When changing test code to accommodate performance fixes (e.g. dynamic text changes or timing), ensure that the rigor of the test is maintained. Weakening specific accessibility tests (like changing a string match to a simple truthiness check) is unacceptable, even if it allows the performance PR to pass tests quickly. Use regex matching or targeted logic instead.
 **Action:** Before changing a failing test, verify whether the original assertion is valid. If the output string changed due to legitimate logic, update the test using a precise regex instead of broad checks like `.toBeTruthy()`.
 
 ## 2025-03-18 - Optimize timeToMinutes parsing
 **Learning:** Found that string operations like `split(":")` and array iterations `map(Number)` create unnecessary object allocations and intermediate arrays which significantly impacts performance when processing thousands of schedules across multiple line cards on the home page.
 **Action:** Replaced functional string manipulation with `indexOf` and `slice` to avoid intermediate arrays, which yielded a ~2-3x performance boost on heavy loops across schedule parsing operations.
+
+## 2024-05-25 - O(1) string normalization caching for UI map lookup
+**Learning:** Found an $O(N)$ string normalization map construction occurring inside `useMemo` of `PopupCustomizado.tsx` which runs for every map popup opened. While `useMemo` caches per instance, mapping thousands of stops again and again whenever a user clicks a new popup creates noticeable UI latency.
+**Action:** When component instances require derived data from global context that only depends on the source global data (e.g. normalizing line names), compute the derived structure exactly once in the data provider layer (`RotasService`) instead of locally within the component tree, reducing complex view initializations from $O(N)$ to $O(1)$.
