@@ -114,7 +114,7 @@ function AppContent() {
   // Validação dos dados
   if (!todasParadas || todasParadas.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-[100dvh] w-screen bg-gray-100 text-gray-800">
+      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
         <div className="text-center p-8 bg-white rounded-lg shadow-xl">
           <h2 className="text-2xl font-bold mb-2 text-red-600">
             ⚠️ Dados não encontrados
@@ -132,7 +132,7 @@ function AppContent() {
 
   if (!linhasData || !linhasData.categoriasDias) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-[100dvh] w-screen bg-gray-100 text-gray-800">
+      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
         <div className="text-center p-8 bg-white rounded-lg shadow-xl">
           <h2 className="text-2xl font-bold mb-2 text-red-600">
             ⚠️ Erro nos Dados de Linhas
@@ -149,7 +149,7 @@ function AppContent() {
   }
 
   return (
-    <div className="relative flex h-screen min-h-[100dvh] w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
+    <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
       <MenuLateral
         linhasData={linhasData}
         todasParadas={todasParadas}
