@@ -3,13 +3,56 @@
  * Adapter Pattern - encapsula a dependência do react-ga4.
  */
 
-import ReactGA from 'react-ga4';
+import ReactGAImport from 'react-ga4';
 import type {
   AnalyticsEvent,
   IAnalyticsService,
   PageViewEvent,
   TimingEvent,
 } from './IAnalyticsService';
+
+type GAClient = {
+  initialize: (measurementId: string, options?: Record<string, unknown>) => void;
+  event: (options: Record<string, unknown>) => void;
+  send: (options: Record<string, unknown>) => void;
+  set: (fields: Record<string, unknown>) => void;
+};
+
+function resolveGAClient(): GAClient | null {
+  const moduleValue = ReactGAImport as unknown as {
+    default?: unknown;
+  };
+  const candidate = moduleValue.default ?? moduleValue;
+
+  if (
+    candidate &&
+    typeof candidate === 'object' &&
+    'initialize' in candidate &&
+    typeof (candidate as { initialize?: unknown }).initialize === 'function'
+  ) {
+    return candidate as GAClient;
+  }
+
+  // Algumas versões/transpilações podem exportar a classe ao invés da instância.
+  if (typeof candidate === 'function') {
+    const prototype = candidate.prototype as { initialize?: unknown } | undefined;
+    if (prototype && typeof prototype.initialize === 'function') {
+      const instance = new (candidate as new () => unknown)();
+      if (
+        instance &&
+        typeof instance === 'object' &&
+        'initialize' in instance &&
+        typeof (instance as { initialize?: unknown }).initialize === 'function'
+      ) {
+        return instance as GAClient;
+      }
+    }
+  }
+
+  return null;
+}
+
+const ReactGA = resolveGAClient();
 
 /**
  * Implementação do serviço de analytics usando Google Analytics 4.
@@ -25,7 +68,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
   }
 
   get isEnabled(): boolean {
-    return !!this.measurementId;
+    return !!this.measurementId && !!ReactGA;
   }
 
   initialize(): void {
@@ -37,9 +80,10 @@ export class GA4AnalyticsService implements IAnalyticsService {
       return;
     }
 
-    ReactGA.initialize(this.measurementId, {
-      testMode: import.meta.env.DEV,
-      gaOptions: {
+    ReactGA?.initialize(this.measurementId, {
+      // testMode bloqueia envio de hits; manter false para aparecer no DebugView.
+      testMode: import.meta.env.MODE === 'test',
+      gtagOptions: {
         debug_mode: import.meta.env.DEV,
       },
     });
@@ -61,7 +105,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
   trackEvent(event: AnalyticsEvent): void {
     if (!this.ensureInitialized()) return;
 
-    ReactGA.event({
+    ReactGA?.event({
       category: event.category,
       action: event.action,
       label: event.label,
@@ -72,7 +116,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
   trackPageView(event?: PageViewEvent): void {
     if (!this.ensureInitialized()) return;
 
-    ReactGA.send({
+    ReactGA?.send({
       hitType: 'pageview',
       page: event?.path || window.location.pathname,
       title: event?.title,
@@ -82,13 +126,13 @@ export class GA4AnalyticsService implements IAnalyticsService {
   setUserProperty(property: string, value: string): void {
     if (!this.ensureInitialized()) return;
 
-    ReactGA.set({ [property]: value });
+    ReactGA?.set({ [property]: value });
   }
 
   trackTiming(timing: TimingEvent): void {
     if (!this.ensureInitialized()) return;
 
-    ReactGA.event({
+    ReactGA?.event({
       category: timing.category || 'Performance',
       action: timing.name,
       label: timing.label,
@@ -99,7 +143,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
   trackError(error: Error, fatal: boolean = false): void {
     if (!this.ensureInitialized()) return;
 
-    ReactGA.event({
+    ReactGA?.event({
       category: 'Erro',
       action: error.name || 'Error',
       label: error.message,
