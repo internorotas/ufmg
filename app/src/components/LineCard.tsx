@@ -241,6 +241,11 @@ function LineCardComponent({
   })();
 
   const handleCardClick = () => {
+    trackEvent({
+      category: 'Engajamento',
+      action: 'Clique Card Linha',
+      label: `${linha.nome} | status=${statusLinha.id} | prox=${nextSchedule}`,
+    });
     onClick(linha);
   };
 

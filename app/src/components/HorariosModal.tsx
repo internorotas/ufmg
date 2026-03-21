@@ -4,9 +4,10 @@
  */
 
 import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { tv } from 'tailwind-variants';
 import { findScheduleIndex, timeToMinutes } from '../../lib/utils';
+import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
 import type { Linha } from '../types/data.types';
@@ -82,6 +83,7 @@ export interface HorariosModalProps {
  * ```
  */
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
+  const { trackEvent } = useAnalytics();
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const statusLinha = obterStatusLinha(linha, now);
@@ -115,8 +117,43 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const proximos = baseHorarios.slice(splitIndex);
   const todos = baseHorarios;
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    trackEvent({
+      category: 'Horarios',
+      action: 'Abrir Modal Horarios',
+      label: `${linha.nome} | status=${statusLinha.id}`,
+      value: todos.length,
+    });
+
+    trackEvent({
+      category: 'Horarios',
+      action: 'Distribuicao Horarios',
+      label: `linha=${linha.nome};proximos=${proximos.length};passados=${passados.length};total=${todos.length}`,
+      value: proximos.length,
+    });
+  }, [
+    isOpen,
+    linha.nome,
+    passados.length,
+    proximos.length,
+    statusLinha.id,
+    todos.length,
+    trackEvent,
+  ]);
+
+  const handleClose = () => {
+    trackEvent({
+      category: 'Horarios',
+      action: 'Fechar Modal Horarios',
+      label: linha.nome,
+    });
+    onClose();
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Horários - ${linha.nome}`} size="md">
+    <Modal isOpen={isOpen} onClose={handleClose} title={`Horários - ${linha.nome}`} size="md">
       <div className="space-y-6">
         {/* Aviso de Horários Suspensos */}
         {shouldDisableSchedules && (
