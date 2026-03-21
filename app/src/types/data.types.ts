@@ -18,6 +18,7 @@ export interface DadosRotas {
 export interface Trecho {
   idParada: string;
   tempoDoAnteriorMinutos: number;
+  isTrechoExterno?: boolean;
 }
 
 // Tipos para os dados das linhas, usados no Menu Lateral
