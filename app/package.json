@@ -6,11 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "vite build && vite gh-pages",
-    "format": "prettier --write .",
-    "generate:og": "node scripts/generate-og-image.mjs"
+    "format": "biome format --write ./src",
+    "lint": "biome check ./src",
+    "lint:fix": "biome check --write ./src",
+    "generate:og": "node scripts/generate-og-image.mjs",
+    "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
@@ -30,7 +32,9 @@
     "use-debounce": "^10.1.0"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@biomejs/biome": "^2.4.8",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@tailwindcss/vite": "^4.2.2",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^25.5.0",
@@ -38,15 +42,11 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.27",
-    "eslint": "^10.1.0",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "husky": "^9.1.7",
     "postcss": "^8.5.8",
-    "prettier": "^3.8.1",
     "tailwindcss": "^4.2.2",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.57.1",
     "vite": "^8.0.1",
     "vite-plugin-gh-pages": "^1.0.1"
   }
