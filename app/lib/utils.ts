@@ -162,3 +162,15 @@ export function buscarParadasPorIds<T extends { idParada: string }>(
     .map((idParada) => paradasMap!.get(idParada))
     .filter((p): p is T => p !== undefined);
 }
+
+/**
+ * Normaliza o nome de uma linha para busca O(1) ignorando acentos e parenteses.
+ */
+export function normalizarNomeLinha(nomeLinha: string): string {
+  return nomeLinha
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s*\(.*?\)\s*/g, "")
+    .trim()
+    .toLowerCase();
+}
