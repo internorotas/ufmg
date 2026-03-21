@@ -258,7 +258,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             data-slot="clear-button"
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background"
             aria-label="Limpar busca"
             title="Limpar busca"
           >
