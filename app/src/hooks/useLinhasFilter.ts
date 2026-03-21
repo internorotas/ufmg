@@ -89,7 +89,7 @@ function filterLinhas(linhas: Linha[], searchTerm: string): Linha[] {
   return linhas.filter(
     (linha) =>
       linha.nome.toLowerCase().includes(termLower) ||
-      (linha.sublinha && linha.sublinha.toLowerCase().includes(termLower)) ||
+      linha.sublinha?.toLowerCase().includes(termLower) ||
       linha.descricao.toLowerCase().includes(termLower),
   );
 }

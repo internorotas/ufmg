@@ -15,7 +15,13 @@ import { ThemeProvider } from './contexts/ThemeContext';
 /**
  * O ponto de entrada da aplicação. Renderiza o componente principal (`App`) dentro do `StrictMode` e do `ThemeProvider`.
  */
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Elemento #root não encontrado para inicializar a aplicação.');
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <ThemeProvider>
       <App />

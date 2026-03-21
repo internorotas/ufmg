@@ -61,7 +61,7 @@ export const MapRoute = React.memo(function MapRoute({ linha }: MapRouteProps) {
  */
 export function useRouteBounds(linha: Linha | null): L.LatLngBounds | null {
   return useMemo(() => {
-    if (linha && linha.coordenadasTrajeto && linha.coordenadasTrajeto.length > 0) {
+    if (linha?.coordenadasTrajeto && linha.coordenadasTrajeto.length > 0) {
       return L.latLngBounds(linha.coordenadasTrajeto as L.LatLngExpression[]);
     }
     return null;

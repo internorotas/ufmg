@@ -1,6 +1,5 @@
 import { MapPin, Navigation } from 'lucide-react';
 import { lazy, Suspense, useCallback, useEffect } from 'react';
-import ReactGA from 'react-ga4';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MenuLateral } from './components/MenuLateral';
@@ -10,6 +9,7 @@ import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useAnalytics } from './hooks/useAnalytics';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
+import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
@@ -27,7 +27,7 @@ const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 // Inicializa o Google Analytics APENAS se a ID existir
 if (GA_MEASUREMENT_ID) {
-  ReactGA.initialize(GA_MEASUREMENT_ID);
+  ga4Analytics.initialize();
 }
 
 /**
@@ -145,7 +145,7 @@ function AppContent() {
         onParadaClick={handleParadaClick}
         linhaSelecionada={linhaSelecionada}
       />
-      <main role="main" className="h-full w-full grow">
+      <main className="h-full w-full grow">
         <Suspense fallback={<LoadingMap />}>
           <Mapa
             ref={mapaRef}

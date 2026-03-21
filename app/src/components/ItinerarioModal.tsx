@@ -109,6 +109,7 @@ export function ItinerarioModal({
                   )}
 
                   <button
+                    type="button"
                     onClick={() => handleParadaClick(parada)}
                     className={stopButtonVariants()}
                     aria-label={`Ver localização da parada ${parada.nome} no mapa`}

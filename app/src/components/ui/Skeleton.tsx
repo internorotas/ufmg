@@ -110,14 +110,16 @@ export function SkeletonText({
   className,
   ...props
 }: SkeletonTextProps) {
+  const lineIds = Array.from({ length: lines }, (_, index) => `line-${index}`);
+
   return (
     <div data-slot="skeleton-text" className={cn('space-y-2', className)}>
-      {Array.from({ length: lines }).map((_, i) => (
+      {lineIds.map((lineId, index) => (
         <Skeleton
-          key={i}
+          key={lineId}
           className="h-4"
           style={{
-            width: i === lines - 1 ? lastLineWidth : '100%',
+            width: index === lines - 1 ? lastLineWidth : '100%',
           }}
           {...props}
         />
@@ -193,10 +195,12 @@ export function SkeletonLineCard({ className }: { className?: string }) {
  * Skeleton para lista de linhas
  */
 export function SkeletonLineList({ count = 5, className }: { count?: number; className?: string }) {
+  const cardIds = Array.from({ length: count }, (_, index) => `line-card-${index}`);
+
   return (
     <div data-slot="skeleton-line-list" className={cn('space-y-3', className)}>
-      {Array.from({ length: count }).map((_, i) => (
-        <SkeletonLineCard key={i} />
+      {cardIds.map((cardId) => (
+        <SkeletonLineCard key={cardId} />
       ))}
     </div>
   );
@@ -226,6 +230,7 @@ export function SkeletonMap({ className }: { className?: string }) {
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
+              <title>Mapa</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -261,6 +266,8 @@ export function SkeletonMap({ className }: { className?: string }) {
  * Skeleton para menu lateral
  */
 export function SkeletonSidebar({ className }: { className?: string }) {
+  const sidebarCardIds = ['sidebar-card-1', 'sidebar-card-2', 'sidebar-card-3', 'sidebar-card-4'];
+
   return (
     <div data-slot="skeleton-sidebar" className={cn('flex h-full flex-col p-4', className)}>
       {/* Logo */}
@@ -278,8 +285,8 @@ export function SkeletonSidebar({ className }: { className?: string }) {
 
       {/* Lines list */}
       <div className="flex-1 space-y-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <SkeletonLineCard key={i} />
+        {sidebarCardIds.map((cardId) => (
+          <SkeletonLineCard key={cardId} />
         ))}
       </div>
     </div>

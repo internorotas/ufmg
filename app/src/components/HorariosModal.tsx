@@ -93,7 +93,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
 
     return horariosDoDia
-      .filter((time) => time && time.includes(':'))
+      .filter((time) => time?.includes(':'))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
@@ -137,9 +137,9 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
               Próximos Horários
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {proximos.map(({ horario }, index) => (
+              {proximos.map(({ horario }) => (
                 <div
-                  key={`proximo-${index}`}
+                  key={`proximo-${horario}`}
                   className={scheduleCardVariants({ status: 'upcoming' })}
                 >
                   <span className="sr-only">Próximo horário às {horario}</span>
@@ -160,9 +160,9 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
               Horários Passados
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {passados.map(({ horario }, index) => (
+              {passados.map(({ horario }) => (
                 <div
-                  key={`passado-${index}`}
+                  key={`passado-${horario}`}
                   className={scheduleCardVariants({ status: 'passed' })}
                 >
                   <span className="sr-only">Horário passado às {horario}</span>

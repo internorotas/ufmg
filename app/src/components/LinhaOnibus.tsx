@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { Clock, Map } from 'lucide-react';
+import { Clock, Map as MapIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { calculateNextAndPreviousSchedule } from '../../lib/utils';
@@ -134,6 +134,7 @@ export function LinhaOnibus({
     <>
       <div data-slot="line-card" className={lineCardContainerVariants()}>
         <button
+          type="button"
           onClick={onLinhaClick}
           className={`${lineHeaderVariants()} ${bgColor}`}
           aria-label={`Ver detalhes da linha ${linha.nome}`}
@@ -171,15 +172,17 @@ export function LinhaOnibus({
             {/* Botões de Ação */}
             <div data-slot="actions" className="flex gap-2">
               <button
+                type="button"
                 onClick={handleItinerarioToggle}
                 className={actionButtonVariants({ intent: 'primary' })}
                 aria-label={`Ver itinerário da linha ${linha.nome}`}
                 title="Ver Itinerário"
               >
-                <Map size={18} />
+                <MapIcon size={18} />
                 Itinerário
               </button>
               <button
+                type="button"
                 onClick={handleHorariosToggle}
                 className={actionButtonVariants({ intent: 'secondary' })}
                 aria-label={`Ver mais horários da linha ${linha.nome}`}

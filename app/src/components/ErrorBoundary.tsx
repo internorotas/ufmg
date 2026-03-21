@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { ga4Analytics } from '../services/analytics';
 
 interface Props {
   children: ReactNode;
@@ -25,21 +26,12 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log o erro no console
-    console.error('Error Boundary capturou um erro:', error, errorInfo);
-
-    // Rastreia no Google Analytics se disponível
-    const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
-    if (GA_MEASUREMENT_ID) {
-      import('react-ga4').then((ReactGA) => {
-        ReactGA.default.event({
-          category: 'Erro',
-          action: 'React Error Boundary',
-          label: `${error.name}: ${error.message} - Component Stack: ${errorInfo.componentStack?.slice(0, 150)}`,
-          value: 1, // 1 = erro fatal
-        });
-      });
-    }
+    ga4Analytics.trackEvent({
+      category: 'Erro',
+      action: 'React Error Boundary',
+      label: `${error.name}: ${error.message} - Component Stack: ${errorInfo.componentStack?.slice(0, 150)}`,
+      value: 1,
+    });
   }
 
   render() {
@@ -54,6 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 novamente.
               </p>
               <button
+                type="button"
                 onClick={() => window.location.reload()}
                 className="px-6 py-3 bg-brand-primary hover:bg-brand-secondary text-white font-semibold rounded-lg transition-colors"
               >
@@ -86,7 +79,6 @@ export function useErrorHandler() {
   const { trackError } = useAnalytics();
 
   const handleError = (error: Error, fatal: boolean = false) => {
-    console.error(fatal ? 'Erro Fatal:' : 'Erro:', error);
     trackError(error, fatal);
   };
 
