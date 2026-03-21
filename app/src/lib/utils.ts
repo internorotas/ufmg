@@ -3,9 +3,9 @@
  * Interno Rotas - UFMG
  */
 
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-import type { Linha } from "../types/data.types";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import type { Linha } from '../types/data.types';
 
 /**
  * Mescla classes CSS usando clsx e tailwind-merge.
@@ -34,7 +34,7 @@ export function cn(...inputs: ClassValue[]): string {
 export function converterHoraParaMinutos(horaString: string): number {
   if (!horaString) return NaN;
 
-  const colonIndex = horaString.indexOf(":");
+  const colonIndex = horaString.indexOf(':');
   if (colonIndex === -1) return NaN;
 
   const horas = Number(horaString.slice(0, colonIndex));
@@ -49,7 +49,7 @@ export function converterHoraParaMinutos(horaString: string): number {
  * Converte minutos desde meia-noite para HH:MM com padding de zeros.
  */
 export function converterMinutosParaHora(minutosTotais: number): string {
-  if (!Number.isFinite(minutosTotais)) return "--:--";
+  if (!Number.isFinite(minutosTotais)) return '--:--';
 
   const minutosNoDia = 24 * 60;
   const valorNormalizado =
@@ -57,7 +57,7 @@ export function converterMinutosParaHora(minutosTotais: number): string {
   const horas = Math.floor(valorNormalizado / 60);
   const minutos = valorNormalizado % 60;
 
-  return `${horas.toString().padStart(2, "0")}:${minutos.toString().padStart(2, "0")}`;
+  return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
 }
 
 interface HorariosPorDia {
@@ -67,24 +67,24 @@ interface HorariosPorDia {
 }
 
 function parseHorarioValido(horario: string): number | null {
-  if (!horario || !horario.includes(":")) return null;
+  if (!horario || !horario.includes(':')) return null;
   const minutos = converterHoraParaMinutos(horario);
   return Number.isFinite(minutos) ? minutos : null;
 }
 
 function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
   const diaSemana = dataAtual.getDay();
-  if (diaSemana === 6) return "sabados";
-  if (diaSemana === 0) return "domingos";
-  return "diasUteis";
+  if (diaSemana === 6) return 'sabados';
+  if (diaSemana === 0) return 'domingos';
+  return 'diasUteis';
 }
 
 function linhaCirculaNoDiaCategoria(linha: Linha, dataAtual: Date): boolean {
   const diaSemana = dataAtual.getDay();
   const categoria = linha.categoriaDia;
 
-  if (categoria === "sabado") return diaSemana === 6;
-  if (categoria === "diasUteis" || categoria === "feriasRecessos") {
+  if (categoria === 'sabado') return diaSemana === 6;
+  if (categoria === 'diasUteis' || categoria === 'feriasRecessos') {
     return diaSemana >= 1 && diaSemana <= 5;
   }
 
@@ -95,10 +95,7 @@ function linhaCirculaNoDiaCategoria(linha: Linha, dataAtual: Date): boolean {
  * Retorna os horários válidos da linha para o dia atual.
  * Suporta formato legado (array) e formato por dia (objeto).
  */
-export function obterHorariosLinhaNoDia(
-  linha: Linha,
-  dataAtual: Date,
-): string[] {
+export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[] {
   const horariosBrutos = linha.horarios as unknown;
 
   if (Array.isArray(horariosBrutos)) {
@@ -106,12 +103,10 @@ export function obterHorariosLinhaNoDia(
       return [];
     }
 
-    return horariosBrutos.filter(
-      (horario) => parseHorarioValido(horario) !== null,
-    );
+    return horariosBrutos.filter((horario) => parseHorarioValido(horario) !== null);
   }
 
-  if (!horariosBrutos || typeof horariosBrutos !== "object") {
+  if (!horariosBrutos || typeof horariosBrutos !== 'object') {
     return [];
   }
 
@@ -140,9 +135,9 @@ export function obterStatusLinha(
 
   if (horariosHoje.length === 0) {
     return {
-      id: "NAO_CIRCULA_HOJE",
-      texto: "Não circula hoje",
-      cor: "danger",
+      id: 'NAO_CIRCULA_HOJE',
+      texto: 'Não circula hoje',
+      cor: 'danger',
     };
   }
 
@@ -152,24 +147,24 @@ export function obterStatusLinha(
 
   if (agoraMinutos < primeiroHorario) {
     return {
-      id: "AGUARDANDO_PRIMEIRA_SAIDA",
+      id: 'AGUARDANDO_PRIMEIRA_SAIDA',
       texto: `Próximo às ${converterMinutosParaHora(primeiroHorario)}`,
-      cor: "warning",
+      cor: 'warning',
     };
   }
 
   if (agoraMinutos > ultimoHorario) {
     return {
-      id: "ENCERRADA",
-      texto: "Encerrado",
-      cor: "neutral",
+      id: 'ENCERRADA',
+      texto: 'Encerrado',
+      cor: 'neutral',
     };
   }
 
   return {
-    id: "CIRCULANDO",
-    texto: "Circulando",
-    cor: "info",
+    id: 'CIRCULANDO',
+    texto: 'Circulando',
+    cor: 'info',
   };
 }
 
@@ -205,10 +200,7 @@ export function calcularDistanciaKm(
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 

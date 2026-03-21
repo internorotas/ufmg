@@ -1,5 +1,5 @@
-import { Component, ReactNode, ErrorInfo } from "react";
-import { useAnalytics } from "../hooks/useAnalytics";
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 interface Props {
   children: ReactNode;
@@ -26,15 +26,15 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log o erro no console
-    console.error("Error Boundary capturou um erro:", error, errorInfo);
+    console.error('Error Boundary capturou um erro:', error, errorInfo);
 
     // Rastreia no Google Analytics se disponível
     const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
     if (GA_MEASUREMENT_ID) {
-      import("react-ga4").then((ReactGA) => {
+      import('react-ga4').then((ReactGA) => {
         ReactGA.default.event({
-          category: "Erro",
-          action: "React Error Boundary",
+          category: 'Erro',
+          action: 'React Error Boundary',
           label: `${error.name}: ${error.message} - Component Stack: ${errorInfo.componentStack?.slice(0, 150)}`,
           value: 1, // 1 = erro fatal
         });
@@ -48,12 +48,10 @@ export class ErrorBoundary extends Component<Props, State> {
         this.props.fallback || (
           <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
             <div className="text-center p-8 bg-white rounded-lg shadow-xl max-w-md">
-              <h2 className="text-2xl font-bold mb-4 text-red-600">
-                😔 Ops! Algo deu errado
-              </h2>
+              <h2 className="text-2xl font-bold mb-4 text-red-600">😔 Ops! Algo deu errado</h2>
               <p className="text-gray-600 mb-6">
-                Encontramos um erro inesperado. Por favor, recarregue a página
-                para tentar novamente.
+                Encontramos um erro inesperado. Por favor, recarregue a página para tentar
+                novamente.
               </p>
               <button
                 onClick={() => window.location.reload()}
@@ -88,7 +86,7 @@ export function useErrorHandler() {
   const { trackError } = useAnalytics();
 
   const handleError = (error: Error, fatal: boolean = false) => {
-    console.error(fatal ? "Erro Fatal:" : "Erro:", error);
+    console.error(fatal ? 'Erro Fatal:' : 'Erro:', error);
     trackError(error, fatal);
   };
 

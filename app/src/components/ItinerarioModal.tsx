@@ -3,13 +3,13 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useMemo } from "react";
-import { tv } from "tailwind-variants";
-import { MapPin } from "lucide-react";
-import { Modal } from "./Modal";
-import type { Linha, Parada } from "../types/data.types";
-import { buscarParadasPorIds } from "../../lib/utils";
-import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
+import { MapPin } from 'lucide-react';
+import { useMemo } from 'react';
+import { tv } from 'tailwind-variants';
+import { buscarParadasPorIds } from '../../lib/utils';
+import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
+import type { Linha, Parada } from '../types/data.types';
+import { Modal } from './Modal';
 
 // ============================================================================
 // VARIANTS
@@ -19,27 +19,21 @@ import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
  * Variantes do botão de parada
  */
 export const stopButtonVariants = tv({
-  base: "group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2",
+  base: 'group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2',
 });
 
 /**
  * Variantes do container do ícone de parada
  */
 export const stopIconContainerVariants = tv({
-  base: [
-    "relative z-10 mt-0.5 shrink-0",
-    "flex size-6 items-center justify-center rounded-full",
-  ],
+  base: ['relative z-10 mt-0.5 shrink-0', 'flex size-6 items-center justify-center rounded-full'],
 });
 
 /**
  * Variantes do card de informação
  */
 export const infoCardVariants = tv({
-  base: [
-    "rounded-lg border p-4 text-center text-sm",
-    "border-card-border bg-card",
-  ],
+  base: ['rounded-lg border p-4 text-center text-sm', 'border-card-border bg-card'],
 });
 
 // ============================================================================
@@ -92,21 +86,14 @@ export function ItinerarioModal({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Itinerário - ${linha.nome}`}
-      size="lg"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={`Itinerário - ${linha.nome}`} size="lg">
       <div className="relative">
         {paradasDoItinerario.length > 0 ? (
           <div className="relative">
             {paradasDoItinerario.map((parada) => {
-              const isFirst =
-                parada.idParada === paradasDoItinerario[0]?.idParada;
+              const isFirst = parada.idParada === paradasDoItinerario[0]?.idParada;
               const isLast =
-                parada.idParada ===
-                paradasDoItinerario[paradasDoItinerario.length - 1]?.idParada;
+                parada.idParada === paradasDoItinerario[paradasDoItinerario.length - 1]?.idParada;
 
               return (
                 <div key={parada.idParada} className="relative flex">
@@ -147,9 +134,7 @@ export function ItinerarioModal({
                         </p>
                       )}
                       {!isFirst && !isLast && (
-                        <p className="mt-0.5 text-xs text-text-secondary">
-                          Parada Regular
-                        </p>
+                        <p className="mt-0.5 text-xs text-text-secondary">Parada Regular</p>
                       )}
 
                       {isFirst && (
@@ -172,39 +157,32 @@ export function ItinerarioModal({
 
                       {/* Previsão de chegada nesta parada */}
                       {(() => {
-                        const previsao = calcularPrevisaoChegada(
-                          linha,
-                          parada.idParada,
-                        );
+                        const previsao = calcularPrevisaoChegada(linha, parada.idParada);
                         if (!previsao || !previsao.proximoOnibus) return null;
-                        const {
-                          proximoOnibus,
-                          onibusAnterior,
-                          isTrafegoIntenso,
-                        } = previsao;
+                        const { proximoOnibus, onibusAnterior, isTrafegoIntenso } = previsao;
                         const minutos = proximoOnibus.minutosFaltantes;
 
                         const badgeBg =
                           minutos < 1
-                            ? "var(--success-bg)"
+                            ? 'var(--success-bg)'
                             : isTrafegoIntenso
-                              ? "var(--warning-bg)"
+                              ? 'var(--warning-bg)'
                               : minutos <= 15
-                                ? "var(--success-bg)"
-                                : "var(--warning-bg)";
+                                ? 'var(--success-bg)'
+                                : 'var(--warning-bg)';
 
                         const badgeText =
                           minutos < 1
-                            ? "var(--success-text)"
+                            ? 'var(--success-text)'
                             : isTrafegoIntenso
-                              ? "#d97706"
+                              ? '#d97706'
                               : minutos <= 15
-                                ? "var(--success-text)"
-                                : "var(--warning-text)";
+                                ? 'var(--success-text)'
+                                : 'var(--warning-text)';
 
                         const textoChegada =
                           minutos < 1
-                            ? "Chega agora"
+                            ? 'Chega agora'
                             : minutos < 60
                               ? `~${minutos} min · ${proximoOnibus.horarioChegada}`
                               : (() => {
@@ -228,8 +206,7 @@ export function ItinerarioModal({
                             </span>
                             {onibusAnterior && (
                               <span className="text-[10px] text-text-tertiary">
-                                Último passou há{" "}
-                                {onibusAnterior.minutosQuePassou} min
+                                Último passou há {onibusAnterior.minutosQuePassou} min
                               </span>
                             )}
                           </div>
@@ -249,9 +226,7 @@ export function ItinerarioModal({
       </div>
 
       <div data-slot="tip" className={`mt-6 ${infoCardVariants()}`}>
-        <p className="text-text-secondary">
-          💡 Clique em uma parada para visualizá-la no mapa
-        </p>
+        <p className="text-text-secondary">💡 Clique em uma parada para visualizá-la no mapa</p>
       </div>
     </Modal>
   );

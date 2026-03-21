@@ -1,14 +1,14 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from 'react';
 import {
+  type AnalyticsEvent,
+  type EventCategory,
   ga4Analytics,
   type IAnalyticsService,
-  type AnalyticsEvent,
   type TimingEvent,
-  type EventCategory,
-} from "../services/analytics";
+} from '../services/analytics';
 
 // Re-exporta os tipos para compatibilidade
-export type { EventCategory, AnalyticsEvent, TimingEvent };
+export type { AnalyticsEvent, EventCategory, TimingEvent };
 
 // Serviço de analytics injetável (permite trocar implementação)
 let analyticsService: IAnalyticsService = ga4Analytics;
@@ -73,10 +73,7 @@ export function useAnalytics() {
 /**
  * Hook para rastrear tempo de permanência em um componente
  */
-export function useSessionTiming(
-  label: string,
-  category: EventCategory = "Session",
-) {
+export function useSessionTiming(label: string, category: EventCategory = 'Session') {
   const startTimeRef = useRef<number>(0);
   const { trackTiming, isEnabled } = useAnalytics();
 
@@ -91,7 +88,7 @@ export function useSessionTiming(
       // Só rastreia se a sessão durou mais de 1 segundo (evita cliques acidentais)
       if (sessionDuration > 1000) {
         trackTiming({
-          name: "Session Duration",
+          name: 'Session Duration',
           value: Math.round(sessionDuration),
           category,
           label,
@@ -110,8 +107,8 @@ export function useExternalLinkTracking() {
   const trackExternalLink = useCallback(
     (url: string, label: string) => {
       trackEvent({
-        category: "External Link",
-        action: "Click",
+        category: 'External Link',
+        action: 'Click',
         label: `${label} - ${url}`,
       });
     },

@@ -3,24 +3,24 @@
  * Design System - Interno Rotas UFMG
  */
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { Menu, ArrowLeft } from "lucide-react";
-import { useLinhasFilter } from "../hooks/useLinhasFilter";
-import { LinhaDetalhesModal } from "./LinhaDetalhesModal";
-import { ThemeToggle } from "./ThemeToggle";
-import { DisclaimerBanner } from "./DisclaimerBanner";
-import { InfoBanner } from "./InfoBanner";
-import { VacationBanner } from "./VacationBanner";
-import { MenuFooter } from "./MenuFooter";
-import { LineCard } from "./LineCard";
-import { SearchEmptyState } from "./ui/EmptyState";
-import { Tabs, TabsList, TabsTrigger } from "./ui/Tabs";
-import { SearchInput } from "./ui/Input";
-import { Button } from "./ui/Button";
-import { useRotasSelection } from "../contexts/RotasContext";
-import type { Linha, CategoriaLinhas, Parada } from "../types/data.types";
-import logo from "../assets/logo-horizontal-transparente.svg";
+import { ArrowLeft, Menu } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import logo from '../assets/logo-horizontal-transparente.svg';
+import { useRotasSelection } from '../contexts/RotasContext';
+import { useLinhasFilter } from '../hooks/useLinhasFilter';
+import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
+import { DisclaimerBanner } from './DisclaimerBanner';
+import { InfoBanner } from './InfoBanner';
+import { LineCard } from './LineCard';
+import { LinhaDetalhesModal } from './LinhaDetalhesModal';
+import { MenuFooter } from './MenuFooter';
+import { ThemeToggle } from './ThemeToggle';
+import { Button } from './ui/Button';
+import { SearchEmptyState } from './ui/EmptyState';
+import { SearchInput } from './ui/Input';
+import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
+import { VacationBanner } from './VacationBanner';
 
 // ============================================================================
 // VARIANTS
@@ -31,18 +31,18 @@ import logo from "../assets/logo-horizontal-transparente.svg";
  */
 export const sidebarVariants = tv({
   base: [
-    "fixed inset-y-0 left-0 z-[1003] flex flex-col",
-    "w-[85vw] max-w-md md:relative md:w-1/2",
-    "border-r border-card-border/50 text-text-primary",
+    'fixed inset-y-0 left-0 z-[1003] flex flex-col',
+    'w-[85vw] max-w-md md:relative md:w-1/2',
+    'border-r border-card-border/50 text-text-primary',
     // Glassmorphism effect
-    "bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150",
-    "shadow-2xl md:shadow-none",
-    "transform transition-transform duration-300",
+    'bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150',
+    'shadow-2xl md:shadow-none',
+    'transform transition-transform duration-300',
   ],
   variants: {
     visible: {
-      true: "translate-x-0",
-      false: "-translate-x-full md:translate-x-0",
+      true: 'translate-x-0',
+      false: '-translate-x-full md:translate-x-0',
     },
   },
   defaultVariants: {
@@ -55,15 +55,15 @@ export const sidebarVariants = tv({
  */
 export const categoryTabVariants = tv({
   base: [
-    "flex-1 rounded-md px-2.5 py-2 lg:py-2.5",
-    "text-xs lg:text-sm font-medium",
-    "cursor-pointer transition-all duration-150 ease-out",
-    "active:scale-[0.97]",
-    "data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm",
-    "data-[state=inactive]:bg-card data-[state=inactive]:text-text-secondary",
-    "data-[state=inactive]:hover:bg-card-hover data-[state=inactive]:hover:text-text-primary",
-    "data-[state=inactive]:border data-[state=inactive]:border-transparent",
-    "data-[state=inactive]:hover:border-card-border",
+    'flex-1 rounded-md px-2.5 py-2 lg:py-2.5',
+    'text-xs lg:text-sm font-medium',
+    'cursor-pointer transition-all duration-150 ease-out',
+    'active:scale-[0.97]',
+    'data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm',
+    'data-[state=inactive]:bg-card data-[state=inactive]:text-text-secondary',
+    'data-[state=inactive]:hover:bg-card-hover data-[state=inactive]:hover:text-text-primary',
+    'data-[state=inactive]:border data-[state=inactive]:border-transparent',
+    'data-[state=inactive]:hover:border-card-border',
   ],
 });
 
@@ -84,18 +84,14 @@ export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
 // ============================================================================
 
 interface CategoryTabsProps {
-  categories: CategoriaLinhas["categoriasDias"];
+  categories: CategoriaLinhas['categoriasDias'];
   activeIndex: number;
   onSelect: (index: number) => void;
 }
 
-function CategoryTabs({
-  categories,
-  activeIndex,
-  onSelect,
-}: CategoryTabsProps) {
+function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) {
   // Converte id numérico para string para o Tabs component
-  const activeValue = String(categories[activeIndex]?.id ?? "");
+  const activeValue = String(categories[activeIndex]?.id ?? '');
 
   const handleValueChange = (value: string) => {
     const numericId = Number(value);
@@ -163,20 +159,15 @@ export const MenuLateral = React.memo(function MenuLateral({
 }: MenuLateralProps) {
   const { paradaSelecionada } = useRotasSelection();
   const [isMenuVisible, setMenuVisible] = useState(false);
-  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(
-    null,
-  );
+  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize state based on environment
   const [shortcutLabel] = useState(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
-    ) {
-      return "⌘K";
+    if (typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform)) {
+      return '⌘K';
     }
-    return "Ctrl+K";
+    return 'Ctrl+K';
   });
 
   const {
@@ -192,7 +183,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         searchInputRef.current?.focus();
 
@@ -204,8 +195,8 @@ export const MenuLateral = React.memo(function MenuLateral({
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleCardClick = useCallback(
@@ -239,8 +230,8 @@ export const MenuLateral = React.memo(function MenuLateral({
         <div
           className={`transition-all duration-300 ${
             isMenuVisible
-              ? "pointer-events-none translate-x-20 opacity-0"
-              : "translate-x-0 opacity-100"
+              ? 'pointer-events-none translate-x-20 opacity-0'
+              : 'translate-x-0 opacity-100'
           }`}
         >
           <div className="rounded-xl bg-brand-primary px-4 py-2 shadow-lg backdrop-blur-sm">
@@ -278,7 +269,7 @@ export const MenuLateral = React.memo(function MenuLateral({
       {/* Sidebar */}
       <aside
         data-slot="sidebar"
-        data-state={isMenuVisible ? "open" : "closed"}
+        data-state={isMenuVisible ? 'open' : 'closed'}
         className={sidebarVariants({ visible: isMenuVisible })}
       >
         {/* Header */}
@@ -345,10 +336,7 @@ export const MenuLateral = React.memo(function MenuLateral({
               />
             ))
           ) : (
-            <SearchEmptyState
-              searchTerm={searchTerm}
-              onClear={() => setSearchTerm("")}
-            />
+            <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
           )}
 
           <DisclaimerBanner />

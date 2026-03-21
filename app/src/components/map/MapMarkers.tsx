@@ -5,13 +5,12 @@
  * Gerencia a renderização de todos os marcadores de paradas.
  */
 
-import React, { useRef, useState, useCallback } from "react";
-import { Marker } from "react-leaflet";
-import L from "leaflet";
-import { PopupCustomizado } from "../PopupCustomizado";
-import type { Parada } from "../../types/data.types";
-
-import icon from "../../assets/marker.svg";
+import L from 'leaflet';
+import React, { useCallback, useRef, useState } from 'react';
+import { Marker } from 'react-leaflet';
+import icon from '../../assets/marker.svg';
+import type { Parada } from '../../types/data.types';
+import { PopupCustomizado } from '../PopupCustomizado';
 
 // Ícone padrão para paradas
 const stationIcon = L.icon({
@@ -27,7 +26,7 @@ const highlightedIcon = L.icon({
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
-  className: "marker-highlighted",
+  className: 'marker-highlighted',
 });
 
 interface MapMarkersProps {
@@ -62,14 +61,11 @@ const MemoizedMarker = React.memo(
   },
   (prev, next) => {
     // Custom comparison: re-render only if highlight state changes
-    return (
-      prev.isDestacada === next.isDestacada &&
-      prev.parada.idParada === next.parada.idParada
-    );
+    return prev.isDestacada === next.isDestacada && prev.parada.idParada === next.parada.idParada;
   },
 );
 
-MemoizedMarker.displayName = "MemoizedMarker";
+MemoizedMarker.displayName = 'MemoizedMarker';
 
 /**
  * Componente que renderiza todos os marcadores de paradas no mapa.
@@ -108,9 +104,7 @@ export const MapMarkers = React.memo(function MapMarkers({
  */
 export function useMapMarkers() {
   const markersRef = useRef<{ [key: string]: L.Marker | null }>({});
-  const [paradaDestacadaId, setParadaDestacadaId] = useState<string | null>(
-    null,
-  );
+  const [paradaDestacadaId, setParadaDestacadaId] = useState<string | null>(null);
 
   const handleMarkerRef = useCallback((id: string, marker: L.Marker | null) => {
     if (marker) {

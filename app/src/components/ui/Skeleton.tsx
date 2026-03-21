@@ -6,9 +6,9 @@
  * Melhora a UX ao mostrar onde o conteúdo será carregado.
  */
 
-import type { ComponentProps } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { cn } from "../../lib/utils";
+import type { ComponentProps } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { cn } from '../../lib/utils';
 
 // ============================================================================
 // VARIANTS
@@ -18,25 +18,25 @@ import { cn } from "../../lib/utils";
  * Variantes do skeleton base
  */
 export const skeletonVariants = tv({
-  base: ["animate-pulse rounded bg-card-border"],
+  base: ['animate-pulse rounded bg-card-border'],
   variants: {
     variant: {
-      default: "bg-card-border",
-      darker: "bg-neutral-border",
-      lighter: "bg-card-hover",
+      default: 'bg-card-border',
+      darker: 'bg-neutral-border',
+      lighter: 'bg-card-hover',
     },
     rounded: {
-      none: "rounded-none",
-      sm: "rounded-sm",
-      md: "rounded-md",
-      lg: "rounded-lg",
-      xl: "rounded-xl",
-      full: "rounded-full",
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-lg',
+      xl: 'rounded-xl',
+      full: 'rounded-full',
     },
   },
   defaultVariants: {
-    variant: "default",
-    rounded: "md",
+    variant: 'default',
+    rounded: 'md',
   },
 });
 
@@ -45,7 +45,8 @@ export const skeletonVariants = tv({
 // ============================================================================
 
 export interface SkeletonProps
-  extends ComponentProps<"div">, VariantProps<typeof skeletonVariants> {
+  extends ComponentProps<'div'>,
+    VariantProps<typeof skeletonVariants> {
   /** Largura do skeleton */
   width?: string | number;
   /** Altura do skeleton */
@@ -79,8 +80,8 @@ export function Skeleton({
       data-slot="skeleton"
       className={cn(skeletonVariants({ variant, rounded }), className)}
       style={{
-        width: typeof width === "number" ? `${width}px` : width,
-        height: typeof height === "number" ? `${height}px` : height,
+        width: typeof width === 'number' ? `${width}px` : width,
+        height: typeof height === 'number' ? `${height}px` : height,
         ...style,
       }}
       aria-hidden="true"
@@ -96,7 +97,7 @@ export function Skeleton({
 /**
  * Skeleton para texto
  */
-export interface SkeletonTextProps extends Omit<SkeletonProps, "height"> {
+export interface SkeletonTextProps extends Omit<SkeletonProps, 'height'> {
   /** Número de linhas */
   lines?: number;
   /** Última linha mais curta */
@@ -105,18 +106,18 @@ export interface SkeletonTextProps extends Omit<SkeletonProps, "height"> {
 
 export function SkeletonText({
   lines = 3,
-  lastLineWidth = "75%",
+  lastLineWidth = '75%',
   className,
   ...props
 }: SkeletonTextProps) {
   return (
-    <div data-slot="skeleton-text" className={cn("space-y-2", className)}>
+    <div data-slot="skeleton-text" className={cn('space-y-2', className)}>
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
           key={i}
           className="h-4"
           style={{
-            width: i === lines - 1 ? lastLineWidth : "100%",
+            width: i === lines - 1 ? lastLineWidth : '100%',
           }}
           {...props}
         />
@@ -128,23 +129,19 @@ export function SkeletonText({
 /**
  * Skeleton para avatar/imagem circular
  */
-export interface SkeletonAvatarProps extends Omit<SkeletonProps, "rounded"> {
+export interface SkeletonAvatarProps extends Omit<SkeletonProps, 'rounded'> {
   /** Tamanho do avatar */
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const avatarSizes = {
-  sm: "size-8",
-  md: "size-10",
-  lg: "size-12",
-  xl: "size-16",
+  sm: 'size-8',
+  md: 'size-10',
+  lg: 'size-12',
+  xl: 'size-16',
 };
 
-export function SkeletonAvatar({
-  size = "md",
-  className,
-  ...props
-}: SkeletonAvatarProps) {
+export function SkeletonAvatar({ size = 'md', className, ...props }: SkeletonAvatarProps) {
   return (
     <Skeleton
       data-slot="skeleton-avatar"
@@ -162,10 +159,7 @@ export function SkeletonLineCard({ className }: { className?: string }) {
   return (
     <div
       data-slot="skeleton-line-card"
-      className={cn(
-        "rounded-xl border border-card-border bg-card p-4",
-        className,
-      )}
+      className={cn('rounded-xl border border-card-border bg-card p-4', className)}
     >
       {/* Header */}
       <div className="mb-4 flex items-center gap-3">
@@ -198,15 +192,9 @@ export function SkeletonLineCard({ className }: { className?: string }) {
 /**
  * Skeleton para lista de linhas
  */
-export function SkeletonLineList({
-  count = 5,
-  className,
-}: {
-  count?: number;
-  className?: string;
-}) {
+export function SkeletonLineList({ count = 5, className }: { count?: number; className?: string }) {
   return (
-    <div data-slot="skeleton-line-list" className={cn("space-y-3", className)}>
+    <div data-slot="skeleton-line-list" className={cn('space-y-3', className)}>
       {Array.from({ length: count }).map((_, i) => (
         <SkeletonLineCard key={i} />
       ))}
@@ -222,8 +210,8 @@ export function SkeletonMap({ className }: { className?: string }) {
     <div
       data-slot="skeleton-map"
       className={cn(
-        "relative flex h-full w-full items-center justify-center",
-        "bg-card-hover",
+        'relative flex h-full w-full items-center justify-center',
+        'bg-card-hover',
         className,
       )}
     >
@@ -274,10 +262,7 @@ export function SkeletonMap({ className }: { className?: string }) {
  */
 export function SkeletonSidebar({ className }: { className?: string }) {
   return (
-    <div
-      data-slot="skeleton-sidebar"
-      className={cn("flex h-full flex-col p-4", className)}
-    >
+    <div data-slot="skeleton-sidebar" className={cn('flex h-full flex-col p-4', className)}>
       {/* Logo */}
       <Skeleton className="mb-6 h-10 w-40" rounded="lg" />
 

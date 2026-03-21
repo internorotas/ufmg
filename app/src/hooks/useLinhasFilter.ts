@@ -5,11 +5,11 @@
  * permitindo que o componente foque apenas na renderização (JSX).
  */
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { useDebounce } from "use-debounce";
-import { useAnalytics } from "./useAnalytics";
-import { getCurrentSpecialPeriod } from "../config/specialPeriods";
-import type { Linha, CategoriaLinhas, DadosLinhas } from "../types/data.types";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDebounce } from 'use-debounce';
+import { getCurrentSpecialPeriod } from '../config/specialPeriods';
+import type { CategoriaLinhas, DadosLinhas, Linha } from '../types/data.types';
+import { useAnalytics } from './useAnalytics';
 
 /**
  * Configurações do hook de filtro
@@ -60,16 +60,14 @@ function getInitialCategory(linhasData: CategoriaLinhas): number {
   // Se está em período de férias E é dia útil → mostrar aba de férias
   if (specialPeriod && isWeekday) {
     const feriasIndex = linhasData.categoriasDias.findIndex(
-      (cat) => cat.categoriaDia === "feriasRecessos",
+      (cat) => cat.categoriaDia === 'feriasRecessos',
     );
     return feriasIndex !== -1 ? feriasIndex : 0;
   }
 
   // Se é sábado (e não está em período de férias) → mostrar aba de sábado
   if (isSaturday && !specialPeriod) {
-    const sabadoIndex = linhasData.categoriasDias.findIndex(
-      (cat) => cat.categoriaDia === "sabado",
-    );
+    const sabadoIndex = linhasData.categoriasDias.findIndex((cat) => cat.categoriaDia === 'sabado');
     return sabadoIndex !== -1 ? sabadoIndex : 0;
   }
 
@@ -130,7 +128,7 @@ export function useLinhasFilter(
   const { trackEvent } = useAnalytics();
 
   // Estado de busca
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, debounceMs);
 
   // Estado de categoria (inicializa baseado em período especial)
@@ -157,8 +155,8 @@ export function useLinhasFilter(
   useEffect(() => {
     if (trackSearch && debouncedSearchTerm) {
       trackEvent({
-        category: "Busca",
-        action: "Termo Pesquisado",
+        category: 'Busca',
+        action: 'Termo Pesquisado',
         label: debouncedSearchTerm,
       });
     }
@@ -168,8 +166,8 @@ export function useLinhasFilter(
   useEffect(() => {
     if (trackSearch && searchTerm && !hasResults) {
       trackEvent({
-        category: "Busca",
-        action: "Busca Sem Resultados",
+        category: 'Busca',
+        action: 'Busca Sem Resultados',
         label: searchTerm,
       });
     }
@@ -181,8 +179,8 @@ export function useLinhasFilter(
       const categoria = linhasData.categoriasDias[index];
       if (categoria && trackSearch) {
         trackEvent({
-          category: "Navegação Principal",
-          action: "Selecionar Categoria Dia",
+          category: 'Navegação Principal',
+          action: 'Selecionar Categoria Dia',
           label: categoria.displayName,
         });
       }

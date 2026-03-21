@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
 
 /**
  * Hook que mantém e atualiza a hora atual a cada 30 segundos.

@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
-import { useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet-ant-path";
+import L from 'leaflet';
+import { useEffect, useRef } from 'react';
+import { useMap } from 'react-leaflet';
+import 'leaflet-ant-path';
 
-import { LatLngExpression } from "leaflet";
+import type { LatLngExpression } from 'leaflet';
 
 interface AntPathOptions {
   delay?: number;
@@ -51,7 +51,7 @@ export function AntPathComponent({ coordinates, options }: AntPathProps) {
     try {
       map.fitBounds(antPath.getBounds(), { padding: [50, 50] });
     } catch (e) {
-      console.warn("Could not fit bounds for AntPath", e);
+      console.warn('Could not fit bounds for AntPath', e);
     }
 
     // Cleanup function: remove a layer quando o componente desmonta ou muda

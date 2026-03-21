@@ -3,14 +3,14 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useMemo } from "react";
-import { tv } from "tailwind-variants";
-import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
-import { Modal } from "./Modal";
-import type { Linha } from "../types/data.types";
-import { timeToMinutes, findScheduleIndex } from "../../lib/utils";
-import { obterHorariosLinhaNoDia, obterStatusLinha } from "../lib/utils";
-import { useCurrentTime } from "../hooks/useCurrentTime";
+import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { useMemo } from 'react';
+import { tv } from 'tailwind-variants';
+import { findScheduleIndex, timeToMinutes } from '../../lib/utils';
+import { useCurrentTime } from '../hooks/useCurrentTime';
+import { obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
+import type { Linha } from '../types/data.types';
+import { Modal } from './Modal';
 
 // ============================================================================
 // VARIANTS
@@ -20,15 +20,15 @@ import { useCurrentTime } from "../hooks/useCurrentTime";
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-all",
+  base: 'rounded-lg border p-3 text-center transition-all',
   variants: {
     status: {
-      upcoming: ["border-green-600 bg-green-900/30"],
-      passed: "border-gray-700 bg-gray-800/50 opacity-50",
+      upcoming: ['border-green-600 bg-green-900/30'],
+      passed: 'border-gray-700 bg-gray-800/50 opacity-50',
     },
   },
   defaultVariants: {
-    status: "upcoming",
+    status: 'upcoming',
   },
 });
 
@@ -36,15 +36,15 @@ export const scheduleCardVariants = tv({
  * Variantes do texto de horário
  */
 export const scheduleTimeVariants = tv({
-  base: "font-bold",
+  base: 'font-bold',
   variants: {
     status: {
-      upcoming: "text-xl text-green-300",
-      passed: "text-lg text-gray-400",
+      upcoming: 'text-xl text-green-300',
+      passed: 'text-lg text-gray-400',
     },
   },
   defaultVariants: {
-    status: "upcoming",
+    status: 'upcoming',
   },
 });
 
@@ -52,10 +52,7 @@ export const scheduleTimeVariants = tv({
  * Variantes do alerta de suspensão
  */
 export const suspensionAlertVariants = tv({
-  base: [
-    "rounded-lg border p-4 text-center",
-    "border-yellow-600 bg-yellow-900/30",
-  ],
+  base: ['rounded-lg border p-4 text-center', 'border-yellow-600 bg-yellow-900/30'],
 });
 
 // ============================================================================
@@ -89,14 +86,14 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const statusLinha = obterStatusLinha(linha, now);
 
-  const shouldDisableSchedules = statusLinha.id === "NAO_CIRCULA_HOJE";
+  const shouldDisableSchedules = statusLinha.id === 'NAO_CIRCULA_HOJE';
 
   // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
   const baseHorarios = useMemo(() => {
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
 
     return horariosDoDia
-      .filter((time) => time && time.includes(":"))
+      .filter((time) => time && time.includes(':'))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
@@ -110,11 +107,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const splitIndex = useMemo(() => {
     // Busca binária para achar onde dividir usando um getter para evitar o .map() inicial.
     // Usamos currentMinutes - 1 pois currentMinutes (agora) deve ser considerado 'proximo'
-    return findScheduleIndex(
-      baseHorarios,
-      currentMinutes - 1,
-      (h) => h.minutos,
-    );
+    return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
   }, [baseHorarios, currentMinutes]);
 
   // Zero-allocation das sublistas virtuais
@@ -123,19 +116,11 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const todos = baseHorarios;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Horários - ${linha.nome}`}
-      size="md"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={`Horários - ${linha.nome}`} size="md">
       <div className="space-y-6">
         {/* Aviso de Horários Suspensos */}
         {shouldDisableSchedules && (
-          <div
-            data-slot="suspension-alert"
-            className={suspensionAlertVariants()}
-          >
+          <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
             <p className="mb-2 font-semibold text-yellow-300">
               <AlertTriangle className="mr-1 inline size-4" />
               Linha sem operação hoje
@@ -155,13 +140,10 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
               {proximos.map(({ horario }, index) => (
                 <div
                   key={`proximo-${index}`}
-                  className={scheduleCardVariants({ status: "upcoming" })}
+                  className={scheduleCardVariants({ status: 'upcoming' })}
                 >
                   <span className="sr-only">Próximo horário às {horario}</span>
-                  <p
-                    className={scheduleTimeVariants({ status: "upcoming" })}
-                    aria-hidden="true"
-                  >
+                  <p className={scheduleTimeVariants({ status: 'upcoming' })} aria-hidden="true">
                     {horario}
                   </p>
                 </div>
@@ -181,13 +163,10 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
               {passados.map(({ horario }, index) => (
                 <div
                   key={`passado-${index}`}
-                  className={scheduleCardVariants({ status: "passed" })}
+                  className={scheduleCardVariants({ status: 'passed' })}
                 >
                   <span className="sr-only">Horário passado às {horario}</span>
-                  <p
-                    className={scheduleTimeVariants({ status: "passed" })}
-                    aria-hidden="true"
-                  >
+                  <p className={scheduleTimeVariants({ status: 'passed' })} aria-hidden="true">
                     {horario}
                   </p>
                 </div>
@@ -198,15 +177,10 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
 
         {/* Informação Extra */}
         {!shouldDisableSchedules && (
-          <div
-            data-slot="summary"
-            className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm"
-          >
+          <div data-slot="summary" className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm">
             <p className="text-center text-gray-300">
-              Total de {todos.length} horários •{" "}
-              <span className="text-green-400">
-                {proximos.length} restantes
-              </span>
+              Total de {todos.length} horários •{' '}
+              <span className="text-green-400">{proximos.length} restantes</span>
             </p>
           </div>
         )}

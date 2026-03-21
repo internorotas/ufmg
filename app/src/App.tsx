@@ -1,25 +1,19 @@
-import { lazy, Suspense, useEffect, useCallback } from "react";
-import ReactGA from "react-ga4";
-import { MenuLateral } from "./components/MenuLateral";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import { RotasProvider, useRotas } from "./contexts/RotasContext";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { useAnalytics } from "./hooks/useAnalytics";
-import {
-  useLocalizacaoUsuario,
-  COORDENADAS_UFMG,
-} from "./hooks/useLocalizacaoUsuario";
-import { Modal } from "./components/Modal";
-import { Button } from "./components/ui/Button";
-import { MapPin, Navigation } from "lucide-react";
-import type { Linha, Parada } from "./types/data.types";
-
-import { AdminLayout } from "./components/admin/AdminLayout";
+import { MapPin, Navigation } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect } from 'react';
+import ReactGA from 'react-ga4';
+import { AdminLayout } from './components/admin/AdminLayout';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { MenuLateral } from './components/MenuLateral';
+import { Modal } from './components/Modal';
+import { Button } from './components/ui/Button';
+import { RotasProvider, useRotas } from './contexts/RotasContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { useAnalytics } from './hooks/useAnalytics';
+import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
+import type { Linha, Parada } from './types/data.types';
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
-const Mapa = lazy(() =>
-  import("./components/Mapa").then((module) => ({ default: module.Mapa })),
-);
+const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default: module.Mapa })));
 
 // Componente simples de Loading
 const LoadingMap = () => (
@@ -77,8 +71,8 @@ function AppContent() {
     (linha: Linha) => {
       selecionarLinha(linha);
       trackEvent({
-        category: "Engajamento",
-        action: "Selecionar Linha",
+        category: 'Engajamento',
+        action: 'Selecionar Linha',
         label: linha.nome,
       });
     },
@@ -89,8 +83,8 @@ function AppContent() {
     (parada: Parada) => {
       selecionarParada(parada);
       trackEvent({
-        category: "Engajamento",
-        action: "Selecionar Parada",
+        category: 'Engajamento',
+        action: 'Selecionar Parada',
         label: parada.nome,
       });
     },
@@ -116,14 +110,11 @@ function AppContent() {
     return (
       <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
         <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-red-600">
-            ⚠️ Dados não encontrados
-          </h2>
+          <h2 className="text-2xl font-bold mb-2 text-red-600">⚠️ Dados não encontrados</h2>
           <p className="text-gray-600">
             Não foi possível carregar os dados de paradas.
             <br />
-            Verifique a integridade dos arquivos em{" "}
-            <code>/src/data/paradas.ts</code>.
+            Verifique a integridade dos arquivos em <code>/src/data/paradas.ts</code>.
           </p>
         </div>
       </div>
@@ -134,14 +125,11 @@ function AppContent() {
     return (
       <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
         <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-red-600">
-            ⚠️ Erro nos Dados de Linhas
-          </h2>
+          <h2 className="text-2xl font-bold mb-2 text-red-600">⚠️ Erro nos Dados de Linhas</h2>
           <p className="text-gray-600">
             Não foi possível carregar os dados das linhas.
             <br />
-            Verifique a integridade dos arquivos em{" "}
-            <code>/src/data/linhas.ts</code>.
+            Verifique a integridade dos arquivos em <code>/src/data/linhas.ts</code>.
           </p>
         </div>
       </div>
@@ -190,8 +178,8 @@ function AppContent() {
               <MapPin className="h-8 w-8 text-brand-primary" />
             </div>
             <p className="text-text-secondary">
-              Para mostrar sua localização no mapa e te ajudar a encontrar a
-              parada mais próxima, precisamos acessar seu GPS.
+              Para mostrar sua localização no mapa e te ajudar a encontrar a parada mais próxima,
+              precisamos acessar seu GPS.
             </p>
           </div>
           {erroLocalizacao && (
@@ -207,14 +195,12 @@ function AppContent() {
               onClick={() => {
                 solicitarPermissaoNavegador();
                 trackEvent({
-                  category: "Engajamento",
-                  action: "Localização Permitida",
+                  category: 'Engajamento',
+                  action: 'Localização Permitida',
                 });
               }}
             >
-              {carregandoLocalizacao
-                ? "Obtendo localização..."
-                : "Permitir Localização"}
+              {carregandoLocalizacao ? 'Obtendo localização...' : 'Permitir Localização'}
             </Button>
             <Button variant="ghost" fullWidth onClick={fecharModalPermissao}>
               Agora não
@@ -233,8 +219,8 @@ function AppContent() {
         <div className="space-y-4 p-4">
           <div className="text-center">
             <p className="text-text-secondary">
-              Parece que você está a mais de 4km da UFMG. Deseja voltar a
-              visualizar o campus no mapa?
+              Parece que você está a mais de 4km da UFMG. Deseja voltar a visualizar o campus no
+              mapa?
             </p>
           </div>
           <div className="flex flex-col gap-2">
@@ -258,7 +244,7 @@ function AppContent() {
  * @returns {JSX.Element} O componente principal da aplicação renderizado.
  */
 export function App() {
-  if (import.meta.env.DEV && window.location.search.includes("admin=true")) {
+  if (import.meta.env.DEV && window.location.search.includes('admin=true')) {
     return (
       <ThemeProvider>
         <AdminLayout />

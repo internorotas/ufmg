@@ -4,18 +4,18 @@
  */
 
 export type EventCategory =
-  | "Engajamento"
-  | "Navegação"
-  | "Navegação Principal"
-  | "Busca"
-  | "UI Interaction"
-  | "Navegação Detalhes"
-  | "Horarios"
-  | "Engajamento Detalhes"
-  | "Performance"
-  | "Erro"
-  | "External Link"
-  | "Session";
+  | 'Engajamento'
+  | 'Navegação'
+  | 'Navegação Principal'
+  | 'Busca'
+  | 'UI Interaction'
+  | 'Navegação Detalhes'
+  | 'Horarios'
+  | 'Engajamento Detalhes'
+  | 'Performance'
+  | 'Erro'
+  | 'External Link'
+  | 'Session';
 
 export interface AnalyticsEvent {
   category: EventCategory;

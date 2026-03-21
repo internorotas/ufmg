@@ -23,8 +23,8 @@ export interface SpecialPeriod {
  */
 export const SPECIAL_PERIODS: SpecialPeriod[] = [
   {
-    name: "Férias de Verão 2025/2026",
-    description: "Período de férias e recessos",
+    name: 'Férias de Verão 2025/2026',
+    description: 'Período de férias e recessos',
     startDate: new Date(2025, 11, 15), // Mês é 0-indexed: 11 = dezembro
     endDate: new Date(2026, 2, 1), // Mês é 0-indexed: 2 = março
     isActive: true, // Defina como false para desativar
@@ -102,9 +102,9 @@ export function obterCategoriaDiaAtual(): string {
   const isSaturday = today === 6;
   const isWeekday = today >= 1 && today <= 5;
   const specialPeriod = getCurrentSpecialPeriod();
-  if (specialPeriod && isWeekday) return "feriasRecessos";
-  if (isSaturday && !specialPeriod) return "sabado";
-  return "diasUteis";
+  if (specialPeriod && isWeekday) return 'feriasRecessos';
+  if (isSaturday && !specialPeriod) return 'sabado';
+  return 'diasUteis';
 }
 
 /**
@@ -118,12 +118,9 @@ export function isLineAvailableToday(categoriaDia: string): boolean {
   const isInVacationPeriod = shouldDisableRegularSchedules();
 
   return (
-    (categoriaDia === "diasUteis" && isWeekday && !isInVacationPeriod) ||
-    (categoriaDia === "sabado" && isSaturday && !isInVacationPeriod) ||
-    (categoriaDia === "feriasRecessos" &&
-      isInVacationPeriod &&
-      !isSaturday &&
-      !isSunday)
+    (categoriaDia === 'diasUteis' && isWeekday && !isInVacationPeriod) ||
+    (categoriaDia === 'sabado' && isSaturday && !isInVacationPeriod) ||
+    (categoriaDia === 'feriasRecessos' && isInVacationPeriod && !isSaturday && !isSunday)
   );
 }
 
@@ -136,18 +133,18 @@ export function getLinhaNotRunningMessage(categoriaDia: string): string {
   const isSunday = today === 0;
   const isInVacationPeriod = shouldDisableRegularSchedules();
 
-  if (categoriaDia === "diasUteis") {
-    if (isInVacationPeriod) return "Linha suspensa durante férias";
-    if (isSaturday) return "Linha não circula aos sábados";
-    if (isSunday) return "Linha não circula aos domingos";
+  if (categoriaDia === 'diasUteis') {
+    if (isInVacationPeriod) return 'Linha suspensa durante férias';
+    if (isSaturday) return 'Linha não circula aos sábados';
+    if (isSunday) return 'Linha não circula aos domingos';
   }
-  if (categoriaDia === "sabado") {
-    if (isInVacationPeriod) return "Linha suspensa durante férias";
-    return "Linha circula apenas aos sábados";
+  if (categoriaDia === 'sabado') {
+    if (isInVacationPeriod) return 'Linha suspensa durante férias';
+    return 'Linha circula apenas aos sábados';
   }
-  if (categoriaDia === "feriasRecessos") {
-    if (!isInVacationPeriod) return "Linha circula apenas durante férias";
-    if (isSaturday || isSunday) return "Linha não circula em fins de semana";
+  if (categoriaDia === 'feriasRecessos') {
+    if (!isInVacationPeriod) return 'Linha circula apenas durante férias';
+    if (isSaturday || isSunday) return 'Linha não circula em fins de semana';
   }
-  return "Linha não está circulando";
+  return 'Linha não está circulando';
 }
