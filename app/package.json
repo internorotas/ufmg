@@ -29,6 +29,9 @@
     "tailwind-variants": "^3.2.2",
     "use-debounce": "^10.1.0"
   },
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "^4.2.2",
