@@ -37,7 +37,12 @@ export class GA4AnalyticsService implements IAnalyticsService {
       return;
     }
 
-    ReactGA.initialize(this.measurementId);
+    ReactGA.initialize(this.measurementId, {
+      testMode: import.meta.env.DEV,
+      gaOptions: {
+        debug_mode: import.meta.env.DEV,
+      },
+    });
     this.initialized = true;
   }
 
