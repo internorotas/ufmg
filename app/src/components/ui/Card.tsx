@@ -6,9 +6,9 @@
  * Permite flexibilidade na construção de cards complexos.
  */
 
-import type { ComponentProps, ReactNode } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { cn } from "../../lib/utils";
+import type { ComponentProps, ReactNode } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { cn } from '../../lib/utils';
 
 // ============================================================================
 // VARIANTS
@@ -18,40 +18,37 @@ import { cn } from "../../lib/utils";
  * Variantes do card root
  */
 export const cardVariants = tv({
-  base: [
-    "rounded-xl border bg-card text-text-primary",
-    "transition-all duration-200",
-  ],
+  base: ['rounded-xl border bg-card text-text-primary', 'transition-all duration-200'],
   variants: {
     variant: {
-      default: "border-card-border shadow-sm",
-      elevated: "border-card-border shadow-md hover:shadow-lg",
-      outline: "border-card-border bg-transparent",
-      ghost: "border-transparent bg-transparent shadow-none",
+      default: 'border-card-border shadow-sm',
+      elevated: 'border-card-border shadow-md hover:shadow-lg',
+      outline: 'border-card-border bg-transparent',
+      ghost: 'border-transparent bg-transparent shadow-none',
       interactive: [
-        "border-card-border shadow-sm cursor-pointer",
-        "hover:border-info-border hover:shadow-md",
-        "active:scale-[0.99]",
+        'border-card-border shadow-sm cursor-pointer',
+        'hover:border-info-border hover:shadow-md',
+        'active:scale-[0.99]',
       ],
     },
     selected: {
       true: [
-        "border-2 border-internoRotas-azul-eletrico shadow-lg",
-        "ring-1 ring-internoRotas-azul-eletrico/20",
+        'border-2 border-internoRotas-azul-eletrico shadow-lg',
+        'ring-1 ring-internoRotas-azul-eletrico/20',
       ],
-      false: "",
+      false: '',
     },
     padding: {
-      none: "p-0",
-      sm: "p-3",
-      md: "p-4",
-      lg: "p-6",
+      none: 'p-0',
+      sm: 'p-3',
+      md: 'p-4',
+      lg: 'p-6',
     },
   },
   defaultVariants: {
-    variant: "default",
+    variant: 'default',
     selected: false,
-    padding: "none",
+    padding: 'none',
   },
 });
 
@@ -59,21 +56,21 @@ export const cardVariants = tv({
  * Variantes do header do card
  */
 export const cardHeaderVariants = tv({
-  base: "flex flex-col gap-1.5",
+  base: 'flex flex-col gap-1.5',
   variants: {
     padding: {
-      none: "",
-      sm: "p-3",
-      md: "p-4",
-      lg: "p-6",
+      none: '',
+      sm: 'p-3',
+      md: 'p-4',
+      lg: 'p-6',
     },
     withBorder: {
-      true: "border-b border-card-border",
-      false: "",
+      true: 'border-b border-card-border',
+      false: '',
     },
   },
   defaultVariants: {
-    padding: "md",
+    padding: 'md',
     withBorder: false,
   },
 });
@@ -82,17 +79,17 @@ export const cardHeaderVariants = tv({
  * Variantes do título do card
  */
 export const cardTitleVariants = tv({
-  base: "font-semibold leading-tight tracking-tight",
+  base: 'font-semibold leading-tight tracking-tight',
   variants: {
     size: {
-      sm: "text-sm",
-      md: "text-base",
-      lg: "text-lg",
-      xl: "text-xl",
+      sm: 'text-sm',
+      md: 'text-base',
+      lg: 'text-lg',
+      xl: 'text-xl',
     },
   },
   defaultVariants: {
-    size: "md",
+    size: 'md',
   },
 });
 
@@ -100,17 +97,17 @@ export const cardTitleVariants = tv({
  * Variantes do conteúdo do card
  */
 export const cardContentVariants = tv({
-  base: "",
+  base: '',
   variants: {
     padding: {
-      none: "",
-      sm: "p-3",
-      md: "p-4",
-      lg: "p-6",
+      none: '',
+      sm: 'p-3',
+      md: 'p-4',
+      lg: 'p-6',
     },
   },
   defaultVariants: {
-    padding: "md",
+    padding: 'md',
   },
 });
 
@@ -118,29 +115,29 @@ export const cardContentVariants = tv({
  * Variantes do footer do card
  */
 export const cardFooterVariants = tv({
-  base: "flex items-center",
+  base: 'flex items-center',
   variants: {
     padding: {
-      none: "",
-      sm: "p-3",
-      md: "p-4",
-      lg: "p-6",
+      none: '',
+      sm: 'p-3',
+      md: 'p-4',
+      lg: 'p-6',
     },
     withBorder: {
-      true: "border-t border-card-border",
-      false: "",
+      true: 'border-t border-card-border',
+      false: '',
     },
     justify: {
-      start: "justify-start",
-      center: "justify-center",
-      end: "justify-end",
-      between: "justify-between",
+      start: 'justify-start',
+      center: 'justify-center',
+      end: 'justify-end',
+      between: 'justify-between',
     },
   },
   defaultVariants: {
-    padding: "md",
+    padding: 'md',
     withBorder: false,
-    justify: "end",
+    justify: 'end',
   },
 });
 
@@ -149,42 +146,45 @@ export const cardFooterVariants = tv({
 // ============================================================================
 
 export interface CardProps
-  extends
-    Omit<ComponentProps<"div">, "ref">,
+  extends Omit<ComponentProps<'div'>, 'ref'>,
     VariantProps<typeof cardVariants> {
   /** Conteúdo do card */
   children: ReactNode;
   /** Elemento HTML a ser renderizado */
-  as?: "article" | "div" | "section";
+  as?: 'article' | 'div' | 'section';
 }
 
 export interface CardHeaderProps
-  extends ComponentProps<"header">, VariantProps<typeof cardHeaderVariants> {
+  extends ComponentProps<'header'>,
+    VariantProps<typeof cardHeaderVariants> {
   /** Conteúdo do header */
   children: ReactNode;
 }
 
 export interface CardTitleProps
-  extends ComponentProps<"h3">, VariantProps<typeof cardTitleVariants> {
+  extends ComponentProps<'h3'>,
+    VariantProps<typeof cardTitleVariants> {
   /** Elemento HTML para o título */
-  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span";
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'span';
   /** Conteúdo do título */
   children: ReactNode;
 }
 
-export interface CardDescriptionProps extends ComponentProps<"p"> {
+export interface CardDescriptionProps extends ComponentProps<'p'> {
   /** Conteúdo da descrição */
   children: ReactNode;
 }
 
 export interface CardContentProps
-  extends ComponentProps<"div">, VariantProps<typeof cardContentVariants> {
+  extends ComponentProps<'div'>,
+    VariantProps<typeof cardContentVariants> {
   /** Conteúdo principal */
   children: ReactNode;
 }
 
 export interface CardFooterProps
-  extends ComponentProps<"footer">, VariantProps<typeof cardFooterVariants> {
+  extends ComponentProps<'footer'>,
+    VariantProps<typeof cardFooterVariants> {
   /** Conteúdo do footer */
   children: ReactNode;
 }
@@ -218,7 +218,7 @@ export function Card({
   variant,
   selected,
   padding,
-  as: Element = "article",
+  as: Element = 'article',
   ...props
 }: CardProps) {
   return (
@@ -261,7 +261,7 @@ export function CardTitle({
   children,
   className,
   size,
-  as: Element = "h3",
+  as: Element = 'h3',
   ...props
 }: CardTitleProps) {
   return (
@@ -278,15 +278,11 @@ export function CardTitle({
 /**
  * Descrição do card - Texto secundário abaixo do título
  */
-export function CardDescription({
-  children,
-  className,
-  ...props
-}: CardDescriptionProps) {
+export function CardDescription({ children, className, ...props }: CardDescriptionProps) {
   return (
     <p
       data-slot="card-description"
-      className={cn("text-sm text-text-secondary", className)}
+      className={cn('text-sm text-text-secondary', className)}
       {...props}
     >
       {children}
@@ -297,12 +293,7 @@ export function CardDescription({
 /**
  * Conteúdo principal do card
  */
-export function CardContent({
-  children,
-  className,
-  padding,
-  ...props
-}: CardContentProps) {
+export function CardContent({ children, className, padding, ...props }: CardContentProps) {
   return (
     <div
       data-slot="card-content"
@@ -328,10 +319,7 @@ export function CardFooter({
   return (
     <footer
       data-slot="card-footer"
-      className={cn(
-        cardFooterVariants({ padding, withBorder, justify }),
-        className,
-      )}
+      className={cn(cardFooterVariants({ padding, withBorder, justify }), className)}
       {...props}
     >
       {children}

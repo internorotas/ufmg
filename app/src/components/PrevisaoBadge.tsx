@@ -1,5 +1,5 @@
-import type { Linha } from "../types/data.types";
-import { usePrevisaoChegada } from "../hooks/usePrevisaoChegada";
+import { usePrevisaoChegada } from '../hooks/usePrevisaoChegada';
+import type { Linha } from '../types/data.types';
 
 interface PrevisaoBadgeProps {
   linha: Linha;
@@ -22,19 +22,15 @@ function formatarDuracao(minutos: number): string {
   return `${horas}h ${minutosRestantes}min`;
 }
 
-export function PrevisaoBadge({
-  linha,
-  idParada,
-  compacto = false,
-}: PrevisaoBadgeProps) {
+export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBadgeProps) {
   const previsao = usePrevisaoChegada(linha, idParada);
   if (!previsao || !previsao.proximoOnibus) {
     return (
       <span
         className="rounded-full px-2 py-0.5 text-[11px] font-medium"
         style={{
-          backgroundColor: "var(--neutral-bg)",
-          color: "var(--neutral-text)",
+          backgroundColor: 'var(--neutral-bg)',
+          color: 'var(--neutral-text)',
         }}
       >
         Sem previsão
@@ -48,14 +44,14 @@ export function PrevisaoBadge({
     return (
       <div className="flex min-w-0 flex-col items-end gap-1">
         <span
-          className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${compacto ? "max-w-42.5" : ""}`}
+          className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${compacto ? 'max-w-42.5' : ''}`}
           style={{
-            backgroundColor: "var(--success-bg)",
-            color: "var(--success-text)",
+            backgroundColor: 'var(--success-bg)',
+            color: 'var(--success-text)',
           }}
         >
           <span className="inline-flex min-w-0 items-center gap-1">
-            <span className={compacto ? "truncate" : ""}>Chega agora</span>
+            <span className={compacto ? 'truncate' : ''}>Chega agora</span>
           </span>
         </span>
 
@@ -69,8 +65,8 @@ export function PrevisaoBadge({
   }
 
   const isUrgent = proximoOnibus.minutosFaltantes <= 15;
-  const bgVar = isUrgent ? "--success-bg" : "--warning-bg";
-  const textVar = isUrgent ? "--success-text" : "--warning-text";
+  const bgVar = isUrgent ? '--success-bg' : '--warning-bg';
+  const textVar = isUrgent ? '--success-text' : '--warning-text';
   const textoPrevisao = compacto
     ? `Chega em ~${formatarDuracao(proximoOnibus.minutosFaltantes)}`
     : `Chega em aproximadamente ${formatarDuracao(proximoOnibus.minutosFaltantes)}`;
@@ -78,14 +74,14 @@ export function PrevisaoBadge({
   return (
     <div className="flex min-w-0 flex-col items-end gap-1">
       <span
-        className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${compacto ? "max-w-42.5" : ""}`}
+        className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${compacto ? 'max-w-42.5' : ''}`}
         style={{
           backgroundColor: `var(${bgVar})`,
           color: `var(${textVar})`,
         }}
       >
         <span className="inline-flex min-w-0 items-center gap-1">
-          <span className={compacto ? "truncate" : ""}>{textoPrevisao}</span>
+          <span className={compacto ? 'truncate' : ''}>{textoPrevisao}</span>
         </span>
       </span>
 

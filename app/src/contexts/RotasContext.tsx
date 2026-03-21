@@ -7,15 +7,15 @@
 
 import {
   createContext,
-  useContext,
-  useState,
+  type ReactNode,
   useCallback,
+  useContext,
   useMemo,
   useRef,
-  type ReactNode,
-} from "react";
-import type { Linha, Parada, CategoriaLinhas } from "../types/data.types";
-import { RotasService, type IRotasService } from "../services/RotasService";
+  useState,
+} from 'react';
+import { type IRotasService, RotasService } from '../services/RotasService';
+import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 
 /**
  * Interface que define a referência do Mapa para centralização.
@@ -73,16 +73,10 @@ interface RotasProviderProps {
  * </RotasProvider>
  * ```
  */
-export function RotasProvider({
-  children,
-  onLinhaSelect,
-  onParadaSelect,
-}: RotasProviderProps) {
+export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: RotasProviderProps) {
   // Estado de seleção
   const [linhaSelecionada, setLinhaSelecionada] = useState<Linha | null>(null);
-  const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(
-    null,
-  );
+  const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(null);
 
   // Referência do mapa para centralização
   const mapaRef = useRef<MapaRef | null>(null);
@@ -149,11 +143,7 @@ export function RotasProvider({
     ],
   );
 
-  return (
-    <RotasContext.Provider value={contextValue}>
-      {children}
-    </RotasContext.Provider>
-  );
+  return <RotasContext.Provider value={contextValue}>{children}</RotasContext.Provider>;
 }
 
 /**
@@ -173,7 +163,7 @@ export function useRotas(): RotasContextData {
   const context = useContext(RotasContext);
 
   if (context === undefined) {
-    throw new Error("useRotas deve ser usado dentro de um RotasProvider");
+    throw new Error('useRotas deve ser usado dentro de um RotasProvider');
   }
 
   return context;
@@ -193,13 +183,8 @@ export function useRotasData() {
  * Use quando o componente só precisa saber o que está selecionado.
  */
 export function useRotasSelection() {
-  const {
-    linhaSelecionada,
-    paradaSelecionada,
-    selecionarLinha,
-    selecionarParada,
-    limparSelecao,
-  } = useRotas();
+  const { linhaSelecionada, paradaSelecionada, selecionarLinha, selecionarParada, limparSelecao } =
+    useRotas();
 
   return {
     linhaSelecionada,

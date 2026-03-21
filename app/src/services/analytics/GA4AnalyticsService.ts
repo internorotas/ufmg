@@ -3,13 +3,13 @@
  * Adapter Pattern - encapsula a dependência do react-ga4.
  */
 
-import ReactGA from "react-ga4";
+import ReactGA from 'react-ga4';
 import type {
-  IAnalyticsService,
   AnalyticsEvent,
-  TimingEvent,
+  IAnalyticsService,
   PageViewEvent,
-} from "./IAnalyticsService";
+  TimingEvent,
+} from './IAnalyticsService';
 
 /**
  * Implementação do serviço de analytics usando Google Analytics 4.
@@ -52,7 +52,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
     if (!this.isEnabled) return;
 
     ReactGA.send({
-      hitType: "pageview",
+      hitType: 'pageview',
       page: event?.path || window.location.pathname,
       title: event?.title,
     });
@@ -68,7 +68,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
     if (!this.isEnabled) return;
 
     ReactGA.event({
-      category: timing.category || "Performance",
+      category: timing.category || 'Performance',
       action: timing.name,
       label: timing.label,
       value: timing.value,
@@ -79,8 +79,8 @@ export class GA4AnalyticsService implements IAnalyticsService {
     if (!this.isEnabled) return;
 
     ReactGA.event({
-      category: "Erro",
-      action: error.name || "Error",
+      category: 'Erro',
+      action: error.name || 'Error',
       label: error.message,
       value: fatal ? 1 : 0,
     });

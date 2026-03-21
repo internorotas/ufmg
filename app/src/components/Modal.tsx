@@ -6,10 +6,10 @@
  * fornecendo uma API simplificada para casos de uso comuns.
  */
 
-import { type ReactNode, type ComponentProps } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { cn } from "../lib/utils";
-import { Dialog, dialogPopupVariants } from "./ui/Dialog";
+import type { ComponentProps, ReactNode } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { cn } from '../lib/utils';
+import { Dialog, dialogPopupVariants } from './ui/Dialog';
 
 // ============================================================================
 // VARIANTS
@@ -20,8 +20,8 @@ import { Dialog, dialogPopupVariants } from "./ui/Dialog";
  */
 export const modalHeaderVariants = tv({
   base: [
-    "flex items-center justify-between",
-    "rounded-t-xl border-b border-card-border bg-background-secondary p-4",
+    'flex items-center justify-between',
+    'rounded-t-xl border-b border-card-border bg-background-secondary p-4',
   ],
 });
 
@@ -29,18 +29,18 @@ export const modalHeaderVariants = tv({
 export { dialogPopupVariants as modalContentVariants };
 
 export const modalOverlayVariants = tv({
-  base: "fixed inset-0 z-[2000] flex items-center justify-center p-4",
+  base: 'fixed inset-0 z-[2000] flex items-center justify-center p-4',
 });
 
 export const modalBackdropVariants = tv({
-  base: "absolute inset-0 bg-black/70 animate-fade-in",
+  base: 'absolute inset-0 bg-black/70 animate-fade-in',
 });
 
 export const modalCloseButtonVariants = tv({
   base: [
-    "rounded-lg p-2 transition-colors",
-    "hover:bg-card",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+    'rounded-lg p-2 transition-colors',
+    'hover:bg-card',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   ],
 });
 
@@ -49,8 +49,7 @@ export const modalCloseButtonVariants = tv({
 // ============================================================================
 
 export interface ModalProps
-  extends
-    Omit<ComponentProps<"div">, "title">,
+  extends Omit<ComponentProps<'div'>, 'title'>,
     VariantProps<typeof dialogPopupVariants> {
   /** Se o modal está aberto */
   isOpen: boolean;
@@ -81,15 +80,7 @@ export interface ModalProps
  * </Modal>
  * ```
  */
-export function Modal({
-  isOpen,
-  onClose,
-  title,
-  children,
-  size,
-  className,
-  ...props
-}: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, size, className, ...props }: ModalProps) {
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
@@ -97,7 +88,7 @@ export function Modal({
         <Dialog.Popup size={size} className={cn(className)} {...props}>
           {/* Header */}
           <div data-slot="header" className={modalHeaderVariants()}>
-            {typeof title === "string" ? (
+            {typeof title === 'string' ? (
               <Dialog.Title>{title}</Dialog.Title>
             ) : (
               <div className="flex-1">{title}</div>
@@ -106,10 +97,7 @@ export function Modal({
           </div>
 
           {/* Content */}
-          <div
-            data-slot="body"
-            className="flex-1 overflow-y-auto rounded-b-xl bg-modal p-4"
-          >
+          <div data-slot="body" className="flex-1 overflow-y-auto rounded-b-xl bg-modal p-4">
             {children}
           </div>
         </Dialog.Popup>

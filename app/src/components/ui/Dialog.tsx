@@ -8,18 +8,18 @@
  * Inspirado no padrão Base UI Dialog mas compatível com React 19.
  */
 
+import { X } from 'lucide-react';
 import {
+  type ComponentProps,
   createContext,
+  type ReactNode,
   useContext,
   useEffect,
   useId,
-  type ComponentProps,
-  type ReactNode,
-} from "react";
-import { createPortal } from "react-dom";
-import { tv, type VariantProps } from "tailwind-variants";
-import { X } from "lucide-react";
-import { cn } from "../../lib/utils";
+} from 'react';
+import { createPortal } from 'react-dom';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { cn } from '../../lib/utils';
 
 // ============================================================================
 // CONTEXT
@@ -37,7 +37,7 @@ const DialogContext = createContext<DialogContextValue | null>(null);
 function useDialogContext() {
   const context = useContext(DialogContext);
   if (!context) {
-    throw new Error("Dialog components must be used within a Dialog.Root");
+    throw new Error('Dialog components must be used within a Dialog.Root');
   }
   return context;
 }
@@ -51,9 +51,9 @@ function useDialogContext() {
  */
 export const dialogBackdropVariants = tv({
   base: [
-    "fixed inset-0 z-[1999] bg-black/70 cursor-pointer",
-    "data-[state=open]:animate-fade-in",
-    "data-[state=closed]:animate-fade-out",
+    'fixed inset-0 z-[1999] bg-black/70 cursor-pointer',
+    'data-[state=open]:animate-fade-in',
+    'data-[state=closed]:animate-fade-out',
   ],
 });
 
@@ -62,26 +62,26 @@ export const dialogBackdropVariants = tv({
  */
 export const dialogPopupVariants = tv({
   base: [
-    "relative flex max-h-[90vh] w-full flex-col",
-    "rounded-xl border border-card-border bg-modal text-text-primary shadow-2xl",
-    "data-[state=open]:animate-modal-in",
-    "data-[state=closed]:animate-modal-out",
+    'relative flex max-h-[90vh] w-full flex-col',
+    'rounded-xl border border-card-border bg-modal text-text-primary shadow-2xl',
+    'data-[state=open]:animate-modal-in',
+    'data-[state=closed]:animate-modal-out',
   ],
   variants: {
     size: {
-      xs: "max-w-xs",
-      sm: "max-w-sm",
-      md: "max-w-md",
-      lg: "max-w-lg",
-      xl: "max-w-xl",
-      "2xl": "max-w-2xl",
-      "3xl": "max-w-3xl",
-      "4xl": "max-w-4xl",
-      full: "max-w-[95vw]",
+      xs: 'max-w-xs',
+      sm: 'max-w-sm',
+      md: 'max-w-md',
+      lg: 'max-w-lg',
+      xl: 'max-w-xl',
+      '2xl': 'max-w-2xl',
+      '3xl': 'max-w-3xl',
+      '4xl': 'max-w-4xl',
+      full: 'max-w-[95vw]',
     },
   },
   defaultVariants: {
-    size: "2xl",
+    size: '2xl',
   },
 });
 
@@ -89,14 +89,14 @@ export const dialogPopupVariants = tv({
  * Variantes do título
  */
 export const dialogTitleVariants = tv({
-  base: "text-xl font-bold text-text-primary",
+  base: 'text-xl font-bold text-text-primary',
 });
 
 /**
  * Variantes da descrição
  */
 export const dialogDescriptionVariants = tv({
-  base: "text-sm text-text-secondary",
+  base: 'text-sm text-text-secondary',
 });
 
 /**
@@ -104,10 +104,10 @@ export const dialogDescriptionVariants = tv({
  */
 export const dialogCloseVariants = tv({
   base: [
-    "inline-flex items-center justify-center rounded-lg p-2",
-    "text-text-secondary transition-colors cursor-pointer",
-    "hover:bg-card hover:text-text-primary",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+    'inline-flex items-center justify-center rounded-lg p-2',
+    'text-text-secondary transition-colors cursor-pointer',
+    'hover:bg-card hover:text-text-primary',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   ],
 });
 
@@ -132,21 +132,26 @@ export interface DialogPortalProps {
 }
 
 export interface DialogBackdropProps
-  extends ComponentProps<"div">, VariantProps<typeof dialogBackdropVariants> {}
+  extends ComponentProps<'div'>,
+    VariantProps<typeof dialogBackdropVariants> {}
 
 export interface DialogPopupProps
-  extends ComponentProps<"div">, VariantProps<typeof dialogPopupVariants> {}
+  extends ComponentProps<'div'>,
+    VariantProps<typeof dialogPopupVariants> {}
 
 export interface DialogTitleProps
-  extends ComponentProps<"h2">, VariantProps<typeof dialogTitleVariants> {}
+  extends ComponentProps<'h2'>,
+    VariantProps<typeof dialogTitleVariants> {}
 
 export interface DialogDescriptionProps
-  extends ComponentProps<"p">, VariantProps<typeof dialogDescriptionVariants> {}
+  extends ComponentProps<'p'>,
+    VariantProps<typeof dialogDescriptionVariants> {}
 
 export interface DialogCloseProps
-  extends ComponentProps<"button">, VariantProps<typeof dialogCloseVariants> {
+  extends ComponentProps<'button'>,
+    VariantProps<typeof dialogCloseVariants> {
   /** Label para acessibilidade */
-  "aria-label"?: string;
+  'aria-label'?: string;
 }
 
 // ============================================================================
@@ -178,7 +183,7 @@ function DialogRoot({ open, onOpenChange, children }: DialogRootProps) {
   useEffect(() => {
     if (open) {
       const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
       return () => {
         document.body.style.overflow = originalOverflow;
       };
@@ -190,21 +195,19 @@ function DialogRoot({ open, onOpenChange, children }: DialogRootProps) {
     if (!open) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         onOpenChange(false);
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open, onOpenChange]);
 
   if (!open) return null;
 
   return (
-    <DialogContext.Provider
-      value={{ open, onOpenChange, titleId, descriptionId }}
-    >
+    <DialogContext.Provider value={{ open, onOpenChange, titleId, descriptionId }}>
       {children}
     </DialogContext.Provider>
   );
@@ -233,7 +236,7 @@ function DialogBackdrop({ className, onClick, ...props }: DialogBackdropProps) {
   return (
     <div
       data-slot="dialog-backdrop"
-      data-state={open ? "open" : "closed"}
+      data-state={open ? 'open' : 'closed'}
       onClick={handleClick}
       className={cn(dialogBackdropVariants(), className)}
       aria-hidden="true"
@@ -245,12 +248,7 @@ function DialogBackdrop({ className, onClick, ...props }: DialogBackdropProps) {
 /**
  * Popup - Container do conteúdo do dialog
  */
-function DialogPopup({
-  size,
-  className,
-  children,
-  ...props
-}: DialogPopupProps) {
+function DialogPopup({ size, className, children, ...props }: DialogPopupProps) {
   const { open, titleId, descriptionId } = useDialogContext();
 
   return (
@@ -260,16 +258,12 @@ function DialogPopup({
     >
       <div
         data-slot="dialog-popup"
-        data-state={open ? "open" : "closed"}
+        data-state={open ? 'open' : 'closed'}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className={cn(
-          "pointer-events-auto",
-          dialogPopupVariants({ size }),
-          className,
-        )}
+        className={cn('pointer-events-auto', dialogPopupVariants({ size }), className)}
         {...props}
       >
         {children}
@@ -299,11 +293,7 @@ function DialogTitle({ className, children, ...props }: DialogTitleProps) {
 /**
  * Description - Descrição do dialog
  */
-function DialogDescription({
-  className,
-  children,
-  ...props
-}: DialogDescriptionProps) {
+function DialogDescription({ className, children, ...props }: DialogDescriptionProps) {
   const { descriptionId } = useDialogContext();
 
   return (
@@ -325,7 +315,7 @@ function DialogClose({
   className,
   children,
   onClick,
-  "aria-label": ariaLabel = "Fechar",
+  'aria-label': ariaLabel = 'Fechar',
   ...props
 }: DialogCloseProps) {
   const { onOpenChange } = useDialogContext();
@@ -391,11 +381,11 @@ export const Dialog = {
 
 // Named exports for individual components
 export {
-  DialogRoot,
-  DialogPortal,
   DialogBackdrop,
-  DialogPopup,
-  DialogTitle,
-  DialogDescription,
   DialogClose,
+  DialogDescription,
+  DialogPopup,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
 };

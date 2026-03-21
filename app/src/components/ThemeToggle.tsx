@@ -3,12 +3,12 @@
  * Design System - Interno Rotas UFMG
  */
 
-import type { ComponentProps } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { Moon, Sun } from "lucide-react";
-import { cn } from "../lib/utils";
-import { useTheme } from "../contexts/ThemeContext";
-import { useAnalytics } from "../hooks/useAnalytics";
+import { Moon, Sun } from 'lucide-react';
+import type { ComponentProps } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { useTheme } from '../contexts/ThemeContext';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { cn } from '../lib/utils';
 
 // ============================================================================
 // VARIANTS
@@ -19,28 +19,25 @@ import { useAnalytics } from "../hooks/useAnalytics";
  */
 export const themeToggleVariants = tv({
   base: [
-    "inline-flex items-center justify-center rounded-lg p-1 cursor-pointer",
-    "transition-all duration-150 ease-out",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-    "active:scale-90 hover:scale-105",
+    'inline-flex items-center justify-center rounded-lg p-1 cursor-pointer',
+    'transition-all duration-150 ease-out',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+    'active:scale-90 hover:scale-105',
   ],
   variants: {
     variant: {
-      default: [
-        "bg-background-secondary hover:bg-card",
-        "dark:bg-card dark:hover:bg-card-hover",
-      ],
-      ghost: "hover:bg-card-hover",
+      default: ['bg-background-secondary hover:bg-card', 'dark:bg-card dark:hover:bg-card-hover'],
+      ghost: 'hover:bg-card-hover',
     },
     size: {
-      sm: "p-1",
-      md: "p-2",
-      lg: "p-3",
+      sm: 'p-1',
+      md: 'p-2',
+      lg: 'p-3',
     },
   },
   defaultVariants: {
-    variant: "default",
-    size: "sm",
+    variant: 'default',
+    size: 'sm',
   },
 });
 
@@ -49,8 +46,7 @@ export const themeToggleVariants = tv({
 // ============================================================================
 
 export interface ThemeToggleProps
-  extends
-    Omit<ComponentProps<"button">, "children">,
+  extends Omit<ComponentProps<'button'>, 'children'>,
     VariantProps<typeof themeToggleVariants> {
   /** Tamanho do ícone em pixels */
   iconSize?: number;
@@ -79,13 +75,13 @@ export function ThemeToggle({
   const { theme, toggleTheme } = useTheme();
   const { trackEvent } = useAnalytics();
 
-  const isDark = theme === "dark";
+  const isDark = theme === 'dark';
 
   const handleToggle = () => {
-    const newTheme = isDark ? "light" : "dark";
+    const newTheme = isDark ? 'light' : 'dark';
     trackEvent({
-      category: "UI Interaction",
-      action: "Toggle Theme",
+      category: 'UI Interaction',
+      action: 'Toggle Theme',
       label: newTheme,
     });
     toggleTheme();
@@ -94,11 +90,11 @@ export function ThemeToggle({
   return (
     <button
       data-slot="toggle"
-      data-state={isDark ? "dark" : "light"}
+      data-state={isDark ? 'dark' : 'light'}
       onClick={handleToggle}
       className={cn(themeToggleVariants({ variant, size }), className)}
-      aria-label={`Alternar para tema ${isDark ? "claro" : "escuro"}`}
-      title={`Alternar para tema ${isDark ? "claro" : "escuro"}`}
+      aria-label={`Alternar para tema ${isDark ? 'claro' : 'escuro'}`}
+      title={`Alternar para tema ${isDark ? 'claro' : 'escuro'}`}
       {...props}
     >
       {isDark ? (

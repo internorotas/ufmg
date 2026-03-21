@@ -10,27 +10,20 @@
  * Atualizado para React 19: ref como prop (sem forwardRef)
  */
 
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
-import {
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useCallback,
-  type Ref,
-} from "react";
-import { Parada, Linha } from "../types/data.types";
-import { useAnalytics } from "../hooks/useAnalytics";
-
+import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { useAnalytics } from '../hooks/useAnalytics';
+import type { Linha, Parada } from '../types/data.types';
+import { ControlesUsuarioMapa } from './ControlesUsuarioMapa';
 // Componentes extraídos (Strategy/Composition Pattern)
 import {
-  MapMarkers,
-  useMapMarkers,
-  MapRoute,
-  useRouteBounds,
-  ChangeView,
   CenterOnParada,
-} from "./map";
-import { ControlesUsuarioMapa } from "./ControlesUsuarioMapa";
+  ChangeView,
+  MapMarkers,
+  MapRoute,
+  useMapMarkers,
+  useRouteBounds,
+} from './map';
 
 export interface MapaRef {
   centralizarParada: (parada: Parada) => void;
@@ -59,7 +52,7 @@ interface MapaProps {
 const MAP_CONFIG = {
   center: [-19.87055, -43.96775] as [number, number],
   zoom: 15,
-  tileUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
 };
@@ -112,8 +105,7 @@ export function Mapa({
   const mapLoadStartRef = useRef<number>(0);
 
   // Hook para gerenciar marcadores
-  const { paradaDestacadaId, handleMarkerRef, destacarParada } =
-    useMapMarkers();
+  const { paradaDestacadaId, handleMarkerRef, destacarParada } = useMapMarkers();
 
   // Hook para calcular bounds da rota
   const bounds = useRouteBounds(linhaSelecionada);
@@ -125,10 +117,10 @@ export function Mapa({
     }
     const loadTime = Date.now() - mapLoadStartRef.current;
     trackTiming({
-      name: "Map Load Time",
+      name: 'Map Load Time',
       value: loadTime,
-      category: "Performance",
-      label: "Initial Map Render",
+      category: 'Performance',
+      label: 'Initial Map Render',
     });
   }, [trackTiming]);
 
@@ -143,10 +135,7 @@ export function Mapa({
       }}
     >
       {/* Camada de tiles */}
-      <TileLayer
-        url={MAP_CONFIG.tileUrl}
-        attribution={MAP_CONFIG.attribution}
-      />
+      <TileLayer url={MAP_CONFIG.tileUrl} attribution={MAP_CONFIG.attribution} />
 
       {/* Controles de visualização */}
       <ChangeView bounds={bounds} />

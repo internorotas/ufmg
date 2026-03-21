@@ -3,11 +3,11 @@
  * Design System - Interno Rotas UFMG
  */
 
-import type { ComponentProps } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { Info } from "lucide-react";
-import { cn } from "../lib/utils";
-import { getCurrentSpecialPeriod, isWeekday } from "../config/specialPeriods";
+import { Info } from 'lucide-react';
+import type { ComponentProps } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { getCurrentSpecialPeriod, isWeekday } from '../config/specialPeriods';
+import { cn } from '../lib/utils';
 
 // ============================================================================
 // VARIANTS
@@ -18,9 +18,9 @@ import { getCurrentSpecialPeriod, isWeekday } from "../config/specialPeriods";
  */
 export const vacationBannerVariants = tv({
   base: [
-    "flex items-start gap-2 rounded-lg border p-3",
-    "mb-3",
-    "border-warning-border bg-warning-bg text-warning-text",
+    'flex items-start gap-2 rounded-lg border p-3',
+    'mb-3',
+    'border-warning-border bg-warning-bg text-warning-text',
   ],
 });
 
@@ -29,7 +29,8 @@ export const vacationBannerVariants = tv({
 // ============================================================================
 
 export interface VacationBannerProps
-  extends ComponentProps<"div">, VariantProps<typeof vacationBannerVariants> {}
+  extends ComponentProps<'div'>,
+    VariantProps<typeof vacationBannerVariants> {}
 
 // ============================================================================
 // COMPONENT
@@ -65,10 +66,9 @@ export function VacationBanner({ className, ...props }: VacationBannerProps) {
       <div className="text-xs leading-relaxed lg:text-sm">
         <p className="mb-1 font-bold">{specialPeriod.name}</p>
         <p>
-          De {specialPeriod.startDate.toLocaleDateString("pt-BR")} a{" "}
-          {specialPeriod.endDate.toLocaleDateString("pt-BR")}, operam apenas os
-          horários de Férias e Recessos. Não há circulação aos fins de semana e
-          feriados.
+          De {specialPeriod.startDate.toLocaleDateString('pt-BR')} a{' '}
+          {specialPeriod.endDate.toLocaleDateString('pt-BR')}, operam apenas os horários de Férias e
+          Recessos. Não há circulação aos fins de semana e feriados.
         </p>
         {!isWeekdayToday && (
           <p className="mt-2 font-semibold">

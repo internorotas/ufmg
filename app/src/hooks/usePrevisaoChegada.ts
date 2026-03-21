@@ -1,12 +1,12 @@
-import { useMemo } from "react";
-import type { Linha } from "../types/data.types";
+import { useMemo } from 'react';
+import { obterMultiplicadorTrafego } from '../config/trafegoConfig';
 import {
   converterHoraParaMinutos,
   converterMinutosParaHora,
   obterHorariosLinhaNoDia,
-} from "../lib/utils";
-import { obterMultiplicadorTrafego } from "../config/trafegoConfig";
-import { useCurrentTime } from "./useCurrentTime";
+} from '../lib/utils';
+import type { Linha } from '../types/data.types';
+import { useCurrentTime } from './useCurrentTime';
 
 interface ProximoOnibus {
   horarioChegada: string;
@@ -85,10 +85,7 @@ export function calcularPrevisaoChegada(
 
     // Lidar com virada de dia: se é quase meia-noite e o ônibus chega após a meia-noite
     let ajusteChegada = chegadaPrevistaMinutos;
-    if (
-      horaAtualMinutos > HORA_INICIO_VIRADA &&
-      chegadaPrevistaMinutos < HORA_MAX_AMANHA
-    ) {
+    if (horaAtualMinutos > HORA_INICIO_VIRADA && chegadaPrevistaMinutos < HORA_MAX_AMANHA) {
       ajusteChegada += MINUTOS_DIA;
     }
 
@@ -108,10 +105,7 @@ export function calcularPrevisaoChegada(
 
   let onibusAnterior: OnibusAnterior | null = null;
   if (ultimaChegadaPassada !== null) {
-    const minutosQuePassou = Math.max(
-      0,
-      horaAtualMinutos - ultimaChegadaPassada,
-    );
+    const minutosQuePassou = Math.max(0, horaAtualMinutos - ultimaChegadaPassada);
     if (minutosQuePassou >= 0 && minutosQuePassou <= 15) {
       onibusAnterior = { minutosQuePassou };
     }

@@ -1,16 +1,10 @@
-import { useMemo, useState } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  Polyline,
-} from "react-leaflet";
-import L, { DragEndEvent } from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { Parada, CategoriaLinhas } from "../../types/data.types";
+import L, { type DragEndEvent } from 'leaflet';
+import { useMemo, useState } from 'react';
+import { MapContainer, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
-import icon from "../../assets/marker.svg";
+import icon from '../../assets/marker.svg';
+import type { CategoriaLinhas, Parada } from '../../types/data.types';
 
 const stationIcon = L.icon({
   iconUrl: icon,
@@ -24,7 +18,7 @@ const highlightedIcon = L.icon({
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
-  className: "marker-highlighted",
+  className: 'marker-highlighted',
 });
 
 export function AdminParadasTab({
@@ -37,7 +31,7 @@ export function AdminParadasTab({
   paradas: Parada[];
   setParadas: (p: Parada[]) => void;
   linhasData: CategoriaLinhas;
-  setActiveTab: (tab: "paradas" | "linhas") => void;
+  setActiveTab: (tab: 'paradas' | 'linhas') => void;
   onExport: () => void;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -56,26 +50,22 @@ export function AdminParadasTab({
   const handleDragEnd = (id: string, e: DragEndEvent) => {
     const latLng = e.target.getLatLng();
     setParadas(
-      paradas.map((p) =>
-        p.idParada === id ? { ...p, coordenadas: [latLng.lat, latLng.lng] } : p,
-      ),
+      paradas.map((p) => (p.idParada === id ? { ...p, coordenadas: [latLng.lat, latLng.lng] } : p)),
     );
   };
 
   const handleUpdate = (updated: Parada) => {
-    setParadas(
-      paradas.map((p) => (p.idParada === updated.idParada ? updated : p)),
-    );
+    setParadas(paradas.map((p) => (p.idParada === updated.idParada ? updated : p)));
   };
 
   const handleAdd = () => {
     const newId = `p_new_${Date.now()}`;
     const newParada: Parada = {
       idParada: newId,
-      nome: "Nova Parada",
+      nome: 'Nova Parada',
       linhasAtendidas: [],
-      categoria: "padrao",
-      descricao: "",
+      categoria: 'padrao',
+      descricao: '',
       coordenadas: [-19.869, -43.966], // default UFMG center
     };
     setParadas([...paradas, newParada]);
@@ -106,13 +96,13 @@ export function AdminParadasTab({
         <div className="flex border-b border-card-border bg-card">
           <button
             className={`flex-1 py-3 text-center font-medium border-b-2 border-brand-primary text-brand-primary`}
-            onClick={() => setActiveTab("paradas")}
+            onClick={() => setActiveTab('paradas')}
           >
             Paradas
           </button>
           <button
             className={`flex-1 py-3 text-center font-medium text-text-secondary hover:text-text-primary`}
-            onClick={() => setActiveTab("linhas")}
+            onClick={() => setActiveTab('linhas')}
           >
             Linhas
           </button>
@@ -120,9 +110,7 @@ export function AdminParadasTab({
 
         <div className="p-4 flex-1 overflow-y-auto w-full bg-sidebar">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-text-primary">
-              Gerenciar Paradas
-            </h2>
+            <h2 className="text-lg font-bold text-text-primary">Gerenciar Paradas</h2>
             <button
               onClick={handleAdd}
               className="bg-success-bg border border-success-border text-success-text px-3 py-1 rounded text-sm hover:opacity-90"
@@ -154,25 +142,19 @@ export function AdminParadasTab({
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">
-                  Nome
-                </label>
+                <label className="block text-sm font-bold text-text-primary mb-1">Nome</label>
                 <input
                   type="text"
                   value={selectedParada.nome}
-                  onChange={(e) =>
-                    handleUpdate({ ...selectedParada, nome: e.target.value })
-                  }
+                  onChange={(e) => handleUpdate({ ...selectedParada, nome: e.target.value })}
                   className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-text-primary mb-1">
-                  Descrição
-                </label>
+                <label className="block text-sm font-bold text-text-primary mb-1">Descrição</label>
                 <input
                   type="text"
-                  value={selectedParada.descricao || ""}
+                  value={selectedParada.descricao || ''}
                   onChange={(e) =>
                     handleUpdate({
                       ...selectedParada,
@@ -188,12 +170,12 @@ export function AdminParadasTab({
                 </label>
                 <input
                   type="text"
-                  value={selectedParada.linhasAtendidas.join(", ")}
+                  value={selectedParada.linhasAtendidas.join(', ')}
                   onChange={(e) =>
                     handleUpdate({
                       ...selectedParada,
                       linhasAtendidas: e.target.value
-                        .split(",")
+                        .split(',')
                         .map((s) => s.trim())
                         .filter(Boolean),
                     })
@@ -217,11 +199,7 @@ export function AdminParadasTab({
 
       {/* Map Area */}
       <div className="flex-1 relative z-0">
-        <MapContainer
-          center={[-19.87055, -43.96775]}
-          zoom={15}
-          className="h-full w-full"
-        >
+        <MapContainer center={[-19.87055, -43.96775]} zoom={15} className="h-full w-full">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -243,9 +221,7 @@ export function AdminParadasTab({
             </Marker>
           ))}
           {linhasData.categoriasDias
-            .flatMap((cd, categoryIdx) =>
-              cd.linhas.map((linha) => ({ linha, categoryIdx })),
-            )
+            .flatMap((cd, categoryIdx) => cd.linhas.map((linha) => ({ linha, categoryIdx })))
             .map(
               ({ linha, categoryIdx }) =>
                 linha.coordenadasTrajeto.length > 0 && (
@@ -256,7 +232,7 @@ export function AdminParadasTab({
                       color: linha.corHex,
                       weight: 3,
                       opacity: 0.5,
-                      dashArray: "5, 5",
+                      dashArray: '5, 5',
                     }}
                   />
                 ),
