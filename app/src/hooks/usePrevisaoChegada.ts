@@ -3,6 +3,7 @@ import type { Linha } from "../types/data.types";
 import {
   converterHoraParaMinutos,
   converterMinutosParaHora,
+  obterHorariosLinhaNoDia,
 } from "../lib/utils";
 import { obterMultiplicadorTrafego } from "../config/trafegoConfig";
 import { useCurrentTime } from "./useCurrentTime";
@@ -34,7 +35,8 @@ export function calcularPrevisaoChegada(
   if (!linha.trajetoDetalhado || linha.trajetoDetalhado.length === 0) {
     return null;
   }
-  if (!linha.horarios || linha.horarios.length === 0) return null;
+  const horariosSaida = obterHorariosLinhaNoDia(linha, agora);
+  if (horariosSaida.length === 0) return null;
 
   const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
   const multiplicadorTrafego = obterMultiplicadorTrafego(horaAtualMinutos);
@@ -62,8 +64,6 @@ export function calcularPrevisaoChegada(
   if (!paradaEncontrada) return null;
 
   const isTrafegoIntenso = multiplicadorTrafego > 1.0;
-  const horariosSaida = linha.horarios;
-
   // Limites para lidar com virada de meia-noite
   const MINUTOS_DIA = 1440;
   const HORA_INICIO_VIRADA = 22 * 60; // 22h: considerado "fim do dia"

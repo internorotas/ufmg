@@ -14,10 +14,7 @@ import {
   findScheduleIndex,
 } from "../../lib/utils";
 import { useAnalytics, useSessionTiming } from "../hooks/useAnalytics";
-import {
-  isLineAvailableToday,
-  getLinhaNotRunningMessage,
-} from "../config/specialPeriods";
+import { obterHorariosLinhaNoDia, obterStatusLinha } from "../lib/utils";
 import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
 import { useCurrentTime } from "../hooks/useCurrentTime";
 
@@ -152,10 +149,9 @@ export function LinhaDetalhesModal({
 
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const statusLinha = obterStatusLinha(linha, now);
 
-  const isLineRunningToday = isLineAvailableToday(linha.categoriaDia);
-  const getNotRunningMessage = () =>
-    getLinhaNotRunningMessage(linha.categoriaDia);
+  const isLineRunningToday = statusLinha.id !== "NAO_CIRCULA_HOJE";
 
   // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
   const paradasDoItinerario = useMemo(() => {
@@ -165,14 +161,16 @@ export function LinhaDetalhesModal({
   // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
   // Isso evita re-ordenar os horários a cada renderização quando o tempo muda
   const baseHorarios = useMemo(() => {
-    return linha.horarios
+    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+
+    return horariosDoDia
       .filter((h) => h && h.includes(":"))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios]);
+  }, [linha, now]);
 
   // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
   // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
@@ -463,7 +461,7 @@ export function LinhaDetalhesModal({
               <div className="flex items-center gap-3">
                 <AlertTriangle size={24} className="shrink-0 text-amber-400" />
                 <p className="text-sm font-medium text-amber-300">
-                  {getNotRunningMessage()}
+                  {statusLinha.texto}
                 </p>
               </div>
             </div>
