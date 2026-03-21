@@ -13,6 +13,8 @@ import type { Parada, Linha } from "../types/data.types";
 import { DisclaimerEstimativa } from "./DisclaimerEstimativa";
 import { PrevisaoBadge } from "./PrevisaoBadge";
 import { useRotasData } from "../contexts/RotasContext";
+import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
+import { obterCategoriaDiaAtual } from "../config/specialPeriods";
 
 // ============================================================================
 // VARIANTS
@@ -56,6 +58,21 @@ function normalizarNomeLinha(nomeLinha: string): string {
     .replace(/\s*\(.*?\)\s*/g, "")
     .trim()
     .toLowerCase();
+}
+
+// Sublinhas que indicam período de operação (não variante de rota)
+const SUBLINHAS_CALENDARIO = ["Sábado", "Férias e Recessos"];
+
+/**
+ * Retorna o nome de exibição da linha com a sublinha de rota (se houver),
+ * ignorando sublinhas que indicam apenas o período do calendário.
+ */
+function getNomeExibicao(linha: Linha | null, nomeLinha: string): string {
+  if (!linha) return nomeLinha.replace(/\s*\(Todas\)\s*/gi, "").trim();
+  if (linha.sublinha && !SUBLINHAS_CALENDARIO.includes(linha.sublinha)) {
+    return `${linha.nome} · ${linha.sublinha}`;
+  }
+  return linha.nome;
 }
 
 // ============================================================================
@@ -110,24 +127,46 @@ export function PopupCustomizado({
     const candidatas = linhasPorNomeNormalizado.get(chave) ?? [];
     if (candidatas.length === 0) return null;
 
-    const comTrajetoNaParada = candidatas.find(
+    // Filtra apenas linhas do dia atual (dias úteis, sábado ou férias)
+    const categoriaDiaAtual = obterCategoriaDiaAtual();
+    const candidatasDoDia = candidatas.filter(
+      (l) => l.categoriaDia === categoriaDiaAtual,
+    );
+    const pool = candidatasDoDia.length > 0 ? candidatasDoDia : candidatas;
+
+    // Candidatas que possuem esta parada no trajeto detalhado
+    const candidatasNaParada = pool.filter(
       (linha) =>
-        Boolean(linha.trajetoDetalhado?.length) &&
+        linha.trajetoDetalhado?.some((t) => t.idParada === idParadaAtual) ??
+        false,
+    );
+
+    if (candidatasNaParada.length === 0) {
+      // Fallback: parada no itinerário mas sem trajetoDetalhado
+      const atendeParada = pool.find((linha) =>
         linha.itinerarioParadasIds.includes(idParadaAtual),
-    );
-    if (comTrajetoNaParada) return comTrajetoNaParada;
+      );
+      return atendeParada ?? pool[0] ?? null;
+    }
 
-    const atendeParada = candidatas.find((linha) =>
-      linha.itinerarioParadasIds.includes(idParadaAtual),
-    );
-    if (atendeParada) return atendeParada;
+    if (candidatasNaParada.length === 1) {
+      return candidatasNaParada[0];
+    }
 
-    const comTrajeto = candidatas.find((linha) =>
-      Boolean(linha.trajetoDetalhado?.length),
-    );
-    if (comTrajeto) return comTrajeto;
-
-    return candidatas[0] ?? null;
+    // Múltiplos sublinhas servem esta parada: escolhe o com chegada mais próxima
+    let melhor: Linha = candidatasNaParada[0];
+    let melhorMinutos = Infinity;
+    for (const candidata of candidatasNaParada) {
+      const previsao = calcularPrevisaoChegada(candidata, idParadaAtual);
+      if (
+        previsao?.proximoOnibus &&
+        previsao.proximoOnibus.minutosFaltantes < melhorMinutos
+      ) {
+        melhorMinutos = previsao.proximoOnibus.minutosFaltantes;
+        melhor = candidata;
+      }
+    }
+    return melhor;
   };
 
   return (
@@ -176,16 +215,22 @@ export function PopupCustomizado({
               <span>Previsão</span>
             </div>
             <div className="space-y-1">
-              {parada.linhasAtendidas.map((nomeLinha, index) => {
+              {parada.linhasAtendidas.map((nomeLinha) => {
                 const linha = resolverLinhaPorNome(nomeLinha, parada.idParada);
                 return (
                   <div
-                    key={index}
+                    key={nomeLinha}
                     className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
                   >
-                    <span className={lineBadgeVariants()} title={nomeLinha}>
+                    <span
+                      className={cn(lineBadgeVariants(), "border-l-[3px]")}
+                      title={nomeLinha}
+                      style={
+                        linha ? { borderLeftColor: linha.corHex } : undefined
+                      }
+                    >
                       <span className="whitespace-normal wrap-break-word text-left">
-                        {nomeLinha}
+                        {getNomeExibicao(linha, nomeLinha)}
                       </span>
                     </span>
                     {linha ? (

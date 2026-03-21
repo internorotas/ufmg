@@ -124,16 +124,6 @@ export function calcularPrevisaoChegada(
   };
 }
 
-/**
- * ⚡ Bolt: Otimização de Performance
- *
- * O que: Memoização completa dos cálculos de previsão com useMemo envolvendo calcularPrevisaoChegada.
- * Por que: O componente que utiliza este hook roda a cada tick (1s/60s) e re-renderiza frequentemente
- * por conta de mudanças no mapa ou geolocalização. O cálculo percorre O(N) os horários de saída
- * gerando overhead na thread principal.
- * Impacto: Reduz o custo de processamento O(N) por render a O(1), cacheando a previsão atualizada
- * enquanto `dataAtual` não muda.
- */
 export function usePrevisaoChegada(
   linha: Linha | null,
   idParadaAtual: string | null,
