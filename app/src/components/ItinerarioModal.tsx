@@ -9,6 +9,7 @@ import { MapPin } from "lucide-react";
 import { Modal } from "./Modal";
 import type { Linha, Parada } from "../types/data.types";
 import { buscarParadasPorIds } from "../../lib/utils";
+import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
 
 // ============================================================================
 // VARIANTS
@@ -100,15 +101,15 @@ export function ItinerarioModal({
       <div className="relative">
         {paradasDoItinerario.length > 0 ? (
           <div className="relative">
-            {paradasDoItinerario.map((parada, index) => {
-              const isFirst = index === 0;
-              const isLast = index === paradasDoItinerario.length - 1;
+            {paradasDoItinerario.map((parada) => {
+              const isFirst =
+                parada.idParada === paradasDoItinerario[0]?.idParada;
+              const isLast =
+                parada.idParada ===
+                paradasDoItinerario[paradasDoItinerario.length - 1]?.idParada;
 
               return (
-                <div
-                  key={`${parada.idParada}-${index}`}
-                  className="relative flex"
-                >
+                <div key={parada.idParada} className="relative flex">
                   {/* Linha conectora vertical tracejada */}
                   {!isLast && (
                     <div
@@ -168,6 +169,72 @@ export function ItinerarioModal({
                           Chegada
                         </span>
                       )}
+
+                      {/* Previsão de chegada nesta parada */}
+                      {(() => {
+                        const previsao = calcularPrevisaoChegada(
+                          linha,
+                          parada.idParada,
+                        );
+                        if (!previsao || !previsao.proximoOnibus) return null;
+                        const {
+                          proximoOnibus,
+                          onibusAnterior,
+                          isTrafegoIntenso,
+                        } = previsao;
+                        const minutos = proximoOnibus.minutosFaltantes;
+
+                        const badgeBg =
+                          minutos < 1
+                            ? "var(--success-bg)"
+                            : isTrafegoIntenso
+                              ? "var(--warning-bg)"
+                              : minutos <= 15
+                                ? "var(--success-bg)"
+                                : "var(--warning-bg)";
+
+                        const badgeText =
+                          minutos < 1
+                            ? "var(--success-text)"
+                            : isTrafegoIntenso
+                              ? "#d97706"
+                              : minutos <= 15
+                                ? "var(--success-text)"
+                                : "var(--warning-text)";
+
+                        const textoChegada =
+                          minutos < 1
+                            ? "Chega agora"
+                            : minutos < 60
+                              ? `~${minutos} min · ${proximoOnibus.horarioChegada}`
+                              : (() => {
+                                  const h = Math.floor(minutos / 60);
+                                  const m = minutos % 60;
+                                  return m === 0
+                                    ? `~${h}h · ${proximoOnibus.horarioChegada}`
+                                    : `~${h}h ${m}min · ${proximoOnibus.horarioChegada}`;
+                                })();
+
+                        return (
+                          <div className="mt-1.5 flex flex-col gap-0.5">
+                            <span
+                              className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+                              style={{
+                                backgroundColor: badgeBg,
+                                color: badgeText,
+                              }}
+                            >
+                              {textoChegada}
+                            </span>
+                            {onibusAnterior && (
+                              <span className="text-[10px] text-text-tertiary">
+                                Último passou há{" "}
+                                {onibusAnterior.minutosQuePassou} min
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </button>
                 </div>
