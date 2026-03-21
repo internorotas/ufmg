@@ -9,7 +9,8 @@ import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal";
 import type { Linha } from "../types/data.types";
 import { timeToMinutes, findScheduleIndex } from "../../lib/utils";
-import { shouldDisableRegularSchedules } from "../config/specialPeriods";
+import { obterHorariosLinhaNoDia, obterStatusLinha } from "../lib/utils";
+import { useCurrentTime } from "../hooks/useCurrentTime";
 
 // ============================================================================
 // VARIANTS
@@ -84,33 +85,24 @@ export interface HorariosModalProps {
  * ```
  */
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
-  const now = new Date();
+  const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const statusLinha = obterStatusLinha(linha, now);
 
-  // Verificar se devemos desabilitar os horários
-  const isVacationLine = linha.categoriaDia === "feriasRecessos";
-  const isInVacationPeriod = shouldDisableRegularSchedules();
-
-  // Verificar se é fim de semana (sábado=6, domingo=0)
-  const today = now.getDay();
-  const isWeekend = today === 0 || today === 6;
-
-  // Lógica de desabilitar horários durante férias:
-  // - Linhas de sábado e dias úteis: SEMPRE desabilitadas durante férias
-  // - Linhas de férias/recessos: desabilitadas apenas em fins de semana
-  const shouldDisableSchedules =
-    isInVacationPeriod && (!isVacationLine || isWeekend);
+  const shouldDisableSchedules = statusLinha.id === "NAO_CIRCULA_HOJE";
 
   // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
   const baseHorarios = useMemo(() => {
-    return linha.horarios
+    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+
+    return horariosDoDia
       .filter((time) => time && time.includes(":"))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios]);
+  }, [linha, now]);
 
   // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
   // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
@@ -146,12 +138,9 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           >
             <p className="mb-2 font-semibold text-yellow-300">
               <AlertTriangle className="mr-1 inline size-4" />
-              Horários suspensos
+              Linha sem operação hoje
             </p>
-            <p className="text-sm text-yellow-200">
-              Esta linha não está operando durante o período de férias e
-              recessos. Utilize os horários de "Férias e Recessos".
-            </p>
+            <p className="text-sm text-yellow-200">{statusLinha.texto}</p>
           </div>
         )}
 
