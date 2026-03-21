@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import type { Linha } from "../types/data.types";
 import {
   converterHoraParaMinutos,
   converterMinutosParaHora,
 } from "../lib/utils";
 import { obterMultiplicadorTrafego } from "../config/trafegoConfig";
+import { useCurrentTime } from "./useCurrentTime";
 
 interface ProximoOnibus {
   horarioChegada: string;
@@ -27,13 +29,13 @@ export interface PrevisaoChegadaResultado {
 export function calcularPrevisaoChegada(
   linha: Linha,
   idParadaAtual: string,
+  agora: Date = new Date(),
 ): PrevisaoChegadaResultado | null {
   if (!linha.trajetoDetalhado || linha.trajetoDetalhado.length === 0) {
     return null;
   }
   if (!linha.horarios || linha.horarios.length === 0) return null;
 
-  const agora = new Date();
   const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
   const multiplicadorTrafego = obterMultiplicadorTrafego(horaAtualMinutos);
 
@@ -126,6 +128,10 @@ export function usePrevisaoChegada(
   linha: Linha | null,
   idParadaAtual: string | null,
 ): PrevisaoChegadaResultado | null {
-  if (!linha || !idParadaAtual) return null;
-  return calcularPrevisaoChegada(linha, idParadaAtual);
+  const dataAtual = useCurrentTime();
+
+  return useMemo(() => {
+    if (!linha || !idParadaAtual) return null;
+    return calcularPrevisaoChegada(linha, idParadaAtual, dataAtual);
+  }, [linha, idParadaAtual, dataAtual]);
 }
