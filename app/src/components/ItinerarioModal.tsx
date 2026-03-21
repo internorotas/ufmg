@@ -7,6 +7,7 @@ import { MapPin } from 'lucide-react';
 import { useMemo } from 'react';
 import { tv } from 'tailwind-variants';
 import { buscarParadasPorIds } from '../../lib/utils';
+import { useAnalytics } from '../hooks/useAnalytics';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
@@ -61,11 +62,16 @@ export function ItinerarioModal({
   paradas,
   onParadaClick,
 }: ItinerarioModalProps) {
+  const analytics = useAnalytics();
   const paradasDoItinerario = useMemo(() => {
     return buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
   }, [linha.itinerarioParadasIds, paradas]);
 
   const handleParadaClick = (parada: Parada) => {
+    analytics.trackEvent('click_stop_from_list', {
+      linha: linha.nome,
+      parada: parada.nome,
+    });
     onParadaClick(parada);
     onClose();
   };

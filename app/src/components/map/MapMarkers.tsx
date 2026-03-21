@@ -9,6 +9,7 @@ import L from 'leaflet';
 import React, { useCallback, useRef, useState } from 'react';
 import { Marker } from 'react-leaflet';
 import icon from '../../assets/marker.svg';
+import { useAnalytics } from '../../hooks/useAnalytics';
 import type { Parada } from '../../types/data.types';
 import { PopupCustomizado } from '../PopupCustomizado';
 
@@ -76,6 +77,8 @@ export const MapMarkers = React.memo(function MapMarkers({
   paradaDestacadaId,
   onMarkerRef,
 }: MapMarkersProps) {
+  const analytics = useAnalytics();
+
   // Callback ref para gerenciar referências de marcadores
   const handleSetMarkerRef = useCallback(
     (id: string, marker: L.Marker | null) => {
@@ -87,12 +90,22 @@ export const MapMarkers = React.memo(function MapMarkers({
   return (
     <>
       {paradas.map((parada) => (
-        <MemoizedMarker
+        <Marker
           key={parada.idParada}
-          parada={parada}
-          isDestacada={paradaDestacadaId === parada.idParada}
-          setMarkerRef={handleSetMarkerRef}
-        />
+          position={parada.coordenadas}
+          icon={paradaDestacadaId === parada.idParada ? highlightedIcon : stationIcon}
+          ref={(ref) => handleSetMarkerRef(parada.idParada, ref)}
+          eventHandlers={{
+            click: () => {
+              analytics.trackEvent('open_stop_popup', {
+                parada_id: parada.idParada,
+                parada_nome: parada.nome,
+              });
+            },
+          }}
+        >
+          <PopupCustomizado parada={parada} />
+        </Marker>
       ))}
     </>
   );

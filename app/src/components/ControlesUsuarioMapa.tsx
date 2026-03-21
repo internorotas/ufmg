@@ -12,6 +12,7 @@
 import L from 'leaflet';
 import { CornerUpLeft, LocateFixed } from 'lucide-react';
 import { Marker, useMap } from 'react-leaflet';
+import { useAnalytics } from '../hooks/useAnalytics';
 import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
 import { cn } from '../lib/utils';
 
@@ -95,6 +96,7 @@ export function ControlesUsuarioMapa({
   permissaoConcedida,
   onPedirLocalizacao,
 }: ControlesUsuarioMapaProps) {
+  const analytics = useAnalytics();
   const map = useMap();
 
   /**
@@ -108,6 +110,8 @@ export function ControlesUsuarioMapa({
    * Centraliza o mapa na localização do usuário
    */
   const handleCentralizar = () => {
+    analytics.trackEvent('click_gps_location');
+
     if (!permissaoConcedida) {
       onPedirLocalizacao();
       return;

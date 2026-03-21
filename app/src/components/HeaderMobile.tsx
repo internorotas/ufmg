@@ -7,6 +7,7 @@ import { Menu, X } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import logo from '../assets/logo-natal-horizontal.svg';
+import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
 
 /**
@@ -48,6 +49,13 @@ export interface HeaderMobileProps
  * ```
  */
 export function HeaderMobile({ isMenuOpen, toggleMenu, className, ...props }: HeaderMobileProps) {
+  const analytics = useAnalytics();
+
+  const handleToggleMenu = () => {
+    analytics.trackEvent('toggle_menu', { state: isMenuOpen ? 'close' : 'open' });
+    toggleMenu();
+  };
+
   return (
     <header data-slot="header" className={cn(headerMobileVariants(), className)} {...props}>
       <div className="h-8">
@@ -56,7 +64,7 @@ export function HeaderMobile({ isMenuOpen, toggleMenu, className, ...props }: He
 
       <button
         type="button"
-        onClick={toggleMenu}
+        onClick={handleToggleMenu}
         className={menuButtonVariants()}
         aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
         title={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}

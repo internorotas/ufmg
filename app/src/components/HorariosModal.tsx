@@ -4,12 +4,12 @@
  */
 
 import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { findScheduleIndex, timeToMinutes } from '../../lib/utils';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
-import { obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
+import { obterStatusLinha } from '../lib/utils';
 import type { Linha } from '../types/data.types';
 import { Modal } from './Modal';
 
@@ -58,6 +58,30 @@ export interface HorariosModalProps {
   linha: Linha;
 }
 
+type ScheduleTab = 'diasUteis' | 'sabados' | 'domingos';
+
+function getInitialTab(): ScheduleTab {
+  const day = new Date().getDay();
+  if (day === 6) return 'sabados';
+  if (day === 0) return 'domingos';
+  return 'diasUteis';
+}
+
+function getHorariosByTab(linha: Linha, tab: ScheduleTab): string[] {
+  const horariosRaw = linha.horarios as unknown;
+
+  if (Array.isArray(horariosRaw)) {
+    return horariosRaw;
+  }
+
+  if (!horariosRaw || typeof horariosRaw !== 'object') {
+    return [];
+  }
+
+  const horariosPorDia = horariosRaw as Partial<Record<ScheduleTab, string[]>>;
+  return Array.isArray(horariosPorDia[tab]) ? horariosPorDia[tab] : [];
+}
+
 /**
  * Modal que exibe os horários de uma linha de ônibus.
  *
@@ -71,7 +95,8 @@ export interface HorariosModalProps {
  * ```
  */
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
-  const { trackEvent } = useAnalytics();
+  const analytics = useAnalytics();
+  const [activeTab, setActiveTab] = useState<ScheduleTab>(() => getInitialTab());
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const statusLinha = obterStatusLinha(linha, now);
@@ -79,7 +104,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const shouldDisableSchedules = statusLinha.id === 'NAO_CIRCULA_HOJE';
 
   const baseHorarios = useMemo(() => {
-    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+    const horariosDoDia = getHorariosByTab(linha, activeTab);
 
     return horariosDoDia
       .filter((time) => time?.includes(':'))
@@ -88,7 +113,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
         minutos: timeToMinutes(horario),
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha, now]);
+  }, [activeTab, linha]);
 
   const splitIndex = useMemo(() => {
     return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
@@ -101,14 +126,14 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   useEffect(() => {
     if (!isOpen) return;
 
-    trackEvent({
+    analytics.trackEvent({
       category: 'Horarios',
       action: 'Abrir Modal Horarios',
       label: `${linha.nome} | status=${statusLinha.id}`,
       value: todos.length,
     });
 
-    trackEvent({
+    analytics.trackEvent({
       category: 'Horarios',
       action: 'Distribuicao Horarios',
       label: `linha=${linha.nome};proximos=${proximos.length};passados=${passados.length};total=${todos.length}`,
@@ -121,11 +146,17 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
     proximos.length,
     statusLinha.id,
     todos.length,
-    trackEvent,
+    analytics,
   ]);
 
+  const handleTabChange = (tab: ScheduleTab) => {
+    if (tab === activeTab) return;
+    setActiveTab(tab);
+    analytics.trackEvent('change_schedule_tab', { linha: linha.nome, tab });
+  };
+
   const handleClose = () => {
-    trackEvent({
+    analytics.trackEvent({
       category: 'Horarios',
       action: 'Fechar Modal Horarios',
       label: linha.nome,
@@ -136,6 +167,30 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={`Horários - ${linha.nome}`} size="md">
       <div className="space-y-6">
+        <div className="flex gap-2 rounded-lg bg-internoRotas-cinza-grafite p-1">
+          <button
+            type="button"
+            onClick={() => handleTabChange('diasUteis')}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'diasUteis' ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-card-hover'}`}
+          >
+            Dias Úteis
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange('sabados')}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'sabados' ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-card-hover'}`}
+          >
+            Sábado
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange('domingos')}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'domingos' ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-card-hover'}`}
+          >
+            Domingo
+          </button>
+        </div>
+
         {shouldDisableSchedules && (
           <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
             <p className="mb-2 font-semibold text-yellow-300">

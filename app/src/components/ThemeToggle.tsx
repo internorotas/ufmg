@@ -61,17 +61,13 @@ export function ThemeToggle({
   ...props
 }: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme();
-  const { trackEvent } = useAnalytics();
+  const analytics = useAnalytics();
 
   const isDark = theme === 'dark';
 
   const handleToggle = () => {
     const newTheme = isDark ? 'light' : 'dark';
-    trackEvent({
-      category: 'UI Interaction',
-      action: 'Toggle Theme',
-      label: newTheme,
-    });
+    analytics.trackEvent('toggle_theme', { theme: newTheme });
     toggleTheme();
   };
 

@@ -4,12 +4,13 @@
  */
 
 import { Bus, MapPin } from 'lucide-react';
-import type { ComponentProps } from 'react';
+import { type ComponentProps, useEffect } from 'react';
 import { Popup } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { normalizarNomeLinha } from '../../lib/utils';
 import { obterCategoriaDiaAtual } from '../config/specialPeriods';
 import { useRotasData } from '../contexts/RotasContext';
+import { useAnalytics } from '../hooks/useAnalytics';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
 import { cn } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
@@ -77,7 +78,15 @@ export interface PopupCustomizadoProps
  * ```
  */
 export function PopupCustomizado({ parada, className, ...props }: PopupCustomizadoProps) {
+  const analytics = useAnalytics();
   const { rotasService } = useRotasData();
+
+  useEffect(() => {
+    analytics.trackEvent('open_stop_popup', {
+      parada_id: parada.idParada,
+      parada_nome: parada.nome,
+    });
+  }, [analytics, parada.idParada, parada.nome]);
 
   const resolverLinhaPorNome = (nomeLinhaParada: string, idParadaAtual: string): Linha | null => {
     const chave = normalizarNomeLinha(nomeLinhaParada);
@@ -159,9 +168,19 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                       title={nomeLinha}
                       style={linha ? { borderLeftColor: linha.corHex } : undefined}
                     >
-                      <span className="whitespace-normal wrap-break-word text-left">
+                      <button
+                        type="button"
+                        className="w-full whitespace-normal wrap-break-word text-left"
+                        onClick={() => {
+                          if (!linha) return;
+                          analytics.trackEvent('click_line_from_popup', {
+                            parada_nome: parada.nome,
+                            linha_selecionada: linha.nome,
+                          });
+                        }}
+                      >
                         {getNomeExibicao(linha, nomeLinha)}
-                      </span>
+                      </button>
                     </span>
                     {linha ? (
                       <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />

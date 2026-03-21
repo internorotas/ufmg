@@ -10,6 +10,7 @@ import {
 export type { AnalyticsEvent, EventCategory, TimingEvent };
 
 let analyticsService: IAnalyticsService = ga4Analytics;
+type AnalyticsPayload = Record<string, string | number | boolean | null | undefined>;
 
 /**
  * Permite injetar um serviço de analytics diferente (útil para testes).
@@ -26,7 +27,16 @@ export function useAnalytics() {
   /**
    * Envia um evento para o Analytics
    */
-  const trackEvent = useCallback((event: AnalyticsEvent) => {
+  const trackEvent = useCallback((event: AnalyticsEvent | string, payload?: AnalyticsPayload) => {
+    if (typeof event === 'string') {
+      analyticsService.trackEvent({
+        category: 'UI Interaction',
+        action: event,
+        label: payload ? JSON.stringify(payload) : undefined,
+      });
+      return;
+    }
+
     analyticsService.trackEvent(event);
   }, []);
 

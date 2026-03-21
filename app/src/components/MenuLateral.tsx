@@ -130,7 +130,8 @@ export const MenuLateral = React.memo(function MenuLateral({
   onParadaClick,
   linhaSelecionada,
 }: MenuLateralProps) {
-  const { trackEvent } = useAnalytics();
+  const analytics = useAnalytics();
+  const { trackEvent } = analytics;
   const { paradaSelecionada } = useRotasSelection();
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
@@ -246,11 +247,7 @@ export const MenuLateral = React.memo(function MenuLateral({
         <Button
           data-slot="mobile-trigger"
           onClick={() => {
-            trackEvent({
-              category: 'UI Interaction',
-              action: 'Abrir Menu Mobile',
-              label: 'botao-ver-linhas',
-            });
+            analytics.trackEvent('toggle_menu', { state: 'open' });
             setMenuVisible(true);
           }}
           variant="primary"
@@ -270,11 +267,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           type="button"
           data-slot="backdrop"
           onClick={() => {
-            trackEvent({
-              category: 'UI Interaction',
-              action: 'Fechar Menu Mobile',
-              label: 'backdrop',
-            });
+            analytics.trackEvent('toggle_menu', { state: 'close' });
             setMenuVisible(false);
           }}
           aria-label="Fechar menu"
@@ -300,11 +293,7 @@ export const MenuLateral = React.memo(function MenuLateral({
             <Button
               data-slot="close"
               onClick={() => {
-                trackEvent({
-                  category: 'UI Interaction',
-                  action: 'Fechar Menu Mobile',
-                  label: 'botao-fechar-header',
-                });
+                analytics.trackEvent('toggle_menu', { state: 'close' });
                 setMenuVisible(false);
               }}
               variant="ghost"
