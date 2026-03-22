@@ -19,3 +19,7 @@
 ## 2024-05-25 - O(1) string normalization caching for UI map lookup
 **Learning:** Found an $O(N)$ string normalization map construction occurring inside `useMemo` of `PopupCustomizado.tsx` which runs for every map popup opened. While `useMemo` caches per instance, mapping thousands of stops again and again whenever a user clicks a new popup creates noticeable UI latency.
 **Action:** When component instances require derived data from global context that only depends on the source global data (e.g. normalizing line names), compute the derived structure exactly once in the data provider layer (`RotasService`) instead of locally within the component tree, reducing complex view initializations from $O(N)$ to $O(1)$.
+
+## 2024-05-20 - Redundant O(N log N) in Utilities
+**Learning:** Pure utility functions that perform expensive parsing or sorting (like checking bus line statuses) can become hidden bottlenecks when called repeatedly by components that already parse and memoize that exact same data for UI rendering. This leads to doing identical $O(N \log N)$ work twice per render.
+**Action:** When creating utility functions that aggregate data over large arrays, always offer an optional parameter to pass pre-calculated intermediate structures. This allows UI components to inject their already-memoized values, bypassing the duplicate work entirely while maintaining backwards compatibility.

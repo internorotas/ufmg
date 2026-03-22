@@ -226,13 +226,16 @@ function LineCardComponent({
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
   const getSuspendedMessage = () =>
     getLinhaNotRunningMessage(linha.categoriaDia);
-  const statusLinha = obterStatusLinha(linha, now);
 
   // Otimização: Memoizar o processamento pesado dos horários (parse + sort)
   const schedulesInMinutes = useMemo(() => {
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
     return parseSchedules(horariosDoDia);
   }, [linha, now]);
+
+  // ⚡ Bolt: Reaproveita os horários já em minutos ordenados da memoização acima
+  // para evitar re-fazer o map/sort interno do obterStatusLinha.
+  const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
 
   // Calcular status baseado no tempo atual
   const currentMinutes = now.getHours() * 60 + now.getMinutes();

@@ -128,15 +128,22 @@ export function obterHorariosLinhaNoDia(
 
 /**
  * Retorna o status de operação da linha para o momento atual.
+ *
+ * ⚡ Bolt: Aceita uma lista opcional precalculada de minutos ordenados (horariosPrecalculados).
+ * Isso evita re-fazer operações O(N log N) (map + filter + sort) a cada 30 segundos
+ * em componentes que já fazem esse parse pesado internamente para renderizar a interface.
  */
 export function obterStatusLinha(
   linha: Linha,
   dataAtual: Date,
+  horariosPrecalculados?: number[],
 ): { id: string; texto: string; cor: string } {
-  const horariosHoje = obterHorariosLinhaNoDia(linha, dataAtual)
-    .map((horario) => converterHoraParaMinutos(horario))
-    .filter((minutos) => Number.isFinite(minutos))
-    .sort((a, b) => a - b);
+  const horariosHoje =
+    horariosPrecalculados ??
+    obterHorariosLinhaNoDia(linha, dataAtual)
+      .map((horario) => converterHoraParaMinutos(horario))
+      .filter((minutos) => Number.isFinite(minutos))
+      .sort((a, b) => a - b);
 
   if (horariosHoje.length === 0) {
     return {

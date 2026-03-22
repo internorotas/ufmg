@@ -150,9 +150,6 @@ export function LinhaDetalhesModal({
 
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const statusLinha = obterStatusLinha(linha, now);
-
-  const isLineRunningToday = statusLinha.id !== "NAO_CIRCULA_HOJE";
 
   // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
   const paradasDoItinerario = useMemo(() => {
@@ -172,6 +169,15 @@ export function LinhaDetalhesModal({
       }))
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha, now]);
+
+  // ⚡ Bolt: Usamos a lista já mapeada de minutos para evitar re-fazer sort/map no obterStatusLinha
+  const statusLinha = obterStatusLinha(
+    linha,
+    now,
+    useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios])
+  );
+
+  const isLineRunningToday = statusLinha.id !== "NAO_CIRCULA_HOJE";
 
   // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
   // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
