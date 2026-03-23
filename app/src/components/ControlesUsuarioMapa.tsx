@@ -10,7 +10,7 @@
  */
 
 import L from 'leaflet';
-import { CornerUpLeft, LocateFixed } from 'lucide-react';
+import { CornerUpLeft, LoaderCircle, LocateFixed } from 'lucide-react';
 import { Marker, useMap } from 'react-leaflet';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
@@ -25,6 +25,8 @@ interface ControlesUsuarioMapaProps {
   permissaoConcedida: boolean;
   /** Callback para abrir o modal de permissão */
   onPedirLocalizacao: () => void;
+  /** Se está carregando a localização no momento */
+  carregandoLocalizacao?: boolean;
 }
 
 /**
@@ -97,6 +99,7 @@ export function ControlesUsuarioMapa({
   heading,
   permissaoConcedida,
   onPedirLocalizacao,
+  carregandoLocalizacao = false,
 }: ControlesUsuarioMapaProps) {
   const analytics = useAnalytics();
   const map = useMap();
@@ -150,7 +153,7 @@ export function ControlesUsuarioMapa({
           className={cn(
             'flex h-12 w-12 cursor-pointer items-center justify-center',
             'rounded-full shadow-lg transition-all duration-200',
-            'bg-info-bg hover:bg-info-border active:scale-95',
+            'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
             'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
           )}
           aria-label="Centralizar mapa no campus UFMG"
@@ -163,6 +166,7 @@ export function ControlesUsuarioMapa({
         <button
           type="button"
           onClick={handleCentralizar}
+          disabled={carregandoLocalizacao}
           className={cn(
             // Tamanho mínimo para touch (48x48px) - Mobile friendly
             'flex h-12 w-12 cursor-pointer items-center justify-center',
@@ -171,6 +175,7 @@ export function ControlesUsuarioMapa({
             'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
             // Focus state para acessibilidade
             'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
+            'disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100',
           )}
           aria-label={
             permissaoConcedida ? 'Centralizar mapa na minha localização' : 'Ativar localização'
@@ -179,7 +184,11 @@ export function ControlesUsuarioMapa({
             permissaoConcedida ? 'Centralizar mapa na minha localização' : 'Ativar localização'
           }
         >
-          <LocateFixed className="h-6 w-6 text-white" />
+          {carregandoLocalizacao ? (
+            <LoaderCircle className="h-6 w-6 animate-spin text-white" />
+          ) : (
+            <LocateFixed className="h-6 w-6 text-white" />
+          )}
         </button>
       </div>
     </>

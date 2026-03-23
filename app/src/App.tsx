@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef } from 'react';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { ModalManager } from './components/app/ModalManager';
@@ -64,6 +64,8 @@ function AppContent() {
     iniciarRastreamento,
     solicitarPermissaoNavegador,
   } = useLocalizacaoUsuario();
+  const autoCenterSolicitadoRef = useRef(false);
+  const autoCenterConsumidoRef = useRef(false);
 
   useEffect(() => {
     trackPageView('/home');
@@ -99,6 +101,7 @@ function AppContent() {
 
   // Handler para voltar ao campus UFMG
   const handleVoltarParaUFMG = useCallback(() => {
+    autoCenterConsumidoRef.current = true;
     mapaRef.current?.centralizarCoordenada(COORDENADAS_UFMG, 15);
     fecharModalLonge();
   }, [mapaRef, fecharModalLonge]);
@@ -107,9 +110,25 @@ function AppContent() {
   const handleContinuarAqui = useCallback(() => {
     if (localizacao) {
       mapaRef.current?.centralizarCoordenada(localizacao, 17);
+      autoCenterConsumidoRef.current = true;
     }
     fecharModalLonge();
   }, [localizacao, mapaRef, fecharModalLonge]);
+
+  useEffect(() => {
+    if (carregandoLocalizacao) {
+      autoCenterConsumidoRef.current = false;
+    }
+  }, [carregandoLocalizacao]);
+
+  useEffect(() => {
+    if (!autoCenterSolicitadoRef.current) return;
+    if (!localizacao || carregandoLocalizacao || mostrarModalLonge) return;
+    if (autoCenterConsumidoRef.current) return;
+
+    mapaRef.current?.centralizarCoordenada(localizacao, 17);
+    autoCenterConsumidoRef.current = true;
+  }, [localizacao, carregandoLocalizacao, mostrarModalLonge, mapaRef]);
 
   // Validação dos dados
   if (isLoadingData) {
@@ -184,7 +203,12 @@ function AppContent() {
             localizacaoUsuario={localizacao}
             headingUsuario={heading}
             permissaoLocalizacao={permissaoConcedida}
-            onPedirLocalizacao={iniciarRastreamento}
+            carregandoLocalizacao={carregandoLocalizacao}
+            onPedirLocalizacao={() => {
+              autoCenterSolicitadoRef.current = true;
+              autoCenterConsumidoRef.current = false;
+              iniciarRastreamento();
+            }}
           />
         </Suspense>
       </main>
@@ -197,6 +221,8 @@ function AppContent() {
         onClosePermissao={fecharModalPermissao}
         onCloseLonge={fecharModalLonge}
         onPermitirLocalizacao={() => {
+          autoCenterSolicitadoRef.current = true;
+          autoCenterConsumidoRef.current = false;
           solicitarPermissaoNavegador();
           trackEvent({
             event: 'location_permission_granted',
