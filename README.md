@@ -9,7 +9,7 @@
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Vite](https://img.shields.io/badge/Vite-7.3-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![License](https://img.shields.io/github/license/internorotas/ufmg?style=flat-square)](https://github.com/internorotas/ufmg/blob/main/LICENSE)
 [![Repo Size](https://img.shields.io/github/repo-size/internorotas/ufmg?style=flat-square)](https://github.com/internorotas/ufmg)
 
@@ -134,7 +134,7 @@ O site oficial da UFMG disponibiliza informações sobre o transporte interno, p
 | :-------------------------------------------------------------------------------------------------------------: | :----: | :------------------------------------------------- |
 |        ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)         |  19.x  | Framework UI com novos recursos (use, ref as prop) |
 | ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) |  5.9   | Tipagem estática e IntelliSense                    |
-|          ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)          |  7.3   | Build tool ultrarrápido com HMR                    |
+|          ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)          |  8.x   | Build tool ultrarrápido com HMR                    |
 
 ### 🎨 Estilização
 
@@ -193,7 +193,7 @@ app/
 
 ### Pré-requisitos
 
-- **Node.js** 18+
+- **Node.js** 20.19+
 - **pnpm** 8+ (recomendado) ou npm/yarn
 
 ### Instalação
