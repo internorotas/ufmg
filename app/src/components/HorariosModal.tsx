@@ -210,7 +210,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {!shouldDisableSchedules && proximos.length > 0 && (
+        {proximos.length > 0 && (
           <div data-slot="upcoming-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
               <Clock className="text-green-400" size={20} />
@@ -232,7 +232,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {!shouldDisableSchedules && passados.length > 0 && (
+        {passados.length > 0 && (
           <div data-slot="passed-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
               <CheckCircle className="text-gray-500" size={20} />
@@ -254,14 +254,12 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {!shouldDisableSchedules && (
-          <div data-slot="summary" className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm">
-            <p className="text-center text-gray-300">
-              Total de {todos.length} horários •{' '}
-              <span className="text-green-400">{proximos.length} restantes</span>
-            </p>
-          </div>
-        )}
+        <div data-slot="summary" className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm">
+          <p className="text-center text-gray-300">
+            Total de {todos.length} horários •{' '}
+            <span className="text-green-400">{proximos.length} restantes</span>
+          </p>
+        </div>
       </div>
     </Modal>
   );

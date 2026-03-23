@@ -123,10 +123,13 @@ export function useLinhasFilter(
     [linhasData.categoriasDias, categoriaAtiva],
   );
 
+  const todasLinhas = useMemo(() => {
+    return linhasData.categoriasDias.flatMap((categoria) => categoria.linhas);
+  }, [linhasData.categoriasDias]);
+
   const linhasFiltradas = useMemo(() => {
-    const linhasDaCategoria = categoriaAtual?.linhas || [];
-    return filterLinhas(linhasDaCategoria, searchTerm);
-  }, [categoriaAtual?.linhas, searchTerm]);
+    return filterLinhas(todasLinhas, searchTerm);
+  }, [todasLinhas, searchTerm]);
 
   const hasResults = linhasFiltradas.length > 0;
 

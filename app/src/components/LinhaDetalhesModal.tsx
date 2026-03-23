@@ -10,7 +10,7 @@ import { buscarParadasPorIds, findScheduleIndex, timeToMinutes } from '../../lib
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
-import { obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
+import { obterStatusLinha } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
 
@@ -97,6 +97,34 @@ export interface LinhaDetalhesModalProps {
 
 type TabType = 'itinerario' | 'horarios';
 
+function getAllLineSchedules(linha: Linha): string[] {
+  const horariosRaw = linha.horarios as unknown;
+
+  if (Array.isArray(horariosRaw)) {
+    return horariosRaw
+      .filter((h) => h?.includes(':'))
+      .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+  }
+
+  if (!horariosRaw || typeof horariosRaw !== 'object') {
+    return [];
+  }
+
+  const horariosPorDia = horariosRaw as Partial<
+    Record<'diasUteis' | 'sabados' | 'domingos', string[]>
+  >;
+
+  return Array.from(
+    new Set([
+      ...(horariosPorDia.diasUteis ?? []),
+      ...(horariosPorDia.sabados ?? []),
+      ...(horariosPorDia.domingos ?? []),
+    ]),
+  )
+    .filter((h) => h?.includes(':'))
+    .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+}
+
 /**
  * Modal que exibe informações detalhadas sobre uma linha de ônibus.
  *
@@ -139,9 +167,9 @@ export function LinhaDetalhesModal({
   }, [linha.itinerarioParadasIds, todasParadas]);
 
   const baseHorarios = useMemo(() => {
-    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+    const horariosDaLinha = getAllLineSchedules(linha);
 
-    return horariosDoDia
+    return horariosDaLinha
       .filter((h) => h?.includes(':'))
       .map((horario, idx) => ({
         id: `${horario}-${idx}`,
@@ -149,7 +177,7 @@ export function LinhaDetalhesModal({
         minutos: timeToMinutes(horario),
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha, now]);
+  }, [linha]);
 
   const splitIndex = useMemo(() => {
     return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
