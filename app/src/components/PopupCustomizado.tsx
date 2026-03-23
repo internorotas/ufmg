@@ -4,7 +4,7 @@
  */
 
 import { Bus, MapPin } from 'lucide-react';
-import { type ComponentProps, useEffect } from 'react';
+import { type ComponentProps } from 'react';
 import { Popup } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { normalizarNomeLinha } from '../../lib/utils';
@@ -80,13 +80,6 @@ export interface PopupCustomizadoProps
 export function PopupCustomizado({ parada, className, ...props }: PopupCustomizadoProps) {
   const analytics = useAnalytics();
   const { rotasService } = useRotasData();
-
-  useEffect(() => {
-    analytics.trackEvent('open_stop_popup', {
-      parada_id: parada.idParada,
-      parada_nome: parada.nome,
-    });
-  }, [analytics, parada.idParada, parada.nome]);
 
   const resolverLinhaPorNome = (nomeLinhaParada: string, idParadaAtual: string): Linha | null => {
     const chave = normalizarNomeLinha(nomeLinhaParada);
