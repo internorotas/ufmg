@@ -114,11 +114,8 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   }, [activeTab, linha]);
 
   // ⚡ Bolt: Usamos a lista já mapeada de minutos para evitar re-fazer sort/map no obterStatusLinha
-  const statusLinha = obterStatusLinha(
-    linha,
-    now,
-    useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios]),
-  );
+  const schedulesInMinutes = useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios]);
+  const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
 
   const shouldDisableSchedules = statusLinha.id === 'NAO_CIRCULA_HOJE';
 
