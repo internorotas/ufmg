@@ -3,11 +3,10 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { CheckCircle, Clock } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { findScheduleIndex, timeToMinutes } from '../../lib/utils';
-import { isLineAvailableToday } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { obterStatusLinha } from '../lib/utils';
@@ -69,10 +68,6 @@ function getInitialTab(): ScheduleTab {
 }
 
 function getHorariosByTab(linha: Linha, tab: ScheduleTab): string[] {
-  if (!isLineAvailableToday(linha.categoriaDia)) {
-    return [];
-  }
-
   const horariosRaw = linha.horarios as unknown;
 
   if (Array.isArray(horariosRaw)) {
@@ -205,51 +200,19 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </button>
         </div>
 
-        {shouldDisableSchedules && (
-          <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
-            <p className="mb-2 font-semibold text-warning-text">
-              <AlertTriangle className="mr-1 inline size-4" />
-              Linha sem operação hoje
-            </p>
-            <p className="text-sm text-warning-text">{statusLinha.texto}</p>
-          </div>
-        )}
-
-        {!shouldDisableSchedules && proximos.length > 0 && (
-          <div data-slot="upcoming-schedules">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-              <Clock className="text-success-text" size={20} />
-              Próximos Horários
+        {shouldDisableSchedules ? (
+          <div data-slot="all-schedules">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+              <Clock size={20} />
+              Todos os Horários
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {proximos.map(({ horario }) => (
+              {todos.map(({ horario }) => (
                 <div
-                  key={`proximo-${horario}`}
-                  className={scheduleCardVariants({ status: 'upcoming' })}
-                >
-                  <span className="sr-only">Próximo horário às {horario}</span>
-                  <p className={scheduleTimeVariants({ status: 'upcoming' })} aria-hidden="true">
-                    {horario}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {!shouldDisableSchedules && passados.length > 0 && (
-          <div data-slot="passed-schedules">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-              <CheckCircle className="text-text-tertiary" size={20} />
-              Horários Passados
-            </h3>
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {passados.map(({ horario }) => (
-                <div
-                  key={`passado-${horario}`}
+                  key={`horario-${horario}`}
                   className={scheduleCardVariants({ status: 'passed' })}
                 >
-                  <span className="sr-only">Horário passado às {horario}</span>
+                  <span className="sr-only">Horário às {horario}</span>
                   <p className={scheduleTimeVariants({ status: 'passed' })} aria-hidden="true">
                     {horario}
                   </p>
@@ -257,12 +220,61 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
               ))}
             </div>
           </div>
+        ) : (
+          <>
+            {proximos.length > 0 && (
+              <div data-slot="upcoming-schedules">
+                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+                  <Clock className="text-success-text" size={20} />
+                  Próximos Horários
+                </h3>
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                  {proximos.map(({ horario }) => (
+                    <div
+                      key={`proximo-${horario}`}
+                      className={scheduleCardVariants({ status: 'upcoming' })}
+                    >
+                      <span className="sr-only">Próximo horário às {horario}</span>
+                      <p
+                        className={scheduleTimeVariants({ status: 'upcoming' })}
+                        aria-hidden="true"
+                      >
+                        {horario}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {passados.length > 0 && (
+              <div data-slot="passed-schedules">
+                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+                  <CheckCircle className="text-text-tertiary" size={20} />
+                  Horários Passados
+                </h3>
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                  {passados.map(({ horario }) => (
+                    <div
+                      key={`passado-${horario}`}
+                      className={scheduleCardVariants({ status: 'passed' })}
+                    >
+                      <span className="sr-only">Horário passado às {horario}</span>
+                      <p className={scheduleTimeVariants({ status: 'passed' })} aria-hidden="true">
+                        {horario}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         <div data-slot="summary" className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm">
           <p className="text-center text-text-secondary">
             {shouldDisableSchedules
-              ? 'Sem horários ativos para hoje'
+              ? `Total de ${todos.length} horários`
               : `Total de ${todos.length} horários • ${proximos.length} restantes`}
           </p>
         </div>
