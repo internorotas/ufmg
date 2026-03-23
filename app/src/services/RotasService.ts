@@ -185,9 +185,13 @@ export async function loadRotasService(): Promise<IRotasService> {
     cachedService = RotasServiceImpl.fromData(linhas, paradas);
     return cachedService;
   } catch {
-    const { linhas, paradas } = await loadFromSourceFallback();
-    cachedService = RotasServiceImpl.fromData(linhas, paradas);
-    return cachedService;
+    if (import.meta.env.DEV) {
+      const { linhas, paradas } = await loadFromSourceFallback();
+      cachedService = RotasServiceImpl.fromData(linhas, paradas);
+      return cachedService;
+    }
+
+    throw new Error('Falha ao carregar dados de rotas em /public/data');
   }
 }
 
