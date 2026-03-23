@@ -5,46 +5,44 @@
  * @description Input reutilizável com suporte a ícones e validação.
  */
 
-import { type ComponentProps, type ReactNode, forwardRef } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { Search, X } from "lucide-react";
-import { cn } from "../../lib/utils";
-
-// VARIANTS
+import { Search, X } from 'lucide-react';
+import { type ComponentProps, forwardRef, type ReactNode } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { cn } from '../../lib/utils';
 
 /**
  * Variantes do input base
  */
 export const inputVariants = tv({
   base: [
-    "w-full rounded-lg border bg-input",
-    "border-input-border text-text-primary",
-    "placeholder:text-text-tertiary",
-    "transition-all duration-200",
-    "focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary",
-    "disabled:cursor-not-allowed disabled:opacity-50",
+    'w-full rounded-lg border bg-input',
+    'border-input-border text-text-primary',
+    'placeholder:text-text-tertiary',
+    'transition-all duration-200',
+    'focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary',
+    'disabled:cursor-not-allowed disabled:opacity-50',
   ],
   variants: {
     size: {
-      sm: "h-8 px-3 text-sm",
-      md: "h-10 px-4 text-sm",
-      lg: "h-12 px-4 text-base",
+      sm: 'h-8 px-3 text-sm',
+      md: 'h-10 px-4 text-sm',
+      lg: 'h-12 px-4 text-base',
     },
     hasLeftIcon: {
-      true: "pl-10",
-      false: "",
+      true: 'pl-10',
+      false: '',
     },
     hasRightIcon: {
-      true: "pr-10",
-      false: "",
+      true: 'pr-10',
+      false: '',
     },
     error: {
-      true: "border-red-500 focus:ring-red-500",
-      false: "",
+      true: 'border-red-500 focus:ring-red-500',
+      false: '',
     },
   },
   defaultVariants: {
-    size: "md",
+    size: 'md',
     hasLeftIcon: false,
     hasRightIcon: false,
     error: false,
@@ -55,11 +53,11 @@ export const inputVariants = tv({
  * Variantes do container de input
  */
 export const inputContainerVariants = tv({
-  base: "relative",
+  base: 'relative',
   variants: {
     fullWidth: {
-      true: "w-full",
-      false: "",
+      true: 'w-full',
+      false: '',
     },
   },
   defaultVariants: {
@@ -67,12 +65,9 @@ export const inputContainerVariants = tv({
   },
 });
 
-// TYPES
-
 export interface InputProps
-  extends
-    Omit<ComponentProps<"input">, "size">,
-    Omit<VariantProps<typeof inputVariants>, "hasLeftIcon" | "hasRightIcon"> {
+  extends Omit<ComponentProps<'input'>, 'size'>,
+    Omit<VariantProps<typeof inputVariants>, 'hasLeftIcon' | 'hasRightIcon'> {
   /** Ícone à esquerda */
   leftIcon?: ReactNode;
   /** Ícone à direita */
@@ -82,8 +77,6 @@ export interface InputProps
   /** Container full width */
   fullWidth?: boolean;
 }
-
-// COMPONENT
 
 /**
  * Componente de input com suporte a ícones e estados
@@ -117,10 +110,7 @@ export function Input({
   ...props
 }: InputProps) {
   return (
-    <div
-      data-slot="input-container"
-      className={inputContainerVariants({ fullWidth })}
-    >
+    <div data-slot="input-container" className={inputContainerVariants({ fullWidth })}>
       {leftIcon && (
         <span
           data-slot="input-left-icon"
@@ -165,10 +155,7 @@ export function Input({
 
 // SEARCH INPUT PRESET
 
-export interface SearchInputProps extends Omit<
-  ComponentProps<"input">,
-  "size"
-> {
+export interface SearchInputProps extends Omit<ComponentProps<'input'>, 'size'> {
   /** Valor do input */
   value?: string;
   /** Callback quando o valor muda */
@@ -196,16 +183,7 @@ export interface SearchInputProps extends Omit<
  */
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   (
-    {
-      value,
-      onValueChange,
-      onClear,
-      showClear = true,
-      onChange,
-      shortcut,
-      className,
-      ...props
-    },
+    { value, onValueChange, onClear, showClear = true, onChange, shortcut, className, ...props },
     ref,
   ) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -214,7 +192,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     };
 
     const handleClear = () => {
-      onValueChange?.("");
+      onValueChange?.('');
       onClear?.();
     };
 
@@ -236,10 +214,9 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           className={cn(
             inputVariants({
               hasLeftIcon: true,
-              hasRightIcon:
-                (showClear && hasValue) || (!hasValue && !!shortcut),
+              hasRightIcon: (showClear && hasValue) || (!hasValue && !!shortcut),
             }),
-            "pr-10",
+            'pr-10',
             className,
           )}
           {...props}
@@ -268,4 +245,4 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   },
 );
 
-SearchInput.displayName = "SearchInput";
+SearchInput.displayName = 'SearchInput';

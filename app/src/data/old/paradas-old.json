@@ -85,11 +85,7 @@
       "properties": {
         "id_parada": "P5",
         "nome": "Unidade Administrativa III",
-        "linhasAtendidasNomes": [
-          "Linha 01",
-          "Linha 02 (Todas)",
-          "Linha 03 (Todas) (Volta)"
-        ]
+        "linhasAtendidasNomes": ["Linha 01", "Linha 02 (Todas)", "Linha 03 (Todas) (Volta)"]
       }
     },
     {
@@ -246,11 +242,7 @@
       "properties": {
         "id_parada": "P16",
         "nome": "Restaurante Universitário Setorial II (Volta)",
-        "linhasAtendidasNomes": [
-          "Linha 01",
-          "Linha 02 (Todas)",
-          "Linha 04 (Todas)"
-        ]
+        "linhasAtendidasNomes": ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"]
       }
     },
     {
@@ -322,11 +314,7 @@
       "properties": {
         "id_parada": "P22",
         "nome": "ICEX - Engenharia (Volta)",
-        "linhasAtendidasNomes": [
-          "Linha 01",
-          "Linha 02 (Todas)",
-          "Linha 04 (Todas)"
-        ]
+        "linhasAtendidasNomes": ["Linha 01", "Linha 02 (Todas)", "Linha 04 (Todas)"]
       }
     },
     {

@@ -3,32 +3,29 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useMemo } from "react";
-import { tv } from "tailwind-variants";
-import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
-import { Modal } from "./Modal";
-import type { Linha } from "../types/data.types";
-import { timeToMinutes, findScheduleIndex } from "../../lib/utils";
-import { obterHorariosLinhaNoDia, obterStatusLinha } from "../lib/utils";
-import { useCurrentTime } from "../hooks/useCurrentTime";
-
-// ============================================================================
-// VARIANTS
-// ============================================================================
+import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { tv } from 'tailwind-variants';
+import { findScheduleIndex, timeToMinutes } from '../../lib/utils';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { useCurrentTime } from '../hooks/useCurrentTime';
+import { obterStatusLinha } from '../lib/utils';
+import type { Linha } from '../types/data.types';
+import { Modal } from './Modal';
 
 /**
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-all",
+  base: 'rounded-lg border p-3 text-center transition-all',
   variants: {
     status: {
-      upcoming: ["border-green-600 bg-green-900/30"],
-      passed: "border-gray-700 bg-gray-800/50 opacity-50",
+      upcoming: ['border-green-600 bg-green-900/30'],
+      passed: 'border-gray-700 bg-gray-800/50 opacity-50',
     },
   },
   defaultVariants: {
-    status: "upcoming",
+    status: 'upcoming',
   },
 });
 
@@ -36,15 +33,15 @@ export const scheduleCardVariants = tv({
  * Variantes do texto de horário
  */
 export const scheduleTimeVariants = tv({
-  base: "font-bold",
+  base: 'font-bold',
   variants: {
     status: {
-      upcoming: "text-xl text-green-300",
-      passed: "text-lg text-gray-400",
+      upcoming: 'text-xl text-green-300',
+      passed: 'text-lg text-gray-400',
     },
   },
   defaultVariants: {
-    status: "upcoming",
+    status: 'upcoming',
   },
 });
 
@@ -52,15 +49,8 @@ export const scheduleTimeVariants = tv({
  * Variantes do alerta de suspensão
  */
 export const suspensionAlertVariants = tv({
-  base: [
-    "rounded-lg border p-4 text-center",
-    "border-yellow-600 bg-yellow-900/30",
-  ],
+  base: ['rounded-lg border p-4 text-center', 'border-yellow-600 bg-yellow-900/30'],
 });
-
-// ============================================================================
-// TYPES
-// ============================================================================
 
 export interface HorariosModalProps {
   isOpen: boolean;
@@ -68,9 +58,29 @@ export interface HorariosModalProps {
   linha: Linha;
 }
 
-// ============================================================================
-// COMPONENT
-// ============================================================================
+type ScheduleTab = 'diasUteis' | 'sabados' | 'domingos';
+
+function getInitialTab(): ScheduleTab {
+  const day = new Date().getDay();
+  if (day === 6) return 'sabados';
+  if (day === 0) return 'domingos';
+  return 'diasUteis';
+}
+
+function getHorariosByTab(linha: Linha, tab: ScheduleTab): string[] {
+  const horariosRaw = linha.horarios as unknown;
+
+  if (Array.isArray(horariosRaw)) {
+    return horariosRaw;
+  }
+
+  if (!horariosRaw || typeof horariosRaw !== 'object') {
+    return [];
+  }
+
+  const horariosPorDia = horariosRaw as Partial<Record<ScheduleTab, string[]>>;
+  return Array.isArray(horariosPorDia[tab]) ? horariosPorDia[tab] : [];
+}
 
 /**
  * Modal que exibe os horários de uma linha de ônibus.
@@ -85,57 +95,113 @@ export interface HorariosModalProps {
  * ```
  */
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
+  const analytics = useAnalytics();
+  const { trackPageView } = analytics;
+  const [activeTab, setActiveTab] = useState<ScheduleTab>(() => getInitialTab());
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const statusLinha = obterStatusLinha(linha, now);
 
-  const shouldDisableSchedules = statusLinha.id === "NAO_CIRCULA_HOJE";
+  const shouldDisableSchedules = statusLinha.id === 'NAO_CIRCULA_HOJE';
 
-  // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
   const baseHorarios = useMemo(() => {
-    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+    const horariosDoDia = getHorariosByTab(linha, activeTab);
 
     return horariosDoDia
-      .filter((time) => time && time.includes(":"))
+      .filter((time) => time?.includes(':'))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha, now]);
+  }, [activeTab, linha]);
 
-  // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
-  // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
-  // Separamos os componentes "passado" e "futuro" para evitar realocação dos itens O(N)
   const splitIndex = useMemo(() => {
-    // Busca binária para achar onde dividir usando um getter para evitar o .map() inicial.
-    // Usamos currentMinutes - 1 pois currentMinutes (agora) deve ser considerado 'proximo'
-    return findScheduleIndex(
-      baseHorarios,
-      currentMinutes - 1,
-      (h) => h.minutos,
-    );
+    return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
   }, [baseHorarios, currentMinutes]);
 
-  // Zero-allocation das sublistas virtuais
   const passados = baseHorarios.slice(0, splitIndex);
   const proximos = baseHorarios.slice(splitIndex);
   const todos = baseHorarios;
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    trackPageView(`/modal/horarios/${linha.idRota}`);
+
+    analytics.trackEvent({
+      category: 'engagement',
+      action: 'view_schedule',
+      label: `${linha.nome} | status=${statusLinha.id}`,
+      value: todos.length,
+    });
+
+    analytics.trackEvent({
+      category: 'engagement',
+      action: 'schedule_distribution',
+      label: `linha=${linha.nome};proximos=${proximos.length};passados=${passados.length};total=${todos.length}`,
+      value: proximos.length,
+    });
+  }, [
+    isOpen,
+    linha.idRota,
+    linha.nome,
+    passados.length,
+    proximos.length,
+    statusLinha.id,
+    todos.length,
+    analytics,
+    trackPageView,
+  ]);
+
+  const handleTabChange = (tab: ScheduleTab) => {
+    if (tab === activeTab) return;
+    setActiveTab(tab);
+    analytics.trackEvent({
+      category: 'navigation',
+      action: 'change_schedule_tab',
+      label: `${linha.nome}:${tab}`,
+    });
+  };
+
+  const handleClose = () => {
+    analytics.trackEvent({
+      category: 'navigation',
+      action: 'close_schedule_modal',
+      label: linha.nome,
+    });
+    onClose();
+  };
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Horários - ${linha.nome}`}
-      size="md"
-    >
+    <Modal isOpen={isOpen} onClose={handleClose} title={`Horários - ${linha.nome}`} size="md">
       <div className="space-y-6">
-        {/* Aviso de Horários Suspensos */}
-        {shouldDisableSchedules && (
-          <div
-            data-slot="suspension-alert"
-            className={suspensionAlertVariants()}
+        <div className="flex gap-2 rounded-lg bg-internoRotas-cinza-grafite p-1">
+          <button
+            type="button"
+            onClick={() => handleTabChange('diasUteis')}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'diasUteis' ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-card-hover'}`}
           >
+            Dias Úteis
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange('sabados')}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'sabados' ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-card-hover'}`}
+          >
+            Sábado
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange('domingos')}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'domingos' ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-card-hover'}`}
+          >
+            Domingo
+          </button>
+        </div>
+
+        {shouldDisableSchedules && (
+          <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
             <p className="mb-2 font-semibold text-yellow-300">
               <AlertTriangle className="mr-1 inline size-4" />
               Linha sem operação hoje
@@ -144,7 +210,6 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {/* Próximos Horários */}
         {!shouldDisableSchedules && proximos.length > 0 && (
           <div data-slot="upcoming-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
@@ -152,16 +217,13 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
               Próximos Horários
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {proximos.map(({ horario }, index) => (
+              {proximos.map(({ horario }) => (
                 <div
-                  key={`proximo-${index}`}
-                  className={scheduleCardVariants({ status: "upcoming" })}
+                  key={`proximo-${horario}`}
+                  className={scheduleCardVariants({ status: 'upcoming' })}
                 >
                   <span className="sr-only">Próximo horário às {horario}</span>
-                  <p
-                    className={scheduleTimeVariants({ status: "upcoming" })}
-                    aria-hidden="true"
-                  >
+                  <p className={scheduleTimeVariants({ status: 'upcoming' })} aria-hidden="true">
                     {horario}
                   </p>
                 </div>
@@ -170,7 +232,6 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {/* Horários Passados */}
         {!shouldDisableSchedules && passados.length > 0 && (
           <div data-slot="passed-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
@@ -178,16 +239,13 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
               Horários Passados
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {passados.map(({ horario }, index) => (
+              {passados.map(({ horario }) => (
                 <div
-                  key={`passado-${index}`}
-                  className={scheduleCardVariants({ status: "passed" })}
+                  key={`passado-${horario}`}
+                  className={scheduleCardVariants({ status: 'passed' })}
                 >
                   <span className="sr-only">Horário passado às {horario}</span>
-                  <p
-                    className={scheduleTimeVariants({ status: "passed" })}
-                    aria-hidden="true"
-                  >
+                  <p className={scheduleTimeVariants({ status: 'passed' })} aria-hidden="true">
                     {horario}
                   </p>
                 </div>
@@ -196,17 +254,11 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {/* Informação Extra */}
         {!shouldDisableSchedules && (
-          <div
-            data-slot="summary"
-            className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm"
-          >
+          <div data-slot="summary" className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm">
             <p className="text-center text-gray-300">
-              Total de {todos.length} horários •{" "}
-              <span className="text-green-400">
-                {proximos.length} restantes
-              </span>
+              Total de {todos.length} horários •{' '}
+              <span className="text-green-400">{proximos.length} restantes</span>
             </p>
           </div>
         )}

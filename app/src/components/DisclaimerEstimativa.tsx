@@ -1,4 +1,4 @@
-import { Info } from "lucide-react";
+import { Info } from 'lucide-react';
 
 export function DisclaimerEstimativa() {
   return (
@@ -13,8 +13,8 @@ export function DisclaimerEstimativa() {
         </p>
       </div>
       <p className="mt-1 text-[11px] leading-snug text-info-text/90">
-        Horários estimados por trajeto teórico. Podem variar com o trânsito.{" "}
-        <strong>Ainda</strong> não é previsão em tempo real.
+        Horários estimados por trajeto teórico. Podem variar com o trânsito. <strong>Ainda</strong>{' '}
+        não é previsão em tempo real.
       </p>
     </section>
   );

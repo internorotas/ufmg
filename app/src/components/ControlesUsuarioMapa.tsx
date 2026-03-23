@@ -9,12 +9,12 @@
  * para que o hook useMap() funcione corretamente.
  */
 
-import { useMap } from "react-leaflet";
-import { Marker } from "react-leaflet";
-import L from "leaflet";
-import { CornerUpLeft, LocateFixed } from "lucide-react";
-import { cn } from "../lib/utils";
-import { COORDENADAS_UFMG } from "../hooks/useLocalizacaoUsuario";
+import L from 'leaflet';
+import { CornerUpLeft, LocateFixed } from 'lucide-react';
+import { Marker, useMap } from 'react-leaflet';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
+import { cn } from '../lib/utils';
 
 interface ControlesUsuarioMapaProps {
   /** Coordenadas atuais do usuário [lat, lng] */
@@ -58,7 +58,7 @@ function criarIconeUsuario(heading: number | null): L.DivIcon {
           "
         ></div>
       `
-          : ""
+          : ''
       }
       <div 
         class="user-dot"
@@ -80,7 +80,7 @@ function criarIconeUsuario(heading: number | null): L.DivIcon {
 
   return L.divIcon({
     html,
-    className: "user-location-icon",
+    className: 'user-location-icon',
     iconSize: [40, 40],
     iconAnchor: [20, 20],
   });
@@ -96,6 +96,7 @@ export function ControlesUsuarioMapa({
   permissaoConcedida,
   onPedirLocalizacao,
 }: ControlesUsuarioMapaProps) {
+  const analytics = useAnalytics();
   const map = useMap();
 
   /**
@@ -109,6 +110,11 @@ export function ControlesUsuarioMapa({
    * Centraliza o mapa na localização do usuário
    */
   const handleCentralizar = () => {
+    analytics.trackEvent({
+      category: 'map_interaction',
+      action: 'click_gps',
+    });
+
     if (!permissaoConcedida) {
       onPedirLocalizacao();
       return;
@@ -140,10 +146,10 @@ export function ControlesUsuarioMapa({
           type="button"
           onClick={handleCentralizarUFMG}
           className={cn(
-            "flex h-12 w-12 items-center justify-center",
-            "rounded-full shadow-lg transition-all duration-200",
-            "bg-blue-100 hover:bg-blue-200 active:scale-95",
-            "focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2",
+            'flex h-12 w-12 items-center justify-center',
+            'rounded-full shadow-lg transition-all duration-200',
+            'bg-blue-100 hover:bg-blue-200 active:scale-95',
+            'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
           )}
           aria-label="Centralizar mapa no campus UFMG"
           title="Voltar para a UFMG"
@@ -157,22 +163,18 @@ export function ControlesUsuarioMapa({
           onClick={handleCentralizar}
           className={cn(
             // Tamanho mínimo para touch (48x48px) - Mobile friendly
-            "flex h-12 w-12 items-center justify-center",
+            'flex h-12 w-12 items-center justify-center',
             // Estilo visual - Azul brand igual ao botão Ver Linhas
-            "rounded-full shadow-lg transition-all duration-200",
-            "bg-brand-primary hover:bg-blue-700 active:scale-95",
+            'rounded-full shadow-lg transition-all duration-200',
+            'bg-brand-primary hover:bg-blue-700 active:scale-95',
             // Focus state para acessibilidade
-            "focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2",
+            'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
           )}
           aria-label={
-            permissaoConcedida
-              ? "Centralizar mapa na minha localização"
-              : "Ativar localização"
+            permissaoConcedida ? 'Centralizar mapa na minha localização' : 'Ativar localização'
           }
           title={
-            permissaoConcedida
-              ? "Centralizar mapa na minha localização"
-              : "Ativar localização"
+            permissaoConcedida ? 'Centralizar mapa na minha localização' : 'Ativar localização'
           }
         >
           <LocateFixed className="h-6 w-6 text-white" />

@@ -15,9 +15,9 @@
  * - webkitCompassHeading (iOS) fornece heading absoluto; alpha (Android) é convertido.
  */
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { calcularDistanciaKm } from "../lib/utils";
-import { useAnalytics } from "./useAnalytics";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { calcularDistanciaKm } from '../lib/utils';
+import { useAnalytics } from './useAnalytics';
 
 /**
  * Coordenadas centrais do Campus UFMG (Pampulha)
@@ -115,18 +115,14 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       if (jaVerificouDistanciaRef.current) return;
       jaVerificouDistanciaRef.current = true;
 
-      const distancia = calcularDistanciaKm(
-        lat,
-        lng,
-        COORDENADAS_UFMG[0],
-        COORDENADAS_UFMG[1],
-      );
+      const distancia = calcularDistanciaKm(lat, lng, COORDENADAS_UFMG[0], COORDENADAS_UFMG[1]);
 
       if (distancia > DISTANCIA_MAXIMA_KM) {
         setMostrarModalLonge(true);
         trackEvent({
-          category: "Engajamento",
-          action: "Usuário Longe da UFMG",
+          event: 'user_far_from_campus',
+          category: 'map_interaction',
+          action: 'user_far_from_campus',
           label: `${distancia.toFixed(1)}km`,
         });
       }
@@ -162,30 +158,37 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
   /**
    * Callback de erro do GPS
    */
-  const onErroGPS = useCallback((error: GeolocationPositionError) => {
-    setCarregando(false);
+  const onErroGPS = useCallback(
+    (error: GeolocationPositionError) => {
+      setCarregando(false);
 
-    switch (error.code) {
-      case error.PERMISSION_DENIED:
-        setErro(
-          "Permissão de localização negada. Verifique as configurações do navegador.",
-        );
-        setPermissaoConcedida(false);
-        setMostrarModalPermissao(true);
-        break;
-      case error.POSITION_UNAVAILABLE:
-        setErro("Localização indisponível. Verifique se o GPS está ativado.");
-        setMostrarModalPermissao(true);
-        break;
-      case error.TIMEOUT:
-        setErro("Tempo esgotado ao obter localização. Tente novamente.");
-        setMostrarModalPermissao(true);
-        break;
-      default:
-        setErro("Erro desconhecido de geolocalização.");
-        setMostrarModalPermissao(true);
-    }
-  }, []);
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          setErro('Permissão de localização negada. Verifique as configurações do navegador.');
+          setPermissaoConcedida(false);
+          setMostrarModalPermissao(true);
+          trackEvent({
+            event: 'location_permission_denied',
+            category: 'preferences',
+            action: 'location_permission_denied',
+            label: 'geolocation_permission_denied',
+          });
+          break;
+        case error.POSITION_UNAVAILABLE:
+          setErro('Localização indisponível. Verifique se o GPS está ativado.');
+          setMostrarModalPermissao(true);
+          break;
+        case error.TIMEOUT:
+          setErro('Tempo esgotado ao obter localização. Tente novamente.');
+          setMostrarModalPermissao(true);
+          break;
+        default:
+          setErro('Erro desconhecido de geolocalização.');
+          setMostrarModalPermissao(true);
+      }
+    },
+    [trackEvent],
+  );
 
   /**
    * Inicia o listener da bússola (DeviceOrientation API).
@@ -213,27 +216,21 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
     // Nunca acesse DeviceOrientationEvent do escopo global — no WebKit ele pode ser
     // undefined ou lançar ReferenceError. Sempre via window para acesso seguro.
     const isOrientationSupported =
-      typeof window !== "undefined" &&
-      window.DeviceOrientationEvent !== undefined;
+      typeof window !== 'undefined' && window.DeviceOrientationEvent !== undefined;
     const requestPermission = isOrientationSupported
       ? (
           window.DeviceOrientationEvent as unknown as {
-            requestPermission?: () => Promise<"granted" | "denied">;
+            requestPermission?: () => Promise<'granted' | 'denied'>;
           }
         ).requestPermission
       : undefined;
 
-    if (typeof requestPermission === "function") {
+    if (typeof requestPermission === 'function') {
       try {
         const perm = await requestPermission();
-        if (perm === "granted") {
-          window.addEventListener("deviceorientation", handleOrientation, true);
-          return () =>
-            window.removeEventListener(
-              "deviceorientation",
-              handleOrientation,
-              true,
-            );
+        if (perm === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation, true);
+          return () => window.removeEventListener('deviceorientation', handleOrientation, true);
         }
       } catch {
         // Bússola indisponível neste dispositivo — GPS continua normalmente
@@ -243,22 +240,11 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
 
     // Android / desktop: deviceorientationabsolute fornece heading absoluto
     // quando disponível; caso contrário usa deviceorientation
-    const supportsAbsolute = "ondeviceorientationabsolute" in window;
-    const eventName = supportsAbsolute
-      ? "deviceorientationabsolute"
-      : "deviceorientation";
+    const supportsAbsolute = 'ondeviceorientationabsolute' in window;
+    const eventName = supportsAbsolute ? 'deviceorientationabsolute' : 'deviceorientation';
 
-    window.addEventListener(
-      eventName,
-      handleOrientation as EventListener,
-      true,
-    );
-    return () =>
-      window.removeEventListener(
-        eventName,
-        handleOrientation as EventListener,
-        true,
-      );
+    window.addEventListener(eventName, handleOrientation as EventListener, true);
+    return () => window.removeEventListener(eventName, handleOrientation as EventListener, true);
   }, []);
 
   /**
@@ -268,7 +254,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
    */
   const solicitarPermissaoNavegador = useCallback(async () => {
     if (!navigator.geolocation) {
-      setErro("Geolocalização não suportada neste navegador.");
+      setErro('Geolocalização não suportada neste navegador.');
       return;
     }
 
@@ -283,15 +269,11 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       navigator.geolocation.clearWatch(watchIdRef.current);
     }
 
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      onPosicaoRecebida,
-      onErroGPS,
-      {
-        enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 0,
-      },
-    );
+    watchIdRef.current = navigator.geolocation.watchPosition(onPosicaoRecebida, onErroGPS, {
+      enableHighAccuracy: true,
+      timeout: 20000,
+      maximumAge: 0,
+    });
 
     const cleanup = await iniciarBussola();
     if (cleanup) {
@@ -312,17 +294,17 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
    */
   const iniciarRastreamento = useCallback(async () => {
     if (!navigator.geolocation) {
-      setErro("Geolocalização não suportada neste navegador.");
+      setErro('Geolocalização não suportada neste navegador.');
       return;
     }
 
     if (navigator.permissions) {
       try {
         const status = await navigator.permissions.query({
-          name: "geolocation",
+          name: 'geolocation',
         });
 
-        if (status.state === "granted") {
+        if (status.state === 'granted') {
           // Permissão já concedida anteriormente — pula o modal
           await solicitarPermissaoNavegador();
           return;
@@ -352,14 +334,8 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
     };
   }, []);
 
-  const abrirModalPermissao = useCallback(
-    () => setMostrarModalPermissao(true),
-    [],
-  );
-  const fecharModalPermissao = useCallback(
-    () => setMostrarModalPermissao(false),
-    [],
-  );
+  const abrirModalPermissao = useCallback(() => setMostrarModalPermissao(true), []);
+  const fecharModalPermissao = useCallback(() => setMostrarModalPermissao(false), []);
   const fecharModalLonge = useCallback(() => setMostrarModalLonge(false), []);
 
   return {

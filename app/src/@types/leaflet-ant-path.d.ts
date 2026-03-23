@@ -1,6 +1,6 @@
-import * as L from "leaflet";
+import * as L from 'leaflet';
 
-declare module "leaflet" {
+declare module 'leaflet' {
   namespace Polyline {
     class AntPath extends L.Polyline {
       constructor(
@@ -34,6 +34,6 @@ declare module "leaflet" {
   ): Polyline.AntPath;
 }
 
-declare module "leaflet-ant-path" {
+declare module 'leaflet-ant-path' {
   export = L;
 }
