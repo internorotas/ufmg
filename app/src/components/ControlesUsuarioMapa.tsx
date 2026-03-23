@@ -10,7 +10,7 @@
  */
 
 import L from 'leaflet';
-import { CornerUpLeft, LocateFixed } from 'lucide-react';
+import { CornerUpLeft, LoaderCircle, LocateFixed } from 'lucide-react';
 import { Marker, useMap } from 'react-leaflet';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
@@ -25,6 +25,8 @@ interface ControlesUsuarioMapaProps {
   permissaoConcedida: boolean;
   /** Callback para abrir o modal de permissão */
   onPedirLocalizacao: () => void;
+  /** Se está carregando a localização no momento */
+  carregandoLocalizacao?: boolean;
 }
 
 /**
@@ -51,9 +53,11 @@ function criarIconeUsuario(heading: number | null): L.DivIcon {
             transform-origin: center bottom;
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 40px solid rgba(59, 130, 246, 0.3);
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-bottom: 36px solid var(--color-info-border);
+            opacity: 0.35;
+            filter: blur(1px);
             pointer-events: none;
           "
         ></div>
@@ -69,10 +73,10 @@ function criarIconeUsuario(heading: number | null): L.DivIcon {
           transform: translate(-50%, -50%);
           width: 16px;
           height: 16px;
-          background: #3b82f6;
+          background: var(--color-brand-primary);
           border: 3px solid white;
           border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 2px 8px var(--color-backdrop);
         "
       ></div>
     </div>
@@ -95,6 +99,7 @@ export function ControlesUsuarioMapa({
   heading,
   permissaoConcedida,
   onPedirLocalizacao,
+  carregandoLocalizacao = false,
 }: ControlesUsuarioMapaProps) {
   const analytics = useAnalytics();
   const map = useMap();
@@ -146,29 +151,31 @@ export function ControlesUsuarioMapa({
           type="button"
           onClick={handleCentralizarUFMG}
           className={cn(
-            'flex h-12 w-12 items-center justify-center',
+            'flex h-12 w-12 cursor-pointer items-center justify-center',
             'rounded-full shadow-lg transition-all duration-200',
-            'bg-blue-100 hover:bg-blue-200 active:scale-95',
+            'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
             'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
           )}
           aria-label="Centralizar mapa no campus UFMG"
           title="Voltar para a UFMG"
         >
-          <CornerUpLeft className="h-6 w-6 text-brand-primary" />
+          <CornerUpLeft className="h-6 w-6 text-white" />
         </button>
 
         {/* Botão: centralizar na localização do usuário */}
         <button
           type="button"
           onClick={handleCentralizar}
+          disabled={carregandoLocalizacao}
           className={cn(
             // Tamanho mínimo para touch (48x48px) - Mobile friendly
-            'flex h-12 w-12 items-center justify-center',
+            'flex h-12 w-12 cursor-pointer items-center justify-center',
             // Estilo visual - Azul brand igual ao botão Ver Linhas
             'rounded-full shadow-lg transition-all duration-200',
-            'bg-brand-primary hover:bg-blue-700 active:scale-95',
+            'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
             // Focus state para acessibilidade
             'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
+            'disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100',
           )}
           aria-label={
             permissaoConcedida ? 'Centralizar mapa na minha localização' : 'Ativar localização'
@@ -177,7 +184,11 @@ export function ControlesUsuarioMapa({
             permissaoConcedida ? 'Centralizar mapa na minha localização' : 'Ativar localização'
           }
         >
-          <LocateFixed className="h-6 w-6 text-white" />
+          {carregandoLocalizacao ? (
+            <LoaderCircle className="h-6 w-6 animate-spin text-white" />
+          ) : (
+            <LocateFixed className="h-6 w-6 text-white" />
+          )}
         </button>
       </div>
     </>

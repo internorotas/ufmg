@@ -37,7 +37,7 @@ export const inputVariants = tv({
       false: '',
     },
     error: {
-      true: 'border-red-500 focus:ring-red-500',
+      true: 'border-warning-border focus:ring-warning-border',
       false: '',
     },
   },
@@ -145,7 +145,7 @@ export function Input({
       )}
 
       {errorMessage && error && (
-        <p data-slot="input-error" className="mt-1 text-xs text-red-500">
+        <p data-slot="input-error" className="mt-1 text-xs text-warning-text">
           {errorMessage}
         </p>
       )}

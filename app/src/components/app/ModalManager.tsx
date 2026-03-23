@@ -33,7 +33,9 @@ export function ModalManager({
         onClose={onClosePermissao}
         title={
           <div className="flex items-center gap-2">
-            <Navigation className="h-5 w-5 text-brand-primary" />
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary/20">
+              <Navigation className="h-4 w-4 text-brand-primary" />
+            </span>
             <span>Ativar Localização</span>
           </div>
         }
@@ -41,8 +43,8 @@ export function ModalManager({
       >
         <div className="space-y-4 p-4">
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-              <MapPin className="h-8 w-8 text-brand-primary" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary shadow-sm">
+              <MapPin className="h-8 w-8 text-white" />
             </div>
             <p className="text-text-secondary">
               Para mostrar sua localização no mapa e te ajudar a encontrar a parada mais próxima,
@@ -50,7 +52,7 @@ export function ModalManager({
             </p>
           </div>
           {erroLocalizacao && (
-            <div className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-600">
+            <div className="rounded-lg bg-warning-bg p-3 text-center text-sm text-warning-text">
               {erroLocalizacao}
             </div>
           )}
@@ -58,6 +60,7 @@ export function ModalManager({
             <Button
               variant="primary"
               fullWidth
+              className="text-white"
               disabled={carregandoLocalizacao}
               onClick={onPermitirLocalizacao}
             >
@@ -84,7 +87,7 @@ export function ModalManager({
             </p>
           </div>
           <div className="flex flex-col gap-2">
-            <Button variant="primary" fullWidth onClick={onVoltarUFMG}>
+            <Button variant="primary" fullWidth className="text-white" onClick={onVoltarUFMG}>
               Voltar para a UFMG
             </Button>
             <Button variant="ghost" fullWidth onClick={onContinuarAqui}>

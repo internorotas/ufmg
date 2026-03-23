@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef } from 'react';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { ModalManager } from './components/app/ModalManager';
@@ -17,7 +17,7 @@ const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default:
 
 // Componente simples de Loading
 const LoadingMap = () => (
-  <div className="flex items-center justify-center h-full w-full bg-gray-100">
+  <div className="flex items-center justify-center h-full w-full bg-background-secondary">
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
   </div>
 );
@@ -64,6 +64,8 @@ function AppContent() {
     iniciarRastreamento,
     solicitarPermissaoNavegador,
   } = useLocalizacaoUsuario();
+  const autoCenterSolicitadoRef = useRef(false);
+  const autoCenterConsumidoRef = useRef(false);
 
   useEffect(() => {
     trackPageView('/home');
@@ -99,6 +101,7 @@ function AppContent() {
 
   // Handler para voltar ao campus UFMG
   const handleVoltarParaUFMG = useCallback(() => {
+    autoCenterConsumidoRef.current = true;
     mapaRef.current?.centralizarCoordenada(COORDENADAS_UFMG, 15);
     fecharModalLonge();
   }, [mapaRef, fecharModalLonge]);
@@ -107,17 +110,33 @@ function AppContent() {
   const handleContinuarAqui = useCallback(() => {
     if (localizacao) {
       mapaRef.current?.centralizarCoordenada(localizacao, 17);
+      autoCenterConsumidoRef.current = true;
     }
     fecharModalLonge();
   }, [localizacao, mapaRef, fecharModalLonge]);
 
+  useEffect(() => {
+    if (carregandoLocalizacao) {
+      autoCenterConsumidoRef.current = false;
+    }
+  }, [carregandoLocalizacao]);
+
+  useEffect(() => {
+    if (!autoCenterSolicitadoRef.current) return;
+    if (!localizacao || carregandoLocalizacao || mostrarModalLonge) return;
+    if (autoCenterConsumidoRef.current) return;
+
+    mapaRef.current?.centralizarCoordenada(localizacao, 17);
+    autoCenterConsumidoRef.current = true;
+  }, [localizacao, carregandoLocalizacao, mostrarModalLonge, mapaRef]);
+
   // Validação dos dados
   if (isLoadingData) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
-        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
+      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
+        <div className="text-center p-8 bg-card rounded-lg shadow-xl">
           <h2 className="text-2xl font-bold mb-2 text-brand-primary">Carregando dados...</h2>
-          <p className="text-gray-600">Buscando linhas e paradas em /public/data.</p>
+          <p className="text-text-secondary">Buscando linhas e paradas em /public/data.</p>
         </div>
       </div>
     );
@@ -125,10 +144,10 @@ function AppContent() {
 
   if (dataError) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
-        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-red-600">Erro ao carregar dados</h2>
-          <p className="text-gray-600">{dataError}</p>
+      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
+        <div className="text-center p-8 bg-card rounded-lg shadow-xl">
+          <h2 className="text-2xl font-bold mb-2 text-warning-text">Erro ao carregar dados</h2>
+          <p className="text-text-secondary">{dataError}</p>
         </div>
       </div>
     );
@@ -136,10 +155,10 @@ function AppContent() {
 
   if (!todasParadas || todasParadas.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
-        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-red-600">⚠️ Dados não encontrados</h2>
-          <p className="text-gray-600">
+      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
+        <div className="text-center p-8 bg-card rounded-lg shadow-xl">
+          <h2 className="text-2xl font-bold mb-2 text-warning-text">⚠️ Dados não encontrados</h2>
+          <p className="text-text-secondary">
             Não foi possível carregar os dados de paradas.
             <br />
             Verifique a integridade dos arquivos em <code>/public/data/paradas.json</code>.
@@ -151,10 +170,10 @@ function AppContent() {
 
   if (!linhasData || !linhasData.categoriasDias) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
-        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-red-600">⚠️ Erro nos Dados de Linhas</h2>
-          <p className="text-gray-600">
+      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
+        <div className="text-center p-8 bg-card rounded-lg shadow-xl">
+          <h2 className="text-2xl font-bold mb-2 text-warning-text">⚠️ Erro nos Dados de Linhas</h2>
+          <p className="text-text-secondary">
             Não foi possível carregar os dados das linhas.
             <br />
             Verifique a integridade dos arquivos em <code>/public/data/linhas.json</code>.
@@ -184,7 +203,12 @@ function AppContent() {
             localizacaoUsuario={localizacao}
             headingUsuario={heading}
             permissaoLocalizacao={permissaoConcedida}
-            onPedirLocalizacao={iniciarRastreamento}
+            carregandoLocalizacao={carregandoLocalizacao}
+            onPedirLocalizacao={() => {
+              autoCenterSolicitadoRef.current = true;
+              autoCenterConsumidoRef.current = false;
+              iniciarRastreamento();
+            }}
           />
         </Suspense>
       </main>
@@ -197,6 +221,8 @@ function AppContent() {
         onClosePermissao={fecharModalPermissao}
         onCloseLonge={fecharModalLonge}
         onPermitirLocalizacao={() => {
+          autoCenterSolicitadoRef.current = true;
+          autoCenterConsumidoRef.current = false;
           solicitarPermissaoNavegador();
           trackEvent({
             event: 'location_permission_granted',

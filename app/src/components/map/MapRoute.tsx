@@ -41,8 +41,8 @@ export const MapRoute = React.memo(function MapRoute({ linha }: MapRouteProps) {
   const options = useMemo(
     () => ({
       ...DEFAULT_ANT_PATH_OPTIONS,
-      color: linha?.corHex || '#3388ff',
-      pulseColor: linha?.corHex || '#3388ff',
+      color: linha?.corHex || 'var(--color-brand-primary)',
+      pulseColor: linha?.corHex || 'var(--color-brand-primary)',
     }),
     [linha?.corHex],
   );

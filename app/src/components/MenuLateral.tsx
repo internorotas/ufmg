@@ -56,9 +56,9 @@ export const categoryTabVariants = tv({
     'cursor-pointer transition-all duration-150 ease-out',
     'active:scale-[0.97]',
     'data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm',
-    'data-[state=inactive]:bg-card data-[state=inactive]:text-text-secondary',
+    'data-[state=inactive]:bg-background-secondary data-[state=inactive]:text-text-secondary',
+    'data-[state=inactive]:border data-[state=inactive]:border-card-border data-[state=inactive]:shadow-sm',
     'data-[state=inactive]:hover:bg-card-hover data-[state=inactive]:hover:text-text-primary',
-    'data-[state=inactive]:border data-[state=inactive]:border-transparent',
     'data-[state=inactive]:hover:border-card-border',
   ],
 });
@@ -261,7 +261,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           className="gap-3 rounded-full px-6 shadow-lg"
           title="Ver Linhas"
         >
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-2 text-white">
             <Menu size={24} />
             Ver Linhas
           </span>
