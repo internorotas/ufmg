@@ -171,7 +171,7 @@ export function ItinerarioModal({
                           minutos < 1
                             ? 'var(--success-text)'
                             : isTrafegoIntenso
-                              ? '#d97706'
+                              ? 'var(--warning-text)'
                               : minutos <= 15
                                 ? 'var(--success-text)'
                                 : 'var(--warning-text)';
@@ -215,7 +215,7 @@ export function ItinerarioModal({
             })}
           </div>
         ) : (
-          <div className="py-8 text-center text-gray-400">
+          <div className="py-8 text-center text-text-secondary">
             <p>Nenhuma parada encontrada para este itinerário.</p>
           </div>
         )}

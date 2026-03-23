@@ -13,7 +13,7 @@ import { cn } from '../lib/utils';
  * Variantes do container do footer
  */
 export const footerContainerVariants = tv({
-  base: ['shrink-0 space-y-2 border-t p-2', 'border-card-border bg-background-secondary'],
+  base: ['shrink-0 space-y-2 border-t p-2', 'border-card-border bg-sidebar transition-colors'],
 });
 
 /**
@@ -22,15 +22,15 @@ export const footerContainerVariants = tv({
 export const footerButtonVariants = tv({
   base: [
     'flex w-full items-center justify-center rounded-md px-2 py-1.5',
-    'text-[10px] font-semibold transition-colors cursor-pointer',
+    'text-xs font-semibold transition-colors cursor-pointer',
   ],
   variants: {
     intent: {
-      danger: 'bg-red-500 text-white hover:bg-red-600',
-      primary: 'bg-internoRotas-azul-eletrico text-white hover:bg-blue-700',
+      danger: 'bg-red-600 text-white hover:bg-red-700',
+      primary: 'bg-blue-600 text-white hover:bg-blue-700',
       ghost: [
-        'border border-card-border bg-card text-text-secondary',
-        'hover:bg-card-hover hover:text-text-primary',
+        'border border-card-border bg-background text-text-primary',
+        'hover:bg-background-secondary hover:text-text-primary',
       ],
     },
   },
@@ -120,9 +120,9 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
         onClick={() => handleLinkClick('Dev Profile')}
         className={creditLinkVariants()}
       >
-        Desenvolvido com{' '}
-        <Heart size={14} fill="currentColor" className="text-internoRotas-azul-eletrico" /> por Igor
-        Martins
+        Desenvolvido com
+        <Heart size={14} fill="currentColor" className="text-red-500" />
+        por Igor Martins
       </a>
     </div>
   );

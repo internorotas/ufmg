@@ -25,7 +25,7 @@ export const badgeVariants = tv({
       success: ['bg-success-bg text-success-text border-success-border'],
       info: ['bg-info-bg text-info-text border-info-border'],
       warning: ['bg-warning-bg text-warning-text border-warning-border'],
-      danger: ['bg-red-900/30 text-red-300 border-red-600'],
+      danger: ['bg-warning-bg text-warning-text border-warning-border'],
       neutral: ['bg-neutral-bg text-neutral-text border-neutral-border'],
 
       // Brand badges
