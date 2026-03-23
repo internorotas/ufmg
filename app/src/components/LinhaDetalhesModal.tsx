@@ -502,13 +502,26 @@ export function LinhaDetalhesModal({
             </div>
           )}
 
+          {/* Linha não vigente hoje: exibe somente os horários da própria linha */}
+          {!isLineRunningToday && (
+            <div data-slot="all-schedules">
+              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+                <Clock size={20} />
+                Todos os Horários ({todos.length})
+              </h3>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                {todos.map(({ horario, id }) => (
+                  <div key={`horario-${id}`} className={scheduleCardVariants({ status: 'passed' })}>
+                    <p className="text-lg font-semibold text-text-secondary">{horario}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Resumo */}
           <div data-slot="summary" className={infoCardVariants()}>
-            <p className="text-text-secondary">
-              {isLineRunningToday
-                ? `Total de ${todos.length} horários`
-                : 'Sem horários ativos para hoje'}
-            </p>
+            <p className="text-text-secondary">Total de {todos.length} horários</p>
           </div>
         </div>
       )}
