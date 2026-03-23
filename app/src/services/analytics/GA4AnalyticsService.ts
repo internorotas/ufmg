@@ -133,7 +133,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
     if (!this.ensureInitialized()) return;
 
     ReactGA?.event({
-      category: timing.category || 'Performance',
+      category: timing.category || 'engagement',
       action: timing.name,
       label: timing.label,
       value: timing.value,
@@ -144,8 +144,8 @@ export class GA4AnalyticsService implements IAnalyticsService {
     if (!this.ensureInitialized()) return;
 
     ReactGA?.event({
-      category: 'Erro',
-      action: error.name || 'Error',
+      category: 'engagement',
+      action: 'application_error',
       label: error.message,
       value: fatal ? 1 : 0,
     });

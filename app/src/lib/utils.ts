@@ -3,6 +3,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import type { Linha } from '../types/data.types';
+import { getSaoPauloDayOfWeek, getSaoPauloMinutesOfDay } from './time';
 
 /**
  * Mescla classes CSS usando clsx e tailwind-merge.
@@ -70,14 +71,14 @@ function parseHorarioValido(horario: string): number | null {
 }
 
 function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
-  const diaSemana = dataAtual.getDay();
+  const diaSemana = getSaoPauloDayOfWeek(dataAtual);
   if (diaSemana === 6) return 'sabados';
   if (diaSemana === 0) return 'domingos';
   return 'diasUteis';
 }
 
 function linhaCirculaNoDiaCategoria(linha: Linha, dataAtual: Date): boolean {
-  const diaSemana = dataAtual.getDay();
+  const diaSemana = getSaoPauloDayOfWeek(dataAtual);
   const categoria = linha.categoriaDia;
 
   if (categoria === 'sabado') return diaSemana === 6;
@@ -146,7 +147,7 @@ export function obterStatusLinha(
     };
   }
 
-  const agoraMinutos = dataAtual.getHours() * 60 + dataAtual.getMinutes();
+  const agoraMinutos = getSaoPauloMinutesOfDay(dataAtual);
   const primeiroHorario = horariosHoje[0];
   const ultimoHorario = horariosHoje[horariosHoje.length - 1];
 

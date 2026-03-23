@@ -4,7 +4,7 @@
  */
 
 import { AlertTriangle, Bus, Clock, Map as MapIcon, MapPin } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { buscarParadasPorIds, findScheduleIndex, timeToMinutes } from '../../lib/utils';
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
@@ -119,9 +119,14 @@ export function LinhaDetalhesModal({
   onParadaClick,
 }: LinhaDetalhesModalProps) {
   const [tabAtiva, setTabAtiva] = useState<TabType>('itinerario');
-  const { trackEvent } = useAnalytics();
+  const { trackEvent, trackPageView } = useAnalytics();
 
-  useSessionTiming(`Linha: ${linha.nome}`, 'Engajamento Detalhes');
+  useSessionTiming(`Linha: ${linha.nome}`, 'engagement');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    trackPageView(`/modal/linha-detalhes/${linha.idRota}`);
+  }, [isOpen, linha.idRota, trackPageView]);
 
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -156,8 +161,8 @@ export function LinhaDetalhesModal({
 
   const handleTabChange = (tab: TabType) => {
     trackEvent({
-      category: 'Navegação Detalhes',
-      action: 'Visualizar Aba',
+      category: 'navigation',
+      action: 'view_details_tab',
       label: `${tab === 'itinerario' ? 'Itinerário' : 'Todos os Horários'} - ${linha.nome}`,
     });
     setTabAtiva(tab);
@@ -165,16 +170,16 @@ export function LinhaDetalhesModal({
 
   const handleHorarioClick = (horario: string) => {
     trackEvent({
-      category: 'Horarios',
-      action: 'Clique Horario Especifico',
+      category: 'engagement',
+      action: 'select_specific_schedule',
       label: `${horario} - ${linha.nome}`,
     });
   };
 
   const handleParadaClick = (parada: Parada) => {
     trackEvent({
-      category: 'Engajamento Detalhes',
-      action: 'Selecionar Parada Itinerario',
+      category: 'map_interaction',
+      action: 'view_stop_details',
       label: `${parada.nome} - ${linha.nome}`,
     });
     onParadaClick(parada);

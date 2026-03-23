@@ -97,9 +97,10 @@ export const MapMarkers = React.memo(function MapMarkers({
           ref={(ref) => handleSetMarkerRef(parada.idParada, ref)}
           eventHandlers={{
             click: () => {
-              analytics.trackEvent('open_stop_popup', {
-                parada_id: parada.idParada,
-                parada_nome: parada.nome,
+              analytics.trackEvent({
+                category: 'map_interaction',
+                action: 'view_stop_details',
+                label: `${parada.idParada} - ${parada.nome}`,
               });
             },
           }}

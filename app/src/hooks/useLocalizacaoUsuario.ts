@@ -120,8 +120,8 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       if (distancia > DISTANCIA_MAXIMA_KM) {
         setMostrarModalLonge(true);
         trackEvent({
-          category: 'Engajamento',
-          action: 'Usuário Longe da UFMG',
+          category: 'map_interaction',
+          action: 'user_far_from_campus',
           label: `${distancia.toFixed(1)}km`,
         });
       }
