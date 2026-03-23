@@ -141,9 +141,13 @@ class RotasServiceImpl implements IRotasService {
 }
 
 async function loadFromPublic(): Promise<{ linhas: CategoriaLinhas; paradas: ParadasPayload }> {
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const linhasUrl = `${baseUrl}data/linhas.json`;
+  const paradasUrl = `${baseUrl}data/paradas.json`;
+
   const [linhasResponse, paradasResponse] = await Promise.all([
-    fetch('/data/linhas.json'),
-    fetch('/data/paradas.json'),
+    fetch(linhasUrl),
+    fetch(paradasUrl),
   ]);
 
   if (!linhasResponse.ok || !paradasResponse.ok) {
@@ -174,20 +178,38 @@ async function loadFromSourceFallback(): Promise<{
 }
 
 let cachedService: IRotasService | null = null;
+let loadingServicePromise: Promise<IRotasService> | null = null;
 
 export async function loadRotasService(): Promise<IRotasService> {
   if (cachedService) {
     return cachedService;
   }
 
+  if (loadingServicePromise) {
+    return loadingServicePromise;
+  }
+
+  loadingServicePromise = (async () => {
+    if (import.meta.env.DEV) {
+      // Em desenvolvimento, evita 404 ruidoso no console quando /public/data ainda nao foi gerado.
+      const { linhas, paradas } = await loadFromSourceFallback();
+      cachedService = RotasServiceImpl.fromData(linhas, paradas);
+      return cachedService;
+    }
+
+    try {
+      const { linhas, paradas } = await loadFromPublic();
+      cachedService = RotasServiceImpl.fromData(linhas, paradas);
+      return cachedService;
+    } catch {
+      throw new Error('Falha ao carregar dados de rotas em /public/data');
+    }
+  })();
+
   try {
-    const { linhas, paradas } = await loadFromPublic();
-    cachedService = RotasServiceImpl.fromData(linhas, paradas);
-    return cachedService;
-  } catch {
-    const { linhas, paradas } = await loadFromSourceFallback();
-    cachedService = RotasServiceImpl.fromData(linhas, paradas);
-    return cachedService;
+    return await loadingServicePromise;
+  } finally {
+    loadingServicePromise = null;
   }
 }
 

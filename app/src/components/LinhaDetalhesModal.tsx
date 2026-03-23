@@ -10,7 +10,7 @@ import { buscarParadasPorIds, findScheduleIndex, timeToMinutes } from '../../lib
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
-import { obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
+import { obterStatusLinha } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
 
@@ -97,6 +97,34 @@ export interface LinhaDetalhesModalProps {
 
 type TabType = 'itinerario' | 'horarios';
 
+function getAllLineSchedules(linha: Linha): string[] {
+  const horariosRaw = linha.horarios as unknown;
+
+  if (Array.isArray(horariosRaw)) {
+    return horariosRaw
+      .filter((h) => h?.includes(':'))
+      .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+  }
+
+  if (!horariosRaw || typeof horariosRaw !== 'object') {
+    return [];
+  }
+
+  const horariosPorDia = horariosRaw as Partial<
+    Record<'diasUteis' | 'sabados' | 'domingos', string[]>
+  >;
+
+  return Array.from(
+    new Set([
+      ...(horariosPorDia.diasUteis ?? []),
+      ...(horariosPorDia.sabados ?? []),
+      ...(horariosPorDia.domingos ?? []),
+    ]),
+  )
+    .filter((h) => h?.includes(':'))
+    .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+}
+
 /**
  * Modal que exibe informações detalhadas sobre uma linha de ônibus.
  *
@@ -136,9 +164,9 @@ export function LinhaDetalhesModal({
   }, [linha.itinerarioParadasIds, todasParadas]);
 
   const baseHorarios = useMemo(() => {
-    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+    const horariosDaLinha = getAllLineSchedules(linha);
 
-    return horariosDoDia
+    return horariosDaLinha
       .filter((h) => h?.includes(':'))
       .map((horario, idx) => ({
         id: `${horario}-${idx}`,
@@ -146,15 +174,11 @@ export function LinhaDetalhesModal({
         minutos: timeToMinutes(horario),
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha, now]);
+  }, [linha]);
 
   // ⚡ Bolt: Usamos a lista já mapeada de minutos para evitar re-fazer sort/map no obterStatusLinha
-  const statusLinha = obterStatusLinha(
-    linha,
-    now,
-    useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios]),
-  );
-
+  const schedulesInMinutes = useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios]);
+  const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
   const isLineRunningToday = statusLinha.id !== 'NAO_CIRCULA_HOJE';
 
   const splitIndex = useMemo(() => {
@@ -339,7 +363,7 @@ export function LinhaDetalhesModal({
                             minutos < 1
                               ? 'var(--success-text)'
                               : isTrafegoIntenso
-                                ? '#d97706'
+                                ? 'var(--warning-text)'
                                 : minutos <= 15
                                   ? 'var(--success-text)'
                                   : 'var(--warning-text)';
@@ -451,8 +475,37 @@ export function LinhaDetalhesModal({
             </div>
           )}
 
-          {/* Horários (todos quando não está circulando, ou apenas passados quando está) */}
-          {!isLineRunningToday ? (
+          {/* Horários passados só aparecem quando a linha está vigente */}
+          {isLineRunningToday && passados.length > 0 && (
+            <div data-slot="passed-schedules">
+              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+                <Clock size={20} />
+                Horários Passados ({passados.length})
+              </h3>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                {passados.map(({ horario, id }) => (
+                  <button
+                    type="button"
+                    key={`passado-${id}`}
+                    aria-label={`Horário passado às ${horario}`}
+                    onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
+                    className={scheduleCardVariants({ status: 'passed' })}
+                  >
+                    <p className="text-lg font-semibold text-text-secondary">{horario}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Linha não vigente hoje: exibe somente os horários da própria linha */}
+          {!isLineRunningToday && (
             <div data-slot="all-schedules">
               <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
                 <Clock size={20} />
@@ -466,34 +519,6 @@ export function LinhaDetalhesModal({
                 ))}
               </div>
             </div>
-          ) : (
-            passados.length > 0 && (
-              <div data-slot="passed-schedules">
-                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
-                  <Clock size={20} />
-                  Horários Passados ({passados.length})
-                </h3>
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                  {passados.map(({ horario, id }) => (
-                    <button
-                      type="button"
-                      key={`passado-${id}`}
-                      aria-label={`Horário passado às ${horario}`}
-                      onClick={() => handleHorarioClick(horario)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleHorarioClick(horario);
-                        }
-                      }}
-                      className={scheduleCardVariants({ status: 'passed' })}
-                    >
-                      <p className="text-lg font-semibold text-text-secondary">{horario}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )
           )}
 
           {/* Resumo */}

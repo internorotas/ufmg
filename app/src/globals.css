@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
@@ -73,6 +74,7 @@ body,
   --color-internoRotas-cinza-grafite: #3a3b3c;
 
   /* Fontes */
+  --font-family-sans: Poppins, sans-serif;
   --font-poppins: Poppins, sans-serif;
 }
 
@@ -481,4 +483,23 @@ html,
 body {
   overflow: hidden;
   overscroll-behavior: none;
+}
+
+/* ============================================================================
+   CUSTOM TEXT SIZE CLASSES
+   Classes customizadas para tamanhos de texto comuns sem valores arbitrários
+   ============================================================================ */
+.text-micro {
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.text-tiny {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.text-sm-medium {
+  font-size: 15px;
+  line-height: 1.4;
 }

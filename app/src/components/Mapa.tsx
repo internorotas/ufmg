@@ -41,6 +41,8 @@ interface MapaProps {
   permissaoLocalizacao?: boolean;
   /** Callback para abrir modal de permissão */
   onPedirLocalizacao?: () => void;
+  /** Estado de carregamento de geolocalização */
+  carregandoLocalizacao?: boolean;
   /** Ref para expor métodos do mapa (React 19 - ref como prop) */
   ref?: Ref<MapaRef>;
 }
@@ -94,6 +96,7 @@ export function Mapa({
   headingUsuario,
   permissaoLocalizacao = false,
   onPedirLocalizacao,
+  carregandoLocalizacao = false,
   ref,
 }: MapaProps) {
   const { trackTiming } = useAnalytics();
@@ -143,6 +146,7 @@ export function Mapa({
           heading={headingUsuario ?? null}
           permissaoConcedida={permissaoLocalizacao}
           onPedirLocalizacao={onPedirLocalizacao}
+          carregandoLocalizacao={carregandoLocalizacao}
         />
       )}
 
