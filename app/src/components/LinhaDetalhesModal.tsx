@@ -176,7 +176,6 @@ export function LinhaDetalhesModal({
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha]);
 
-  // ⚡ Bolt: Usamos a lista já mapeada de minutos para evitar re-fazer sort/map no obterStatusLinha
   const schedulesInMinutes = useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios]);
   const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
   const isLineRunningToday = statusLinha.id !== 'NAO_CIRCULA_HOJE';

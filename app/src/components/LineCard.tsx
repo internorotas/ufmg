@@ -13,7 +13,6 @@ import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { cn, obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
 import type { Linha } from '../types/data.types';
-import { PrevisaoBadge } from './PrevisaoBadge';
 import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 
 /**
@@ -156,9 +155,9 @@ function SuspendedNotice({ message }: SuspendedNoticeProps) {
   return (
     <div
       data-slot="notice"
-      className="mb-4 rounded-lg border border-red-600/50 bg-red-900/20 p-3 text-center"
+      className="mb-4 rounded-lg border border-warning-border/50 bg-warning-bg/20 p-3 text-center"
     >
-      <p className="text-xs font-semibold text-red-300 md:text-sm">{message}</p>
+      <p className="text-xs font-semibold text-warning-text md:text-sm">{message}</p>
     </div>
   );
 }
@@ -182,7 +181,6 @@ function LineCardComponent({
   onClick,
   onDetailsClick,
   isSelected = false,
-  idParada,
   className,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
@@ -196,8 +194,7 @@ function LineCardComponent({
     return parseSchedules(horariosDoDia);
   }, [linha, now]);
 
-  // ⚡ Bolt: Reaproveita os horários já em minutos ordenados da memoização acima
-  // para evitar re-fazer o map/sort interno do obterStatusLinha.
+  // Passa schedulesInMinutes para obterStatusLinha para evitar recálculo O(N log N)
   const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -267,14 +264,6 @@ function LineCardComponent({
               {linha.sublinha && (
                 <p className="mt-0.5 text-xs text-text-secondary md:text-sm">{linha.sublinha}</p>
               )}
-
-              {idParada &&
-              linha.trajetoDetalhado?.length &&
-              linha.itinerarioParadasIds.includes(idParada) ? (
-                <div className="mt-2">
-                  <PrevisaoBadge linha={linha} idParada={idParada} />
-                </div>
-              ) : null}
             </div>
           </div>
           <div className="flex items-center gap-2">

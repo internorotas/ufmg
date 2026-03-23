@@ -2,6 +2,7 @@
 
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { isLineAvailableToday } from '../config/specialPeriods';
 import type { Linha } from '../types/data.types';
 import { getSaoPauloDayOfWeek, getSaoPauloMinutesOfDay } from './time';
 
@@ -77,18 +78,6 @@ function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
   return 'diasUteis';
 }
 
-function linhaCirculaNoDiaCategoria(linha: Linha, dataAtual: Date): boolean {
-  const diaSemana = getSaoPauloDayOfWeek(dataAtual);
-  const categoria = linha.categoriaDia;
-
-  if (categoria === 'sabado') return diaSemana === 6;
-  if (categoria === 'diasUteis' || categoria === 'feriasRecessos') {
-    return diaSemana >= 1 && diaSemana <= 5;
-  }
-
-  return true;
-}
-
 /**
  * Retorna os horários válidos da linha para o dia atual.
  * Suporta formato legado (array) e formato por dia (objeto).
@@ -98,13 +87,14 @@ function linhaCirculaNoDiaCategoria(linha: Linha, dataAtual: Date): boolean {
  * @returns Lista de horários válidos para o dia, já filtrada por formato.
  */
 export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[] {
+  // Regra de negócio central: somente linhas vigentes no dia entram no motor de horários/ETA.
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
   const horariosBrutos = linha.horarios as unknown;
 
   if (Array.isArray(horariosBrutos)) {
-    if (!linhaCirculaNoDiaCategoria(linha, dataAtual)) {
-      return [];
-    }
-
     return horariosBrutos.filter((horario) => parseHorarioValido(horario) !== null);
   }
 
@@ -126,22 +116,19 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
 /**
  * Calcula status operacional da linha no instante atual.
  *
- * ⚡ Bolt: Aceita uma lista opcional precalculada de minutos ordenados (horariosPrecalculados).
- * Isso evita re-fazer operações O(N log N) (map + filter + sort) a cada 30 segundos
- * em componentes que já fazem esse parse pesado internamente para renderizar a interface.
- *
  * @param linha Linha a ser classificada.
  * @param dataAtual Data/hora de referência.
- * @param horariosPrecalculados Lista opcional precalculada de minutos ordenados.
+ * @param horariosPreCalculados Lista opcional de minutos pré-computados e ordenados para evitar
+ *   recálculo O(N log N) em componentes que já fizeram esse parse internamente.
  * @returns Identificador técnico, texto de exibição e severidade visual do status.
  */
 export function obterStatusLinha(
   linha: Linha,
   dataAtual: Date,
-  horariosPrecalculados?: number[],
+  horariosPreCalculados?: number[],
 ): { id: string; texto: string; cor: string } {
   const horariosHoje =
-    horariosPrecalculados ??
+    horariosPreCalculados ??
     obterHorariosLinhaNoDia(linha, dataAtual)
       .map((horario) => converterHoraParaMinutos(horario))
       .filter((minutos) => Number.isFinite(minutos))
