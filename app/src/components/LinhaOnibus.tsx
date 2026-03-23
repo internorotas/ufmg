@@ -112,18 +112,30 @@ export function LinhaOnibus({
 
   const handleItinerarioToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    analytics.trackEvent('open_itinerario_modal', { linha: linha.nome });
+    analytics.trackEvent({
+      category: 'navigation',
+      action: 'view_stop_details',
+      label: linha.nome,
+    });
     setItinerarioVisible(true);
   };
 
   const handleHorariosToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    analytics.trackEvent('open_horarios_modal', { linha: linha.nome });
+    analytics.trackEvent({
+      category: 'engagement',
+      action: 'view_schedule',
+      label: linha.nome,
+    });
     setHorariosVisible(true);
   };
 
   const handleExpandLineCard = () => {
-    analytics.trackEvent('expand_line_card', { linha: linha.nome });
+    analytics.trackEvent({
+      category: 'engagement',
+      action: 'expand_line_card',
+      label: linha.nome,
+    });
     onLinhaClick();
   };
 

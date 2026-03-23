@@ -110,7 +110,10 @@ export function ControlesUsuarioMapa({
    * Centraliza o mapa na localização do usuário
    */
   const handleCentralizar = () => {
-    analytics.trackEvent('click_gps_location');
+    analytics.trackEvent({
+      category: 'map_interaction',
+      action: 'click_gps',
+    });
 
     if (!permissaoConcedida) {
       onPedirLocalizacao();

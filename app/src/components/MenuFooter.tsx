@@ -66,7 +66,11 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
   const analytics = useAnalytics();
 
   const handleLinkClick = (platform: string) => {
-    analytics.trackEvent('click_outbound_link', { platform });
+    analytics.trackEvent({
+      category: 'navigation',
+      action: 'click_outbound_link',
+      label: platform,
+    });
   };
 
   return (

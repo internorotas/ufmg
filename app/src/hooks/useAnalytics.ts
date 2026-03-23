@@ -12,6 +12,17 @@ export type { AnalyticsEvent, EventCategory, TimingEvent };
 let analyticsService: IAnalyticsService = ga4Analytics;
 type AnalyticsPayload = Record<string, string | number | boolean | null | undefined>;
 
+function normalizeAction(value: string): string {
+  return value
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toLowerCase();
+}
+
 /**
  * Permite injetar um serviço de analytics diferente (útil para testes).
  */
@@ -30,14 +41,17 @@ export function useAnalytics() {
   const trackEvent = useCallback((event: AnalyticsEvent | string, payload?: AnalyticsPayload) => {
     if (typeof event === 'string') {
       analyticsService.trackEvent({
-        category: 'UI Interaction',
-        action: event,
+        category: 'engagement',
+        action: normalizeAction(event),
         label: payload ? JSON.stringify(payload) : undefined,
       });
       return;
     }
 
-    analyticsService.trackEvent(event);
+    analyticsService.trackEvent({
+      ...event,
+      action: normalizeAction(event.action),
+    });
   }, []);
 
   /**
@@ -81,7 +95,7 @@ export function useAnalytics() {
 /**
  * Hook para rastrear tempo de permanência em um componente
  */
-export function useSessionTiming(label: string, category: EventCategory = 'Session') {
+export function useSessionTiming(label: string, category: EventCategory = 'engagement') {
   const startTimeRef = useRef<number>(0);
   const { trackTiming, isEnabled } = useAnalytics();
 
@@ -95,9 +109,9 @@ export function useSessionTiming(label: string, category: EventCategory = 'Sessi
 
       if (sessionDuration > 1000) {
         trackTiming({
-          name: 'Session Duration',
+          name: 'session_duration',
           value: Math.round(sessionDuration),
-          category,
+          category: category,
           label,
         });
       }
@@ -114,8 +128,8 @@ export function useExternalLinkTracking() {
   const trackExternalLink = useCallback(
     (url: string, label: string) => {
       trackEvent({
-        category: 'External Link',
-        action: 'Click',
+        category: 'navigation',
+        action: 'click_external_link',
         label: `${label} - ${url}`,
       });
     },
@@ -142,16 +156,16 @@ function trackNavigationTimings(trackTiming: (timing: TimingEvent) => void): voi
   const domReady = Math.round(nav.domContentLoadedEventEnd);
   const totalLoad = Math.round(nav.loadEventEnd);
 
-  trackTiming({ category: 'Performance', name: 'TTFB', value: ttfb, label: nav.type });
+  trackTiming({ category: 'navigation', name: 'ttfb', value: ttfb, label: nav.type });
   trackTiming({
-    category: 'Performance',
-    name: 'DOM Ready',
+    category: 'navigation',
+    name: 'dom_ready',
     value: domReady,
     label: nav.type,
   });
   trackTiming({
-    category: 'Performance',
-    name: 'Page Load',
+    category: 'navigation',
+    name: 'page_load',
     value: totalLoad,
     label: nav.type,
   });
@@ -170,8 +184,8 @@ function trackResourceSummary(trackEvent: (event: AnalyticsEvent) => void): void
   );
 
   trackEvent({
-    category: 'Performance',
-    action: 'Resource Summary',
+    category: 'engagement',
+    action: 'resource_summary',
     label: `total=${resources.length};js=${jsCount};css=${cssCount};img=${imageCount};fetch=${fetchCount}`,
     value: totalTransferKb,
   });
@@ -197,8 +211,8 @@ export function useAnalyticsAutoTracking() {
 
     const nav = getNavigationTiming();
     trackEvent({
-      category: 'Navegação',
-      action: 'App Boot',
+      category: 'navigation',
+      action: 'app_boot',
       label: nav?.type || 'navigate',
     });
 
@@ -211,8 +225,8 @@ export function useAnalyticsAutoTracking() {
           usedJSHeapSize: number;
         };
         trackTiming({
-          category: 'Performance',
-          name: 'Used JS Heap (MB)',
+          category: 'engagement',
+          name: 'used_js_heap_mb',
           value: Math.round(memory.usedJSHeapSize / 1024 / 1024),
           label: 'onLoad',
         });
@@ -223,16 +237,16 @@ export function useAnalyticsAutoTracking() {
 
     const onVisibilityChange = () => {
       trackEvent({
-        category: 'Engajamento',
-        action: 'Visibility Change',
+        category: 'engagement',
+        action: 'visibility_change',
         label: document.visibilityState,
       });
 
       if (document.visibilityState === 'hidden') {
         const durationMs = Date.now() - sessionStartRef.current;
         trackTiming({
-          category: 'Session',
-          name: 'Session Duration (ms)',
+          category: 'engagement',
+          name: 'session_duration_ms',
           value: durationMs,
           label: 'page_hidden',
         });
@@ -242,11 +256,11 @@ export function useAnalyticsAutoTracking() {
     document.addEventListener('visibilitychange', onVisibilityChange);
 
     const onOnline = () => {
-      trackEvent({ category: 'Navegação', action: 'Network Status', label: 'online' });
+      trackEvent({ category: 'navigation', action: 'network_status', label: 'online' });
     };
 
     const onOffline = () => {
-      trackEvent({ category: 'Navegação', action: 'Network Status', label: 'offline' });
+      trackEvent({ category: 'navigation', action: 'network_status', label: 'offline' });
     };
 
     window.addEventListener('online', onOnline);
@@ -286,8 +300,8 @@ export function useAnalyticsAutoTracking() {
         'sem-label';
 
       trackEvent({
-        category: 'UI Interaction',
-        action: 'Global Click',
+        category: 'engagement',
+        action: 'global_click',
         label: truncateLabel(`${role}: ${label}`),
       });
     };
@@ -305,8 +319,8 @@ export function useAnalyticsAutoTracking() {
         list.getEntries().forEach((entry) => {
           if (entry.name === 'first-contentful-paint') {
             trackTiming({
-              category: 'Performance',
-              name: 'FCP',
+              category: 'engagement',
+              name: 'fcp',
               value: Math.round(entry.startTime),
             });
           }
@@ -351,18 +365,18 @@ export function useAnalyticsAutoTracking() {
 
     const flushVitals = () => {
       if (lcpValue > 0) {
-        trackTiming({ category: 'Performance', name: 'LCP', value: lcpValue });
+        trackTiming({ category: 'engagement', name: 'lcp', value: lcpValue });
       }
       if (clsValue > 0) {
         trackEvent({
-          category: 'Performance',
-          action: 'CLS',
+          category: 'engagement',
+          action: 'web_vital_cls',
           label: clsValue.toFixed(4),
           value: Math.round(clsValue * 10000),
         });
       }
       if (inpValue > 0) {
-        trackTiming({ category: 'Performance', name: 'INP Candidate', value: inpValue });
+        trackTiming({ category: 'engagement', name: 'inp_candidate', value: inpValue });
       }
     };
 
@@ -370,8 +384,8 @@ export function useAnalyticsAutoTracking() {
       flushVitals();
       const durationMs = Date.now() - sessionStartRef.current;
       trackTiming({
-        category: 'Session',
-        name: 'Session Duration (ms)',
+        category: 'engagement',
+        name: 'session_duration_ms',
         value: durationMs,
         label: 'page_hide',
       });
@@ -382,8 +396,8 @@ export function useAnalyticsAutoTracking() {
     const heartbeatId = window.setInterval(() => {
       const elapsedMs = Date.now() - sessionStartRef.current;
       trackTiming({
-        category: 'Session',
-        name: 'Session Heartbeat (s)',
+        category: 'engagement',
+        name: 'session_heartbeat_s',
         value: Math.round(elapsedMs / 1000),
         label: window.location.pathname,
       });

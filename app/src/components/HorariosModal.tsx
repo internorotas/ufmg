@@ -96,6 +96,7 @@ function getHorariosByTab(linha: Linha, tab: ScheduleTab): string[] {
  */
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const analytics = useAnalytics();
+  const { trackPageView } = analytics;
   const [activeTab, setActiveTab] = useState<ScheduleTab>(() => getInitialTab());
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -126,39 +127,47 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   useEffect(() => {
     if (!isOpen) return;
 
+    trackPageView(`/modal/horarios/${linha.idRota}`);
+
     analytics.trackEvent({
-      category: 'Horarios',
-      action: 'Abrir Modal Horarios',
+      category: 'engagement',
+      action: 'view_schedule',
       label: `${linha.nome} | status=${statusLinha.id}`,
       value: todos.length,
     });
 
     analytics.trackEvent({
-      category: 'Horarios',
-      action: 'Distribuicao Horarios',
+      category: 'engagement',
+      action: 'schedule_distribution',
       label: `linha=${linha.nome};proximos=${proximos.length};passados=${passados.length};total=${todos.length}`,
       value: proximos.length,
     });
   }, [
     isOpen,
+    linha.idRota,
     linha.nome,
     passados.length,
     proximos.length,
     statusLinha.id,
     todos.length,
     analytics,
+    trackPageView,
   ]);
 
   const handleTabChange = (tab: ScheduleTab) => {
     if (tab === activeTab) return;
     setActiveTab(tab);
-    analytics.trackEvent('change_schedule_tab', { linha: linha.nome, tab });
+    analytics.trackEvent({
+      category: 'navigation',
+      action: 'change_schedule_tab',
+      label: `${linha.nome}:${tab}`,
+    });
   };
 
   const handleClose = () => {
     analytics.trackEvent({
-      category: 'Horarios',
-      action: 'Fechar Modal Horarios',
+      category: 'navigation',
+      action: 'close_schedule_modal',
       label: linha.nome,
     });
     onClose();

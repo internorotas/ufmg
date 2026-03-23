@@ -4,7 +4,7 @@
  */
 
 import { MapPin } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { tv } from 'tailwind-variants';
 import { buscarParadasPorIds } from '../../lib/utils';
 import { useAnalytics } from '../hooks/useAnalytics';
@@ -63,14 +63,21 @@ export function ItinerarioModal({
   onParadaClick,
 }: ItinerarioModalProps) {
   const analytics = useAnalytics();
+  const { trackPageView } = analytics;
   const paradasDoItinerario = useMemo(() => {
     return buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
   }, [linha.itinerarioParadasIds, paradas]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    trackPageView(`/modal/itinerario/${linha.idRota}`);
+  }, [isOpen, linha.idRota, trackPageView]);
+
   const handleParadaClick = (parada: Parada) => {
-    analytics.trackEvent('click_stop_from_list', {
-      linha: linha.nome,
-      parada: parada.nome,
+    analytics.trackEvent({
+      category: 'map_interaction',
+      action: 'view_stop_details',
+      label: `${linha.nome} - ${parada.nome}`,
     });
     onParadaClick(parada);
     onClose();

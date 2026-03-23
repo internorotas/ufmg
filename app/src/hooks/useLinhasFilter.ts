@@ -133,30 +133,30 @@ export function useLinhasFilter(
   useEffect(() => {
     if (trackSearch && debouncedSearchTerm) {
       trackEvent({
-        category: 'Busca',
-        action: 'Termo Pesquisado',
+        category: 'engagement',
+        action: 'search_term',
         label: debouncedSearchTerm,
       });
     }
   }, [debouncedSearchTerm, trackEvent, trackSearch]);
 
   useEffect(() => {
-    if (trackSearch && searchTerm && !hasResults) {
+    if (trackSearch && searchTerm && linhasFiltradas.length === 0) {
       trackEvent({
-        category: 'Busca',
-        action: 'Busca Sem Resultados',
+        category: 'engagement',
+        action: 'search_empty',
         label: searchTerm,
       });
     }
-  }, [searchTerm, hasResults, trackEvent, trackSearch]);
+  }, [searchTerm, linhasFiltradas.length, trackEvent, trackSearch]);
 
   const handleCategoriaChange = useCallback(
     (index: number) => {
       const categoria = linhasData.categoriasDias[index];
       if (categoria && trackSearch) {
         trackEvent({
-          category: 'Navegação Principal',
-          action: 'Selecionar Categoria Dia',
+          category: 'navigation',
+          action: 'select_day_category',
           label: categoria.displayName,
         });
       }

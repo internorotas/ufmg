@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { obterMultiplicadorTrafego } from '../config/trafegoConfig';
+import { getSaoPauloMinutesOfDay, getSaoPauloNow, toSaoPauloDate } from '../lib/time';
 import {
   converterHoraParaMinutos,
   converterMinutosParaHora,
@@ -43,15 +44,16 @@ export interface PrevisaoChegadaResultado {
 export function calcularPrevisaoChegada(
   linha: Linha,
   idParadaAtual: string,
-  agora: Date = new Date(),
+  agora: Date = getSaoPauloNow(),
 ): PrevisaoChegadaResultado | null {
   if (!linha.trajetoDetalhado || linha.trajetoDetalhado.length === 0) {
     return null;
   }
-  const horariosSaida = obterHorariosLinhaNoDia(linha, agora);
+  const agoraSaoPaulo = toSaoPauloDate(agora);
+  const horariosSaida = obterHorariosLinhaNoDia(linha, agoraSaoPaulo);
   if (horariosSaida.length === 0) return null;
 
-  const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
+  const horaAtualMinutos = getSaoPauloMinutesOfDay(agoraSaoPaulo);
   const multiplicadorTrafego = obterMultiplicadorTrafego(horaAtualMinutos);
 
   let tempoViagemReal = 0;

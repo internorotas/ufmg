@@ -67,7 +67,11 @@ export function ThemeToggle({
 
   const handleToggle = () => {
     const newTheme = isDark ? 'light' : 'dark';
-    analytics.trackEvent('toggle_theme', { theme: newTheme });
+    analytics.trackEvent({
+      category: 'preferences',
+      action: 'toggle_theme',
+      label: newTheme,
+    });
     toggleTheme();
   };
 

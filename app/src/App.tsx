@@ -1,5 +1,5 @@
 import { MapPin, Navigation } from 'lucide-react';
-import { lazy, Suspense, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MenuLateral } from './components/MenuLateral';
@@ -47,6 +47,9 @@ function AppContent() {
 
   const { trackEvent, trackPageView } = useAnalytics();
   useAnalyticsAutoTracking();
+  const [isOffline, setIsOffline] = useState<boolean>(() => !navigator.onLine);
+  const [showOfflineToast, setShowOfflineToast] = useState(false);
+  const offlineToastTimeoutRef = useRef<number | null>(null);
 
   // Hook de localização do usuário
   const {
@@ -67,13 +70,44 @@ function AppContent() {
     trackPageView();
   }, [trackPageView]);
 
+  useEffect(() => {
+    const clearOfflineToastTimeout = () => {
+      if (offlineToastTimeoutRef.current !== null) {
+        window.clearTimeout(offlineToastTimeoutRef.current);
+        offlineToastTimeoutRef.current = null;
+      }
+    };
+
+    const onOffline = () => {
+      setIsOffline(true);
+      setShowOfflineToast(true);
+      clearOfflineToastTimeout();
+      offlineToastTimeoutRef.current = window.setTimeout(() => {
+        setShowOfflineToast(false);
+      }, 4500);
+    };
+
+    const onOnline = () => {
+      setIsOffline(false);
+    };
+
+    window.addEventListener('offline', onOffline);
+    window.addEventListener('online', onOnline);
+
+    return () => {
+      window.removeEventListener('offline', onOffline);
+      window.removeEventListener('online', onOnline);
+      clearOfflineToastTimeout();
+    };
+  }, []);
+
   // Handlers com tracking de analytics
   const handleLinhaSelect = useCallback(
     (linha: Linha) => {
       selecionarLinha(linha);
       trackEvent({
-        category: 'Engajamento',
-        action: 'Selecionar Linha',
+        category: 'engagement',
+        action: 'select_line',
         label: linha.nome,
       });
     },
@@ -84,8 +118,8 @@ function AppContent() {
     (parada: Parada) => {
       selecionarParada(parada);
       trackEvent({
-        category: 'Engajamento',
-        action: 'Selecionar Parada',
+        category: 'map_interaction',
+        action: 'select_stop',
         label: parada.nome,
       });
     },
@@ -145,6 +179,7 @@ function AppContent() {
         onLinhaSelect={handleLinhaSelect}
         onParadaClick={handleParadaClick}
         linhaSelecionada={linhaSelecionada}
+        isOffline={isOffline}
       />
       <main className="h-full w-full grow">
         <Suspense fallback={<LoadingMap />}>
@@ -196,8 +231,8 @@ function AppContent() {
               onClick={() => {
                 solicitarPermissaoNavegador();
                 trackEvent({
-                  category: 'Engajamento',
-                  action: 'Localização Permitida',
+                  category: 'preferences',
+                  action: 'grant_location_permission',
                 });
               }}
             >
@@ -234,6 +269,16 @@ function AppContent() {
           </div>
         </div>
       </Modal>
+
+      {showOfflineToast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed right-4 top-4 z-[1200] rounded-lg border border-warning-border bg-warning-bg px-4 py-3 text-sm font-medium text-warning-text shadow-lg"
+        >
+          Conexao perdida. Mapas podem nao carregar, mas previsoes estaticas continuam funcionando.
+        </div>
+      )}
     </div>
   );
 }

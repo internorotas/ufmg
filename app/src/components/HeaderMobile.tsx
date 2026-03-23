@@ -52,7 +52,11 @@ export function HeaderMobile({ isMenuOpen, toggleMenu, className, ...props }: He
   const analytics = useAnalytics();
 
   const handleToggleMenu = () => {
-    analytics.trackEvent('toggle_menu', { state: isMenuOpen ? 'close' : 'open' });
+    analytics.trackEvent({
+      category: 'navigation',
+      action: isMenuOpen ? 'close_menu' : 'open_menu',
+      label: 'header_mobile',
+    });
     toggleMenu();
   };
 

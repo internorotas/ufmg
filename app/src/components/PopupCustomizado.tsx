@@ -4,7 +4,7 @@
  */
 
 import { Bus, MapPin } from 'lucide-react';
-import { type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 import { Popup } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { normalizarNomeLinha } from '../../lib/utils';
@@ -166,9 +166,10 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                         className="w-full whitespace-normal wrap-break-word text-left"
                         onClick={() => {
                           if (!linha) return;
-                          analytics.trackEvent('click_line_from_popup', {
-                            parada_nome: parada.nome,
-                            linha_selecionada: linha.nome,
+                          analytics.trackEvent({
+                            category: 'map_interaction',
+                            action: 'select_line',
+                            label: `${parada.nome} -> ${linha.nome}`,
                           });
                         }}
                       >

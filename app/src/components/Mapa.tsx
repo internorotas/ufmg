@@ -109,10 +109,10 @@ export function Mapa({
     }
     const loadTime = Date.now() - mapLoadStartRef.current;
     trackTiming({
-      name: 'Map Load Time',
+      name: 'map_load_time',
       value: loadTime,
-      category: 'Performance',
-      label: 'Initial Map Render',
+      category: 'navigation',
+      label: 'initial_map_render',
     });
   }, [trackTiming]);
 

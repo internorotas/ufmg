@@ -220,8 +220,8 @@ function LineCardComponent({
 
   const handleCardClick = () => {
     trackEvent({
-      category: 'Engajamento',
-      action: 'Clique Card Linha',
+      category: 'engagement',
+      action: 'click_line_card',
       label: `${linha.nome} | status=${statusLinha.id} | prox=${nextSchedule}`,
     });
     onClick(linha);
@@ -230,8 +230,8 @@ function LineCardComponent({
   const handleDetailsClickInternal = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent({
-      category: 'Engajamento',
-      action: 'Abrir Card Detalhes',
+      category: 'navigation',
+      action: 'view_stop_details',
       label: linha.nome,
     });
     onDetailsClick(linha);

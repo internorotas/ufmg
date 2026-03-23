@@ -29,7 +29,9 @@ export const contactButtonVariants = tv({
 
 export interface DisclaimerBannerProps
   extends ComponentProps<'div'>,
-    VariantProps<typeof disclaimerBannerVariants> {}
+    VariantProps<typeof disclaimerBannerVariants> {
+  isOffline?: boolean;
+}
 
 /**
  * Banner de aviso com informações de contato da Divisão de Transportes.
@@ -39,7 +41,11 @@ export interface DisclaimerBannerProps
  * <DisclaimerBanner />
  * ```
  */
-export function DisclaimerBanner({ className, ...props }: DisclaimerBannerProps) {
+export function DisclaimerBanner({
+  className,
+  isOffline = false,
+  ...props
+}: DisclaimerBannerProps) {
   return (
     <div
       data-slot="banner"
@@ -50,6 +56,12 @@ export function DisclaimerBanner({ className, ...props }: DisclaimerBannerProps)
       <div className="flex items-start gap-2">
         <AlertTriangle className="mt-0.5 size-4.5 shrink-0" />
         <div className="flex-1">
+          {isOffline && (
+            <p className="mb-2 text-xs font-semibold leading-relaxed">
+              Conexao perdida. Mapas podem nao carregar, mas previsoes estaticas continuam
+              funcionando.
+            </p>
+          )}
           <p className="mb-2 text-xs leading-relaxed">
             Informações extraídas do{' '}
             <a

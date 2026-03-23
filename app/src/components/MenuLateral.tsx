@@ -69,6 +69,7 @@ export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
   onLinhaSelect: (linha: Linha) => void;
   onParadaClick: (parada: Parada) => void;
   linhaSelecionada: Linha | null;
+  isOffline: boolean;
 }
 
 interface CategoryTabsProps {
@@ -129,6 +130,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   onLinhaSelect,
   onParadaClick,
   linhaSelecionada,
+  isOffline,
 }: MenuLateralProps) {
   const analytics = useAnalytics();
   const { trackEvent } = analytics;
@@ -167,8 +169,8 @@ export const MenuLateral = React.memo(function MenuLateral({
     lastListSummaryRef.current = summary;
 
     trackEvent({
-      category: 'Navegação Principal',
-      action: 'Resumo Lista Linhas',
+      category: 'engagement',
+      action: 'filter_lines_summary',
       label: `categoria=${categoria};busca=${debouncedSearchTerm || 'vazio'};resultado=${linhasFiltradas.length}`,
       value: linhasFiltradas.length,
     });
@@ -193,8 +195,8 @@ export const MenuLateral = React.memo(function MenuLateral({
   const handleCardClick = useCallback(
     (linha: Linha) => {
       trackEvent({
-        category: 'Engajamento',
-        action: 'Selecionar Linha no Menu',
+        category: 'navigation',
+        action: 'select_line_from_menu',
         label: `${linha.nome} | categoria=${categoriaAtual?.displayName || 'desconhecida'}`,
       });
       onLinhaSelect(linha);
@@ -208,8 +210,8 @@ export const MenuLateral = React.memo(function MenuLateral({
   const handleDetailsClick = useCallback(
     (linha: Linha) => {
       trackEvent({
-        category: 'Engajamento',
-        action: 'Abrir Detalhes pelo Menu',
+        category: 'navigation',
+        action: 'view_stop_details',
         label: linha.nome,
       });
       setLinhaDetalhesAberta(linha);
@@ -247,7 +249,11 @@ export const MenuLateral = React.memo(function MenuLateral({
         <Button
           data-slot="mobile-trigger"
           onClick={() => {
-            analytics.trackEvent('toggle_menu', { state: 'open' });
+            analytics.trackEvent({
+              category: 'navigation',
+              action: 'open_menu',
+              label: 'mobile_trigger',
+            });
             setMenuVisible(true);
           }}
           variant="primary"
@@ -267,7 +273,11 @@ export const MenuLateral = React.memo(function MenuLateral({
           type="button"
           data-slot="backdrop"
           onClick={() => {
-            analytics.trackEvent('toggle_menu', { state: 'close' });
+            analytics.trackEvent({
+              category: 'navigation',
+              action: 'close_menu',
+              label: 'backdrop',
+            });
             setMenuVisible(false);
           }}
           aria-label="Fechar menu"
@@ -293,7 +303,11 @@ export const MenuLateral = React.memo(function MenuLateral({
             <Button
               data-slot="close"
               onClick={() => {
-                analytics.trackEvent('toggle_menu', { state: 'close' });
+                analytics.trackEvent({
+                  category: 'navigation',
+                  action: 'close_menu',
+                  label: 'header_button',
+                });
                 setMenuVisible(false);
               }}
               variant="ghost"
@@ -346,7 +360,7 @@ export const MenuLateral = React.memo(function MenuLateral({
             <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
           )}
 
-          <DisclaimerBanner />
+          <DisclaimerBanner isOffline={isOffline} />
         </nav>
 
         <MenuFooter />
@@ -357,8 +371,8 @@ export const MenuLateral = React.memo(function MenuLateral({
           isOpen={true}
           onClose={() => {
             trackEvent({
-              category: 'Engajamento Detalhes',
-              action: 'Fechar Modal Detalhes Linha',
+              category: 'navigation',
+              action: 'close_line_details_modal',
               label: linhaDetalhesAberta.nome,
             });
             setLinhaDetalhesAberta(null);
