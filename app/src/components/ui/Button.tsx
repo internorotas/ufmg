@@ -24,18 +24,21 @@ export const buttonVariants = tv({
   variants: {
     variant: {
       primary: [
-        'bg-internoRotas-azul-eletrico text-white shadow-sm',
-        'hover:bg-blue-700 focus-visible:ring-blue-500',
+        'bg-brand-primary text-text-inverse shadow-sm',
+        'hover:bg-brand-primary/90 focus-visible:ring-brand-primary',
       ],
       secondary: [
-        'bg-internoRotas-laranja-ambar text-white shadow-sm',
-        'hover:bg-orange-600 focus-visible:ring-orange-500',
+        'bg-brand-accent text-text-inverse shadow-sm',
+        'hover:bg-brand-accent/90 focus-visible:ring-brand-accent',
       ],
       success: [
-        'bg-green-600 text-white shadow-sm',
-        'hover:bg-green-700 focus-visible:ring-green-500',
+        'bg-success-border text-text-inverse shadow-sm',
+        'hover:bg-success-border/90 focus-visible:ring-success-border',
       ],
-      danger: ['bg-red-500 text-white shadow-sm', 'hover:bg-red-600 focus-visible:ring-red-500'],
+      danger: [
+        'bg-warning-border text-text-inverse shadow-sm',
+        'hover:bg-warning-border/90 focus-visible:ring-warning-border',
+      ],
       ghost: [
         'bg-transparent text-text-primary',
         'hover:bg-card-hover focus-visible:ring-card-border',
@@ -46,7 +49,7 @@ export const buttonVariants = tv({
       ],
       link: [
         'bg-transparent text-internoRotas-azul-eletrico underline-offset-4',
-        'hover:underline focus-visible:ring-blue-500',
+        'hover:underline focus-visible:ring-brand-primary',
       ],
     },
     size: {

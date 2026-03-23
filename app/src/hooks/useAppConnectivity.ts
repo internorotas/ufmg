@@ -8,12 +8,14 @@ interface UseAppConnectivityReturn {
 
 export function useAppConnectivity(): UseAppConnectivityReturn {
   const { trackEvent } = useAnalytics();
-  const [isOffline, setIsOffline] = useState<boolean>(() => !navigator.onLine);
+  const [isOffline, setIsOffline] = useState<boolean>(() =>
+    typeof navigator !== 'undefined' ? !navigator.onLine : false,
+  );
   const [showOfflineToast, setShowOfflineToast] = useState(false);
   const offlineToastTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!navigator.onLine) {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
       trackEvent({
         event: 'app_opened_offline',
         category: 'navigation',
@@ -23,6 +25,10 @@ export function useAppConnectivity(): UseAppConnectivityReturn {
   }, [trackEvent]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const clearOfflineToastTimeout = () => {
       if (offlineToastTimeoutRef.current !== null) {
         window.clearTimeout(offlineToastTimeoutRef.current);

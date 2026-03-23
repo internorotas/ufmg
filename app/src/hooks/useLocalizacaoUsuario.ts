@@ -253,6 +253,10 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
    * "Permitir" do modal após confirmação do usuário.
    */
   const solicitarPermissaoNavegador = useCallback(async () => {
+    if (carregando) {
+      return;
+    }
+
     if (!navigator.geolocation) {
       setErro('Geolocalização não suportada neste navegador.');
       return;
@@ -279,7 +283,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
     if (cleanup) {
       bussolaCleanupRef.current = cleanup;
     }
-  }, [onPosicaoRecebida, onErroGPS, iniciarBussola]);
+  }, [carregando, onPosicaoRecebida, onErroGPS, iniciarBussola]);
 
   /**
    * Ponto de entrada principal.
@@ -293,6 +297,10 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
    * comportamento correto e conservador para todos os navegadores.
    */
   const iniciarRastreamento = useCallback(async () => {
+    if (carregando) {
+      return;
+    }
+
     if (!navigator.geolocation) {
       setErro('Geolocalização não suportada neste navegador.');
       return;
@@ -320,7 +328,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       // Navegador sem Permissions API — exibe modal
       setMostrarModalPermissao(true);
     }
-  }, [solicitarPermissaoNavegador]);
+  }, [carregando, solicitarPermissaoNavegador]);
 
   // Limpeza de recursos ao desmontar o componente
   useEffect(() => {
