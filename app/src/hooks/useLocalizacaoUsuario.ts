@@ -120,6 +120,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       if (distancia > DISTANCIA_MAXIMA_KM) {
         setMostrarModalLonge(true);
         trackEvent({
+          event: 'user_far_from_campus',
           category: 'map_interaction',
           action: 'user_far_from_campus',
           label: `${distancia.toFixed(1)}km`,
@@ -157,28 +158,37 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
   /**
    * Callback de erro do GPS
    */
-  const onErroGPS = useCallback((error: GeolocationPositionError) => {
-    setCarregando(false);
+  const onErroGPS = useCallback(
+    (error: GeolocationPositionError) => {
+      setCarregando(false);
 
-    switch (error.code) {
-      case error.PERMISSION_DENIED:
-        setErro('Permissão de localização negada. Verifique as configurações do navegador.');
-        setPermissaoConcedida(false);
-        setMostrarModalPermissao(true);
-        break;
-      case error.POSITION_UNAVAILABLE:
-        setErro('Localização indisponível. Verifique se o GPS está ativado.');
-        setMostrarModalPermissao(true);
-        break;
-      case error.TIMEOUT:
-        setErro('Tempo esgotado ao obter localização. Tente novamente.');
-        setMostrarModalPermissao(true);
-        break;
-      default:
-        setErro('Erro desconhecido de geolocalização.');
-        setMostrarModalPermissao(true);
-    }
-  }, []);
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          setErro('Permissão de localização negada. Verifique as configurações do navegador.');
+          setPermissaoConcedida(false);
+          setMostrarModalPermissao(true);
+          trackEvent({
+            event: 'location_permission_denied',
+            category: 'preferences',
+            action: 'location_permission_denied',
+            label: 'geolocation_permission_denied',
+          });
+          break;
+        case error.POSITION_UNAVAILABLE:
+          setErro('Localização indisponível. Verifique se o GPS está ativado.');
+          setMostrarModalPermissao(true);
+          break;
+        case error.TIMEOUT:
+          setErro('Tempo esgotado ao obter localização. Tente novamente.');
+          setMostrarModalPermissao(true);
+          break;
+        default:
+          setErro('Erro desconhecido de geolocalização.');
+          setMostrarModalPermissao(true);
+      }
+    },
+    [trackEvent],
+  );
 
   /**
    * Inicia o listener da bússola (DeviceOrientation API).

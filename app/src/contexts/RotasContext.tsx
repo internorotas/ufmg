@@ -10,11 +10,12 @@ import {
   type ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { type IRotasService, RotasService } from '../services/RotasService';
+import { type IRotasService, loadRotasService, RotasService } from '../services/RotasService';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 
 /**
@@ -31,6 +32,8 @@ export interface MapaRef {
 interface RotasContextData {
   linhasData: CategoriaLinhas;
   todasParadas: Parada[];
+  isLoadingData: boolean;
+  dataError: string | null;
 
   linhaSelecionada: Linha | null;
   paradaSelecionada: Parada | null;
@@ -71,11 +74,42 @@ interface RotasProviderProps {
 export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: RotasProviderProps) {
   const [linhaSelecionada, setLinhaSelecionada] = useState<Linha | null>(null);
   const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(null);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
+  const [rotasService, setRotasService] = useState<IRotasService>(RotasService);
 
   const mapaRef = useRef<MapaRef | null>(null);
 
-  const linhasData = useMemo(() => RotasService.getTodasLinhas(), []);
-  const todasParadas = useMemo(() => RotasService.getTodasParadas(), []);
+  useEffect(() => {
+    let isMounted = true;
+
+    const bootstrap = async () => {
+      setIsLoadingData(true);
+      setDataError(null);
+
+      try {
+        const loadedService = await loadRotasService();
+        if (!isMounted) return;
+        setRotasService(loadedService);
+      } catch {
+        if (!isMounted) return;
+        setDataError('Nao foi possivel carregar os dados de linhas e paradas.');
+      } finally {
+        if (isMounted) {
+          setIsLoadingData(false);
+        }
+      }
+    };
+
+    bootstrap();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const linhasData = useMemo(() => rotasService.getTodasLinhas(), [rotasService]);
+  const todasParadas = useMemo(() => rotasService.getTodasParadas(), [rotasService]);
 
   const selecionarLinha = useCallback(
     (linha: Linha) => {
@@ -103,22 +137,27 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
     () => ({
       linhasData,
       todasParadas,
+      isLoadingData,
+      dataError,
       linhaSelecionada,
       paradaSelecionada,
       selecionarLinha,
       selecionarParada,
       limparSelecao,
       mapaRef,
-      rotasService: RotasService,
+      rotasService,
     }),
     [
       linhasData,
       todasParadas,
+      isLoadingData,
+      dataError,
       linhaSelecionada,
       paradaSelecionada,
       selecionarLinha,
       selecionarParada,
       limparSelecao,
+      rotasService,
     ],
   );
 
@@ -153,8 +192,8 @@ export function useRotas(): RotasContextData {
  * Use quando o componente só precisa dos dados e não das ações.
  */
 export function useRotasData() {
-  const { linhasData, todasParadas, rotasService } = useRotas();
-  return { linhasData, todasParadas, rotasService };
+  const { linhasData, todasParadas, rotasService, isLoadingData, dataError } = useRotas();
+  return { linhasData, todasParadas, rotasService, isLoadingData, dataError };
 }
 
 /**

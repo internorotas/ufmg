@@ -109,7 +109,7 @@ export function useLinhasFilter(
   options: UseLinhasFilterOptions = {},
 ): UseLinhasFilterReturn {
   const { debounceMs = 1500, trackSearch = true } = options;
-  const { trackEvent } = useAnalytics();
+  const { trackEvent, trackPageView } = useAnalytics();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, debounceMs);
@@ -133,16 +133,19 @@ export function useLinhasFilter(
   useEffect(() => {
     if (trackSearch && debouncedSearchTerm) {
       trackEvent({
+        event: 'search_term',
         category: 'engagement',
         action: 'search_term',
         label: debouncedSearchTerm,
       });
+      trackPageView(`/search/${encodeURIComponent(debouncedSearchTerm)}`);
     }
-  }, [debouncedSearchTerm, trackEvent, trackSearch]);
+  }, [debouncedSearchTerm, trackEvent, trackPageView, trackSearch]);
 
   useEffect(() => {
     if (trackSearch && searchTerm && linhasFiltradas.length === 0) {
       trackEvent({
+        event: 'search_empty',
         category: 'engagement',
         action: 'search_empty',
         label: searchTerm,
@@ -155,6 +158,7 @@ export function useLinhasFilter(
       const categoria = linhasData.categoriasDias[index];
       if (categoria && trackSearch) {
         trackEvent({
+          event: 'select_day_category',
           category: 'navigation',
           action: 'select_day_category',
           label: categoria.displayName,

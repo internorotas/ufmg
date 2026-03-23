@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import { useAnalytics } from '../hooks/useAnalytics';
 import { usePrevisaoChegada } from '../hooks/usePrevisaoChegada';
 import type { Linha } from '../types/data.types';
 
@@ -23,7 +25,28 @@ function formatarDuracao(minutos: number): string {
 }
 
 export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBadgeProps) {
+  const { trackEvent } = useAnalytics();
   const previsao = usePrevisaoChegada(linha, idParada);
+  const lastTrackedKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const next = previsao?.proximoOnibus;
+    if (!next) return;
+
+    const roundedBucket = Math.floor(next.minutosFaltantes / 5) * 5;
+    const trackingKey = `${linha.idRota}:${idParada}:${roundedBucket}`;
+    if (lastTrackedKeyRef.current === trackingKey) return;
+
+    lastTrackedKeyRef.current = trackingKey;
+    trackEvent({
+      event: 'eta_viewed',
+      category: 'engagement',
+      action: 'eta_viewed',
+      label: `${linha.idRota}:${idParada}`,
+      value: next.minutosFaltantes,
+    });
+  }, [idParada, linha.idRota, previsao?.proximoOnibus, trackEvent]);
+
   if (!previsao || !previsao.proximoOnibus) {
     return (
       <span
