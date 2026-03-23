@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { isLineAvailableToday } from '../config/specialPeriods';
 import { obterMultiplicadorTrafego } from '../config/trafegoConfig';
 import { getSaoPauloMinutesOfDay, getSaoPauloNow, toSaoPauloDate } from '../lib/time';
 import {
@@ -46,6 +47,10 @@ export function calcularPrevisaoChegada(
   idParadaAtual: string,
   agora: Date = getSaoPauloNow(),
 ): PrevisaoChegadaResultado | null {
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return null;
+  }
+
   if (!linha.trajetoDetalhado || linha.trajetoDetalhado.length === 0) {
     return null;
   }

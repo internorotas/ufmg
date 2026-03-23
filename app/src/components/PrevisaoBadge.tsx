@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { isLineAvailableToday } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { usePrevisaoChegada } from '../hooks/usePrevisaoChegada';
 import type { Linha } from '../types/data.types';
@@ -26,6 +27,7 @@ function formatarDuracao(minutos: number): string {
 
 export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBadgeProps) {
   const { trackEvent } = useAnalytics();
+  const linhaVigente = isLineAvailableToday(linha.categoriaDia);
   const previsao = usePrevisaoChegada(linha, idParada);
   const lastTrackedKeyRef = useRef<string | null>(null);
 
@@ -47,7 +49,7 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
     });
   }, [idParada, linha.idRota, previsao?.proximoOnibus, trackEvent]);
 
-  if (!previsao || !previsao.proximoOnibus) {
+  if (!linhaVigente || !previsao || !previsao.proximoOnibus) {
     return (
       <span
         className="rounded-full px-2 py-0.5 text-[11px] font-medium"
