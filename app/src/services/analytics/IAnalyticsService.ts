@@ -6,10 +6,12 @@
 export type EventCategory = 'engagement' | 'navigation' | 'map_interaction' | 'preferences';
 
 export interface AnalyticsEvent {
-  category: EventCategory;
-  action: string;
+  event?: string;
+  category?: EventCategory;
+  action?: string;
   label?: string;
   value?: number;
+  params?: Record<string, string | number | boolean | null | undefined>;
 }
 
 export interface TimingEvent {

@@ -1,13 +1,13 @@
-import { MapPin, Navigation } from 'lucide-react';
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect } from 'react';
 import { AdminLayout } from './components/admin/AdminLayout';
+import { AnalyticsProvider } from './components/app/AnalyticsProvider';
+import { ModalManager } from './components/app/ModalManager';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MenuLateral } from './components/MenuLateral';
-import { Modal } from './components/Modal';
-import { Button } from './components/ui/Button';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { useAnalytics, useAnalyticsAutoTracking } from './hooks/useAnalytics';
+import { useAnalytics } from './hooks/useAnalytics';
+import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
@@ -38,6 +38,8 @@ function AppContent() {
   const {
     linhasData,
     todasParadas,
+    isLoadingData,
+    dataError,
     linhaSelecionada,
     paradaSelecionada,
     selecionarLinha,
@@ -46,10 +48,7 @@ function AppContent() {
   } = useRotas();
 
   const { trackEvent, trackPageView } = useAnalytics();
-  useAnalyticsAutoTracking();
-  const [isOffline, setIsOffline] = useState<boolean>(() => !navigator.onLine);
-  const [showOfflineToast, setShowOfflineToast] = useState(false);
-  const offlineToastTimeoutRef = useRef<number | null>(null);
+  const { isOffline, showOfflineToast } = useAppConnectivity();
 
   // Hook de localização do usuário
   const {
@@ -67,57 +66,29 @@ function AppContent() {
   } = useLocalizacaoUsuario();
 
   useEffect(() => {
-    trackPageView();
+    trackPageView('/home');
   }, [trackPageView]);
-
-  useEffect(() => {
-    const clearOfflineToastTimeout = () => {
-      if (offlineToastTimeoutRef.current !== null) {
-        window.clearTimeout(offlineToastTimeoutRef.current);
-        offlineToastTimeoutRef.current = null;
-      }
-    };
-
-    const onOffline = () => {
-      setIsOffline(true);
-      setShowOfflineToast(true);
-      clearOfflineToastTimeout();
-      offlineToastTimeoutRef.current = window.setTimeout(() => {
-        setShowOfflineToast(false);
-      }, 4500);
-    };
-
-    const onOnline = () => {
-      setIsOffline(false);
-    };
-
-    window.addEventListener('offline', onOffline);
-    window.addEventListener('online', onOnline);
-
-    return () => {
-      window.removeEventListener('offline', onOffline);
-      window.removeEventListener('online', onOnline);
-      clearOfflineToastTimeout();
-    };
-  }, []);
 
   // Handlers com tracking de analytics
   const handleLinhaSelect = useCallback(
     (linha: Linha) => {
       selecionarLinha(linha);
       trackEvent({
+        event: 'select_line',
         category: 'engagement',
         action: 'select_line',
         label: linha.nome,
       });
+      trackPageView(`/line/${linha.idRota}`);
     },
-    [selecionarLinha, trackEvent],
+    [selecionarLinha, trackEvent, trackPageView],
   );
 
   const handleParadaClick = useCallback(
     (parada: Parada) => {
       selecionarParada(parada);
       trackEvent({
+        event: 'select_stop',
         category: 'map_interaction',
         action: 'select_stop',
         label: parada.nome,
@@ -141,6 +112,28 @@ function AppContent() {
   }, [localizacao, mapaRef, fecharModalLonge]);
 
   // Validação dos dados
+  if (isLoadingData) {
+    return (
+      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
+        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
+          <h2 className="text-2xl font-bold mb-2 text-brand-primary">Carregando dados...</h2>
+          <p className="text-gray-600">Buscando linhas e paradas em /public/data.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (dataError) {
+    return (
+      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
+        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
+          <h2 className="text-2xl font-bold mb-2 text-red-600">Erro ao carregar dados</h2>
+          <p className="text-gray-600">{dataError}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!todasParadas || todasParadas.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-gray-100 text-gray-800">
@@ -149,7 +142,7 @@ function AppContent() {
           <p className="text-gray-600">
             Não foi possível carregar os dados de paradas.
             <br />
-            Verifique a integridade dos arquivos em <code>/src/data/paradas.ts</code>.
+            Verifique a integridade dos arquivos em <code>/public/data/paradas.json</code>.
           </p>
         </div>
       </div>
@@ -164,7 +157,7 @@ function AppContent() {
           <p className="text-gray-600">
             Não foi possível carregar os dados das linhas.
             <br />
-            Verifique a integridade dos arquivos em <code>/src/data/linhas.ts</code>.
+            Verifique a integridade dos arquivos em <code>/public/data/linhas.json</code>.
           </p>
         </div>
       </div>
@@ -196,79 +189,24 @@ function AppContent() {
         </Suspense>
       </main>
 
-      {/* Modal de Permissão de Localização */}
-      <Modal
-        isOpen={mostrarModalPermissao}
-        onClose={fecharModalPermissao}
-        title={
-          <div className="flex items-center gap-2">
-            <Navigation className="h-5 w-5 text-brand-primary" />
-            <span>Ativar Localização</span>
-          </div>
-        }
-        size="sm"
-      >
-        <div className="space-y-4 p-4">
-          <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-              <MapPin className="h-8 w-8 text-brand-primary" />
-            </div>
-            <p className="text-text-secondary">
-              Para mostrar sua localização no mapa e te ajudar a encontrar a parada mais próxima,
-              precisamos acessar seu GPS.
-            </p>
-          </div>
-          {erroLocalizacao && (
-            <div className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-600">
-              {erroLocalizacao}
-            </div>
-          )}
-          <div className="flex flex-col gap-2">
-            <Button
-              variant="primary"
-              fullWidth
-              disabled={carregandoLocalizacao}
-              onClick={() => {
-                solicitarPermissaoNavegador();
-                trackEvent({
-                  category: 'preferences',
-                  action: 'grant_location_permission',
-                });
-              }}
-            >
-              {carregandoLocalizacao ? 'Obtendo localização...' : 'Permitir Localização'}
-            </Button>
-            <Button variant="ghost" fullWidth onClick={fecharModalPermissao}>
-              Agora não
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Modal de Distância (Longe da UFMG) */}
-      <Modal
-        isOpen={mostrarModalLonge}
-        onClose={fecharModalLonge}
-        title="Você está longe do campus"
-        size="sm"
-      >
-        <div className="space-y-4 p-4">
-          <div className="text-center">
-            <p className="text-text-secondary">
-              Parece que você está a mais de 4km da UFMG. Deseja voltar a visualizar o campus no
-              mapa?
-            </p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Button variant="primary" fullWidth onClick={handleVoltarParaUFMG}>
-              Voltar para a UFMG
-            </Button>
-            <Button variant="ghost" fullWidth onClick={handleContinuarAqui}>
-              Continuar aqui
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <ModalManager
+        erroLocalizacao={erroLocalizacao}
+        carregandoLocalizacao={carregandoLocalizacao}
+        mostrarModalPermissao={mostrarModalPermissao}
+        mostrarModalLonge={mostrarModalLonge}
+        onClosePermissao={fecharModalPermissao}
+        onCloseLonge={fecharModalLonge}
+        onPermitirLocalizacao={() => {
+          solicitarPermissaoNavegador();
+          trackEvent({
+            event: 'location_permission_granted',
+            category: 'preferences',
+            action: 'location_permission_granted',
+          });
+        }}
+        onVoltarUFMG={handleVoltarParaUFMG}
+        onContinuarAqui={handleContinuarAqui}
+      />
 
       {showOfflineToast && (
         <div
@@ -302,7 +240,9 @@ export function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <RotasProvider>
-          <AppContent />
+          <AnalyticsProvider>
+            <AppContent />
+          </AnalyticsProvider>
         </RotasProvider>
       </ThemeProvider>
     </ErrorBoundary>

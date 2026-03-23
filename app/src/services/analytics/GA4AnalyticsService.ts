@@ -54,6 +54,19 @@ function resolveGAClient(): GAClient | null {
 
 const ReactGA = resolveGAClient();
 
+function toEventCategory(category?: string): AnalyticsEvent['category'] {
+  if (
+    category === 'engagement' ||
+    category === 'navigation' ||
+    category === 'map_interaction' ||
+    category === 'preferences'
+  ) {
+    return category;
+  }
+
+  return undefined;
+}
+
 /**
  * Implementação do serviço de analytics usando Google Analytics 4.
  * Pode ser substituída por outra implementação (Mixpanel, Amplitude, etc.)
@@ -105,11 +118,25 @@ export class GA4AnalyticsService implements IAnalyticsService {
   trackEvent(event: AnalyticsEvent): void {
     if (!this.ensureInitialized()) return;
 
-    ReactGA?.event({
+    const eventName = event.event || event.action || 'unknown_event';
+    const eventParams: Record<string, unknown> = {
       category: event.category,
       action: event.action,
       label: event.label,
       value: event.value,
+      ...event.params,
+    };
+
+    const filteredParams = Object.fromEntries(
+      Object.entries(eventParams).filter(([, value]) => value !== undefined),
+    );
+
+    ReactGA?.event({
+      category: event.category || 'engagement',
+      action: eventName,
+      label: event.label,
+      value: event.value,
+      ...filteredParams,
     });
   }
 
@@ -132,9 +159,9 @@ export class GA4AnalyticsService implements IAnalyticsService {
   trackTiming(timing: TimingEvent): void {
     if (!this.ensureInitialized()) return;
 
-    ReactGA?.event({
-      category: timing.category || 'engagement',
-      action: timing.name,
+    this.trackEvent({
+      event: timing.name,
+      category: toEventCategory(timing.category) || 'engagement',
       label: timing.label,
       value: timing.value,
     });
@@ -143,9 +170,9 @@ export class GA4AnalyticsService implements IAnalyticsService {
   trackError(error: Error, fatal: boolean = false): void {
     if (!this.ensureInitialized()) return;
 
-    ReactGA?.event({
+    this.trackEvent({
+      event: 'application_error',
       category: 'engagement',
-      action: 'application_error',
       label: error.message,
       value: fatal ? 1 : 0,
     });

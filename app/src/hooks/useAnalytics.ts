@@ -23,6 +23,12 @@ function normalizeAction(value: string): string {
     .toLowerCase();
 }
 
+function serializePayload(payload?: AnalyticsPayload): string | undefined {
+  if (!payload) return undefined;
+  const serialized = JSON.stringify(payload);
+  return serialized.length > 120 ? `${serialized.slice(0, 117)}...` : serialized;
+}
+
 /**
  * Permite injetar um serviço de analytics diferente (útil para testes).
  */
@@ -40,17 +46,24 @@ export function useAnalytics() {
    */
   const trackEvent = useCallback((event: AnalyticsEvent | string, payload?: AnalyticsPayload) => {
     if (typeof event === 'string') {
+      const normalizedEvent = normalizeAction(event);
       analyticsService.trackEvent({
+        event: normalizedEvent,
         category: 'engagement',
-        action: normalizeAction(event),
-        label: payload ? JSON.stringify(payload) : undefined,
+        action: normalizedEvent,
+        label: serializePayload(payload),
+        params: payload,
       });
       return;
     }
 
+    const baseEvent = event.event || event.action || 'unknown_event';
+    const normalizedEvent = normalizeAction(baseEvent);
+
     analyticsService.trackEvent({
       ...event,
-      action: normalizeAction(event.action),
+      event: normalizedEvent,
+      action: event.action ? normalizeAction(event.action) : normalizedEvent,
     });
   }, []);
 
@@ -128,6 +141,7 @@ export function useExternalLinkTracking() {
   const trackExternalLink = useCallback(
     (url: string, label: string) => {
       trackEvent({
+        event: 'click_external_link',
         category: 'navigation',
         action: 'click_external_link',
         label: `${label} - ${url}`,
@@ -184,6 +198,7 @@ function trackResourceSummary(trackEvent: (event: AnalyticsEvent) => void): void
   );
 
   trackEvent({
+    event: 'resource_summary',
     category: 'engagement',
     action: 'resource_summary',
     label: `total=${resources.length};js=${jsCount};css=${cssCount};img=${imageCount};fetch=${fetchCount}`,
@@ -211,6 +226,7 @@ export function useAnalyticsAutoTracking() {
 
     const nav = getNavigationTiming();
     trackEvent({
+      event: 'app_boot',
       category: 'navigation',
       action: 'app_boot',
       label: nav?.type || 'navigate',
@@ -237,6 +253,7 @@ export function useAnalyticsAutoTracking() {
 
     const onVisibilityChange = () => {
       trackEvent({
+        event: 'visibility_change',
         category: 'engagement',
         action: 'visibility_change',
         label: document.visibilityState,
@@ -256,11 +273,21 @@ export function useAnalyticsAutoTracking() {
     document.addEventListener('visibilitychange', onVisibilityChange);
 
     const onOnline = () => {
-      trackEvent({ category: 'navigation', action: 'network_status', label: 'online' });
+      trackEvent({
+        event: 'network_status',
+        category: 'navigation',
+        action: 'network_status',
+        label: 'online',
+      });
     };
 
     const onOffline = () => {
-      trackEvent({ category: 'navigation', action: 'network_status', label: 'offline' });
+      trackEvent({
+        event: 'network_status',
+        category: 'navigation',
+        action: 'network_status',
+        label: 'offline',
+      });
     };
 
     window.addEventListener('online', onOnline);
@@ -300,6 +327,7 @@ export function useAnalyticsAutoTracking() {
         'sem-label';
 
       trackEvent({
+        event: 'global_click',
         category: 'engagement',
         action: 'global_click',
         label: truncateLabel(`${role}: ${label}`),
@@ -369,6 +397,7 @@ export function useAnalyticsAutoTracking() {
       }
       if (clsValue > 0) {
         trackEvent({
+          event: 'web_vital_cls',
           category: 'engagement',
           action: 'web_vital_cls',
           label: clsValue.toFixed(4),

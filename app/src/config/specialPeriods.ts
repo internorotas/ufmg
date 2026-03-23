@@ -5,6 +5,8 @@
  * a manutenção e atualização das datas de férias e recessos.
  */
 
+import { getSaoPauloDayOfWeek, getSaoPauloNow, toSaoPauloDate } from '../lib/time';
+
 export interface SpecialPeriod {
   startDate: Date;
   endDate: Date;
@@ -31,16 +33,16 @@ export const SPECIAL_PERIODS: SpecialPeriod[] = [
  * @returns {SpecialPeriod | null} O período especial ativo ou null se não houver nenhum
  */
 export function getCurrentSpecialPeriod(): SpecialPeriod | null {
-  const now = new Date();
+  const now = getSaoPauloNow();
   now.setHours(0, 0, 0, 0);
 
   for (const period of SPECIAL_PERIODS) {
     if (!period.isActive) continue;
 
-    const start = new Date(period.startDate);
+    const start = toSaoPauloDate(new Date(period.startDate));
     start.setHours(0, 0, 0, 0);
 
-    const end = new Date(period.endDate);
+    const end = toSaoPauloDate(new Date(period.endDate));
     end.setHours(23, 59, 59, 999);
 
     if (now >= start && now <= end) {
@@ -56,7 +58,7 @@ export function getCurrentSpecialPeriod(): SpecialPeriod | null {
  * @returns {boolean} true se for dia útil, false caso contrário
  */
 export function isWeekday(): boolean {
-  const today = new Date().getDay();
+  const today = getSaoPauloDayOfWeek(getSaoPauloNow());
   return today >= 1 && today <= 5;
 }
 
@@ -84,7 +86,7 @@ export function shouldDisableRegularSchedules(): boolean {
  * - "diasUteis": padrão
  */
 export function obterCategoriaDiaAtual(): string {
-  const today = new Date().getDay();
+  const today = getSaoPauloDayOfWeek(getSaoPauloNow());
   const isSaturday = today === 6;
   const isWeekday = today >= 1 && today <= 5;
   const specialPeriod = getCurrentSpecialPeriod();
@@ -97,7 +99,7 @@ export function obterCategoriaDiaAtual(): string {
  * Verifica se uma linha está circulando hoje com base na sua categoria.
  */
 export function isLineAvailableToday(categoriaDia: string): boolean {
-  const today = new Date().getDay();
+  const today = getSaoPauloDayOfWeek(getSaoPauloNow());
   const isSaturday = today === 6;
   const isSunday = today === 0;
   const isWeekday = today >= 1 && today <= 5;
@@ -114,7 +116,7 @@ export function isLineAvailableToday(categoriaDia: string): boolean {
  * Retorna a mensagem descritiva de por que a linha não está circulando hoje.
  */
 export function getLinhaNotRunningMessage(categoriaDia: string): string {
-  const today = new Date().getDay();
+  const today = getSaoPauloDayOfWeek(getSaoPauloNow());
   const isSaturday = today === 6;
   const isSunday = today === 0;
   const isInVacationPeriod = shouldDisableRegularSchedules();
