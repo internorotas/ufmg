@@ -188,12 +188,14 @@ function LineCardComponent({
 
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
   const getSuspendedMessage = () => getLinhaNotRunningMessage(linha.categoriaDia);
-  const statusLinha = obterStatusLinha(linha, now);
 
   const schedulesInMinutes = useMemo(() => {
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
     return parseSchedules(horariosDoDia);
   }, [linha, now]);
+
+  // Passa schedulesInMinutes para obterStatusLinha para evitar recálculo O(N log N)
+  const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const { nextSchedule, previousSchedule } = calculateSchedules(schedulesInMinutes, currentMinutes);

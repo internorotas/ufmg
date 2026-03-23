@@ -158,9 +158,6 @@ export function LinhaDetalhesModal({
 
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const statusLinha = obterStatusLinha(linha, now);
-
-  const isLineRunningToday = statusLinha.id !== 'NAO_CIRCULA_HOJE';
 
   const paradasDoItinerario = useMemo(() => {
     return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
@@ -178,6 +175,10 @@ export function LinhaDetalhesModal({
       }))
       .sort((a, b) => a.minutos - b.minutos);
   }, [linha]);
+
+  const schedulesInMinutes = useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios]);
+  const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
+  const isLineRunningToday = statusLinha.id !== 'NAO_CIRCULA_HOJE';
 
   const splitIndex = useMemo(() => {
     return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
