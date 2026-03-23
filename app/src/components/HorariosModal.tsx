@@ -7,6 +7,7 @@ import { AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { findScheduleIndex, timeToMinutes } from '../../lib/utils';
+import { isLineAvailableToday } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { obterStatusLinha } from '../lib/utils';
@@ -68,6 +69,10 @@ function getInitialTab(): ScheduleTab {
 }
 
 function getHorariosByTab(linha: Linha, tab: ScheduleTab): string[] {
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
   const horariosRaw = linha.horarios as unknown;
 
   if (Array.isArray(horariosRaw)) {
@@ -210,7 +215,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {proximos.length > 0 && (
+        {!shouldDisableSchedules && proximos.length > 0 && (
           <div data-slot="upcoming-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
               <Clock className="text-success-text" size={20} />
@@ -232,7 +237,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           </div>
         )}
 
-        {passados.length > 0 && (
+        {!shouldDisableSchedules && passados.length > 0 && (
           <div data-slot="passed-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
               <CheckCircle className="text-text-tertiary" size={20} />
@@ -256,8 +261,9 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
 
         <div data-slot="summary" className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm">
           <p className="text-center text-text-secondary">
-            Total de {todos.length} horários •{' '}
-            <span className="text-success-text">{proximos.length} restantes</span>
+            {shouldDisableSchedules
+              ? 'Sem horários ativos para hoje'
+              : `Total de ${todos.length} horários • ${proximos.length} restantes`}
           </p>
         </div>
       </div>

@@ -8,7 +8,7 @@ import type { ComponentProps } from 'react';
 import { Popup } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { normalizarNomeLinha } from '../../lib/utils';
-import { obterCategoriaDiaAtual } from '../config/specialPeriods';
+import { isLineAvailableToday } from '../config/specialPeriods';
 import { useRotasData } from '../contexts/RotasContext';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
@@ -86,20 +86,21 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
     const candidatas = rotasService.getLinhasPorNomeNormalizado(chave);
     if (candidatas.length === 0) return null;
 
-    // Filtra apenas linhas do dia atual (dias úteis, sábado ou férias)
-    const categoriaDiaAtual = obterCategoriaDiaAtual();
-    const candidatasDoDia = candidatas.filter((l) => l.categoriaDia === categoriaDiaAtual);
-    const pool = candidatasDoDia.length > 0 ? candidatasDoDia : candidatas;
+    // Considera apenas linhas vigentes hoje para evitar ETA indevida de linhas não circulantes.
+    const candidatasDoDia = candidatas.filter((l) => isLineAvailableToday(l.categoriaDia));
+    if (candidatasDoDia.length === 0) return null;
 
     // Candidatas que possuem esta parada no trajeto detalhado
-    const candidatasNaParada = pool.filter(
+    const candidatasNaParada = candidatasDoDia.filter(
       (linha) => linha.trajetoDetalhado?.some((t) => t.idParada === idParadaAtual) ?? false,
     );
 
     if (candidatasNaParada.length === 0) {
       // Fallback: parada no itinerário mas sem trajetoDetalhado
-      const atendeParada = pool.find((linha) => linha.itinerarioParadasIds.includes(idParadaAtual));
-      return atendeParada ?? pool[0] ?? null;
+      const atendeParada = candidatasDoDia.find((linha) =>
+        linha.itinerarioParadasIds.includes(idParadaAtual),
+      );
+      return atendeParada ?? candidatasDoDia[0] ?? null;
     }
 
     if (candidatasNaParada.length === 1) {

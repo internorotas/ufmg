@@ -473,54 +473,42 @@ export function LinhaDetalhesModal({
             </div>
           )}
 
-          {/* Horários (todos quando não está circulando, ou apenas passados quando está) */}
-          {!isLineRunningToday ? (
-            <div data-slot="all-schedules">
+          {/* Horários passados só aparecem quando a linha está vigente */}
+          {isLineRunningToday && passados.length > 0 && (
+            <div data-slot="passed-schedules">
               <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
                 <Clock size={20} />
-                Todos os Horários ({todos.length})
+                Horários Passados ({passados.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {todos.map(({ horario, id }) => (
-                  <div key={`horario-${id}`} className={scheduleCardVariants({ status: 'passed' })}>
+                {passados.map(({ horario, id }) => (
+                  <button
+                    type="button"
+                    key={`passado-${id}`}
+                    aria-label={`Horário passado às ${horario}`}
+                    onClick={() => handleHorarioClick(horario)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleHorarioClick(horario);
+                      }
+                    }}
+                    className={scheduleCardVariants({ status: 'passed' })}
+                  >
                     <p className="text-lg font-semibold text-text-secondary">{horario}</p>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
-          ) : (
-            passados.length > 0 && (
-              <div data-slot="passed-schedules">
-                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
-                  <Clock size={20} />
-                  Horários Passados ({passados.length})
-                </h3>
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                  {passados.map(({ horario, id }) => (
-                    <button
-                      type="button"
-                      key={`passado-${id}`}
-                      aria-label={`Horário passado às ${horario}`}
-                      onClick={() => handleHorarioClick(horario)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleHorarioClick(horario);
-                        }
-                      }}
-                      className={scheduleCardVariants({ status: 'passed' })}
-                    >
-                      <p className="text-lg font-semibold text-text-secondary">{horario}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )
           )}
 
           {/* Resumo */}
           <div data-slot="summary" className={infoCardVariants()}>
-            <p className="text-text-secondary">Total de {todos.length} horários</p>
+            <p className="text-text-secondary">
+              {isLineRunningToday
+                ? `Total de ${todos.length} horários`
+                : 'Sem horários ativos para hoje'}
+            </p>
           </div>
         </div>
       )}
