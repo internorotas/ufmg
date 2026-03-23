@@ -1,15 +1,11 @@
-import {
-  FeatureCollection,
-  RotaFeature,
-  ParadaFeature,
-} from "./types/data.types";
+import { FeatureCollection, RotaFeature, ParadaFeature } from './types/data.types';
 
-declare module "*.geojson" {
+declare module '*.geojson' {
   const value: FeatureCollection<RotaFeature | ParadaFeature>;
   export default value;
 }
 
-declare module "*.json" {
+declare module '*.json' {
   const value: FeatureCollection<RotaFeature | ParadaFeature>;
   export default value;
 }

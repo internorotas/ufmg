@@ -7,15 +7,16 @@
 
 import {
   createContext,
-  useContext,
-  useState,
+  type ReactNode,
   useCallback,
+  useContext,
+  useEffect,
   useMemo,
   useRef,
-  type ReactNode,
-} from "react";
-import type { Linha, Parada, CategoriaLinhas } from "../types/data.types";
-import { RotasService, type IRotasService } from "../services/RotasService";
+  useState,
+} from 'react';
+import { type IRotasService, loadRotasService, RotasService } from '../services/RotasService';
+import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 
 /**
  * Interface que define a referência do Mapa para centralização.
@@ -29,23 +30,20 @@ export interface MapaRef {
  * Interface que define o formato do contexto de rotas.
  */
 interface RotasContextData {
-  // Dados
   linhasData: CategoriaLinhas;
   todasParadas: Parada[];
+  isLoadingData: boolean;
+  dataError: string | null;
 
-  // Estado de seleção
   linhaSelecionada: Linha | null;
   paradaSelecionada: Parada | null;
 
-  // Ações
   selecionarLinha: (linha: Linha) => void;
   selecionarParada: (parada: Parada) => void;
   limparSelecao: () => void;
 
-  // Referência do Mapa
   mapaRef: React.RefObject<MapaRef | null>;
 
-  // Serviço de dados (para acesso direto se necessário)
   rotasService: IRotasService;
 }
 
@@ -73,25 +71,46 @@ interface RotasProviderProps {
  * </RotasProvider>
  * ```
  */
-export function RotasProvider({
-  children,
-  onLinhaSelect,
-  onParadaSelect,
-}: RotasProviderProps) {
-  // Estado de seleção
+export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: RotasProviderProps) {
   const [linhaSelecionada, setLinhaSelecionada] = useState<Linha | null>(null);
-  const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(
-    null,
-  );
+  const [paradaSelecionada, setParadaSelecionada] = useState<Parada | null>(null);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
+  const [rotasService, setRotasService] = useState<IRotasService>(RotasService);
 
-  // Referência do mapa para centralização
   const mapaRef = useRef<MapaRef | null>(null);
 
-  // Dados memoizados do serviço
-  const linhasData = useMemo(() => RotasService.getTodasLinhas(), []);
-  const todasParadas = useMemo(() => RotasService.getTodasParadas(), []);
+  useEffect(() => {
+    let isMounted = true;
 
-  // Ação: Selecionar uma linha
+    const bootstrap = async () => {
+      setIsLoadingData(true);
+      setDataError(null);
+
+      try {
+        const loadedService = await loadRotasService();
+        if (!isMounted) return;
+        setRotasService(loadedService);
+      } catch {
+        if (!isMounted) return;
+        setDataError('Nao foi possivel carregar os dados de linhas e paradas.');
+      } finally {
+        if (isMounted) {
+          setIsLoadingData(false);
+        }
+      }
+    };
+
+    bootstrap();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const linhasData = useMemo(() => rotasService.getTodasLinhas(), [rotasService]);
+  const todasParadas = useMemo(() => rotasService.getTodasParadas(), [rotasService]);
+
   const selecionarLinha = useCallback(
     (linha: Linha) => {
       setLinhaSelecionada(linha);
@@ -100,7 +119,6 @@ export function RotasProvider({
     [onLinhaSelect],
   );
 
-  // Ação: Selecionar uma parada (também centraliza no mapa)
   const selecionarParada = useCallback(
     (parada: Parada) => {
       setParadaSelecionada(parada);
@@ -110,50 +128,40 @@ export function RotasProvider({
     [onParadaSelect],
   );
 
-  // Ação: Limpar seleção
   const limparSelecao = useCallback(() => {
     setLinhaSelecionada(null);
     setParadaSelecionada(null);
   }, []);
 
-  // Valor memoizado do contexto para evitar re-renders desnecessários
   const contextValue = useMemo<RotasContextData>(
     () => ({
-      // Dados
       linhasData,
       todasParadas,
-
-      // Estado
+      isLoadingData,
+      dataError,
       linhaSelecionada,
       paradaSelecionada,
-
-      // Ações
       selecionarLinha,
       selecionarParada,
       limparSelecao,
-
-      // Referência
       mapaRef,
-
-      // Serviço
-      rotasService: RotasService,
+      rotasService,
     }),
     [
       linhasData,
       todasParadas,
+      isLoadingData,
+      dataError,
       linhaSelecionada,
       paradaSelecionada,
       selecionarLinha,
       selecionarParada,
       limparSelecao,
+      rotasService,
     ],
   );
 
-  return (
-    <RotasContext.Provider value={contextValue}>
-      {children}
-    </RotasContext.Provider>
-  );
+  return <RotasContext.Provider value={contextValue}>{children}</RotasContext.Provider>;
 }
 
 /**
@@ -173,7 +181,7 @@ export function useRotas(): RotasContextData {
   const context = useContext(RotasContext);
 
   if (context === undefined) {
-    throw new Error("useRotas deve ser usado dentro de um RotasProvider");
+    throw new Error('useRotas deve ser usado dentro de um RotasProvider');
   }
 
   return context;
@@ -184,8 +192,8 @@ export function useRotas(): RotasContextData {
  * Use quando o componente só precisa dos dados e não das ações.
  */
 export function useRotasData() {
-  const { linhasData, todasParadas, rotasService } = useRotas();
-  return { linhasData, todasParadas, rotasService };
+  const { linhasData, todasParadas, rotasService, isLoadingData, dataError } = useRotas();
+  return { linhasData, todasParadas, rotasService, isLoadingData, dataError };
 }
 
 /**
@@ -193,13 +201,8 @@ export function useRotasData() {
  * Use quando o componente só precisa saber o que está selecionado.
  */
 export function useRotasSelection() {
-  const {
-    linhaSelecionada,
-    paradaSelecionada,
-    selecionarLinha,
-    selecionarParada,
-    limparSelecao,
-  } = useRotas();
+  const { linhaSelecionada, paradaSelecionada, selecionarLinha, selecionarParada, limparSelecao } =
+    useRotas();
 
   return {
     linhaSelecionada,

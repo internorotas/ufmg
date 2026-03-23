@@ -5,13 +5,13 @@
  * Gerencia a renderização de todos os marcadores de paradas.
  */
 
-import React, { useRef, useState, useCallback } from "react";
-import { Marker } from "react-leaflet";
-import L from "leaflet";
-import { PopupCustomizado } from "../PopupCustomizado";
-import type { Parada } from "../../types/data.types";
-
-import icon from "../../assets/marker.svg";
+import L from 'leaflet';
+import React, { useCallback, useRef, useState } from 'react';
+import { Marker } from 'react-leaflet';
+import icon from '../../assets/marker.svg';
+import { useAnalytics } from '../../hooks/useAnalytics';
+import type { Parada } from '../../types/data.types';
+import { PopupCustomizado } from '../PopupCustomizado';
 
 // Ícone padrão para paradas
 const stationIcon = L.icon({
@@ -27,7 +27,7 @@ const highlightedIcon = L.icon({
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
-  className: "marker-highlighted",
+  className: 'marker-highlighted',
 });
 
 interface MapMarkersProps {
@@ -62,14 +62,11 @@ const MemoizedMarker = React.memo(
   },
   (prev, next) => {
     // Custom comparison: re-render only if highlight state changes
-    return (
-      prev.isDestacada === next.isDestacada &&
-      prev.parada.idParada === next.parada.idParada
-    );
+    return prev.isDestacada === next.isDestacada && prev.parada.idParada === next.parada.idParada;
   },
 );
 
-MemoizedMarker.displayName = "MemoizedMarker";
+MemoizedMarker.displayName = 'MemoizedMarker';
 
 /**
  * Componente que renderiza todos os marcadores de paradas no mapa.
@@ -80,6 +77,8 @@ export const MapMarkers = React.memo(function MapMarkers({
   paradaDestacadaId,
   onMarkerRef,
 }: MapMarkersProps) {
+  const analytics = useAnalytics();
+
   // Callback ref para gerenciar referências de marcadores
   const handleSetMarkerRef = useCallback(
     (id: string, marker: L.Marker | null) => {
@@ -91,12 +90,23 @@ export const MapMarkers = React.memo(function MapMarkers({
   return (
     <>
       {paradas.map((parada) => (
-        <MemoizedMarker
+        <Marker
           key={parada.idParada}
-          parada={parada}
-          isDestacada={paradaDestacadaId === parada.idParada}
-          setMarkerRef={handleSetMarkerRef}
-        />
+          position={parada.coordenadas}
+          icon={paradaDestacadaId === parada.idParada ? highlightedIcon : stationIcon}
+          ref={(ref) => handleSetMarkerRef(parada.idParada, ref)}
+          eventHandlers={{
+            click: () => {
+              analytics.trackEvent({
+                category: 'map_interaction',
+                action: 'view_stop_details',
+                label: `${parada.idParada} - ${parada.nome}`,
+              });
+            },
+          }}
+        >
+          <PopupCustomizado parada={parada} />
+        </Marker>
       ))}
     </>
   );
@@ -108,9 +118,7 @@ export const MapMarkers = React.memo(function MapMarkers({
  */
 export function useMapMarkers() {
   const markersRef = useRef<{ [key: string]: L.Marker | null }>({});
-  const [paradaDestacadaId, setParadaDestacadaId] = useState<string | null>(
-    null,
-  );
+  const [paradaDestacadaId, setParadaDestacadaId] = useState<string | null>(null);
 
   const handleMarkerRef = useCallback((id: string, marker: L.Marker | null) => {
     if (marker) {

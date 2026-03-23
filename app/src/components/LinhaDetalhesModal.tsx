@@ -3,39 +3,29 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useState, useMemo } from "react";
-import { tv } from "tailwind-variants";
-import { Clock, Map, MapPin, Bus, AlertTriangle } from "lucide-react";
-import { Modal } from "./Modal";
-import type { Linha, Parada } from "../types/data.types";
-import {
-  buscarParadasPorIds,
-  timeToMinutes,
-  findScheduleIndex,
-} from "../../lib/utils";
-import { useAnalytics, useSessionTiming } from "../hooks/useAnalytics";
-import { obterHorariosLinhaNoDia, obterStatusLinha } from "../lib/utils";
-import { calcularPrevisaoChegada } from "../hooks/usePrevisaoChegada";
-import { useCurrentTime } from "../hooks/useCurrentTime";
-
-// ============================================================================
-// VARIANTS
-// ============================================================================
+import { AlertTriangle, Bus, Clock, Map as MapIcon, MapPin } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { tv } from 'tailwind-variants';
+import { buscarParadasPorIds, findScheduleIndex, timeToMinutes } from '../../lib/utils';
+import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
+import { useCurrentTime } from '../hooks/useCurrentTime';
+import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
+import { obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
+import type { Linha, Parada } from '../types/data.types';
+import { Modal } from './Modal';
 
 /**
  * Variantes do container do título
  */
 export const titleContainerVariants = tv({
-  base: "flex items-center gap-3",
+  base: 'flex items-center gap-3',
 });
 
 /**
  * Variantes do ícone do título
  */
 export const titleIconVariants = tv({
-  base: [
-    "flex size-12 shrink-0 items-center justify-center rounded-lg shadow-sm",
-  ],
+  base: ['flex size-12 shrink-0 items-center justify-center rounded-lg shadow-sm'],
 });
 
 /**
@@ -43,14 +33,14 @@ export const titleIconVariants = tv({
  */
 export const tabVariants = tv({
   base: [
-    "flex items-center gap-2 px-4 py-3 font-semibold transition-all duration-200 cursor-pointer",
-    "hover:bg-card-hover/50 rounded-t-lg",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-inset",
+    'flex items-center gap-2 px-4 py-3 font-semibold transition-all duration-200 cursor-pointer',
+    'hover:bg-card-hover/50 rounded-t-lg',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-inset',
   ],
   variants: {
     active: {
-      true: "border-b-2 text-text-primary",
-      false: "text-text-secondary hover:text-text-primary",
+      true: 'border-b-2 text-text-primary',
+      false: 'text-text-secondary hover:text-text-primary',
     },
   },
   defaultVariants: {
@@ -62,34 +52,31 @@ export const tabVariants = tv({
  * Variantes do botão de parada
  */
 export const stopButtonVariants = tv({
-  base: "group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+  base: 'group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
 });
 
 /**
  * Variantes do container do ícone de parada
  */
 export const stopIconContainerVariants = tv({
-  base: [
-    "relative z-10 mt-0.5 shrink-0",
-    "flex size-6 items-center justify-center rounded-full",
-  ],
+  base: ['relative z-10 mt-0.5 shrink-0', 'flex size-6 items-center justify-center rounded-full'],
 });
 
 /**
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+  base: 'rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
   variants: {
     status: {
       upcoming:
-        "border-2 hover:scale-105 hover:shadow-md active:scale-95 cursor-pointer focus-visible:ring-brand-primary",
+        'border-2 hover:scale-105 hover:shadow-md active:scale-95 cursor-pointer focus-visible:ring-brand-primary',
       passed:
-        "border border-card-border bg-card opacity-50 cursor-default focus-visible:ring-card-border",
+        'border border-card-border bg-card opacity-50 cursor-default focus-visible:ring-card-border',
     },
   },
   defaultVariants: {
-    status: "upcoming",
+    status: 'upcoming',
   },
 });
 
@@ -97,15 +84,8 @@ export const scheduleCardVariants = tv({
  * Variantes do card de informação
  */
 export const infoCardVariants = tv({
-  base: [
-    "rounded-lg border p-4 text-center text-sm",
-    "border-card-border bg-card",
-  ],
+  base: ['rounded-lg border p-4 text-center text-sm', 'border-card-border bg-card'],
 });
-
-// ============================================================================
-// TYPES
-// ============================================================================
 
 export interface LinhaDetalhesModalProps {
   isOpen: boolean;
@@ -115,11 +95,7 @@ export interface LinhaDetalhesModalProps {
   onParadaClick: (parada: Parada) => void;
 }
 
-type TabType = "itinerario" | "horarios";
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
+type TabType = 'itinerario' | 'horarios';
 
 /**
  * Modal que exibe informações detalhadas sobre uma linha de ônibus.
@@ -142,28 +118,30 @@ export function LinhaDetalhesModal({
   todasParadas,
   onParadaClick,
 }: LinhaDetalhesModalProps) {
-  const [tabAtiva, setTabAtiva] = useState<TabType>("itinerario");
-  const { trackEvent } = useAnalytics();
+  const [tabAtiva, setTabAtiva] = useState<TabType>('itinerario');
+  const { trackEvent, trackPageView } = useAnalytics();
 
-  // Rastreia tempo que o usuário passa visualizando detalhes desta linha
-  useSessionTiming(`Linha: ${linha.nome}`, "Engajamento Detalhes");
+  useSessionTiming(`Linha: ${linha.nome}`, 'engagement');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    trackPageView(`/modal/linha-detalhes/${linha.idRota}`);
+  }, [isOpen, linha.idRota, trackPageView]);
 
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // Buscar paradas do itinerário dinamicamente usando os IDs com memoização
   const paradasDoItinerario = useMemo(() => {
     return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
   }, [linha.itinerarioParadasIds, todasParadas]);
 
-  // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
-  // Isso evita re-ordenar os horários a cada renderização quando o tempo muda
   const baseHorarios = useMemo(() => {
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
 
     return horariosDoDia
-      .filter((h) => h && h.includes(":"))
-      .map((horario) => ({
+      .filter((h) => h?.includes(':'))
+      .map((horario, idx) => ({
+        id: `${horario}-${idx}`,
         horario,
         minutos: timeToMinutes(horario),
       }))
@@ -174,52 +152,40 @@ export function LinhaDetalhesModal({
   const statusLinha = obterStatusLinha(
     linha,
     now,
-    useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios])
+    useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios]),
   );
 
-  const isLineRunningToday = statusLinha.id !== "NAO_CIRCULA_HOJE";
+  const isLineRunningToday = statusLinha.id !== 'NAO_CIRCULA_HOJE';
 
-  // ⚡ Bolt: Usar busca binária O(log N) e fatiamento virtual (slice) em vez de iterar com map/filter O(N)
-  // Isso evita criar novos arrays/objetos base em cada renderização (a cada minuto que o relógio muda).
-  // Separamos os componentes "passado" e "futuro" para evitar realocação dos itens O(N)
   const splitIndex = useMemo(() => {
-    // Busca binária para achar onde dividir usando um getter para evitar o .map() inicial.
-    // Usamos currentMinutes - 1 pois currentMinutes (agora) deve ser considerado 'proximo'
-    return findScheduleIndex(
-      baseHorarios,
-      currentMinutes - 1,
-      (h) => h.minutos,
-    );
+    return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
   }, [baseHorarios, currentMinutes]);
 
-  // Zero-allocation das sublistas virtuais
   const passados = baseHorarios.slice(0, splitIndex);
   const proximos = baseHorarios.slice(splitIndex);
   const todos = baseHorarios;
 
   const handleTabChange = (tab: TabType) => {
     trackEvent({
-      category: "Navegação Detalhes",
-      action: "Visualizar Aba",
-      label: `${tab === "itinerario" ? "Itinerário" : "Todos os Horários"} - ${
-        linha.nome
-      }`,
+      category: 'navigation',
+      action: 'view_details_tab',
+      label: `${tab === 'itinerario' ? 'Itinerário' : 'Todos os Horários'} - ${linha.nome}`,
     });
     setTabAtiva(tab);
   };
 
   const handleHorarioClick = (horario: string) => {
     trackEvent({
-      category: "Horarios",
-      action: "Clique Horario Especifico",
+      category: 'engagement',
+      action: 'select_specific_schedule',
       label: `${horario} - ${linha.nome}`,
     });
   };
 
   const handleParadaClick = (parada: Parada) => {
     trackEvent({
-      category: "Engajamento Detalhes",
-      action: "Selecionar Parada Itinerario",
+      category: 'map_interaction',
+      action: 'view_stop_details',
       label: `${parada.nome} - ${linha.nome}`,
     });
     onParadaClick(parada);
@@ -232,10 +198,7 @@ export function LinhaDetalhesModal({
       onClose={onClose}
       title={
         <div className={titleContainerVariants()}>
-          <div
-            className={titleIconVariants()}
-            style={{ backgroundColor: linha.corHex }}
-          >
+          <div className={titleIconVariants()} style={{ backgroundColor: linha.corHex }}>
             <Bus size={24} className="text-white drop-shadow-sm" />
           </div>
           <div className="min-w-0 flex-1">
@@ -243,16 +206,13 @@ export function LinhaDetalhesModal({
               {linha.nome}
             </h2>
             {linha.sublinha && (
-              <p className="mt-0.5 truncate text-xs text-text-secondary">
-                {linha.sublinha}
-              </p>
+              <p className="mt-0.5 truncate text-xs text-text-secondary">{linha.sublinha}</p>
             )}
           </div>
         </div>
       }
       size="2xl"
     >
-      {/* Tabs */}
       <div
         data-slot="tabs"
         role="tablist"
@@ -260,53 +220,50 @@ export function LinhaDetalhesModal({
         className="mb-6 flex gap-2 border-b border-card-border"
       >
         <button
+          type="button"
           role="tab"
-          aria-selected={tabAtiva === "itinerario"}
+          aria-selected={tabAtiva === 'itinerario'}
           aria-controls="panel-itinerario"
           id="tab-itinerario"
-          onClick={() => handleTabChange("itinerario")}
-          className={tabVariants({ active: tabAtiva === "itinerario" })}
-          style={tabAtiva === "itinerario" ? { borderColor: linha.corHex } : {}}
+          onClick={() => handleTabChange('itinerario')}
+          className={tabVariants({ active: tabAtiva === 'itinerario' })}
+          style={tabAtiva === 'itinerario' ? { borderColor: linha.corHex } : {}}
         >
-          <Map size={20} />
+          <MapIcon size={20} />
           Itinerário
         </button>
         <button
+          type="button"
           role="tab"
-          aria-selected={tabAtiva === "horarios"}
+          aria-selected={tabAtiva === 'horarios'}
           aria-controls="panel-horarios"
           id="tab-horarios"
-          onClick={() => handleTabChange("horarios")}
-          className={tabVariants({ active: tabAtiva === "horarios" })}
-          style={tabAtiva === "horarios" ? { borderColor: linha.corHex } : {}}
+          onClick={() => handleTabChange('horarios')}
+          className={tabVariants({ active: tabAtiva === 'horarios' })}
+          style={tabAtiva === 'horarios' ? { borderColor: linha.corHex } : {}}
         >
           <Clock size={20} />
           Todos os Horários
         </button>
       </div>
 
-      {/* Conteúdo das Tabs */}
-      {tabAtiva === "itinerario" ? (
+      {tabAtiva === 'itinerario' ? (
         <div
           role="tabpanel"
           id="panel-itinerario"
           aria-labelledby="tab-itinerario"
-          tabIndex={0}
           data-slot="itinerary-tab"
           className="relative animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
         >
           {paradasDoItinerario.length > 0 ? (
             <div className="relative">
               {paradasDoItinerario.map((parada) => {
-                const isFirst =
-                  parada.idParada === paradasDoItinerario[0]?.idParada;
+                const isFirst = parada.idParada === paradasDoItinerario[0]?.idParada;
                 const isLast =
-                  parada.idParada ===
-                  paradasDoItinerario[paradasDoItinerario.length - 1]?.idParada;
+                  parada.idParada === paradasDoItinerario[paradasDoItinerario.length - 1]?.idParada;
 
                 return (
                   <div key={parada.idParada} className="relative flex">
-                    {/* Linha conectora vertical tracejada */}
                     {!isLast && (
                       <div
                         className="absolute left-2.75 top-7 h-full w-0.5"
@@ -318,12 +275,12 @@ export function LinhaDetalhesModal({
                     )}
 
                     <button
+                      type="button"
                       onClick={() => handleParadaClick(parada)}
                       className={stopButtonVariants()}
                       aria-label={`Ver localização da parada ${parada.nome} no mapa`}
                       title={`Ver localização da parada ${parada.nome} no mapa`}
                     >
-                      {/* Ícone de localização com círculo */}
                       <div
                         className={stopIconContainerVariants()}
                         style={{ backgroundColor: `${linha.corHex}20` }}
@@ -331,7 +288,6 @@ export function LinhaDetalhesModal({
                         <MapPin size={18} style={{ color: linha.corHex }} />
                       </div>
 
-                      {/* Conteúdo da parada */}
                       <div className="min-w-0 flex-1 pt-0.5">
                         <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
                           {parada.nome}
@@ -343,9 +299,7 @@ export function LinhaDetalhesModal({
                           </p>
                         )}
                         {!isFirst && !isLast && (
-                          <p className="mt-0.5 text-xs text-text-secondary">
-                            Parada Regular
-                          </p>
+                          <p className="mt-0.5 text-xs text-text-secondary">Parada Regular</p>
                         )}
 
                         {isFirst && (
@@ -366,42 +320,33 @@ export function LinhaDetalhesModal({
                           </span>
                         )}
 
-                        {/* Previsão de chegada nesta parada */}
                         {(() => {
-                          const previsao = calcularPrevisaoChegada(
-                            linha,
-                            parada.idParada,
-                            now,
-                          );
+                          const previsao = calcularPrevisaoChegada(linha, parada.idParada, now);
                           if (!previsao || !previsao.proximoOnibus) return null;
-                          const {
-                            proximoOnibus,
-                            onibusAnterior,
-                            isTrafegoIntenso,
-                          } = previsao;
+                          const { proximoOnibus, onibusAnterior, isTrafegoIntenso } = previsao;
                           const minutos = proximoOnibus.minutosFaltantes;
 
                           const badgeBg =
                             minutos < 1
-                              ? "var(--success-bg)"
+                              ? 'var(--success-bg)'
                               : isTrafegoIntenso
-                                ? "var(--warning-bg)"
+                                ? 'var(--warning-bg)'
                                 : minutos <= 15
-                                  ? "var(--success-bg)"
-                                  : "var(--warning-bg)";
+                                  ? 'var(--success-bg)'
+                                  : 'var(--warning-bg)';
 
                           const badgeText =
                             minutos < 1
-                              ? "var(--success-text)"
+                              ? 'var(--success-text)'
                               : isTrafegoIntenso
-                                ? "#d97706"
+                                ? '#d97706'
                                 : minutos <= 15
-                                  ? "var(--success-text)"
-                                  : "var(--warning-text)";
+                                  ? 'var(--success-text)'
+                                  : 'var(--warning-text)';
 
                           const textoChegada =
                             minutos < 1
-                              ? "Chega agora"
+                              ? 'Chega agora'
                               : minutos < 60
                                 ? `~${minutos} min · ${proximoOnibus.horarioChegada}`
                                 : (() => {
@@ -425,8 +370,7 @@ export function LinhaDetalhesModal({
                               </span>
                               {onibusAnterior && (
                                 <span className="text-[10px] text-text-tertiary">
-                                  Último passou há{" "}
-                                  {onibusAnterior.minutosQuePassou} min
+                                  Último passou há {onibusAnterior.minutosQuePassou} min
                                 </span>
                               )}
                             </div>
@@ -445,9 +389,7 @@ export function LinhaDetalhesModal({
           )}
 
           <div className={`mt-6 ${infoCardVariants()}`}>
-            <p className="text-text-secondary">
-              💡 Clique em uma parada para visualizá-la no mapa
-            </p>
+            <p className="text-text-secondary">💡 Clique em uma parada para visualizá-la no mapa</p>
           </div>
         </div>
       ) : (
@@ -455,7 +397,6 @@ export function LinhaDetalhesModal({
           role="tabpanel"
           id="panel-horarios"
           aria-labelledby="tab-horarios"
-          tabIndex={0}
           data-slot="schedules-tab"
           className="space-y-6 animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
         >
@@ -467,9 +408,7 @@ export function LinhaDetalhesModal({
             >
               <div className="flex items-center gap-3">
                 <AlertTriangle size={24} className="shrink-0 text-amber-400" />
-                <p className="text-sm font-medium text-amber-300">
-                  {statusLinha.texto}
-                </p>
+                <p className="text-sm font-medium text-amber-300">{statusLinha.texto}</p>
               </div>
             </div>
           )}
@@ -485,32 +424,28 @@ export function LinhaDetalhesModal({
                 Próximos Horários ({proximos.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {proximos.map(({ horario, minutos }, index) => (
-                  <div
-                    key={`proximo-${minutos}-${index}`}
-                    role="button"
-                    tabIndex={0}
+                {proximos.map(({ horario, id }) => (
+                  <button
+                    type="button"
+                    key={`proximo-${id}`}
                     aria-label={`Próximo horário às ${horario}`}
                     onClick={() => handleHorarioClick(horario)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
+                      if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         handleHorarioClick(horario);
                       }
                     }}
-                    className={scheduleCardVariants({ status: "upcoming" })}
+                    className={scheduleCardVariants({ status: 'upcoming' })}
                     style={{
                       borderColor: linha.corHex,
                       backgroundColor: `${linha.corHex}20`,
                     }}
                   >
-                    <p
-                      className="text-xl font-bold"
-                      style={{ color: linha.corHex }}
-                    >
+                    <p className="text-xl font-bold" style={{ color: linha.corHex }}>
                       {horario}
                     </p>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -524,14 +459,9 @@ export function LinhaDetalhesModal({
                 Todos os Horários ({todos.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {todos.map(({ horario, minutos }, index) => (
-                  <div
-                    key={`horario-${minutos}-${index}`}
-                    className={scheduleCardVariants({ status: "passed" })}
-                  >
-                    <p className="text-lg font-semibold text-text-secondary">
-                      {horario}
-                    </p>
+                {todos.map(({ horario, id }) => (
+                  <div key={`horario-${id}`} className={scheduleCardVariants({ status: 'passed' })}>
+                    <p className="text-lg font-semibold text-text-secondary">{horario}</p>
                   </div>
                 ))}
               </div>
@@ -544,25 +474,22 @@ export function LinhaDetalhesModal({
                   Horários Passados ({passados.length})
                 </h3>
                 <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                  {passados.map(({ horario, minutos }, index) => (
-                    <div
-                      key={`passado-${minutos}-${index}`}
-                      role="button"
-                      tabIndex={0}
+                  {passados.map(({ horario, id }) => (
+                    <button
+                      type="button"
+                      key={`passado-${id}`}
                       aria-label={`Horário passado às ${horario}`}
                       onClick={() => handleHorarioClick(horario)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
+                        if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
                           handleHorarioClick(horario);
                         }
                       }}
-                      className={scheduleCardVariants({ status: "passed" })}
+                      className={scheduleCardVariants({ status: 'passed' })}
                     >
-                      <p className="text-lg font-semibold text-text-secondary">
-                        {horario}
-                      </p>
-                    </div>
+                      <p className="text-lg font-semibold text-text-secondary">{horario}</p>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -571,9 +498,7 @@ export function LinhaDetalhesModal({
 
           {/* Resumo */}
           <div data-slot="summary" className={infoCardVariants()}>
-            <p className="text-text-secondary">
-              Total de {todos.length} horários
-            </p>
+            <p className="text-text-secondary">Total de {todos.length} horários</p>
           </div>
         </div>
       )}

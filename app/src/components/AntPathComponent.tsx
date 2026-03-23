@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
-import { useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet-ant-path";
+import L from 'leaflet';
+import { useEffect, useRef } from 'react';
+import { useMap } from 'react-leaflet';
+import 'leaflet-ant-path';
 
-import { LatLngExpression } from "leaflet";
+import type { LatLngExpression } from 'leaflet';
 
 interface AntPathOptions {
   delay?: number;
@@ -34,15 +34,12 @@ export function AntPathComponent({ coordinates, options }: AntPathProps) {
   const antPathRef = useRef<L.Polyline | null>(null);
 
   useEffect(() => {
-    // Se não houver coordenadas, não faz nada
     if (!coordinates || coordinates.length === 0) return;
 
-    // Remove camada anterior se existir (para evitar duplicação em re-renders rápidos)
     if (antPathRef.current) {
       map.removeLayer(antPathRef.current);
     }
 
-    // Cria nova instância
     const antPath = new L.Polyline.AntPath(coordinates, options);
 
     antPathRef.current = antPath;
@@ -50,18 +47,15 @@ export function AntPathComponent({ coordinates, options }: AntPathProps) {
 
     try {
       map.fitBounds(antPath.getBounds(), { padding: [50, 50] });
-    } catch (e) {
-      console.warn("Could not fit bounds for AntPath", e);
-    }
+    } catch (_e) {}
 
-    // Cleanup function: remove a layer quando o componente desmonta ou muda
     return () => {
       if (antPathRef.current) {
         map.removeLayer(antPathRef.current);
         antPathRef.current = null;
       }
     };
-  }, [coordinates, options, map]); // Recria apenas se coordenadas ou opções mudarem
+  }, [coordinates, options, map]);
 
   return null;
 }
