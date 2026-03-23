@@ -118,8 +118,6 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
  *
  * @param linha Linha a ser classificada.
  * @param dataAtual Data/hora de referência.
- * @param horariosPreCalculados Lista opcional de minutos pré-computados e ordenados para evitar
- *   recálculo O(N log N) em componentes que já fizeram esse parse internamente.
  * @returns Identificador técnico, texto de exibição e severidade visual do status.
  */
 export function obterStatusLinha(

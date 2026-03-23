@@ -1,0 +1,3 @@
+## 2024-05-20 - Redundant O(N log N) in Utilities
+**Learning:** Pure utility functions that perform expensive parsing or sorting (like checking bus line statuses) can become hidden bottlenecks when called repeatedly by components that already parse and memoize that exact same data for UI rendering. This leads to doing identical $O(N \log N)$ work twice per render.
+**Action:** When creating utility functions that aggregate data over large arrays, always offer an optional parameter to pass pre-calculated intermediate structures. This allows UI components to inject their already-memoized values, bypassing the duplicate work entirely while maintaining backwards compatibility.
