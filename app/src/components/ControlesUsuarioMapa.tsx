@@ -51,9 +51,11 @@ function criarIconeUsuario(heading: number | null): L.DivIcon {
             transform-origin: center bottom;
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 40px solid var(--color-info-border);
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-bottom: 36px solid var(--color-info-border);
+            opacity: 0.35;
+            filter: blur(1px);
             pointer-events: none;
           "
         ></div>
