@@ -3,46 +3,33 @@
  * Design System - Interno Rotas UFMG
  */
 
-import React, { memo, useMemo, type KeyboardEvent } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { Bus, Clock, ChevronRight } from "lucide-react";
-import { cn, obterHorariosLinhaNoDia, obterStatusLinha } from "../lib/utils";
-import {
-  timeToMinutes,
-  minutesToTime,
-  findScheduleIndex,
-} from "../../lib/utils";
-import { useAnalytics } from "../hooks/useAnalytics";
-import { useCurrentTime } from "../hooks/useCurrentTime";
-import {
-  isLineAvailableToday,
-  getLinhaNotRunningMessage,
-} from "../config/specialPeriods";
-import { LineStatusBadge, type LineStatusType } from "./ui/Badge";
-import { PrevisaoBadge } from "./PrevisaoBadge";
-import type { Linha } from "../types/data.types";
-
-// ============================================================================
-// VARIANTS - Definição de estilos com tailwind-variants
-// ============================================================================
+import { Bus, ChevronRight, Clock } from 'lucide-react';
+import type React from 'react';
+import { memo, useMemo } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { findScheduleIndex, minutesToTime, timeToMinutes } from '../../lib/utils';
+import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { useCurrentTime } from '../hooks/useCurrentTime';
+import { cn, obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
+import type { Linha } from '../types/data.types';
+import { PrevisaoBadge } from './PrevisaoBadge';
+import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 
 /**
  * Variantes do card principal
  */
 export const lineCardVariants = tv({
   base: [
-    "relative overflow-hidden rounded-xl border bg-card shadow-sm",
-    "cursor-pointer transition-all duration-200 ease-out",
-    "hover:shadow-lg hover:-translate-y-0.5",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2",
+    'relative overflow-hidden rounded-xl border bg-card shadow-sm',
+    'cursor-pointer transition-all duration-200 ease-out',
+    'hover:shadow-lg hover:-translate-y-0.5',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
   ],
   variants: {
     selected: {
-      true: [
-        "border-2 border-brand-primary shadow-lg",
-        "ring-1 ring-brand-primary/20",
-      ],
-      false: ["border-card-border", "hover:border-info-border"],
+      true: ['border-2 border-brand-primary shadow-lg', 'ring-1 ring-brand-primary/20'],
+      false: ['border-card-border', 'hover:border-info-border'],
     },
   },
   defaultVariants: {
@@ -55,16 +42,12 @@ export const lineCardVariants = tv({
  */
 export const detailsButtonVariants = tv({
   base: [
-    "w-full py-2.5 rounded-lg text-white font-semibold cursor-pointer",
-    "text-xs md:text-sm shadow-sm",
-    "hover:brightness-110 active:scale-[0.97] transition-all duration-150",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary",
+    'w-full py-2.5 rounded-lg text-white font-semibold cursor-pointer',
+    'text-xs md:text-sm shadow-sm',
+    'hover:brightness-110 active:scale-[0.97] transition-all duration-150',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
   ],
 });
-
-// ============================================================================
-// TYPES
-// ============================================================================
 
 interface ScheduleResult {
   nextSchedule: string;
@@ -86,10 +69,6 @@ export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
   className?: string;
 }
 
-// ============================================================================
-// HELPERS
-// ============================================================================
-
 /**
  * Analisa e ordena os horários em minutos.
  * Esta operação é cara (O(N log N)) e deve ser memoizada.
@@ -98,24 +77,21 @@ function parseSchedules(horarios: string[]): number[] {
   if (!horarios || horarios.length === 0) return [];
 
   return horarios
-    .filter((time) => time && time.includes(":"))
+    .filter((time) => time?.includes(':'))
     .map(timeToMinutes)
     .sort((a, b) => a - b);
 }
 
-function calculateSchedules(
-  schedulesInMinutes: number[],
-  currentMinutes: number,
-): ScheduleResult {
+function calculateSchedules(schedulesInMinutes: number[], currentMinutes: number): ScheduleResult {
   if (schedulesInMinutes.length === 0) {
     return {
-      nextSchedule: "--:--",
-      previousSchedule: "--:--",
+      nextSchedule: '--:--',
+      previousSchedule: '--:--',
     };
   }
 
-  let nextSchedule = "--:--";
-  let previousSchedule = "--:--";
+  let nextSchedule = '--:--';
+  let previousSchedule = '--:--';
 
   const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
 
@@ -130,10 +106,6 @@ function calculateSchedules(
 
   return { nextSchedule, previousSchedule };
 }
-
-// ============================================================================
-// SUBCOMPONENTS
-// ============================================================================
 
 interface LineIconProps {
   color: string;
@@ -159,18 +131,15 @@ interface ScheduleDisplayProps {
 
 function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
   return (
-    <div
-      data-slot="schedule"
-      className="rounded-lg bg-background-secondary/50 p-2 text-center"
-    >
+    <div data-slot="schedule" className="rounded-lg bg-background-secondary/50 p-2 text-center">
       <p className="mb-1 flex items-center justify-center gap-1 text-xs text-text-secondary">
         <Clock className="size-3.5" />
         {label}
       </p>
       <p
         className={cn(
-          "text-base font-bold md:text-lg",
-          highlight ? "text-success-text" : "text-text-primary",
+          'text-base font-bold md:text-lg',
+          highlight ? 'text-success-text' : 'text-text-primary',
         )}
       >
         {time}
@@ -193,10 +162,6 @@ function SuspendedNotice({ message }: SuspendedNoticeProps) {
     </div>
   );
 }
-
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
 
 /**
  * Card que exibe informações sobre uma linha de ônibus.
@@ -224,57 +189,56 @@ function LineCardComponent({
   const now = useCurrentTime();
 
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
-  const getSuspendedMessage = () =>
-    getLinhaNotRunningMessage(linha.categoriaDia);
+  const getSuspendedMessage = () => getLinhaNotRunningMessage(linha.categoriaDia);
   const statusLinha = obterStatusLinha(linha, now);
 
-  // Otimização: Memoizar o processamento pesado dos horários (parse + sort)
   const schedulesInMinutes = useMemo(() => {
     const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
     return parseSchedules(horariosDoDia);
   }, [linha, now]);
 
-  // Calcular status baseado no tempo atual
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const { nextSchedule, previousSchedule } = calculateSchedules(
-    schedulesInMinutes,
-    currentMinutes,
-  );
+  const { nextSchedule, previousSchedule } = calculateSchedules(schedulesInMinutes, currentMinutes);
 
   const status =
-    shouldDisableSchedules || statusLinha.id === "NAO_CIRCULA_HOJE"
-      ? "Não Circulando"
+    shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE'
+      ? 'Não Circulando'
       : statusLinha.texto;
 
   const statusType: LineStatusType = (() => {
-    if (shouldDisableSchedules || statusLinha.id === "NAO_CIRCULA_HOJE") {
-      return "notRunning";
+    if (shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE') {
+      return 'notRunning';
     }
-    if (statusLinha.id === "AGUARDANDO_PRIMEIRA_SAIDA") {
-      return "upcoming";
+    if (statusLinha.id === 'AGUARDANDO_PRIMEIRA_SAIDA') {
+      return 'upcoming';
     }
-    if (statusLinha.id === "CIRCULANDO") {
-      return "running";
+    if (statusLinha.id === 'CIRCULANDO') {
+      return 'running';
     }
-    return "closed";
+    return 'closed';
   })();
 
   const handleCardClick = () => {
+    trackEvent({
+      category: 'engagement',
+      action: 'click_line_card',
+      label: `${linha.nome} | status=${statusLinha.id} | prox=${nextSchedule}`,
+    });
     onClick(linha);
   };
 
   const handleDetailsClickInternal = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent({
-      category: "Engajamento",
-      action: "Abrir Card Detalhes",
+      category: 'navigation',
+      action: 'view_stop_details',
       label: linha.nome,
     });
     onDetailsClick(linha);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
+  const handleCardKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onClick(linha);
     }
@@ -283,20 +247,12 @@ function LineCardComponent({
   return (
     <article
       data-slot="card"
-      data-state={isSelected ? "selected" : undefined}
-      role="button"
-      tabIndex={0}
-      aria-label={`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ""}. Status: ${status}`}
-      aria-pressed={isSelected}
+      data-state={isSelected ? 'selected' : undefined}
+      aria-label={`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ''}. Status: ${status}`}
       onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-      className={cn(
-        lineCardVariants({ selected: isSelected }),
-        "mb-3",
-        className,
-      )}
+      onKeyDown={handleCardKeyDown}
+      className={cn(lineCardVariants({ selected: isSelected }), 'mb-3', className)}
     >
-      {/* Header */}
       <div data-slot="header" className="relative w-full p-4 pb-3 text-left">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-1 items-start gap-3">
@@ -306,9 +262,7 @@ function LineCardComponent({
                 {linha.nome}
               </h3>
               {linha.sublinha && (
-                <p className="mt-0.5 text-xs text-text-secondary md:text-sm">
-                  {linha.sublinha}
-                </p>
+                <p className="mt-0.5 text-xs text-text-secondary md:text-sm">{linha.sublinha}</p>
               )}
 
               {idParada &&
@@ -327,13 +281,10 @@ function LineCardComponent({
         </div>
       </div>
 
-      {/* Body */}
       <div data-slot="body" className="px-4 pb-4">
-        {shouldDisableSchedules || statusLinha.id === "NAO_CIRCULA_HOJE" ? (
+        {shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE' ? (
           <SuspendedNotice
-            message={
-              shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto
-            }
+            message={shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto}
           />
         ) : (
           <div className="mb-4 grid grid-cols-2 gap-3">
@@ -342,7 +293,6 @@ function LineCardComponent({
           </div>
         )}
 
-        {/* Button */}
         <button
           type="button"
           aria-label={`Ver detalhes da linha ${linha.nome}`}

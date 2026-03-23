@@ -5,15 +5,12 @@
  * permitindo fácil substituição por APIs externas no futuro.
  */
 
-import linhasData from "../data/linhas";
-import paradasData from "../data/paradas";
-import type {
-  Linha,
-  Parada,
-  CategoriaLinhas,
-  DadosLinhas,
-} from "../types/data.types";
-import { normalizarNomeLinha } from "../../lib/utils";
+import { normalizarNomeLinha } from '../../lib/utils';
+import type { CategoriaLinhas, DadosLinhas, Linha, Parada } from '../types/data.types';
+
+interface ParadasPayload {
+  paradas: Parada[];
+}
 
 /**
  * Interface que define o contrato do serviço de rotas.
@@ -34,16 +31,35 @@ export interface IRotasService {
  * Pode ser substituída por uma implementação que busca dados de uma API.
  */
 class RotasServiceImpl implements IRotasService {
-  private readonly linhasCache: CategoriaLinhas;
-  private readonly paradasCache: Parada[];
-  private readonly linhasMap: Map<string, Linha>;
-  private readonly paradasMap: Map<string, Parada>;
-  private readonly linhasPorNomeNormalizadoMap: Map<string, Linha[]>;
+  private linhasCache: CategoriaLinhas;
+  private paradasCache: Parada[];
+  private linhasMap: Map<string, Linha>;
+  private paradasMap: Map<string, Parada>;
+  private linhasPorNomeNormalizadoMap: Map<string, Linha[]>;
 
   constructor() {
-    // Inicializa os caches
+    this.linhasCache = { categoriasDias: [] };
+    this.paradasCache = [];
+
+    // Cria mapas para acesso O(1) por ID e Nome Normalizado
+    this.linhasMap = new Map();
+    this.paradasMap = new Map();
+    this.linhasPorNomeNormalizadoMap = new Map();
+  }
+
+  static fromData(linhasData: CategoriaLinhas, paradasData: ParadasPayload): RotasServiceImpl {
+    const service = new RotasServiceImpl();
+    service.hydrate(linhasData, paradasData.paradas);
+    return service;
+  }
+
+  private hydrate(linhasData: CategoriaLinhas, paradas: Parada[]): void {
     this.linhasCache = linhasData;
-    this.paradasCache = paradasData.paradas;
+    this.paradasCache = paradas;
+
+    this.linhasMap.clear();
+    this.paradasMap.clear();
+    this.linhasPorNomeNormalizadoMap.clear();
 
     // Cria mapas para acesso O(1) por ID e Nome Normalizado
     this.linhasMap = new Map();
@@ -51,7 +67,7 @@ class RotasServiceImpl implements IRotasService {
     this.linhasPorNomeNormalizadoMap = new Map();
 
     // Popula o mapa de linhas
-    this.linhasCache.categoriasDias.forEach((categoria) => {
+    linhasData.categoriasDias.forEach((categoria) => {
       categoria.linhas.forEach((linha) => {
         this.linhasMap.set(linha.idRota, linha);
 
@@ -64,7 +80,7 @@ class RotasServiceImpl implements IRotasService {
     });
 
     // Popula o mapa de paradas
-    this.paradasCache.forEach((parada) => {
+    paradas.forEach((parada) => {
       this.paradasMap.set(parada.idParada, parada);
     });
   }
@@ -124,7 +140,58 @@ class RotasServiceImpl implements IRotasService {
   }
 }
 
-// Exporta uma instância singleton do serviço
+async function loadFromPublic(): Promise<{ linhas: CategoriaLinhas; paradas: ParadasPayload }> {
+  const [linhasResponse, paradasResponse] = await Promise.all([
+    fetch('/data/linhas.json'),
+    fetch('/data/paradas.json'),
+  ]);
+
+  if (!linhasResponse.ok || !paradasResponse.ok) {
+    throw new Error('Falha ao carregar dados de rotas em /public/data');
+  }
+
+  const [linhas, paradas] = await Promise.all([
+    linhasResponse.json() as Promise<CategoriaLinhas>,
+    paradasResponse.json() as Promise<ParadasPayload>,
+  ]);
+
+  return { linhas, paradas };
+}
+
+async function loadFromSourceFallback(): Promise<{
+  linhas: CategoriaLinhas;
+  paradas: ParadasPayload;
+}> {
+  const [linhasModule, paradasModule] = await Promise.all([
+    import('../data/linhas'),
+    import('../data/paradas'),
+  ]);
+
+  return {
+    linhas: linhasModule.default,
+    paradas: paradasModule.default,
+  };
+}
+
+let cachedService: IRotasService | null = null;
+
+export async function loadRotasService(): Promise<IRotasService> {
+  if (cachedService) {
+    return cachedService;
+  }
+
+  try {
+    const { linhas, paradas } = await loadFromPublic();
+    cachedService = RotasServiceImpl.fromData(linhas, paradas);
+    return cachedService;
+  } catch {
+    const { linhas, paradas } = await loadFromSourceFallback();
+    cachedService = RotasServiceImpl.fromData(linhas, paradas);
+    return cachedService;
+  }
+}
+
+// Instância vazia para evitar null checks durante bootstrap.
 export const RotasService: IRotasService = new RotasServiceImpl();
 
 // Também exporta a classe para permitir testes ou injeção de dependência

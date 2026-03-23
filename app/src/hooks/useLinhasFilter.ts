@@ -5,41 +5,29 @@
  * permitindo que o componente foque apenas na renderização (JSX).
  */
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { useDebounce } from "use-debounce";
-import { useAnalytics } from "./useAnalytics";
-import { getCurrentSpecialPeriod } from "../config/specialPeriods";
-import type { Linha, CategoriaLinhas, DadosLinhas } from "../types/data.types";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDebounce } from 'use-debounce';
+import { getCurrentSpecialPeriod } from '../config/specialPeriods';
+import type { CategoriaLinhas, DadosLinhas, Linha } from '../types/data.types';
+import { useAnalytics } from './useAnalytics';
 
-/**
- * Configurações do hook de filtro
- */
 interface UseLinhasFilterOptions {
-  /** Tempo de debounce para a busca em ms (padrão: 1500) */
   debounceMs?: number;
-  /** Se deve rastrear eventos de busca no Analytics */
   trackSearch?: boolean;
 }
 
-/**
- * Retorno do hook de filtro de linhas
- */
 interface UseLinhasFilterReturn {
-  // Estado de busca
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   debouncedSearchTerm: string;
 
-  // Estado de categoria
   categoriaAtiva: number;
   setCategoriaAtiva: (index: number) => void;
   categoriaAtual: DadosLinhas | undefined;
 
-  // Linhas filtradas
   linhasFiltradas: Linha[];
   hasResults: boolean;
 
-  // Handler para mudança de categoria com tracking
   handleCategoriaChange: (index: number) => void;
 }
 
@@ -52,28 +40,23 @@ interface UseLinhasFilterReturn {
  * - Caso contrário → aba "diasUteis" (padrão)
  */
 function getInitialCategory(linhasData: CategoriaLinhas): number {
-  const today = new Date().getDay(); // 0 = domingo, 6 = sábado
+  const today = new Date().getDay();
   const isSaturday = today === 6;
   const isWeekday = today >= 1 && today <= 5;
   const specialPeriod = getCurrentSpecialPeriod();
 
-  // Se está em período de férias E é dia útil → mostrar aba de férias
   if (specialPeriod && isWeekday) {
     const feriasIndex = linhasData.categoriasDias.findIndex(
-      (cat) => cat.categoriaDia === "feriasRecessos",
+      (cat) => cat.categoriaDia === 'feriasRecessos',
     );
     return feriasIndex !== -1 ? feriasIndex : 0;
   }
 
-  // Se é sábado (e não está em período de férias) → mostrar aba de sábado
   if (isSaturday && !specialPeriod) {
-    const sabadoIndex = linhasData.categoriasDias.findIndex(
-      (cat) => cat.categoriaDia === "sabado",
-    );
+    const sabadoIndex = linhasData.categoriasDias.findIndex((cat) => cat.categoriaDia === 'sabado');
     return sabadoIndex !== -1 ? sabadoIndex : 0;
   }
 
-  // Padrão: dias úteis (índice 0)
   return 0;
 }
 
@@ -91,7 +74,7 @@ function filterLinhas(linhas: Linha[], searchTerm: string): Linha[] {
   return linhas.filter(
     (linha) =>
       linha.nome.toLowerCase().includes(termLower) ||
-      (linha.sublinha && linha.sublinha.toLowerCase().includes(termLower)) ||
+      linha.sublinha?.toLowerCase().includes(termLower) ||
       linha.descricao.toLowerCase().includes(termLower),
   );
 }
@@ -117,7 +100,6 @@ function filterLinhas(linhas: Linha[], searchTerm: string): Linha[] {
  *
  *   return (
  *     <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
- *     // ...resto do JSX
  *   );
  * }
  * ```
@@ -127,62 +109,58 @@ export function useLinhasFilter(
   options: UseLinhasFilterOptions = {},
 ): UseLinhasFilterReturn {
   const { debounceMs = 1500, trackSearch = true } = options;
-  const { trackEvent } = useAnalytics();
+  const { trackEvent, trackPageView } = useAnalytics();
 
-  // Estado de busca
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, debounceMs);
 
-  // Estado de categoria (inicializa baseado em período especial)
   const [categoriaAtiva, setCategoriaAtiva] = useState<number>(() =>
     getInitialCategory(linhasData),
   );
 
-  // Categoria atual memoizada
   const categoriaAtual = useMemo(
     () => linhasData.categoriasDias[categoriaAtiva],
     [linhasData.categoriasDias, categoriaAtiva],
   );
 
-  // Linhas filtradas memoizadas
   const linhasFiltradas = useMemo(() => {
     const linhasDaCategoria = categoriaAtual?.linhas || [];
     return filterLinhas(linhasDaCategoria, searchTerm);
   }, [categoriaAtual?.linhas, searchTerm]);
 
-  // Flag de resultados
   const hasResults = linhasFiltradas.length > 0;
 
-  // Tracking: Termo de busca (debounced)
   useEffect(() => {
     if (trackSearch && debouncedSearchTerm) {
       trackEvent({
-        category: "Busca",
-        action: "Termo Pesquisado",
+        event: 'search_term',
+        category: 'engagement',
+        action: 'search_term',
         label: debouncedSearchTerm,
       });
+      trackPageView(`/search/${encodeURIComponent(debouncedSearchTerm)}`);
     }
-  }, [debouncedSearchTerm, trackEvent, trackSearch]);
+  }, [debouncedSearchTerm, trackEvent, trackPageView, trackSearch]);
 
-  // Tracking: Busca sem resultados
   useEffect(() => {
-    if (trackSearch && searchTerm && !hasResults) {
+    if (trackSearch && searchTerm && linhasFiltradas.length === 0) {
       trackEvent({
-        category: "Busca",
-        action: "Busca Sem Resultados",
+        event: 'search_empty',
+        category: 'engagement',
+        action: 'search_empty',
         label: searchTerm,
       });
     }
-  }, [searchTerm, hasResults, trackEvent, trackSearch]);
+  }, [searchTerm, linhasFiltradas.length, trackEvent, trackSearch]);
 
-  // Handler para mudança de categoria com tracking
   const handleCategoriaChange = useCallback(
     (index: number) => {
       const categoria = linhasData.categoriasDias[index];
       if (categoria && trackSearch) {
         trackEvent({
-          category: "Navegação Principal",
-          action: "Selecionar Categoria Dia",
+          event: 'select_day_category',
+          category: 'navigation',
+          action: 'select_day_category',
           label: categoria.displayName,
         });
       }
@@ -192,21 +170,17 @@ export function useLinhasFilter(
   );
 
   return {
-    // Busca
     searchTerm,
     setSearchTerm,
     debouncedSearchTerm,
 
-    // Categoria
     categoriaAtiva,
     setCategoriaAtiva,
     categoriaAtual,
 
-    // Resultados
     linhasFiltradas,
     hasResults,
 
-    // Handlers
     handleCategoriaChange,
   };
 }

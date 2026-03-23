@@ -6,30 +6,26 @@
  * Suporta diferentes variantes para contextos específicos.
  */
 
-import type { ComponentProps, ReactNode } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { Search, Bus, MapPin, AlertCircle, FileQuestion } from "lucide-react";
-import { cn } from "../../lib/utils";
-import { Button } from "./Button";
-
-// ============================================================================
-// VARIANTS
-// ============================================================================
+import { AlertCircle, Bus, FileQuestion, MapPin, Search } from 'lucide-react';
+import type { ComponentProps, ReactNode } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { cn } from '../../lib/utils';
+import { Button } from './Button';
 
 /**
  * Variantes do container de empty state
  */
 export const emptyStateVariants = tv({
-  base: ["flex flex-col items-center justify-center text-center", "py-8 px-4"],
+  base: ['flex flex-col items-center justify-center text-center', 'py-8 px-4'],
   variants: {
     size: {
-      sm: "py-6 gap-2",
-      md: "py-8 gap-3",
-      lg: "py-12 gap-4",
+      sm: 'py-6 gap-2',
+      md: 'py-8 gap-3',
+      lg: 'py-12 gap-4',
     },
   },
   defaultVariants: {
-    size: "md",
+    size: 'md',
   },
 });
 
@@ -37,28 +33,22 @@ export const emptyStateVariants = tv({
  * Variantes do ícone
  */
 export const emptyStateIconVariants = tv({
-  base: [
-    "flex items-center justify-center rounded-full",
-    "bg-card-hover text-text-tertiary",
-  ],
+  base: ['flex items-center justify-center rounded-full', 'bg-card-hover text-text-tertiary'],
   variants: {
     size: {
-      sm: "size-12",
-      md: "size-16",
-      lg: "size-20",
+      sm: 'size-12',
+      md: 'size-16',
+      lg: 'size-20',
     },
   },
   defaultVariants: {
-    size: "md",
+    size: 'md',
   },
 });
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface EmptyStateProps
-  extends ComponentProps<"div">, VariantProps<typeof emptyStateVariants> {
+  extends ComponentProps<'div'>,
+    VariantProps<typeof emptyStateVariants> {
   /** Ícone personalizado */
   icon?: ReactNode;
   /** Título principal */
@@ -76,10 +66,6 @@ export interface EmptyStateProps
     onClick: () => void;
   };
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Componente de empty state genérico
@@ -104,32 +90,19 @@ export function EmptyState({
   ...props
 }: EmptyStateProps) {
   return (
-    <div
-      data-slot="empty-state"
-      className={cn(emptyStateVariants({ size }), className)}
-      {...props}
-    >
+    <div data-slot="empty-state" className={cn(emptyStateVariants({ size }), className)} {...props}>
       {icon && (
-        <div
-          data-slot="empty-state-icon"
-          className={emptyStateIconVariants({ size })}
-        >
+        <div data-slot="empty-state-icon" className={emptyStateIconVariants({ size })}>
           {icon}
         </div>
       )}
 
       <div data-slot="empty-state-content" className="space-y-1">
-        <h3
-          data-slot="empty-state-title"
-          className="font-semibold text-text-primary"
-        >
+        <h3 data-slot="empty-state-title" className="font-semibold text-text-primary">
           {title}
         </h3>
         {description && (
-          <p
-            data-slot="empty-state-description"
-            className="text-sm text-text-secondary"
-          >
+          <p data-slot="empty-state-description" className="text-sm text-text-secondary">
             {description}
           </p>
         )}
@@ -153,9 +126,7 @@ export function EmptyState({
   );
 }
 
-// ============================================================================
 // PRESET EMPTY STATES
-// ============================================================================
 
 /**
  * Empty state para busca sem resultados
@@ -166,14 +137,10 @@ export interface SearchEmptyStateProps {
   /** Callback para limpar busca */
   onClear?: () => void;
   /** Tamanho do componente */
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function SearchEmptyState({
-  searchTerm,
-  onClear,
-  size = "md",
-}: SearchEmptyStateProps) {
+export function SearchEmptyState({ searchTerm, onClear, size = 'md' }: SearchEmptyStateProps) {
   const iconSizes = { sm: 24, md: 32, lg: 40 };
 
   return (
@@ -184,9 +151,9 @@ export function SearchEmptyState({
       description={
         searchTerm
           ? `Não encontramos linhas para "${searchTerm}"`
-          : "Tente buscar por nome da linha ou destino"
+          : 'Tente buscar por nome da linha ou destino'
       }
-      action={onClear ? { label: "Limpar busca", onClick: onClear } : undefined}
+      action={onClear ? { label: 'Limpar busca', onClick: onClear } : undefined}
     />
   );
 }
@@ -198,13 +165,10 @@ export interface LinesEmptyStateProps {
   /** Categoria selecionada */
   category?: string;
   /** Tamanho do componente */
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function LinesEmptyState({
-  category,
-  size = "md",
-}: LinesEmptyStateProps) {
+export function LinesEmptyState({ category, size = 'md' }: LinesEmptyStateProps) {
   const iconSizes = { sm: 24, md: 32, lg: 40 };
 
   return (
@@ -215,7 +179,7 @@ export function LinesEmptyState({
       description={
         category
           ? `Não há linhas cadastradas para ${category}`
-          : "Selecione uma categoria para ver as linhas"
+          : 'Selecione uma categoria para ver as linhas'
       }
     />
   );
@@ -226,10 +190,10 @@ export function LinesEmptyState({
  */
 export interface MapEmptyStateProps {
   /** Tamanho do componente */
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function MapEmptyState({ size = "lg" }: MapEmptyStateProps) {
+export function MapEmptyState({ size = 'lg' }: MapEmptyStateProps) {
   const iconSizes = { sm: 24, md: 32, lg: 40 };
 
   return (
@@ -251,14 +215,10 @@ export interface ErrorEmptyStateProps {
   /** Callback para tentar novamente */
   onRetry?: () => void;
   /** Tamanho do componente */
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function ErrorEmptyState({
-  message,
-  onRetry,
-  size = "md",
-}: ErrorEmptyStateProps) {
+export function ErrorEmptyState({ message, onRetry, size = 'md' }: ErrorEmptyStateProps) {
   const iconSizes = { sm: 24, md: 32, lg: 40 };
 
   return (
@@ -266,10 +226,8 @@ export function ErrorEmptyState({
       size={size}
       icon={<AlertCircle size={iconSizes[size]} />}
       title="Algo deu errado"
-      description={message || "Ocorreu um erro ao carregar os dados"}
-      action={
-        onRetry ? { label: "Tentar novamente", onClick: onRetry } : undefined
-      }
+      description={message || 'Ocorreu um erro ao carregar os dados'}
+      action={onRetry ? { label: 'Tentar novamente', onClick: onRetry } : undefined}
     />
   );
 }
@@ -283,13 +241,13 @@ export interface NotFoundEmptyStateProps {
   /** Descrição personalizada */
   description?: string;
   /** Tamanho do componente */
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export function NotFoundEmptyState({
-  title = "Conteúdo não encontrado",
-  description = "O item que você procura não existe ou foi removido",
-  size = "md",
+  title = 'Conteúdo não encontrado',
+  description = 'O item que você procura não existe ou foi removido',
+  size = 'md',
 }: NotFoundEmptyStateProps) {
   const iconSizes = { sm: 24, md: 32, lg: 40 };
 

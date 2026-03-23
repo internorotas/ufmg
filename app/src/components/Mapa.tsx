@@ -10,27 +10,19 @@
  * Atualizado para React 19: ref como prop (sem forwardRef)
  */
 
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { useAnalytics } from '../hooks/useAnalytics';
+import type { Linha, Parada } from '../types/data.types';
+import { ControlesUsuarioMapa } from './ControlesUsuarioMapa';
 import {
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useCallback,
-  type Ref,
-} from "react";
-import { Parada, Linha } from "../types/data.types";
-import { useAnalytics } from "../hooks/useAnalytics";
-
-// Componentes extraídos (Strategy/Composition Pattern)
-import {
-  MapMarkers,
-  useMapMarkers,
-  MapRoute,
-  useRouteBounds,
-  ChangeView,
   CenterOnParada,
-} from "./map";
-import { ControlesUsuarioMapa } from "./ControlesUsuarioMapa";
+  ChangeView,
+  MapMarkers,
+  MapRoute,
+  useMapMarkers,
+  useRouteBounds,
+} from './map';
 
 export interface MapaRef {
   centralizarParada: (parada: Parada) => void;
@@ -59,7 +51,7 @@ interface MapaProps {
 const MAP_CONFIG = {
   center: [-19.87055, -43.96775] as [number, number],
   zoom: 15,
-  tileUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
 };
@@ -69,10 +61,6 @@ const MAP_CONFIG = {
  * Componente container que orquestra os sub-componentes do mapa.
  *
  * React 19: ref é recebida diretamente como prop, sem necessidade de forwardRef.
- */
-/**
- * Componente interno para gerenciar imperativeHandle
- * Precisa estar dentro do MapContainer para usar useMap()
  */
 function MapImperativeHandler({
   mapaRef,
@@ -111,24 +99,20 @@ export function Mapa({
   const { trackTiming } = useAnalytics();
   const mapLoadStartRef = useRef<number>(0);
 
-  // Hook para gerenciar marcadores
-  const { paradaDestacadaId, handleMarkerRef, destacarParada } =
-    useMapMarkers();
+  const { paradaDestacadaId, handleMarkerRef, destacarParada } = useMapMarkers();
 
-  // Hook para calcular bounds da rota
   const bounds = useRouteBounds(linhaSelecionada);
 
-  // Rastreia o tempo de carregamento do mapa
   useEffect(() => {
     if (mapLoadStartRef.current === 0) {
       mapLoadStartRef.current = Date.now();
     }
     const loadTime = Date.now() - mapLoadStartRef.current;
     trackTiming({
-      name: "Map Load Time",
+      name: 'map_load_time',
       value: loadTime,
-      category: "Performance",
-      label: "Initial Map Render",
+      category: 'navigation',
+      label: 'initial_map_render',
     });
   }, [trackTiming]);
 
@@ -138,31 +122,21 @@ export function Mapa({
       zoom={MAP_CONFIG.zoom}
       className="h-full w-full"
       zoomControl={true}
-      whenReady={() => {
-        // Map is ready
-      }}
+      whenReady={() => {}}
     >
-      {/* Camada de tiles */}
-      <TileLayer
-        url={MAP_CONFIG.tileUrl}
-        attribution={MAP_CONFIG.attribution}
-      />
+      <TileLayer url={MAP_CONFIG.tileUrl} attribution={MAP_CONFIG.attribution} />
 
-      {/* Controles de visualização */}
       <ChangeView bounds={bounds} />
       <CenterOnParada parada={paradaSelecionada} />
 
-      {/* Rota animada da linha selecionada */}
       <MapRoute linha={linhaSelecionada} />
 
-      {/* Marcadores de paradas */}
       <MapMarkers
         paradas={todasParadas}
         paradaDestacadaId={paradaDestacadaId}
         onMarkerRef={handleMarkerRef}
       />
 
-      {/* Controles de localização do usuário */}
       {onPedirLocalizacao && (
         <ControlesUsuarioMapa
           localizacao={localizacaoUsuario ?? null}
@@ -172,7 +146,6 @@ export function Mapa({
         />
       )}
 
-      {/* Handler para imperative ref (precisa estar dentro do MapContainer) */}
       <MapImperativeHandler mapaRef={ref} destacarParada={destacarParada} />
     </MapContainer>
   );

@@ -1,16 +1,20 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
+import { getSaoPauloNow } from '../lib/time';
 
 /**
- * Hook que mantém e atualiza a hora atual a cada 30 segundos.
- * Garante que cálculos de ETA e horários sejam recalculados automaticamente
- * enquanto o usuário mantém o aplicativo aberto.
+ * Mantém um relógio reativo para atualizar cálculos dependentes de tempo.
+ *
+ * O hook existe para desacoplar componentes da API de tempo do navegador
+ * e centralizar a frequência de atualização usada por ETA e horários.
+ *
+ * @returns Data atual atualizada em intervalos regulares.
  */
 export function useCurrentTime(): Date {
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState(() => getSaoPauloNow());
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setNow(new Date());
+      setNow(getSaoPauloNow());
     }, 30000);
 
     return () => clearInterval(interval);
