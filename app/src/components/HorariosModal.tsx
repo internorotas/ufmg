@@ -100,9 +100,6 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
   const [activeTab, setActiveTab] = useState<ScheduleTab>(() => getInitialTab());
   const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const statusLinha = obterStatusLinha(linha, now);
-
-  const shouldDisableSchedules = statusLinha.id === 'NAO_CIRCULA_HOJE';
 
   const baseHorarios = useMemo(() => {
     const horariosDoDia = getHorariosByTab(linha, activeTab);
@@ -115,6 +112,10 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
       }))
       .sort((a, b) => a.minutos - b.minutos);
   }, [activeTab, linha]);
+
+  const statusLinha = obterStatusLinha(linha, now);
+
+  const shouldDisableSchedules = statusLinha.id === 'NAO_CIRCULA_HOJE';
 
   const splitIndex = useMemo(() => {
     return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
