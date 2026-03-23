@@ -13,7 +13,6 @@ import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { cn, obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
 import type { Linha } from '../types/data.types';
-import { PrevisaoBadge } from './PrevisaoBadge';
 import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 
 /**
@@ -182,7 +181,6 @@ function LineCardComponent({
   onClick,
   onDetailsClick,
   isSelected = false,
-  idParada,
   className,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
@@ -264,14 +262,6 @@ function LineCardComponent({
               {linha.sublinha && (
                 <p className="mt-0.5 text-xs text-text-secondary md:text-sm">{linha.sublinha}</p>
               )}
-
-              {idParada &&
-              linha.trajetoDetalhado?.length &&
-              linha.itinerarioParadasIds.includes(idParada) ? (
-                <div className="mt-2">
-                  <PrevisaoBadge linha={linha} idParada={idParada} />
-                </div>
-              ) : null}
             </div>
           </div>
           <div className="flex items-center gap-2">
