@@ -361,7 +361,7 @@ export function LinhaDetalhesModal({
                             minutos < 1
                               ? 'var(--success-text)'
                               : isTrafegoIntenso
-                                ? '#d97706'
+                                ? 'var(--warning-text)'
                                 : minutos <= 15
                                   ? 'var(--success-text)'
                                   : 'var(--warning-text)';

@@ -20,8 +20,8 @@ export const scheduleCardVariants = tv({
   base: 'rounded-lg border p-3 text-center transition-all',
   variants: {
     status: {
-      upcoming: ['border-green-600 bg-green-900/30'],
-      passed: 'border-gray-700 bg-gray-800/50 opacity-50',
+      upcoming: ['border-success-border bg-success-bg'],
+      passed: 'border-card-border bg-card/50 opacity-50',
     },
   },
   defaultVariants: {
@@ -36,8 +36,8 @@ export const scheduleTimeVariants = tv({
   base: 'font-bold',
   variants: {
     status: {
-      upcoming: 'text-xl text-green-300',
-      passed: 'text-lg text-gray-400',
+      upcoming: 'text-xl text-success-text',
+      passed: 'text-lg text-text-secondary',
     },
   },
   defaultVariants: {
@@ -49,7 +49,7 @@ export const scheduleTimeVariants = tv({
  * Variantes do alerta de suspensão
  */
 export const suspensionAlertVariants = tv({
-  base: ['rounded-lg border p-4 text-center', 'border-yellow-600 bg-yellow-900/30'],
+  base: ['rounded-lg border p-4 text-center', 'border-warning-border bg-warning-bg'],
 });
 
 export interface HorariosModalProps {
@@ -180,21 +180,21 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
           <button
             type="button"
             onClick={() => handleTabChange('diasUteis')}
-            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'diasUteis' ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-card-hover'}`}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'diasUteis' ? 'bg-brand-primary text-white' : 'text-text-secondary hover:bg-card-hover'}`}
           >
             Dias Úteis
           </button>
           <button
             type="button"
             onClick={() => handleTabChange('sabados')}
-            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'sabados' ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-card-hover'}`}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'sabados' ? 'bg-brand-primary text-white' : 'text-text-secondary hover:bg-card-hover'}`}
           >
             Sábado
           </button>
           <button
             type="button"
             onClick={() => handleTabChange('domingos')}
-            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'domingos' ? 'bg-brand-primary text-white' : 'text-gray-300 hover:bg-card-hover'}`}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'domingos' ? 'bg-brand-primary text-white' : 'text-text-secondary hover:bg-card-hover'}`}
           >
             Domingo
           </button>
@@ -202,18 +202,18 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
 
         {shouldDisableSchedules && (
           <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
-            <p className="mb-2 font-semibold text-yellow-300">
+            <p className="mb-2 font-semibold text-warning-text">
               <AlertTriangle className="mr-1 inline size-4" />
               Linha sem operação hoje
             </p>
-            <p className="text-sm text-yellow-200">{statusLinha.texto}</p>
+            <p className="text-sm text-warning-text">{statusLinha.texto}</p>
           </div>
         )}
 
         {proximos.length > 0 && (
           <div data-slot="upcoming-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-              <Clock className="text-green-400" size={20} />
+              <Clock className="text-success-text" size={20} />
               Próximos Horários
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
@@ -235,7 +235,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
         {passados.length > 0 && (
           <div data-slot="passed-schedules">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-              <CheckCircle className="text-gray-500" size={20} />
+              <CheckCircle className="text-text-tertiary" size={20} />
               Horários Passados
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
@@ -255,9 +255,9 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
         )}
 
         <div data-slot="summary" className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm">
-          <p className="text-center text-gray-300">
+          <p className="text-center text-text-secondary">
             Total de {todos.length} horários •{' '}
-            <span className="text-green-400">{proximos.length} restantes</span>
+            <span className="text-success-text">{proximos.length} restantes</span>
           </p>
         </div>
       </div>

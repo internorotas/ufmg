@@ -41,7 +41,7 @@ export function ModalManager({
       >
         <div className="space-y-4 p-4">
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-info-bg">
               <MapPin className="h-8 w-8 text-brand-primary" />
             </div>
             <p className="text-text-secondary">
@@ -50,7 +50,7 @@ export function ModalManager({
             </p>
           </div>
           {erroLocalizacao && (
-            <div className="rounded-lg bg-red-50 p-3 text-center text-sm text-red-600">
+            <div className="rounded-lg bg-warning-bg p-3 text-center text-sm text-warning-text">
               {erroLocalizacao}
             </div>
           )}
@@ -58,6 +58,7 @@ export function ModalManager({
             <Button
               variant="primary"
               fullWidth
+              className="text-white"
               disabled={carregandoLocalizacao}
               onClick={onPermitirLocalizacao}
             >

@@ -53,7 +53,7 @@ function criarIconeUsuario(heading: number | null): L.DivIcon {
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-bottom: 40px solid rgba(59, 130, 246, 0.3);
+            border-bottom: 40px solid var(--color-info-border);
             pointer-events: none;
           "
         ></div>
@@ -69,10 +69,10 @@ function criarIconeUsuario(heading: number | null): L.DivIcon {
           transform: translate(-50%, -50%);
           width: 16px;
           height: 16px;
-          background: #3b82f6;
+          background: var(--color-brand-primary);
           border: 3px solid white;
           border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 2px 8px var(--color-backdrop);
         "
       ></div>
     </div>
@@ -146,15 +146,15 @@ export function ControlesUsuarioMapa({
           type="button"
           onClick={handleCentralizarUFMG}
           className={cn(
-            'flex h-12 w-12 items-center justify-center',
+            'flex h-12 w-12 cursor-pointer items-center justify-center',
             'rounded-full shadow-lg transition-all duration-200',
-            'bg-blue-100 hover:bg-blue-200 active:scale-95',
+            'bg-info-bg hover:bg-info-border active:scale-95',
             'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
           )}
           aria-label="Centralizar mapa no campus UFMG"
           title="Voltar para a UFMG"
         >
-          <CornerUpLeft className="h-6 w-6 text-brand-primary" />
+          <CornerUpLeft className="h-6 w-6 text-white" />
         </button>
 
         {/* Botão: centralizar na localização do usuário */}
@@ -163,10 +163,10 @@ export function ControlesUsuarioMapa({
           onClick={handleCentralizar}
           className={cn(
             // Tamanho mínimo para touch (48x48px) - Mobile friendly
-            'flex h-12 w-12 items-center justify-center',
+            'flex h-12 w-12 cursor-pointer items-center justify-center',
             // Estilo visual - Azul brand igual ao botão Ver Linhas
             'rounded-full shadow-lg transition-all duration-200',
-            'bg-brand-primary hover:bg-blue-700 active:scale-95',
+            'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
             // Focus state para acessibilidade
             'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
           )}

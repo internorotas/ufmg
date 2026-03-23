@@ -40,8 +40,8 @@ export const actionButtonVariants = tv({
   ],
   variants: {
     intent: {
-      primary: 'bg-internoRotas-azul-eletrico hover:bg-blue-700',
-      secondary: 'bg-internoRotas-laranja-ambar hover:bg-orange-600',
+      primary: 'bg-brand-primary hover:bg-brand-primary/90',
+      secondary: 'bg-brand-accent hover:bg-brand-accent/90',
     },
   },
   defaultVariants: {
@@ -53,7 +53,7 @@ export const actionButtonVariants = tv({
  * Variantes do alerta de suspensão
  */
 export const suspensionAlertVariants = tv({
-  base: ['mb-4 rounded-lg border p-4 text-center', 'border-red-600 bg-red-900/30'],
+  base: ['mb-4 rounded-lg border p-4 text-center', 'border-warning-border bg-warning-bg'],
 });
 
 export interface LinhaOnibusProps {
@@ -72,7 +72,7 @@ export interface LinhaOnibusProps {
  * <LinhaOnibus
  *   linha={linhaData}
  *   onLinhaClick={() => selectLine(linha)}
- *   bgColor="bg-blue-500"
+ *   bgColor="bg-brand-primary"
  *   paradas={paradasData}
  *   onParadaClick={(parada) => focusOnMap(parada)}
  * />
@@ -160,20 +160,20 @@ export function LinhaOnibus({
             {/* Aviso de Horários Suspensos ou Horários Normais */}
             {shouldDisableSchedules ? (
               <div data-slot="suspension-alert" className={suspensionAlertVariants()}>
-                <p className="mb-1 text-sm font-bold text-red-300">🚫 NÃO CIRCULANDO</p>
-                <p className="text-xs text-red-200">
+                <p className="mb-1 text-sm font-bold text-warning-text">🚫 NÃO CIRCULANDO</p>
+                <p className="text-xs text-warning-text">
                   Esta linha está suspensa durante o período de férias
                 </p>
               </div>
             ) : (
               <div data-slot="schedules" className="mb-4 flex justify-between text-center">
                 <div>
-                  <p className="mb-1 text-xs text-gray-400">Último Partiu</p>
+                  <p className="mb-1 text-xs text-text-tertiary">Último Partiu</p>
                   <p className="text-xl font-bold">{previousSchedule}</p>
                 </div>
                 <div>
-                  <p className="mb-1 text-xs text-gray-400">Próximo</p>
-                  <p className="text-xl font-bold text-green-400">{nextSchedule}</p>
+                  <p className="mb-1 text-xs text-text-tertiary">Próximo</p>
+                  <p className="text-xl font-bold text-success-text">{nextSchedule}</p>
                 </div>
               </div>
             )}

@@ -261,7 +261,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           className="gap-3 rounded-full px-6 shadow-lg"
           title="Ver Linhas"
         >
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-2 text-white">
             <Menu size={24} />
             Ver Linhas
           </span>
