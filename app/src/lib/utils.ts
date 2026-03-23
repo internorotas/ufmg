@@ -123,11 +123,14 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
 export function obterStatusLinha(
   linha: Linha,
   dataAtual: Date,
+  horariosPreCalculados?: number[],
 ): { id: string; texto: string; cor: string } {
-  const horariosHoje = obterHorariosLinhaNoDia(linha, dataAtual)
-    .map((horario) => converterHoraParaMinutos(horario))
-    .filter((minutos) => Number.isFinite(minutos))
-    .sort((a, b) => a - b);
+  const horariosHoje =
+    horariosPreCalculados ??
+    obterHorariosLinhaNoDia(linha, dataAtual)
+      .map((horario) => converterHoraParaMinutos(horario))
+      .filter((minutos) => Number.isFinite(minutos))
+      .sort((a, b) => a - b);
 
   if (horariosHoje.length === 0) {
     return {
