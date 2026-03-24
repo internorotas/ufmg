@@ -4,15 +4,20 @@
  */
 
 import { Clock, Map as MapIcon } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { shouldDisableRegularSchedules } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { getSaoPauloDayOfWeek, getSaoPauloNow } from '../lib/time';
 import { calculateNextAndPreviousSchedule } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
-import { HorariosModal } from './HorariosModal';
-import { ItinerarioModal } from './ItinerarioModal';
+
+const HorariosModal = lazy(() =>
+  import('./HorariosModal').then((m) => ({ default: m.HorariosModal })),
+);
+const ItinerarioModal = lazy(() =>
+  import('./ItinerarioModal').then((m) => ({ default: m.ItinerarioModal })),
+);
 
 /**
  * Variantes do card da linha
@@ -207,18 +212,20 @@ export function LinhaOnibus({
       </div>
 
       {/* Modais */}
-      <HorariosModal
-        isOpen={isHorariosVisible}
-        onClose={() => setHorariosVisible(false)}
-        linha={linha}
-      />
-      <ItinerarioModal
-        isOpen={isItinerarioVisible}
-        onClose={() => setItinerarioVisible(false)}
-        linha={linha}
-        paradas={paradas}
-        onParadaClick={onParadaClick}
-      />
+      <Suspense fallback={null}>
+        <HorariosModal
+          isOpen={isHorariosVisible}
+          onClose={() => setHorariosVisible(false)}
+          linha={linha}
+        />
+        <ItinerarioModal
+          isOpen={isItinerarioVisible}
+          onClose={() => setItinerarioVisible(false)}
+          linha={linha}
+          paradas={paradas}
+          onParadaClick={onParadaClick}
+        />
+      </Suspense>
     </>
   );
 }

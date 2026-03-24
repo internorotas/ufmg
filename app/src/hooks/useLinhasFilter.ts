@@ -141,7 +141,7 @@ export function useLinhasFilter(
   linhasData: CategoriaLinhas,
   options: UseLinhasFilterOptions = {},
 ): UseLinhasFilterReturn {
-  const { debounceMs = 1500, trackSearch = true } = options;
+  const { debounceMs = 300, trackSearch = true } = options;
   const { trackEvent, trackPageView } = useAnalytics();
 
   const [searchTerm, setSearchTerm] = useState('');
