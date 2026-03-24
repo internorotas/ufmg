@@ -6,9 +6,9 @@
 import { MapPin } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { tv } from 'tailwind-variants';
-import { buscarParadasPorIds } from '../../lib/utils';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
+import { buscarParadasPorIds } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
 

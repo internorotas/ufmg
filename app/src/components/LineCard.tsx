@@ -7,11 +7,17 @@ import { Bus, ChevronRight, Clock } from 'lucide-react';
 import type React from 'react';
 import { memo, useMemo } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { findScheduleIndex, minutesToTime, timeToMinutes } from '../../lib/utils';
 import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
-import { cn, obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
+import {
+  cn,
+  findScheduleIndex,
+  minutesToTime,
+  obterHorariosLinhaNoDia,
+  obterStatusLinha,
+  timeToMinutes,
+} from '../lib/utils';
 import type { Linha } from '../types/data.types';
 import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 

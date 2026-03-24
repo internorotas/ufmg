@@ -6,11 +6,15 @@
 import { AlertTriangle, Bus, Clock, Map as MapIcon, MapPin } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
-import { buscarParadasPorIds, findScheduleIndex, timeToMinutes } from '../../lib/utils';
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
-import { obterStatusLinha } from '../lib/utils';
+import {
+  buscarParadasPorIds,
+  findScheduleIndex,
+  obterStatusLinha,
+  timeToMinutes,
+} from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
 

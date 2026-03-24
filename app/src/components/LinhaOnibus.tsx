@@ -6,9 +6,10 @@
 import { Clock, Map as MapIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
-import { calculateNextAndPreviousSchedule } from '../../lib/utils';
 import { shouldDisableRegularSchedules } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { getSaoPauloDayOfWeek, getSaoPauloNow } from '../lib/time';
+import { calculateNextAndPreviousSchedule } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { HorariosModal } from './HorariosModal';
 import { ItinerarioModal } from './ItinerarioModal';
@@ -93,8 +94,8 @@ export function LinhaOnibus({
   const isVacationLine = linha.categoriaDia === 'feriasRecessos';
   const isInVacationPeriod = shouldDisableRegularSchedules();
 
-  // Verificar se é fim de semana (sábado=6, domingo=0)
-  const today = new Date().getDay();
+  // Verificar se é fim de semana (sábado=6, domingo=0) — usando horário de São Paulo
+  const today = getSaoPauloDayOfWeek(getSaoPauloNow());
   const isWeekend = today === 0 || today === 6;
 
   // Lógica de desabilitar horários durante férias:

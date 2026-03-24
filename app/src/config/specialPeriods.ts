@@ -24,6 +24,13 @@ export const SPECIAL_PERIODS: SpecialPeriod[] = [
     description: 'Período de férias e recessos',
     startDate: new Date(2025, 11, 15),
     endDate: new Date(2026, 2, 1),
+    isActive: false,
+  },
+  {
+    name: 'Recesso de Julho 2026',
+    description: 'Recesso acadêmico de meio de ano',
+    startDate: new Date(2026, 6, 5),
+    endDate: new Date(2026, 7, 2),
     isActive: true,
   },
 ];

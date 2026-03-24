@@ -6,10 +6,9 @@
 import { CheckCircle, Clock } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
-import { findScheduleIndex, timeToMinutes } from '../../lib/utils';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
-import { obterStatusLinha } from '../lib/utils';
+import { findScheduleIndex, obterStatusLinha, timeToMinutes } from '../lib/utils';
 import type { Linha } from '../types/data.types';
 import { Modal } from './Modal';
 
