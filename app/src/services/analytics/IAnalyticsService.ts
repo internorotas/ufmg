@@ -3,25 +3,15 @@
  * Permite troca fácil de biblioteca no futuro (Adapter Pattern).
  */
 
-export type EventCategory =
-  | "Engajamento"
-  | "Navegação"
-  | "Navegação Principal"
-  | "Busca"
-  | "UI Interaction"
-  | "Navegação Detalhes"
-  | "Horarios"
-  | "Engajamento Detalhes"
-  | "Performance"
-  | "Erro"
-  | "External Link"
-  | "Session";
+export type EventCategory = 'engagement' | 'navigation' | 'map_interaction' | 'preferences';
 
 export interface AnalyticsEvent {
-  category: EventCategory;
-  action: string;
+  event?: string;
+  category?: EventCategory;
+  action?: string;
   label?: string;
   value?: number;
+  params?: Record<string, string | number | boolean | null | undefined>;
 }
 
 export interface TimingEvent {

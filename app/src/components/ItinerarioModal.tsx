@@ -3,46 +3,35 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { tv } from "tailwind-variants";
-import { MapPin } from "lucide-react";
-import { Modal } from "./Modal";
-import type { Linha, Parada } from "../types/data.types";
-import { buscarParadasPorIds } from "../../lib/utils";
-
-// ============================================================================
-// VARIANTS
-// ============================================================================
+import { MapPin } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
+import { tv } from 'tailwind-variants';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
+import { buscarParadasPorIds } from '../lib/utils';
+import type { Linha, Parada } from '../types/data.types';
+import { Modal } from './Modal';
 
 /**
  * Variantes do botão de parada
  */
 export const stopButtonVariants = tv({
-  base: "group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2",
+  base: 'group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2',
 });
 
 /**
  * Variantes do container do ícone de parada
  */
 export const stopIconContainerVariants = tv({
-  base: [
-    "relative z-10 mt-0.5 shrink-0",
-    "flex size-6 items-center justify-center rounded-full",
-  ],
+  base: ['relative z-10 mt-0.5 shrink-0', 'flex size-6 items-center justify-center rounded-full'],
 });
 
 /**
  * Variantes do card de informação
  */
 export const infoCardVariants = tv({
-  base: [
-    "rounded-lg border p-4 text-center text-sm",
-    "border-card-border bg-card",
-  ],
+  base: ['rounded-lg border p-4 text-center text-sm', 'border-card-border bg-card'],
 });
-
-// ============================================================================
-// TYPES
-// ============================================================================
 
 export interface ItinerarioModalProps {
   isOpen: boolean;
@@ -51,10 +40,6 @@ export interface ItinerarioModalProps {
   paradas: Parada[];
   onParadaClick: (parada: Parada) => void;
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 /**
  * Modal que exibe o itinerário de uma linha de ônibus.
@@ -77,34 +62,39 @@ export function ItinerarioModal({
   paradas,
   onParadaClick,
 }: ItinerarioModalProps) {
-  // Buscar paradas do itinerário
-  const paradasDoItinerario = buscarParadasPorIds(
-    linha.itinerarioParadasIds,
-    paradas,
-  );
+  const analytics = useAnalytics();
+  const { trackPageView } = analytics;
+  const paradasDoItinerario = useMemo(() => {
+    return buscarParadasPorIds(linha.itinerarioParadasIds, paradas);
+  }, [linha.itinerarioParadasIds, paradas]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    trackPageView(`/modal/itinerario/${linha.idRota}`);
+  }, [isOpen, linha.idRota, trackPageView]);
 
   const handleParadaClick = (parada: Parada) => {
+    analytics.trackEvent({
+      category: 'map_interaction',
+      action: 'view_stop_details',
+      label: `${linha.nome} - ${parada.nome}`,
+    });
     onParadaClick(parada);
     onClose();
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Itinerário - ${linha.nome}`}
-      size="lg"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={`Itinerário - ${linha.nome}`} size="lg">
       <div className="relative">
         {paradasDoItinerario.length > 0 ? (
           <div className="relative">
-            {paradasDoItinerario.map((parada, index) => {
-              const isFirst = index === 0;
-              const isLast = index === paradasDoItinerario.length - 1;
+            {paradasDoItinerario.map((parada) => {
+              const isFirst = parada.idParada === paradasDoItinerario[0]?.idParada;
+              const isLast =
+                parada.idParada === paradasDoItinerario[paradasDoItinerario.length - 1]?.idParada;
 
               return (
                 <div key={parada.idParada} className="relative flex">
-                  {/* Linha conectora vertical tracejada */}
                   {!isLast && (
                     <div
                       className="absolute left-2.75 top-7 h-full w-0.5"
@@ -116,10 +106,12 @@ export function ItinerarioModal({
                   )}
 
                   <button
+                    type="button"
                     onClick={() => handleParadaClick(parada)}
                     className={stopButtonVariants()}
+                    aria-label={`Ver localização da parada ${parada.nome} no mapa`}
+                    title={`Ver localização da parada ${parada.nome} no mapa`}
                   >
-                    {/* Ícone de localização com círculo */}
                     <div
                       className={stopIconContainerVariants()}
                       style={{ backgroundColor: `${linha.corHex}20` }}
@@ -127,21 +119,18 @@ export function ItinerarioModal({
                       <MapPin size={18} style={{ color: linha.corHex }} />
                     </div>
 
-                    {/* Conteúdo da parada */}
                     <div className="min-w-0 flex-1 pt-0.5">
                       <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
                         {parada.nome}
                       </h4>
 
-                      {isFirst && (
+                      {(isFirst || isLast) && (
                         <p className="mt-0.5 text-xs text-text-secondary">
                           Ponto de Origem/Destino
                         </p>
                       )}
                       {!isFirst && !isLast && (
-                        <p className="mt-0.5 text-xs text-text-secondary">
-                          Parada Regular
-                        </p>
+                        <p className="mt-0.5 text-xs text-text-secondary">Parada Regular</p>
                       )}
 
                       {isFirst && (
@@ -152,6 +141,73 @@ export function ItinerarioModal({
                           Partida
                         </span>
                       )}
+
+                      {isLast && (
+                        <span
+                          className="mt-1 inline-block px-0 text-xs font-semibold"
+                          style={{ color: linha.corHex }}
+                        >
+                          Chegada
+                        </span>
+                      )}
+
+                      {/* Previsão de chegada nesta parada */}
+                      {(() => {
+                        const previsao = calcularPrevisaoChegada(linha, parada.idParada);
+                        if (!previsao || !previsao.proximoOnibus) return null;
+                        const { proximoOnibus, onibusAnterior, isTrafegoIntenso } = previsao;
+                        const minutos = proximoOnibus.minutosFaltantes;
+
+                        const badgeBg =
+                          minutos < 1
+                            ? 'var(--success-bg)'
+                            : isTrafegoIntenso
+                              ? 'var(--warning-bg)'
+                              : minutos <= 15
+                                ? 'var(--success-bg)'
+                                : 'var(--warning-bg)';
+
+                        const badgeText =
+                          minutos < 1
+                            ? 'var(--success-text)'
+                            : isTrafegoIntenso
+                              ? 'var(--warning-text)'
+                              : minutos <= 15
+                                ? 'var(--success-text)'
+                                : 'var(--warning-text)';
+
+                        const textoChegada =
+                          minutos < 1
+                            ? 'Chega agora'
+                            : minutos < 60
+                              ? `~${minutos} min · ${proximoOnibus.horarioChegada}`
+                              : (() => {
+                                  const h = Math.floor(minutos / 60);
+                                  const m = minutos % 60;
+                                  return m === 0
+                                    ? `~${h}h · ${proximoOnibus.horarioChegada}`
+                                    : `~${h}h ${m}min · ${proximoOnibus.horarioChegada}`;
+                                })();
+
+                        return (
+                          <div className="mt-1.5 flex flex-col gap-0.5">
+                            <span
+                              className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+                              style={{
+                                backgroundColor: badgeBg,
+                                color: badgeText,
+                              }}
+                            >
+                              {textoChegada}
+                            </span>
+                            {onibusAnterior && (
+                              <span className="text-[10px] text-text-tertiary">
+                                Último passou há {onibusAnterior.minutosQuePassou} min
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </button>
                 </div>
@@ -159,16 +215,14 @@ export function ItinerarioModal({
             })}
           </div>
         ) : (
-          <div className="py-8 text-center text-gray-400">
+          <div className="py-8 text-center text-text-secondary">
             <p>Nenhuma parada encontrada para este itinerário.</p>
           </div>
         )}
       </div>
 
       <div data-slot="tip" className={`mt-6 ${infoCardVariants()}`}>
-        <p className="text-text-secondary">
-          💡 Clique em uma parada para visualizá-la no mapa
-        </p>
+        <p className="text-text-secondary">💡 Clique em uma parada para visualizá-la no mapa</p>
       </div>
     </Modal>
   );

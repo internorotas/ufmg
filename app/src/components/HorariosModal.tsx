@@ -3,35 +3,28 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { useMemo } from "react";
-import { tv } from "tailwind-variants";
-import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
-import { Modal } from "./Modal";
-import type { Linha } from "../types/data.types";
-import { timeToMinutes } from "../../lib/utils";
-import { shouldDisableRegularSchedules } from "../config/specialPeriods";
-
-// ============================================================================
-// VARIANTS
-// ============================================================================
+import { CheckCircle, Clock } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { tv } from 'tailwind-variants';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { useCurrentTime } from '../hooks/useCurrentTime';
+import { findScheduleIndex, obterStatusLinha, timeToMinutes } from '../lib/utils';
+import type { Linha } from '../types/data.types';
+import { Modal } from './Modal';
 
 /**
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: "rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+  base: 'rounded-lg border p-3 text-center transition-all',
   variants: {
     status: {
-      upcoming: [
-        "border-green-600 bg-green-900/30 cursor-pointer focus-visible:ring-green-500",
-        "hover:bg-green-900/50 hover:scale-105 hover:shadow-md active:scale-95",
-      ],
-      passed:
-        "border-gray-700 bg-gray-800/50 opacity-50 cursor-default focus-visible:ring-gray-500",
+      upcoming: ['border-success-border bg-success-bg'],
+      passed: 'border-card-border bg-card/50 opacity-50',
     },
   },
   defaultVariants: {
-    status: "upcoming",
+    status: 'upcoming',
   },
 });
 
@@ -39,15 +32,15 @@ export const scheduleCardVariants = tv({
  * Variantes do texto de horário
  */
 export const scheduleTimeVariants = tv({
-  base: "font-bold",
+  base: 'font-bold',
   variants: {
     status: {
-      upcoming: "text-xl text-green-300",
-      passed: "text-lg text-gray-400",
+      upcoming: 'text-xl text-success-text',
+      passed: 'text-lg text-text-secondary',
     },
   },
   defaultVariants: {
-    status: "upcoming",
+    status: 'upcoming',
   },
 });
 
@@ -55,15 +48,8 @@ export const scheduleTimeVariants = tv({
  * Variantes do alerta de suspensão
  */
 export const suspensionAlertVariants = tv({
-  base: [
-    "rounded-lg border p-4 text-center",
-    "border-yellow-600 bg-yellow-900/30",
-  ],
+  base: ['rounded-lg border p-4 text-center', 'border-warning-border bg-warning-bg'],
 });
-
-// ============================================================================
-// TYPES
-// ============================================================================
 
 export interface HorariosModalProps {
   isOpen: boolean;
@@ -71,9 +57,52 @@ export interface HorariosModalProps {
   linha: Linha;
 }
 
-// ============================================================================
-// COMPONENT
-// ============================================================================
+type ScheduleTab = 'diasUteis' | 'sabados' | 'domingos';
+
+/**
+ * Card de horário individual memoizado.
+ * Evita re-renderização de todos os cards quando apenas o splitIndex muda.
+ */
+const ScheduleCard = React.memo(function ScheduleCard({
+  horario,
+  status,
+}: {
+  horario: string;
+  status: 'upcoming' | 'passed';
+}) {
+  return (
+    <div className={scheduleCardVariants({ status })}>
+      <span className="sr-only">
+        {status === 'upcoming' ? 'Próximo horário às' : 'Horário passado às'} {horario}
+      </span>
+      <p className={scheduleTimeVariants({ status })} aria-hidden="true">
+        {horario}
+      </p>
+    </div>
+  );
+});
+
+function getInitialTab(): ScheduleTab {
+  const day = new Date().getDay();
+  if (day === 6) return 'sabados';
+  if (day === 0) return 'domingos';
+  return 'diasUteis';
+}
+
+function getHorariosByTab(linha: Linha, tab: ScheduleTab): string[] {
+  const horariosRaw = linha.horarios as unknown;
+
+  if (Array.isArray(horariosRaw)) {
+    return horariosRaw;
+  }
+
+  if (!horariosRaw || typeof horariosRaw !== 'object') {
+    return [];
+  }
+
+  const horariosPorDia = horariosRaw as Partial<Record<ScheduleTab, string[]>>;
+  return Array.isArray(horariosPorDia[tab]) ? horariosPorDia[tab] : [];
+}
 
 /**
  * Modal que exibe os horários de uma linha de ônibus.
@@ -88,132 +117,163 @@ export interface HorariosModalProps {
  * ```
  */
 export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
-  const now = new Date();
+  const analytics = useAnalytics();
+  const { trackPageView } = analytics;
+  const [activeTab, setActiveTab] = useState<ScheduleTab>(() => getInitialTab());
+  const now = useCurrentTime();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // Verificar se devemos desabilitar os horários
-  const isVacationLine = linha.categoriaDia === "feriasRecessos";
-  const isInVacationPeriod = shouldDisableRegularSchedules();
-
-  // Verificar se é fim de semana (sábado=6, domingo=0)
-  const today = now.getDay();
-  const isWeekend = today === 0 || today === 6;
-
-  // Lógica de desabilitar horários durante férias:
-  // - Linhas de sábado e dias úteis: SEMPRE desabilitadas durante férias
-  // - Linhas de férias/recessos: desabilitadas apenas em fins de semana
-  const shouldDisableSchedules =
-    isInVacationPeriod && (!isVacationLine || isWeekend);
-
-  // ⚡ Bolt: Separar parsing e ordenação (O(N log N)) custosos em um useMemo independente
   const baseHorarios = useMemo(() => {
-    return linha.horarios
-      .filter((time) => time && time.includes(":"))
+    const horariosDoDia = getHorariosByTab(linha, activeTab);
+
+    return horariosDoDia
+      .filter((time) => time?.includes(':'))
       .map((horario) => ({
         horario,
         minutos: timeToMinutes(horario),
       }))
       .sort((a, b) => a.minutos - b.minutos);
-  }, [linha.horarios]);
+  }, [activeTab, linha]);
 
-  // ⚡ Bolt: Calcular status 'passou' O(N) separado com base no tempo atual
-  const horariosOrganizados = useMemo(() => {
-    return baseHorarios.map((h) => ({
-      ...h,
-      passou: h.minutos < currentMinutes,
-    }));
+  const statusLinha = obterStatusLinha(linha, now);
+
+  const shouldDisableSchedules = statusLinha.id === 'NAO_CIRCULA_HOJE';
+
+  const splitIndex = useMemo(() => {
+    return findScheduleIndex(baseHorarios, currentMinutes - 1, (h) => h.minutos);
   }, [baseHorarios, currentMinutes]);
 
-  const proximos = horariosOrganizados.filter((h) => !h.passou);
-  const passados = horariosOrganizados.filter((h) => h.passou);
+  const passados = baseHorarios.slice(0, splitIndex);
+  const proximos = baseHorarios.slice(splitIndex);
+  const todos = baseHorarios;
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    trackPageView(`/modal/horarios/${linha.idRota}`);
+
+    analytics.trackEvent({
+      category: 'engagement',
+      action: 'view_schedule',
+      label: `${linha.nome} | status=${statusLinha.id}`,
+      value: todos.length,
+    });
+
+    analytics.trackEvent({
+      category: 'engagement',
+      action: 'schedule_distribution',
+      label: `linha=${linha.nome};proximos=${proximos.length};passados=${passados.length};total=${todos.length}`,
+      value: proximos.length,
+    });
+  }, [
+    isOpen,
+    linha.idRota,
+    linha.nome,
+    passados.length,
+    proximos.length,
+    statusLinha.id,
+    todos.length,
+    analytics,
+    trackPageView,
+  ]);
+
+  const handleTabChange = (tab: ScheduleTab) => {
+    if (tab === activeTab) return;
+    setActiveTab(tab);
+    analytics.trackEvent({
+      category: 'navigation',
+      action: 'change_schedule_tab',
+      label: `${linha.nome}:${tab}`,
+    });
+  };
+
+  const handleClose = () => {
+    analytics.trackEvent({
+      category: 'navigation',
+      action: 'close_schedule_modal',
+      label: linha.nome,
+    });
+    onClose();
+  };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Horários - ${linha.nome}`}
-      size="md"
-    >
+    <Modal isOpen={isOpen} onClose={handleClose} title={`Horários - ${linha.nome}`} size="md">
       <div className="space-y-6">
-        {/* Aviso de Horários Suspensos */}
-        {shouldDisableSchedules && (
-          <div
-            data-slot="suspension-alert"
-            className={suspensionAlertVariants()}
+        <div className="flex gap-2 rounded-lg bg-internoRotas-cinza-grafite p-1">
+          <button
+            type="button"
+            onClick={() => handleTabChange('diasUteis')}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'diasUteis' ? 'bg-brand-primary text-white' : 'text-text-secondary hover:bg-card-hover'}`}
           >
-            <p className="mb-2 font-semibold text-yellow-300">
-              <AlertTriangle className="mr-1 inline size-4" />
-              Horários suspensos
-            </p>
-            <p className="text-sm text-yellow-200">
-              Esta linha não está operando durante o período de férias e
-              recessos. Utilize os horários de "Férias e Recessos".
-            </p>
-          </div>
-        )}
+            Dias Úteis
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange('sabados')}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'sabados' ? 'bg-brand-primary text-white' : 'text-text-secondary hover:bg-card-hover'}`}
+          >
+            Sábado
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange('domingos')}
+            className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold ${activeTab === 'domingos' ? 'bg-brand-primary text-white' : 'text-text-secondary hover:bg-card-hover'}`}
+          >
+            Domingo
+          </button>
+        </div>
 
-        {/* Próximos Horários */}
-        {!shouldDisableSchedules && proximos.length > 0 && (
-          <div data-slot="upcoming-schedules">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-              <Clock className="text-green-400" size={20} />
-              Próximos Horários
+        {shouldDisableSchedules ? (
+          <div data-slot="all-schedules">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+              <Clock size={20} />
+              Todos os Horários
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {proximos.map(({ horario }, index) => (
-                <div
-                  key={`proximo-${index}`}
-                  className={scheduleCardVariants({ status: "upcoming" })}
-                  tabIndex={0}
-                  aria-label={`Próximo horário às ${horario}`}
-                >
-                  <p className={scheduleTimeVariants({ status: "upcoming" })}>
-                    {horario}
-                  </p>
-                </div>
+              {todos.map(({ horario }) => (
+                <ScheduleCard key={`horario-${horario}`} horario={horario} status="passed" />
               ))}
             </div>
           </div>
-        )}
-
-        {/* Horários Passados */}
-        {!shouldDisableSchedules && passados.length > 0 && (
-          <div data-slot="passed-schedules">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-              <CheckCircle className="text-gray-500" size={20} />
-              Horários Passados
-            </h3>
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {passados.map(({ horario }, index) => (
-                <div
-                  key={`passado-${index}`}
-                  className={scheduleCardVariants({ status: "passed" })}
-                  tabIndex={0}
-                  aria-label={`Horário passado às ${horario}`}
-                >
-                  <p className={scheduleTimeVariants({ status: "passed" })}>
-                    {horario}
-                  </p>
+        ) : (
+          <>
+            {proximos.length > 0 && (
+              <div data-slot="upcoming-schedules">
+                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+                  <Clock className="text-success-text" size={20} />
+                  Próximos Horários
+                </h3>
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                  {proximos.map(({ horario }) => (
+                    <ScheduleCard key={`proximo-${horario}`} horario={horario} status="upcoming" />
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            )}
+
+            {passados.length > 0 && (
+              <div data-slot="passed-schedules">
+                <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+                  <CheckCircle className="text-text-tertiary" size={20} />
+                  Horários Passados
+                </h3>
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                  {passados.map(({ horario }) => (
+                    <ScheduleCard key={`passado-${horario}`} horario={horario} status="passed" />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
-        {/* Informação Extra */}
-        {!shouldDisableSchedules && (
-          <div
-            data-slot="summary"
-            className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm"
-          >
-            <p className="text-center text-gray-300">
-              Total de {horariosOrganizados.length} horários •{" "}
-              <span className="text-green-400">
-                {proximos.length} restantes
-              </span>
-            </p>
-          </div>
-        )}
+        <div data-slot="summary" className="rounded-lg bg-internoRotas-cinza-grafite p-4 text-sm">
+          <p className="text-center text-text-secondary">
+            {shouldDisableSchedules
+              ? `Total de ${todos.length} horários`
+              : `Total de ${todos.length} horários • ${proximos.length} restantes`}
+          </p>
+        </div>
       </div>
     </Modal>
   );

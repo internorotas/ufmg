@@ -5,10 +5,10 @@
  * Gerencia a renderização da rota animada (AntPath).
  */
 
-import React, { useMemo } from "react";
-import L from "leaflet";
-import { AntPathComponent } from "../AntPathComponent";
-import type { Linha } from "../../types/data.types";
+import L from 'leaflet';
+import React, { useMemo } from 'react';
+import type { Linha } from '../../types/data.types';
+import { AntPathComponent } from '../AntPathComponent';
 
 interface MapRouteProps {
   linha: Linha | null;
@@ -41,8 +41,8 @@ export const MapRoute = React.memo(function MapRoute({ linha }: MapRouteProps) {
   const options = useMemo(
     () => ({
       ...DEFAULT_ANT_PATH_OPTIONS,
-      color: linha?.corHex || "#3388ff",
-      pulseColor: linha?.corHex || "#3388ff",
+      color: linha?.corHex || 'var(--color-brand-primary)',
+      pulseColor: linha?.corHex || 'var(--color-brand-primary)',
     }),
     [linha?.corHex],
   );
@@ -61,11 +61,7 @@ export const MapRoute = React.memo(function MapRoute({ linha }: MapRouteProps) {
  */
 export function useRouteBounds(linha: Linha | null): L.LatLngBounds | null {
   return useMemo(() => {
-    if (
-      linha &&
-      linha.coordenadasTrajeto &&
-      linha.coordenadasTrajeto.length > 0
-    ) {
+    if (linha?.coordenadasTrajeto && linha.coordenadasTrajeto.length > 0) {
       return L.latLngBounds(linha.coordenadasTrajeto as L.LatLngExpression[]);
     }
     return null;

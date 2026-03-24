@@ -1089,15 +1089,7 @@
         "categoria": "diasUteis",
         "identificador_cor_tema": "linha-3",
         "cor_hex_leaflet": "#006400",
-        "horarios": [
-          "11:20",
-          "12:00",
-          "12:40",
-          "13:30",
-          "17:20",
-          "18:10",
-          "22:50"
-        ],
+        "horarios": ["11:20", "12:00", "12:40", "13:30", "17:20", "18:10", "22:50"],
         "itinerario_paradas_ids": [
           "P0",
           "P1",
@@ -1519,15 +1511,7 @@
         "categoria": "diasUteis",
         "identificador_cor_tema": "linha-4",
         "cor_hex_leaflet": "#00008B",
-        "horarios": [
-          "06:00",
-          "08:05",
-          "08:50",
-          "14:45",
-          "15:40",
-          "16:20",
-          "20:15"
-        ],
+        "horarios": ["06:00", "08:05", "08:50", "14:45", "15:40", "16:20", "20:15"],
         "itinerario_paradas_ids": [
           "P0",
           "P1",
@@ -1740,16 +1724,7 @@
         "categoria": "diasUteis",
         "identificador_cor_tema": "linha-4",
         "cor_hex_leaflet": "#00008B",
-        "horarios": [
-          "11:00",
-          "11:40",
-          "12:20",
-          "13:05",
-          "13:55",
-          "17:00",
-          "17:40",
-          "18:35"
-        ],
+        "horarios": ["11:00", "11:40", "12:20", "13:05", "13:55", "17:00", "17:40", "18:35"],
         "itinerario_paradas_ids": [
           "P0",
           "P1",
