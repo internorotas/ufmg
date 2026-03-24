@@ -5,7 +5,7 @@
  * permitindo fácil substituição por APIs externas no futuro.
  */
 
-import { normalizarNomeLinha } from '../../lib/utils';
+import { normalizarNomeLinha } from '../lib/utils';
 import type { CategoriaLinhas, DadosLinhas, Linha, Parada } from '../types/data.types';
 
 interface ParadasPayload {

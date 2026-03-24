@@ -4,7 +4,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { isLineAvailableToday } from '../config/specialPeriods';
 import type { Linha } from '../types/data.types';
-import { getSaoPauloDayOfWeek, getSaoPauloMinutesOfDay } from './time';
+import { getSaoPauloDayOfWeek, getSaoPauloMinutesOfDay, getSaoPauloNow } from './time';
 
 /**
  * Mescla classes CSS usando clsx e tailwind-merge.
@@ -204,4 +204,133 @@ export function calcularDistanciaKm(
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return RAIO_TERRA_KM * c;
+}
+
+/**
+ * Encontra o índice do primeiro elemento do array cujo valor é estritamente
+ * maior que o alvo. Retorna o tamanho do array quando não há elemento futuro.
+ * Requer array ordenado em ordem crescente.
+ */
+export function findScheduleIndex<T>(
+  sortedArray: T[],
+  target: number,
+  getVal: (item: T) => number = (item) => item as unknown as number,
+): number {
+  let left = 0;
+  let right = sortedArray.length;
+
+  while (left < right) {
+    const mid = Math.floor((left + right) / 2);
+    if (getVal(sortedArray[mid]) > target) {
+      right = mid;
+    } else {
+      left = mid + 1;
+    }
+  }
+
+  return left;
+}
+
+const _paradasCache = new WeakMap<object, Map<string, unknown>>();
+
+/**
+ * Busca paradas do itinerário pelos IDs fornecidos, preservando a ordem.
+ * Usa WeakMap como cache para evitar recriar o mapa a cada chamada.
+ */
+export function buscarParadasPorIds<T extends { idParada: string }>(
+  itinerarioParadasIds: string[],
+  todasParadas: T[],
+): T[] {
+  let paradasMap = _paradasCache.get(todasParadas) as Map<string, T> | undefined;
+
+  if (!paradasMap) {
+    paradasMap = new Map<string, T>();
+    for (const parada of todasParadas) {
+      paradasMap.set(parada.idParada, parada);
+    }
+    _paradasCache.set(todasParadas, paradasMap);
+  }
+
+  return itinerarioParadasIds
+    .map((id) => (paradasMap as Map<string, T>).get(id))
+    .filter((p): p is T => p !== undefined);
+}
+
+/**
+ * Normaliza o nome de uma linha para busca case-insensitive sem acentos.
+ * Remove conteúdos entre parênteses para evitar diferenças de nomenclatura.
+ */
+export function normalizarNomeLinha(nomeLinha: string): string {
+  return nomeLinha
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s*\(.*?\)\s*/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * Aliases para compatibilidade com código legado que usa nomenclatura em inglês.
+ * Prefira `converterHoraParaMinutos` e `converterMinutosParaHora` em código novo.
+ */
+export const timeToMinutes = converterHoraParaMinutos;
+export const minutesToTime = converterMinutosParaHora;
+
+/**
+ * Calcula o próximo e o anterior horário com base no horário atual de São Paulo.
+ *
+ * @param horarios Lista de horários no formato `HH:MM`.
+ * @returns Objeto com `nextSchedule` e `previousSchedule` formatados em `HH:MM`.
+ */
+export function calculateNextAndPreviousSchedule(horarios: string[]): {
+  nextSchedule: string;
+  previousSchedule: string;
+} {
+  if (!horarios || horarios.length === 0) {
+    return { nextSchedule: '--:--', previousSchedule: '--:--' };
+  }
+
+  const currentMinutes = getSaoPauloMinutesOfDay(getSaoPauloNow());
+
+  const schedulesInMinutes = horarios
+    .filter((time) => time?.includes(':'))
+    .map(converterHoraParaMinutos)
+    .sort((a, b) => a - b);
+
+  if (schedulesInMinutes.length === 0) {
+    return { nextSchedule: '--:--', previousSchedule: '--:--' };
+  }
+
+  const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
+
+  let nextSchedule: string;
+  let previousSchedule: string;
+
+  if (nextIndex < schedulesInMinutes.length) {
+    nextSchedule = converterMinutosParaHora(schedulesInMinutes[nextIndex]);
+
+    let prevIndex = nextIndex - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] >= currentMinutes) {
+      prevIndex--;
+    }
+
+    previousSchedule =
+      prevIndex >= 0
+        ? converterMinutosParaHora(schedulesInMinutes[prevIndex])
+        : converterMinutosParaHora(schedulesInMinutes[schedulesInMinutes.length - 1]);
+  } else {
+    nextSchedule = converterMinutosParaHora(schedulesInMinutes[0]);
+
+    let prevIndex = schedulesInMinutes.length - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] >= currentMinutes) {
+      prevIndex--;
+    }
+
+    previousSchedule =
+      prevIndex >= 0
+        ? converterMinutosParaHora(schedulesInMinutes[prevIndex])
+        : converterMinutosParaHora(schedulesInMinutes[schedulesInMinutes.length - 1]);
+  }
+
+  return { nextSchedule, previousSchedule };
 }
