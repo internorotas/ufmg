@@ -26,6 +26,12 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://internorotas.github.io/ufmg/" />
 
+    <!-- Pré-carrega dados críticos para reduzir tempo de carregamento inicial -->
+    <link rel="preload" as="fetch" href="/ufmg/data/linhas.json" crossorigin="anonymous" />
+    <link rel="preload" as="fetch" href="/ufmg/data/paradas.json" crossorigin="anonymous" />
+    <!-- Pré-resolve DNS do servidor de tiles do mapa antes da interação -->
+    <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+
     <link rel="icon" href="/logo_Icone.svg" type="image/svg+xml" />
     <link rel="shortcut icon" href="/logo_Icone.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

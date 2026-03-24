@@ -33,7 +33,7 @@ export function ModalManager({
         onClose={onClosePermissao}
         title={
           <div className="flex items-center gap-2">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary/20">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary/10">
               <Navigation className="h-4 w-4 text-brand-primary" />
             </span>
             <span>Ativar Localização</span>

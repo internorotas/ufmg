@@ -232,9 +232,8 @@ export function useAnalyticsAutoTracking() {
       label: nav?.type || 'navigate',
     });
 
-    trackNavigationTimings(trackTiming);
-
     const onLoad = () => {
+      trackNavigationTimings(trackTiming);
       trackResourceSummary(trackEvent);
       if ('memory' in performance) {
         const memory = performance.memory as {
@@ -249,7 +248,15 @@ export function useAnalyticsAutoTracking() {
       }
     };
 
-    window.addEventListener('load', onLoad);
+    // Se a página já carregou (o caso típico num SPA), dispara imediatamente.
+    // Se não, aguarda o evento load.
+    let loadListenerAdded = false;
+    if (document.readyState === 'complete') {
+      onLoad();
+    } else {
+      loadListenerAdded = true;
+      window.addEventListener('load', onLoad);
+    }
 
     const onVisibilityChange = () => {
       trackEvent({
@@ -291,6 +298,10 @@ export function useAnalyticsAutoTracking() {
         'button, a, [role="button"], input[type="button"], input[type="submit"]',
       ) as HTMLElement | null;
       if (!interactiveElement) return;
+
+      // Permite que elementos com data-no-track="true" suprimam o evento genérico
+      // (útil quando o elemento já dispara um evento de analytics mais específico)
+      if (interactiveElement.dataset.noTrack === 'true') return;
 
       const role =
         interactiveElement.getAttribute('role') || interactiveElement.tagName.toLowerCase();
@@ -358,10 +369,21 @@ export function useAnalyticsAutoTracking() {
 
       const inpObserver = new PerformanceObserver((list) => {
         list.getEntries().forEach((entry) => {
-          inpValue = Math.max(inpValue, Math.round(entry.duration));
+          const timingEntry = entry as PerformanceEntry & {
+            duration?: number;
+            interactionId?: number;
+          };
+          // Considera apenas eventos de interação real (INP candidates)
+          if ((timingEntry.interactionId ?? 0) > 0) {
+            inpValue = Math.max(inpValue, Math.round(timingEntry.duration ?? 0));
+          }
         });
       });
-      inpObserver.observe({ type: 'event', buffered: true });
+      inpObserver.observe({
+        type: 'event',
+        buffered: true,
+        durationThreshold: 16,
+      } as PerformanceObserverInit);
       observers.push(inpObserver);
     }
 
@@ -407,7 +429,7 @@ export function useAnalyticsAutoTracking() {
     }, 60000);
 
     return () => {
-      window.removeEventListener('load', onLoad);
+      if (loadListenerAdded) window.removeEventListener('load', onLoad);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('error', onWindowError);
       window.removeEventListener('unhandledrejection', onUnhandledRejection);
