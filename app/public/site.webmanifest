@@ -2,6 +2,7 @@
   "name": "Interno Rotas - UFMG",
   "short_name": "Interno Rotas",
   "start_url": ".",
+  "scope": "/ufmg/",
   "display": "standalone",
   "background_color": "#2c0eeb",
   "lang": "pt-BR",

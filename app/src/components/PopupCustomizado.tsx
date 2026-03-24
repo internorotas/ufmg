@@ -143,7 +143,9 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
     <Popup className={cn('popup-customizado', className)} minWidth={220} {...props}>
       <div data-slot="container" className={popupContainerVariants()}>
         <div data-slot="header" className={popupHeaderVariants()}>
-          <MapPin className="mt-1 shrink-0 text-internoRotas-laranja-ambar" size={22} />
+          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-internoRotas-laranja-ambar/20">
+            <MapPin className="text-internoRotas-laranja-ambar" size={18} />
+          </div>
           <div>
             <h3 className="text-base font-bold leading-tight text-text-primary">{parada.nome}</h3>
             <p className="mt-1 text-xs text-text-secondary">{parada.categoria}</p>
@@ -157,7 +159,9 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
           <div data-slot="lines-section" className={popupLinesSectionVariants()}>
             <div className="mb-1.5 flex items-center gap-2">
-              <Bus className="text-internoRotas-azul-eletrico" size={16} />
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-internoRotas-azul-eletrico/20">
+                <Bus className="text-shadow-internoRotas-laranja-ambar" size={13} />
+              </div>
               <p className="text-xs font-semibold text-text-primary">
                 {parada.linhasAtendidas.length} linha
                 {parada.linhasAtendidas.length !== 1 ? 's' : ''} atende
