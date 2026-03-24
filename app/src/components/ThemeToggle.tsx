@@ -17,7 +17,7 @@ export const themeToggleVariants = tv({
   base: [
     'inline-flex items-center justify-center rounded-lg p-1 cursor-pointer',
     'transition-all duration-150 ease-out',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
     'active:scale-90 hover:scale-105',
   ],
   variants: {

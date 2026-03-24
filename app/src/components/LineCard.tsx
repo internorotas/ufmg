@@ -161,7 +161,7 @@ function SuspendedNotice({ message }: SuspendedNoticeProps) {
   return (
     <div
       data-slot="notice"
-      className="mb-4 rounded-lg border border-warning-border/50 bg-warning-bg/20 p-3 text-center"
+      className="mb-4 rounded-lg border border-warning-border bg-warning-bg p-3 text-center"
     >
       <p className="text-xs font-semibold text-warning-text md:text-sm">{message}</p>
     </div>
