@@ -323,7 +323,7 @@ export function LinhaDetalhesModal({
     (parada: Parada) => {
       trackEvent({
         category: 'map_interaction',
-        action: 'view_stop_details',
+        action: 'click_itinerary_stop',
         label: `${parada.nome} - ${linha.nome}`,
       });
       onParadaClick(parada);
