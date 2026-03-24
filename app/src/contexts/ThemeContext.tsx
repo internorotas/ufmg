@@ -24,8 +24,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     // try/catch necessário: Safari em modo privado lança SecurityError ao acessar localStorage
     try {
-      const savedTheme = localStorage.getItem('theme') as Theme | null;
-      return savedTheme || 'dark';
+      const savedTheme = localStorage.getItem('theme');
+      // 🛡️ Sentinel: Validate input from localStorage to prevent unexpected values
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        return savedTheme;
+      }
+      return 'dark';
     } catch {
       return 'dark';
     }
