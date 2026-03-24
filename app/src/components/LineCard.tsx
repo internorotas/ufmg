@@ -249,6 +249,8 @@ function LineCardComponent({
       data-slot="card"
       data-state={isSelected ? 'selected' : undefined}
       aria-label={`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ''}. Status: ${status}`}
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: Card contains interactive elements and must be focusable via tabIndex instead of role="button"
+      tabIndex={0}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       className={cn(lineCardVariants({ selected: isSelected }), 'mb-3', className)}
