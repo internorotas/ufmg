@@ -26,6 +26,12 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://internorotas.github.io/ufmg/" />
 
+    <!-- Pré-carrega dados críticos para reduzir tempo de carregamento inicial -->
+    <link rel="preload" as="fetch" href="/ufmg/data/linhas.json" crossorigin="anonymous" />
+    <link rel="preload" as="fetch" href="/ufmg/data/paradas.json" crossorigin="anonymous" />
+    <!-- Pré-resolve DNS do servidor de tiles do mapa antes da interação -->
+    <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+
     <link rel="icon" href="/ufmg/logo_Icone.svg" type="image/svg+xml" />
     <link rel="shortcut icon" href="/ufmg/logo_Icone.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/ufmg/apple-touch-icon.png" />
@@ -114,14 +120,15 @@
         ]
       }
     </script>
-    <script type="module" crossorigin src="/ufmg/assets/index-slAmIeGZ.js"></script>
+    <script type="module" crossorigin src="/ufmg/assets/index-DRqj4WVI.js"></script>
     <link rel="modulepreload" crossorigin href="/ufmg/assets/rolldown-runtime-DF2fYuay.js">
-    <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-misc-DWzNBv6a.js">
-    <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-framework-map-BT-H5i8o.js">
-    <link rel="modulepreload" crossorigin href="/ufmg/assets/useCurrentTime-C8GzOa4w.js">
+    <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-misc-CBGju3sN.js">
+    <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-leaflet-Dphs2bih.js">
+    <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-react-flNMoXUz.js">
+    <link rel="modulepreload" crossorigin href="/ufmg/assets/useCurrentTime-DEo5rx3P.js">
     <link rel="stylesheet" crossorigin href="/ufmg/assets/vendor-misc-B6_KBaKc.css">
-    <link rel="stylesheet" crossorigin href="/ufmg/assets/vendor-framework-map-vh-t_kPv.css">
-    <link rel="stylesheet" crossorigin href="/ufmg/assets/index-akvc-Ak-.css">
+    <link rel="stylesheet" crossorigin href="/ufmg/assets/vendor-leaflet-vh-t_kPv.css">
+    <link rel="stylesheet" crossorigin href="/ufmg/assets/index-n7xeMnc-.css">
   </head>
 
   <body>
