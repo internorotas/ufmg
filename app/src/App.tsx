@@ -1,7 +1,9 @@
-import { lazy, Suspense, useCallback, useEffect, useRef } from 'react';
+import { lazy, Suspense, useCallback, useEffect } from 'react';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
+import { DataStatusScreen } from './components/app/DataStatusScreen';
 import { ModalManager } from './components/app/ModalManager';
+import { OfflineToast } from './components/app/OfflineToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MenuLateral } from './components/MenuLateral';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
@@ -9,6 +11,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
+import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
 
@@ -64,8 +67,12 @@ function AppContent() {
     iniciarRastreamento,
     solicitarPermissaoNavegador,
   } = useLocalizacaoUsuario();
-  const autoCenterSolicitadoRef = useRef(false);
-  const autoCenterConsumidoRef = useRef(false);
+  const { solicitarAutoCenter, consumirAutoCenter } = useMapAutoCenter({
+    mapaRef,
+    localizacao,
+    carregandoLocalizacao,
+    mostrarModalLonge,
+  });
 
   useEffect(() => {
     trackPageView('/home');
@@ -89,6 +96,7 @@ function AppContent() {
   const handleParadaClick = useCallback(
     (parada: Parada) => {
       selecionarParada(parada);
+      mapaRef.current?.centralizarParada(parada);
       trackEvent({
         event: 'select_stop',
         category: 'map_interaction',
@@ -96,90 +104,70 @@ function AppContent() {
         label: parada.nome,
       });
     },
-    [selecionarParada, trackEvent],
+    [selecionarParada, mapaRef, trackEvent],
   );
 
   // Handler para voltar ao campus UFMG
   const handleVoltarParaUFMG = useCallback(() => {
-    autoCenterConsumidoRef.current = true;
+    consumirAutoCenter();
     mapaRef.current?.centralizarCoordenada(COORDENADAS_UFMG, 15);
     fecharModalLonge();
-  }, [mapaRef, fecharModalLonge]);
+  }, [consumirAutoCenter, mapaRef, fecharModalLonge]);
 
   // Handler para ficar na localização atual do usuário
   const handleContinuarAqui = useCallback(() => {
     if (localizacao) {
       mapaRef.current?.centralizarCoordenada(localizacao, 17);
-      autoCenterConsumidoRef.current = true;
+      consumirAutoCenter();
     }
     fecharModalLonge();
-  }, [localizacao, mapaRef, fecharModalLonge]);
-
-  useEffect(() => {
-    if (carregandoLocalizacao) {
-      autoCenterConsumidoRef.current = false;
-    }
-  }, [carregandoLocalizacao]);
-
-  useEffect(() => {
-    if (!autoCenterSolicitadoRef.current) return;
-    if (!localizacao || carregandoLocalizacao || mostrarModalLonge) return;
-    if (autoCenterConsumidoRef.current) return;
-
-    mapaRef.current?.centralizarCoordenada(localizacao, 17);
-    autoCenterConsumidoRef.current = true;
-  }, [localizacao, carregandoLocalizacao, mostrarModalLonge, mapaRef]);
+  }, [localizacao, consumirAutoCenter, mapaRef, fecharModalLonge]);
 
   // Validação dos dados
   if (isLoadingData) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
-        <div className="text-center p-8 bg-card rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-brand-primary">Carregando dados...</h2>
-          <p className="text-text-secondary">Buscando linhas e paradas em /public/data.</p>
-        </div>
-      </div>
+      <DataStatusScreen
+        title="Carregando dados..."
+        description="Buscando linhas e paradas em /public/data."
+      />
     );
   }
 
   if (dataError) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
-        <div className="text-center p-8 bg-card rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-warning-text">Erro ao carregar dados</h2>
-          <p className="text-text-secondary">{dataError}</p>
-        </div>
-      </div>
+      <DataStatusScreen title="Erro ao carregar dados" description={dataError} variant="warning" />
     );
   }
 
   if (!todasParadas || todasParadas.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
-        <div className="text-center p-8 bg-card rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-warning-text">⚠️ Dados não encontrados</h2>
-          <p className="text-text-secondary">
+      <DataStatusScreen
+        title="⚠️ Dados não encontrados"
+        variant="warning"
+        description={
+          <>
             Não foi possível carregar os dados de paradas.
             <br />
             Verifique a integridade dos arquivos em <code>/public/data/paradas.json</code>.
-          </p>
-        </div>
-      </div>
+          </>
+        }
+      />
     );
   }
 
   if (!linhasData || !linhasData.categoriasDias) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
-        <div className="text-center p-8 bg-card rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-warning-text">⚠️ Erro nos Dados de Linhas</h2>
-          <p className="text-text-secondary">
+      <DataStatusScreen
+        title="⚠️ Erro nos Dados de Linhas"
+        variant="warning"
+        description={
+          <>
             Não foi possível carregar os dados das linhas.
             <br />
             Verifique a integridade dos arquivos em <code>/public/data/linhas.json</code>.
-          </p>
-        </div>
-      </div>
+          </>
+        }
+      />
     );
   }
 
@@ -205,8 +193,7 @@ function AppContent() {
             permissaoLocalizacao={permissaoConcedida}
             carregandoLocalizacao={carregandoLocalizacao}
             onPedirLocalizacao={() => {
-              autoCenterSolicitadoRef.current = true;
-              autoCenterConsumidoRef.current = false;
+              solicitarAutoCenter();
               iniciarRastreamento();
             }}
           />
@@ -221,8 +208,7 @@ function AppContent() {
         onClosePermissao={fecharModalPermissao}
         onCloseLonge={fecharModalLonge}
         onPermitirLocalizacao={() => {
-          autoCenterSolicitadoRef.current = true;
-          autoCenterConsumidoRef.current = false;
+          solicitarAutoCenter();
           solicitarPermissaoNavegador();
           trackEvent({
             event: 'location_permission_granted',
@@ -234,15 +220,7 @@ function AppContent() {
         onContinuarAqui={handleContinuarAqui}
       />
 
-      {showOfflineToast && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="fixed right-4 top-4 z-[1200] rounded-lg border border-warning-border bg-warning-bg px-4 py-3 text-sm font-medium text-warning-text shadow-lg"
-        >
-          Conexao perdida. Mapas podem nao carregar, mas previsoes estaticas continuam funcionando.
-        </div>
-      )}
+      <OfflineToast show={showOfflineToast} />
     </div>
   );
 }

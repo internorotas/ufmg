@@ -45,25 +45,27 @@ const MemoizedMarker = React.memo(
     parada,
     isDestacada,
     setMarkerRef,
+    onMarkerClick,
   }: {
     parada: Parada;
     isDestacada: boolean;
     setMarkerRef: (id: string, ref: L.Marker | null) => void;
+    onMarkerClick: (parada: Parada) => void;
   }) => {
     return (
       <Marker
         position={parada.coordenadas}
         icon={isDestacada ? highlightedIcon : stationIcon}
         ref={(ref) => setMarkerRef(parada.idParada, ref)}
+        eventHandlers={{ click: () => onMarkerClick(parada) }}
       >
         <PopupCustomizado parada={parada} />
       </Marker>
     );
   },
-  (prev, next) => {
-    // Custom comparison: re-render only if highlight state changes
-    return prev.isDestacada === next.isDestacada && prev.parada.idParada === next.parada.idParada;
-  },
+  (prev, next) =>
+    // Re-renderiza apenas quando o estado de destaque ou a parada muda
+    prev.isDestacada === next.isDestacada && prev.parada.idParada === next.parada.idParada,
 );
 
 MemoizedMarker.displayName = 'MemoizedMarker';
@@ -87,26 +89,28 @@ export const MapMarkers = React.memo(function MapMarkers({
     [onMarkerRef],
   );
 
+  // useCallback garante estabilidade da referência: sem ele, MemoizedMarker perde a memoização
+  const handleMarkerClick = useCallback(
+    (parada: Parada) => {
+      analytics.trackEvent({
+        category: 'map_interaction',
+        action: 'view_stop_details',
+        label: `${parada.idParada} - ${parada.nome}`,
+      });
+    },
+    [analytics],
+  );
+
   return (
     <>
       {paradas.map((parada) => (
-        <Marker
+        <MemoizedMarker
           key={parada.idParada}
-          position={parada.coordenadas}
-          icon={paradaDestacadaId === parada.idParada ? highlightedIcon : stationIcon}
-          ref={(ref) => handleSetMarkerRef(parada.idParada, ref)}
-          eventHandlers={{
-            click: () => {
-              analytics.trackEvent({
-                category: 'map_interaction',
-                action: 'view_stop_details',
-                label: `${parada.idParada} - ${parada.nome}`,
-              });
-            },
-          }}
-        >
-          <PopupCustomizado parada={parada} />
-        </Marker>
+          parada={parada}
+          isDestacada={paradaDestacadaId === parada.idParada}
+          setMarkerRef={handleSetMarkerRef}
+          onMarkerClick={handleMarkerClick}
+        />
       ))}
     </>
   );

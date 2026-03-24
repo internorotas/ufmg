@@ -164,6 +164,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                       <button
                         type="button"
                         className="w-full whitespace-normal wrap-break-word text-left"
+                        aria-label={`Selecionar linha ${getNomeExibicao(linha, nomeLinha)}`}
                         onClick={() => {
                           if (!linha) return;
                           analytics.trackEvent({

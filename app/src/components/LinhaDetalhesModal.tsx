@@ -4,11 +4,11 @@
  */
 
 import { AlertTriangle, Bus, Clock, Map as MapIcon, MapPin } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
-import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
+import { usePrevisaoChegada } from '../hooks/usePrevisaoChegada';
 import {
   buscarParadasPorIds,
   findScheduleIndex,
@@ -100,6 +100,116 @@ export interface LinhaDetalhesModalProps {
 }
 
 type TabType = 'itinerario' | 'horarios';
+
+/**
+ * Linha do itinerário memoizada: cada parada só recalcula quando sua previsão muda.
+ * Substitui o IIFE inline que executava calcularPrevisaoChegada sem cache a cada render.
+ */
+interface ParadaItinerarioRowProps {
+  parada: Parada;
+  linha: Linha;
+  isFirst: boolean;
+  isLast: boolean;
+  onClick: (parada: Parada) => void;
+}
+
+const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
+  parada,
+  linha,
+  isFirst,
+  isLast,
+  onClick,
+}: ParadaItinerarioRowProps) {
+  const previsao = usePrevisaoChegada(linha, parada.idParada);
+
+  const textoChegada = useMemo(() => {
+    if (!previsao?.proximoOnibus) return null;
+    const minutos = previsao.proximoOnibus.minutosFaltantes;
+    if (minutos < 1) return 'Chega agora';
+    if (minutos < 60) return `~${minutos} min · ${previsao.proximoOnibus.horarioChegada}`;
+    const h = Math.floor(minutos / 60);
+    const m = minutos % 60;
+    return m === 0
+      ? `~${h}h · ${previsao.proximoOnibus.horarioChegada}`
+      : `~${h}h ${m}min · ${previsao.proximoOnibus.horarioChegada}`;
+  }, [previsao]);
+
+  const badgeStyle = useMemo(() => {
+    if (!previsao?.proximoOnibus) return null;
+    const minutos = previsao.proximoOnibus.minutosFaltantes;
+    const isUrgent = minutos <= 15;
+    const isNow = minutos < 1;
+    return {
+      backgroundColor: isNow || isUrgent ? 'var(--success-bg)' : 'var(--warning-bg)',
+      color: isNow || isUrgent ? 'var(--success-text)' : 'var(--warning-text)',
+    };
+  }, [previsao]);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(parada)}
+      className={stopButtonVariants()}
+      aria-label={`Ver localização da parada ${parada.nome} no mapa`}
+      title={`Ver localização da parada ${parada.nome} no mapa`}
+    >
+      <div className={stopIconContainerVariants()} style={{ backgroundColor: `${linha.corHex}20` }}>
+        <MapPin size={18} style={{ color: linha.corHex }} />
+      </div>
+
+      <div className="min-w-0 flex-1 pt-0.5">
+        <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
+          {parada.nome}
+        </h4>
+
+        {(isFirst || isLast) && (
+          <p className="mt-0.5 text-xs text-text-secondary">Ponto de Origem/Destino</p>
+        )}
+        {!isFirst && !isLast && (
+          <p className="mt-0.5 text-xs text-text-secondary">Parada Regular</p>
+        )}
+
+        {isFirst && (
+          <span
+            className="mt-1 inline-block px-0 text-xs font-semibold"
+            style={{ color: linha.corHex }}
+          >
+            Partida
+          </span>
+        )}
+        {isLast && (
+          <span
+            className="mt-1 inline-block px-0 text-xs font-semibold"
+            style={{ color: linha.corHex }}
+          >
+            Chegada
+          </span>
+        )}
+
+        {textoChegada && badgeStyle && (
+          <div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            className="mt-1.5 flex flex-col gap-0.5"
+          >
+            <span
+              className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+              style={badgeStyle}
+            >
+              {textoChegada}
+            </span>
+            {previsao?.onibusAnterior && (
+              <span className="text-[10px] text-text-tertiary">
+                Último passou há {previsao.onibusAnterior.minutosQuePassou} min
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    </button>
+  );
+});
 
 function getAllLineSchedules(linha: Linha): string[] {
   const horariosRaw = linha.horarios as unknown;
@@ -209,15 +319,18 @@ export function LinhaDetalhesModal({
     });
   };
 
-  const handleParadaClick = (parada: Parada) => {
-    trackEvent({
-      category: 'map_interaction',
-      action: 'view_stop_details',
-      label: `${parada.nome} - ${linha.nome}`,
-    });
-    onParadaClick(parada);
-    onClose();
-  };
+  const handleParadaClick = useCallback(
+    (parada: Parada) => {
+      trackEvent({
+        category: 'map_interaction',
+        action: 'view_stop_details',
+        label: `${parada.nome} - ${linha.nome}`,
+      });
+      onParadaClick(parada);
+      onClose();
+    },
+    [trackEvent, onParadaClick, onClose, linha.nome],
+  );
 
   return (
     <Modal
@@ -284,11 +397,8 @@ export function LinhaDetalhesModal({
         >
           {paradasDoItinerario.length > 0 ? (
             <div className="relative">
-              {paradasDoItinerario.map((parada) => {
-                const isFirst = parada.idParada === paradasDoItinerario[0]?.idParada;
-                const isLast =
-                  parada.idParada === paradasDoItinerario[paradasDoItinerario.length - 1]?.idParada;
-
+              {paradasDoItinerario.map((parada, idx) => {
+                const isLast = idx === paradasDoItinerario.length - 1;
                 return (
                   <div key={parada.idParada} className="relative flex">
                     {!isLast && (
@@ -300,111 +410,13 @@ export function LinhaDetalhesModal({
                         }}
                       />
                     )}
-
-                    <button
-                      type="button"
-                      onClick={() => handleParadaClick(parada)}
-                      className={stopButtonVariants()}
-                      aria-label={`Ver localização da parada ${parada.nome} no mapa`}
-                      title={`Ver localização da parada ${parada.nome} no mapa`}
-                    >
-                      <div
-                        className={stopIconContainerVariants()}
-                        style={{ backgroundColor: `${linha.corHex}20` }}
-                      >
-                        <MapPin size={18} style={{ color: linha.corHex }} />
-                      </div>
-
-                      <div className="min-w-0 flex-1 pt-0.5">
-                        <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
-                          {parada.nome}
-                        </h4>
-
-                        {(isFirst || isLast) && (
-                          <p className="mt-0.5 text-xs text-text-secondary">
-                            Ponto de Origem/Destino
-                          </p>
-                        )}
-                        {!isFirst && !isLast && (
-                          <p className="mt-0.5 text-xs text-text-secondary">Parada Regular</p>
-                        )}
-
-                        {isFirst && (
-                          <span
-                            className="mt-1 inline-block px-0 text-xs font-semibold"
-                            style={{ color: linha.corHex }}
-                          >
-                            Partida
-                          </span>
-                        )}
-
-                        {isLast && (
-                          <span
-                            className="mt-1 inline-block px-0 text-xs font-semibold"
-                            style={{ color: linha.corHex }}
-                          >
-                            Chegada
-                          </span>
-                        )}
-
-                        {(() => {
-                          const previsao = calcularPrevisaoChegada(linha, parada.idParada, now);
-                          if (!previsao || !previsao.proximoOnibus) return null;
-                          const { proximoOnibus, onibusAnterior, isTrafegoIntenso } = previsao;
-                          const minutos = proximoOnibus.minutosFaltantes;
-
-                          const badgeBg =
-                            minutos < 1
-                              ? 'var(--success-bg)'
-                              : isTrafegoIntenso
-                                ? 'var(--warning-bg)'
-                                : minutos <= 15
-                                  ? 'var(--success-bg)'
-                                  : 'var(--warning-bg)';
-
-                          const badgeText =
-                            minutos < 1
-                              ? 'var(--success-text)'
-                              : isTrafegoIntenso
-                                ? 'var(--warning-text)'
-                                : minutos <= 15
-                                  ? 'var(--success-text)'
-                                  : 'var(--warning-text)';
-
-                          const textoChegada =
-                            minutos < 1
-                              ? 'Chega agora'
-                              : minutos < 60
-                                ? `~${minutos} min · ${proximoOnibus.horarioChegada}`
-                                : (() => {
-                                    const h = Math.floor(minutos / 60);
-                                    const m = minutos % 60;
-                                    return m === 0
-                                      ? `~${h}h · ${proximoOnibus.horarioChegada}`
-                                      : `~${h}h ${m}min · ${proximoOnibus.horarioChegada}`;
-                                  })();
-
-                          return (
-                            <div className="mt-1.5 flex flex-col gap-0.5">
-                              <span
-                                className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
-                                style={{
-                                  backgroundColor: badgeBg,
-                                  color: badgeText,
-                                }}
-                              >
-                                {textoChegada}
-                              </span>
-                              {onibusAnterior && (
-                                <span className="text-[10px] text-text-tertiary">
-                                  Último passou há {onibusAnterior.minutosQuePassou} min
-                                </span>
-                              )}
-                            </div>
-                          );
-                        })()}
-                      </div>
-                    </button>
+                    <ParadaItinerarioRow
+                      parada={parada}
+                      linha={linha}
+                      isFirst={idx === 0}
+                      isLast={isLast}
+                      onClick={handleParadaClick}
+                    />
                   </div>
                 );
               })}

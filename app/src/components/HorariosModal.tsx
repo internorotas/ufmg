@@ -4,7 +4,7 @@
  */
 
 import { CheckCircle, Clock } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
@@ -58,6 +58,29 @@ export interface HorariosModalProps {
 }
 
 type ScheduleTab = 'diasUteis' | 'sabados' | 'domingos';
+
+/**
+ * Card de horário individual memoizado.
+ * Evita re-renderização de todos os cards quando apenas o splitIndex muda.
+ */
+const ScheduleCard = React.memo(function ScheduleCard({
+  horario,
+  status,
+}: {
+  horario: string;
+  status: 'upcoming' | 'passed';
+}) {
+  return (
+    <div className={scheduleCardVariants({ status })}>
+      <span className="sr-only">
+        {status === 'upcoming' ? 'Próximo horário às' : 'Horário passado às'} {horario}
+      </span>
+      <p className={scheduleTimeVariants({ status })} aria-hidden="true">
+        {horario}
+      </p>
+    </div>
+  );
+});
 
 function getInitialTab(): ScheduleTab {
   const day = new Date().getDay();
@@ -208,15 +231,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
               {todos.map(({ horario }) => (
-                <div
-                  key={`horario-${horario}`}
-                  className={scheduleCardVariants({ status: 'passed' })}
-                >
-                  <span className="sr-only">Horário às {horario}</span>
-                  <p className={scheduleTimeVariants({ status: 'passed' })} aria-hidden="true">
-                    {horario}
-                  </p>
-                </div>
+                <ScheduleCard key={`horario-${horario}`} horario={horario} status="passed" />
               ))}
             </div>
           </div>
@@ -230,18 +245,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                 </h3>
                 <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                   {proximos.map(({ horario }) => (
-                    <div
-                      key={`proximo-${horario}`}
-                      className={scheduleCardVariants({ status: 'upcoming' })}
-                    >
-                      <span className="sr-only">Próximo horário às {horario}</span>
-                      <p
-                        className={scheduleTimeVariants({ status: 'upcoming' })}
-                        aria-hidden="true"
-                      >
-                        {horario}
-                      </p>
-                    </div>
+                    <ScheduleCard key={`proximo-${horario}`} horario={horario} status="upcoming" />
                   ))}
                 </div>
               </div>
@@ -255,15 +259,7 @@ export function HorariosModal({ isOpen, onClose, linha }: HorariosModalProps) {
                 </h3>
                 <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                   {passados.map(({ horario }) => (
-                    <div
-                      key={`passado-${horario}`}
-                      className={scheduleCardVariants({ status: 'passed' })}
-                    >
-                      <span className="sr-only">Horário passado às {horario}</span>
-                      <p className={scheduleTimeVariants({ status: 'passed' })} aria-hidden="true">
-                        {horario}
-                      </p>
-                    </div>
+                    <ScheduleCard key={`passado-${horario}`} horario={horario} status="passed" />
                   ))}
                 </div>
               </div>

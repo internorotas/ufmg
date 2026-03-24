@@ -122,7 +122,6 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
   const selecionarParada = useCallback(
     (parada: Parada) => {
       setParadaSelecionada(parada);
-      mapaRef.current?.centralizarParada(parada);
       onParadaSelect?.(parada);
     },
     [onParadaSelect],

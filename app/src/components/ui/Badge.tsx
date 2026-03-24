@@ -102,6 +102,8 @@ export function Badge({
     <span
       data-slot="badge"
       data-variant={variant}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
       className={cn(badgeVariants({ variant, size, clickable }), className)}
       {...props}
     >

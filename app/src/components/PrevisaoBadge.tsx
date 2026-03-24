@@ -52,6 +52,8 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
   if (!linhaVigente || !previsao || !previsao.proximoOnibus) {
     return (
       <span
+        role="status"
+        aria-live="polite"
         className="rounded-full px-2 py-0.5 text-[11px] font-medium"
         style={{
           backgroundColor: 'var(--neutral-bg)',
@@ -67,7 +69,12 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
 
   if (proximoOnibus.minutosFaltantes < 1) {
     return (
-      <div className="flex min-w-0 flex-col items-end gap-1">
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="flex min-w-0 flex-col items-end gap-1"
+      >
         <span
           className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${compacto ? 'max-w-42.5' : ''}`}
           style={{
@@ -97,7 +104,12 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
     : `Chega em aproximadamente ${formatarDuracao(proximoOnibus.minutosFaltantes)}`;
 
   return (
-    <div className="flex min-w-0 flex-col items-end gap-1">
+    <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      className="flex min-w-0 flex-col items-end gap-1"
+    >
       <span
         className={`inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-xs font-bold ${compacto ? 'max-w-42.5' : ''}`}
         style={{

@@ -4,7 +4,7 @@
  */
 
 import { ArrowLeft, Menu } from 'lucide-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import logo from '../assets/logo-horizontal-transparente.svg';
 import { useRotasSelection } from '../contexts/RotasContext';
@@ -14,7 +14,6 @@ import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 import { DisclaimerBanner } from './DisclaimerBanner';
 import { InfoBanner } from './InfoBanner';
 import { LineCard } from './LineCard';
-import { LinhaDetalhesModal } from './LinhaDetalhesModal';
 import { MenuFooter } from './MenuFooter';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from './ui/Button';
@@ -22,6 +21,10 @@ import { SearchEmptyState } from './ui/EmptyState';
 import { SearchInput } from './ui/Input';
 import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
 import { VacationBanner } from './VacationBanner';
+
+const LinhaDetalhesModal = React.lazy(() =>
+  import('./LinhaDetalhesModal').then((m) => ({ default: m.LinhaDetalhesModal })),
+);
 
 /**
  * Variantes do container sidebar
@@ -367,20 +370,22 @@ export const MenuLateral = React.memo(function MenuLateral({
       </aside>
 
       {linhaDetalhesAberta && (
-        <LinhaDetalhesModal
-          isOpen={true}
-          onClose={() => {
-            trackEvent({
-              category: 'navigation',
-              action: 'close_line_details_modal',
-              label: linhaDetalhesAberta.nome,
-            });
-            setLinhaDetalhesAberta(null);
-          }}
-          linha={linhaDetalhesAberta}
-          todasParadas={todasParadas}
-          onParadaClick={handleParadaClickWrapper}
-        />
+        <Suspense fallback={null}>
+          <LinhaDetalhesModal
+            isOpen={true}
+            onClose={() => {
+              trackEvent({
+                category: 'navigation',
+                action: 'close_line_details_modal',
+                label: linhaDetalhesAberta.nome,
+              });
+              setLinhaDetalhesAberta(null);
+            }}
+            linha={linhaDetalhesAberta}
+            todasParadas={todasParadas}
+            onParadaClick={handleParadaClickWrapper}
+          />
+        </Suspense>
       )}
     </>
   );
