@@ -94,7 +94,7 @@ export const MapMarkers = React.memo(function MapMarkers({
     (parada: Parada) => {
       analytics.trackEvent({
         category: 'map_interaction',
-        action: 'view_stop_details',
+        action: 'click_map_marker',
         label: `${parada.idParada} - ${parada.nome}`,
       });
     },

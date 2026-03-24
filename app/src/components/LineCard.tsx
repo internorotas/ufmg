@@ -237,7 +237,7 @@ function LineCardComponent({
     e.stopPropagation();
     trackEvent({
       category: 'navigation',
-      action: 'view_stop_details',
+      action: 'open_line_details',
       label: linha.nome,
     });
     onDetailsClick(linha);

@@ -260,38 +260,12 @@ export function useAnalyticsAutoTracking() {
       });
 
       if (document.visibilityState === 'hidden') {
-        const durationMs = Date.now() - sessionStartRef.current;
-        trackTiming({
-          category: 'engagement',
-          name: 'session_duration_ms',
-          value: durationMs,
-          label: 'page_hidden',
-        });
+        // Não rastrear duration aqui: pagehide já captura isso de forma mais confiável
+        // e evita contagem dupla em contextos mobile onde ambos os eventos disparam.
       }
     };
 
     document.addEventListener('visibilitychange', onVisibilityChange);
-
-    const onOnline = () => {
-      trackEvent({
-        event: 'network_status',
-        category: 'navigation',
-        action: 'network_status',
-        label: 'online',
-      });
-    };
-
-    const onOffline = () => {
-      trackEvent({
-        event: 'network_status',
-        category: 'navigation',
-        action: 'network_status',
-        label: 'offline',
-      });
-    };
-
-    window.addEventListener('online', onOnline);
-    window.addEventListener('offline', onOffline);
 
     const onWindowError = (event: ErrorEvent) => {
       const message = truncateLabel(`${event.message} @ ${event.filename}:${event.lineno}`);
@@ -435,8 +409,6 @@ export function useAnalyticsAutoTracking() {
     return () => {
       window.removeEventListener('load', onLoad);
       document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('online', onOnline);
-      window.removeEventListener('offline', onOffline);
       window.removeEventListener('error', onWindowError);
       window.removeEventListener('unhandledrejection', onUnhandledRejection);
       document.removeEventListener('click', onClick, { capture: true });

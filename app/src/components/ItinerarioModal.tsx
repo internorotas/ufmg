@@ -76,7 +76,7 @@ export function ItinerarioModal({
   const handleParadaClick = (parada: Parada) => {
     analytics.trackEvent({
       category: 'map_interaction',
-      action: 'view_stop_details',
+      action: 'click_itinerary_stop',
       label: `${linha.nome} - ${parada.nome}`,
     });
     onParadaClick(parada);

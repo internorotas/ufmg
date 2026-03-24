@@ -214,7 +214,7 @@ export const MenuLateral = React.memo(function MenuLateral({
     (linha: Linha) => {
       trackEvent({
         category: 'navigation',
-        action: 'view_stop_details',
+        action: 'open_line_details',
         label: linha.nome,
       });
       setLinhaDetalhesAberta(linha);
