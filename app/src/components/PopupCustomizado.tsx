@@ -5,11 +5,13 @@
 
 import { Bus, MapPin } from 'lucide-react';
 import type { ComponentProps } from 'react';
+import { useMemo } from 'react';
 import { Popup } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { isLineAvailableToday } from '../config/specialPeriods';
 import { useRotasData } from '../contexts/RotasContext';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { useCurrentTime } from '../hooks/useCurrentTime';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
 import { cn, normalizarNomeLinha } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
@@ -79,6 +81,11 @@ export interface PopupCustomizadoProps
 export function PopupCustomizado({ parada, className, ...props }: PopupCustomizadoProps) {
   const analytics = useAnalytics();
   const { rotasService } = useRotasData();
+  // Faz o popup re-renderizar a cada tick (30s) para que a seleção de subLinha
+  // seja sempre reavaliada com o horário atual — evita que a escolha feita no
+  // primeiro render fique obsoleta enquanto o PrevisaoBadge interno atualiza o
+  // ETA do candidato errado.
+  const currentTime = useCurrentTime();
 
   const resolverLinhaPorNome = (nomeLinhaParada: string, idParadaAtual: string): Linha | null => {
     const chave = normalizarNomeLinha(nomeLinhaParada);
@@ -106,11 +113,12 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
       return candidatasNaParada[0];
     }
 
-    // Múltiplos sublinhas servem esta parada: escolhe o com chegada mais próxima
+    // Múltiplos sublinhas servem esta parada: escolhe o com chegada mais próxima.
+    // Usa currentTime (mesmo tick do PrevisaoBadge) para comparação consistente.
     let melhor: Linha = candidatasNaParada[0];
     let melhorMinutos = Infinity;
     for (const candidata of candidatasNaParada) {
-      const previsao = calcularPrevisaoChegada(candidata, idParadaAtual);
+      const previsao = calcularPrevisaoChegada(candidata, idParadaAtual, currentTime);
       if (previsao?.proximoOnibus && previsao.proximoOnibus.minutosFaltantes < melhorMinutos) {
         melhorMinutos = previsao.proximoOnibus.minutosFaltantes;
         melhor = candidata;
@@ -118,6 +126,18 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
     }
     return melhor;
   };
+
+  // Resolve todas as linhas de uma vez, memoizado por parada + tempo.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: currentTime é a dependência reativa propositalmente
+  const linhasResolvidas = useMemo(
+    () =>
+      (parada.linhasAtendidas ?? []).map((nomeLinha) => ({
+        nomeLinha,
+        linha: resolverLinhaPorNome(nomeLinha, parada.idParada),
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [parada.idParada, parada.linhasAtendidas, rotasService, currentTime],
+  );
 
   return (
     <Popup className={cn('popup-customizado', className)} minWidth={220} {...props}>
@@ -149,50 +169,47 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
               <span>Previsão</span>
             </div>
             <div className="space-y-1">
-              {parada.linhasAtendidas.map((nomeLinha) => {
-                const linha = resolverLinhaPorNome(nomeLinha, parada.idParada);
-                return (
-                  <div
-                    key={nomeLinha}
-                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
+              {linhasResolvidas.map(({ nomeLinha, linha }) => (
+                <div
+                  key={nomeLinha}
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
+                >
+                  <span
+                    className={cn(lineBadgeVariants(), 'border-l-[3px]')}
+                    title={nomeLinha}
+                    style={linha ? { borderLeftColor: linha.corHex } : undefined}
                   >
-                    <span
-                      className={cn(lineBadgeVariants(), 'border-l-[3px]')}
-                      title={nomeLinha}
-                      style={linha ? { borderLeftColor: linha.corHex } : undefined}
+                    <button
+                      type="button"
+                      className="w-full whitespace-normal wrap-break-word text-left"
+                      aria-label={`Selecionar linha ${getNomeExibicao(linha, nomeLinha)}`}
+                      onClick={() => {
+                        if (!linha) return;
+                        analytics.trackEvent({
+                          category: 'map_interaction',
+                          action: 'select_line',
+                          label: `${parada.nome} -> ${linha.nome}`,
+                        });
+                      }}
                     >
-                      <button
-                        type="button"
-                        className="w-full whitespace-normal wrap-break-word text-left"
-                        aria-label={`Selecionar linha ${getNomeExibicao(linha, nomeLinha)}`}
-                        onClick={() => {
-                          if (!linha) return;
-                          analytics.trackEvent({
-                            category: 'map_interaction',
-                            action: 'select_line',
-                            label: `${parada.nome} -> ${linha.nome}`,
-                          });
-                        }}
-                      >
-                        {getNomeExibicao(linha, nomeLinha)}
-                      </button>
+                      {getNomeExibicao(linha, nomeLinha)}
+                    </button>
+                  </span>
+                  {linha ? (
+                    <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                  ) : (
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+                      style={{
+                        backgroundColor: 'var(--neutral-bg)',
+                        color: 'var(--neutral-text)',
+                      }}
+                    >
+                      Sem previsão
                     </span>
-                    {linha ? (
-                      <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
-                    ) : (
-                      <span
-                        className="rounded-full px-2 py-0.5 text-[11px] font-medium"
-                        style={{
-                          backgroundColor: 'var(--neutral-bg)',
-                          color: 'var(--neutral-text)',
-                        }}
-                      >
-                        Sem previsão
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         )}
