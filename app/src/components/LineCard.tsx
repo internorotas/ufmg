@@ -189,10 +189,13 @@ function LineCardComponent({
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
   const getSuspendedMessage = () => getLinhaNotRunningMessage(linha.categoriaDia);
 
+  // Isola a data de `now` (que atualiza a cada 30s) para memoizar O(N log N) do parseSchedules por dia
+  const dayKey = now.toDateString();
   const schedulesInMinutes = useMemo(() => {
-    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+    const referenceDate = new Date(dayKey);
+    const horariosDoDia = obterHorariosLinhaNoDia(linha, referenceDate);
     return parseSchedules(horariosDoDia);
-  }, [linha, now]);
+  }, [linha, dayKey]);
 
   // Passa schedulesInMinutes para obterStatusLinha para evitar recálculo O(N log N)
   const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);

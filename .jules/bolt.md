@@ -1,0 +1,3 @@
+## 2024-05-18 - Isolate React state side-effects from frequent time updates
+**Learning:** `useCurrentTime()` updates every 30 seconds. If `now` is used directly in dependency arrays for `useMemo` hooks containing expensive operations (like `parseSchedules` sorting arrays in `LineCard`), the O(N log N) logic will run constantly even if the schedules for the line don't actually change.
+**Action:** Extract a stable day identifier (e.g. `now.toDateString()`) and pass that down instead of `now` to any logic determining "what are today's schedules" so recalculations only happen once a day, rather than every 30 seconds.
