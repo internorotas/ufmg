@@ -27,7 +27,7 @@ export const footerButtonVariants = tv({
   variants: {
     intent: {
       danger: 'bg-red-600 text-white hover:bg-red-700',
-      primary: 'bg-blue-600 text-white hover:bg-blue-700',
+      primary: 'bg-brand-primary text-white hover:bg-brand-primary/90',
       ghost: [
         'border border-card-border bg-background text-text-primary',
         'hover:bg-background-secondary hover:text-text-primary',

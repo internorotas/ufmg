@@ -232,7 +232,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   return (
     <>
       <div
-        className="fixed left-1/2 top-4 z-1001 -translate-x-1/2 md:hidden"
+        className="fixed left-1/2 top-4 z-50 -translate-x-1/2 md:hidden"
         aria-hidden={isMenuVisible}
       >
         <div
