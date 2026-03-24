@@ -3,37 +3,38 @@
  * Design System - Interno Rotas UFMG
  */
 
-import React, { memo, useMemo, type KeyboardEvent } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { Bus, Clock, ChevronRight } from "lucide-react";
-import { cn } from "../lib/utils";
-import { timeToMinutes, minutesToTime } from "../../lib/utils";
-import { useAnalytics } from "../hooks/useAnalytics";
-import { shouldDisableRegularSchedules } from "../config/specialPeriods";
-import { LineStatusBadge, type LineStatusType } from "./ui/Badge";
-import type { Linha } from "../types/data.types";
-
-// ============================================================================
-// VARIANTS - Definição de estilos com tailwind-variants
-// ============================================================================
+import { Bus, ChevronRight, Clock } from 'lucide-react';
+import type React from 'react';
+import { memo, useMemo } from 'react';
+import { tv, type VariantProps } from 'tailwind-variants';
+import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { useCurrentTime } from '../hooks/useCurrentTime';
+import {
+  cn,
+  findScheduleIndex,
+  minutesToTime,
+  obterHorariosLinhaNoDia,
+  obterStatusLinha,
+  timeToMinutes,
+} from '../lib/utils';
+import type { Linha } from '../types/data.types';
+import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 
 /**
  * Variantes do card principal
  */
 export const lineCardVariants = tv({
   base: [
-    "relative overflow-hidden rounded-xl border bg-card shadow-sm",
-    "cursor-pointer transition-all duration-200 ease-out",
-    "hover:shadow-lg hover:-translate-y-0.5",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2",
+    'relative overflow-hidden rounded-xl border bg-card shadow-sm',
+    'cursor-pointer transition-all duration-200 ease-out',
+    'hover:shadow-lg hover:-translate-y-0.5',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
   ],
   variants: {
     selected: {
-      true: [
-        "border-2 border-brand-primary shadow-lg",
-        "ring-1 ring-brand-primary/20",
-      ],
-      false: ["border-card-border", "hover:border-info-border"],
+      true: ['border-2 border-brand-primary shadow-lg', 'ring-1 ring-brand-primary/20'],
+      false: ['border-card-border', 'hover:border-info-border'],
     },
   },
   defaultVariants: {
@@ -46,21 +47,16 @@ export const lineCardVariants = tv({
  */
 export const detailsButtonVariants = tv({
   base: [
-    "w-full py-2.5 rounded-lg text-white font-semibold cursor-pointer",
-    "text-xs md:text-sm shadow-sm",
-    "hover:brightness-110 active:scale-[0.97] transition-all duration-150",
+    'w-full py-2.5 rounded-lg text-white font-semibold cursor-pointer',
+    'text-xs md:text-sm shadow-sm',
+    'hover:brightness-110 active:scale-[0.97] transition-all duration-150',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
   ],
 });
-
-// ============================================================================
-// TYPES
-// ============================================================================
 
 interface ScheduleResult {
   nextSchedule: string;
   previousSchedule: string;
-  status: string;
-  statusType: LineStatusType;
 }
 
 export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
@@ -72,13 +68,11 @@ export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
   onDetailsClick: (linha: Linha) => void;
   /** Se o card está selecionado */
   isSelected?: boolean;
+  /** Parada selecionada para calculo de ETA */
+  idParada?: string;
   /** Classe CSS adicional */
   className?: string;
 }
-
-// ============================================================================
-// HELPERS
-// ============================================================================
 
 /**
  * Analisa e ordena os horários em minutos.
@@ -88,61 +82,35 @@ function parseSchedules(horarios: string[]): number[] {
   if (!horarios || horarios.length === 0) return [];
 
   return horarios
-    .filter((time) => time && time.includes(":"))
+    .filter((time) => time?.includes(':'))
     .map(timeToMinutes)
     .sort((a, b) => a - b);
 }
 
-/**
- * Calcula o status com base nos horários já processados e no tempo atual.
- * Esta operação é barata (O(N)) e pode rodar em cada render para garantir frescor.
- */
-function calculateStatus(
-  schedulesInMinutes: number[],
-  currentMinutes: number,
-): ScheduleResult {
+function calculateSchedules(schedulesInMinutes: number[], currentMinutes: number): ScheduleResult {
   if (schedulesInMinutes.length === 0) {
     return {
-      nextSchedule: "--:--",
-      previousSchedule: "--:--",
-      status: "Sem Horários",
-      statusType: "closed",
+      nextSchedule: '--:--',
+      previousSchedule: '--:--',
     };
   }
 
-  let nextSchedule = "--:--";
-  let previousSchedule = "--:--";
-  let status = "Encerrado";
-  let statusType: LineStatusType = "closed";
+  let nextSchedule = '--:--';
+  let previousSchedule = '--:--';
 
-  // Próximo horário
-  const next = schedulesInMinutes.find((schedule) => schedule > currentMinutes);
-  if (next !== undefined) {
-    nextSchedule = minutesToTime(next);
-    const diffMinutes = next - currentMinutes;
-    if (diffMinutes <= 15) {
-      status = `Próximo às ${nextSchedule}`;
-      statusType = "upcoming";
-    } else {
-      status = "Circulando";
-      statusType = "running";
-    }
+  const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
+
+  if (nextIndex < schedulesInMinutes.length) {
+    nextSchedule = minutesToTime(schedulesInMinutes[nextIndex]);
   }
 
-  // Último que partiu
-  for (let i = schedulesInMinutes.length - 1; i >= 0; i--) {
-    if (schedulesInMinutes[i] <= currentMinutes) {
-      previousSchedule = minutesToTime(schedulesInMinutes[i]);
-      break;
-    }
+  const prevIndex = nextIndex - 1;
+  if (prevIndex >= 0 && prevIndex < schedulesInMinutes.length) {
+    previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
   }
 
-  return { nextSchedule, previousSchedule, status, statusType };
+  return { nextSchedule, previousSchedule };
 }
-
-// ============================================================================
-// SUBCOMPONENTS
-// ============================================================================
 
 interface LineIconProps {
   color: string;
@@ -168,18 +136,15 @@ interface ScheduleDisplayProps {
 
 function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
   return (
-    <div
-      data-slot="schedule"
-      className="rounded-lg bg-background-secondary/50 p-2 text-center"
-    >
+    <div data-slot="schedule" className="rounded-lg bg-background-secondary/50 p-2 text-center">
       <p className="mb-1 flex items-center justify-center gap-1 text-xs text-text-secondary">
         <Clock className="size-3.5" />
         {label}
       </p>
       <p
         className={cn(
-          "text-base font-bold md:text-lg",
-          highlight ? "text-success-text" : "text-text-primary",
+          'text-base font-bold md:text-lg',
+          highlight ? 'text-success-text' : 'text-text-primary',
         )}
       >
         {time}
@@ -196,16 +161,12 @@ function SuspendedNotice({ message }: SuspendedNoticeProps) {
   return (
     <div
       data-slot="notice"
-      className="mb-4 rounded-lg border border-red-600/50 bg-red-900/20 p-3 text-center"
+      className="mb-4 rounded-lg border border-warning-border/50 bg-warning-bg/20 p-3 text-center"
     >
-      <p className="text-xs font-semibold text-red-300 md:text-sm">{message}</p>
+      <p className="text-xs font-semibold text-warning-text md:text-sm">{message}</p>
     </div>
   );
 }
-
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
 
 /**
  * Card que exibe informações sobre uma linha de ônibus.
@@ -229,86 +190,61 @@ function LineCardComponent({
   className,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
+  const now = useCurrentTime();
 
-  // Verificar categoria da linha
-  const isVacationLine = linha.categoriaDia === "feriasRecessos";
-  const isSaturdayLine = linha.categoriaDia === "sabado";
-  const isWeekdayLine = linha.categoriaDia === "diasUteis";
+  const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
+  const getSuspendedMessage = () => getLinhaNotRunningMessage(linha.categoriaDia);
 
-  // Verificar período atual
-  const isInVacationPeriod = shouldDisableRegularSchedules();
-
-  // Verificar dia da semana (domingo=0, sábado=6)
-  const today = new Date().getDay();
-  const isSaturday = today === 6;
-  const isSunday = today === 0;
-  const isWeekday = today >= 1 && today <= 5;
-
-  // Lógica de quando cada categoria NÃO circula:
-  // - Linhas de dias úteis: não circulam em fins de semana ou durante período de férias
-  // - Linhas de sábado: não circulam fora do sábado ou durante período de férias
-  // - Linhas de férias: não circulam fora do período de férias ou em fins de semana
-  const shouldDisableSchedules =
-    (isWeekdayLine && (!isWeekday || isInVacationPeriod)) ||
-    (isSaturdayLine && (!isSaturday || isInVacationPeriod)) ||
-    (isVacationLine && (!isInVacationPeriod || isSunday || isSaturday));
-
-  // Determinar mensagem de suspensão baseada na categoria
-  const getSuspendedMessage = (): string => {
-    if (isWeekdayLine) {
-      if (isInVacationPeriod) return "Linha suspensa durante férias";
-      if (isSaturday) return "Linha não circula aos sábados";
-      if (isSunday) return "Linha não circula aos domingos";
-    }
-    if (isSaturdayLine) {
-      if (isInVacationPeriod) return "Linha suspensa durante férias";
-      return "Linha circula apenas aos sábados";
-    }
-    if (isVacationLine) {
-      if (!isInVacationPeriod) return "Linha circula apenas durante férias";
-      if (isSaturday || isSunday) return "Linha não circula em fins de semana";
-    }
-    return "Linha não está circulando";
-  };
-
-  // Otimização: Memoizar o processamento pesado dos horários (parse + sort)
   const schedulesInMinutes = useMemo(() => {
-    return parseSchedules(linha.horarios);
-  }, [linha.horarios]);
+    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
+    return parseSchedules(horariosDoDia);
+  }, [linha, now]);
 
-  // Calcular status baseado no tempo atual
-  const { nextSchedule, previousSchedule, status, statusType } = (() => {
-    if (shouldDisableSchedules) {
-      return {
-        nextSchedule: "Indisponível",
-        previousSchedule: "Indisponível",
-        status: "Não Circulando",
-        statusType: "notRunning" as LineStatusType,
-      };
+  // Passa schedulesInMinutes para obterStatusLinha para evitar recálculo O(N log N)
+  const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const { nextSchedule, previousSchedule } = calculateSchedules(schedulesInMinutes, currentMinutes);
+
+  const status =
+    shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE'
+      ? 'Não Circulando'
+      : statusLinha.texto;
+
+  const statusType: LineStatusType = (() => {
+    if (shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE') {
+      return 'notRunning';
     }
-
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-    return calculateStatus(schedulesInMinutes, currentMinutes);
+    if (statusLinha.id === 'AGUARDANDO_PRIMEIRA_SAIDA') {
+      return 'upcoming';
+    }
+    if (statusLinha.id === 'CIRCULANDO') {
+      return 'running';
+    }
+    return 'closed';
   })();
 
   const handleCardClick = () => {
+    trackEvent({
+      category: 'engagement',
+      action: 'click_line_card',
+      label: `${linha.nome} | status=${statusLinha.id} | prox=${nextSchedule}`,
+    });
     onClick(linha);
   };
 
   const handleDetailsClickInternal = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent({
-      category: "Engajamento",
-      action: "Abrir Card Detalhes",
+      category: 'navigation',
+      action: 'view_stop_details',
       label: linha.nome,
     });
     onDetailsClick(linha);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
+  const handleCardKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onClick(linha);
     }
@@ -317,20 +253,14 @@ function LineCardComponent({
   return (
     <article
       data-slot="card"
-      data-state={isSelected ? "selected" : undefined}
-      role="button"
+      data-state={isSelected ? 'selected' : undefined}
+      aria-label={`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ''}. Status: ${status}`}
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: Card contains interactive elements and must be focusable via tabIndex instead of role="button"
       tabIndex={0}
-      aria-label={`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ""}. Status: ${status}`}
-      aria-pressed={isSelected}
       onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-      className={cn(
-        lineCardVariants({ selected: isSelected }),
-        "mb-3",
-        className,
-      )}
+      onKeyDown={handleCardKeyDown}
+      className={cn(lineCardVariants({ selected: isSelected }), 'mb-3', className)}
     >
-      {/* Header */}
       <div data-slot="header" className="relative w-full p-4 pb-3 text-left">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-1 items-start gap-3">
@@ -340,9 +270,7 @@ function LineCardComponent({
                 {linha.nome}
               </h3>
               {linha.sublinha && (
-                <p className="mt-0.5 text-xs text-text-secondary md:text-sm">
-                  {linha.sublinha}
-                </p>
+                <p className="mt-0.5 text-xs text-text-secondary md:text-sm">{linha.sublinha}</p>
               )}
             </div>
           </div>
@@ -353,10 +281,11 @@ function LineCardComponent({
         </div>
       </div>
 
-      {/* Body */}
       <div data-slot="body" className="px-4 pb-4">
-        {shouldDisableSchedules ? (
-          <SuspendedNotice message={getSuspendedMessage()} />
+        {shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE' ? (
+          <SuspendedNotice
+            message={shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto}
+          />
         ) : (
           <div className="mb-4 grid grid-cols-2 gap-3">
             <ScheduleDisplay label="Último Partiu" time={previousSchedule} />
@@ -364,7 +293,6 @@ function LineCardComponent({
           </div>
         )}
 
-        {/* Button */}
         <button
           type="button"
           aria-label={`Ver detalhes da linha ${linha.nome}`}

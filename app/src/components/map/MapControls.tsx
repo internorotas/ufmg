@@ -4,10 +4,10 @@
  * Componentes utilitários para controle de visualização do mapa.
  */
 
-import React, { useEffect } from "react";
-import { useMap } from "react-leaflet";
-import L from "leaflet";
-import type { Parada } from "../../types/data.types";
+import type L from 'leaflet';
+import React, { useEffect } from 'react';
+import { useMap } from 'react-leaflet';
+import type { Parada } from '../../types/data.types';
 
 interface ChangeViewProps {
   bounds: L.LatLngBounds | null;
@@ -52,12 +52,10 @@ export const CenterOnParada = React.memo(function CenterOnParada({
   const map = useMap();
 
   useEffect(() => {
-    if (parada && parada.coordenadas) {
+    if (parada?.coordenadas) {
       try {
         map.setView(parada.coordenadas, zoom, { animate, duration });
-      } catch (e) {
-        console.error("Erro ao centralizar no mapa:", e);
-      }
+      } catch (_e) {}
     }
   }, [parada, map, zoom, animate, duration]);
 

@@ -10,6 +10,7 @@
     />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="theme-color" content="#2c0eeb" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <title>Interno Rotas 🚌 | Horários e Rotas dos Ônibus da UFMG</title>
 
@@ -76,6 +77,43 @@
       content="Interno Rotas — Mapa e horários dos ônibus da UFMG"
     />
     <meta property="twitter:creator" content="@titanmpolo" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Interno Rotas",
+        "alternateName": "Interno Rotas UFMG",
+        "url": "https://internorotas.github.io/ufmg/",
+        "description": "Mapa interativo com as rotas e horários em tempo real dos ônibus internos do campus Pampulha da UFMG. Planeje seus trajetos com previsão de chegada.",
+        "applicationCategory": "TransportationApplication",
+        "operatingSystem": "Web",
+        "inLanguage": "pt-BR",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "BRL"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Igor Martins"
+        },
+        "about": {
+          "@type": "EducationalOrganization",
+          "name": "UFMG",
+          "alternateName": "Universidade Federal de Minas Gerais",
+          "url": "https://ufmg.br"
+        },
+        "featureList": [
+          "Mapa interativo das linhas de ônibus",
+          "Horários em tempo real com previsão de chegada",
+          "Itinerário detalhado das paradas",
+          "Filtro por linha e destino"
+        ]
+      }
+    </script>
   </head>
 
   <body>

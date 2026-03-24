@@ -1,17 +1,16 @@
-/**
- * Utilitários para o Design System
- * Interno Rotas - UFMG
- */
+/** Utilitários compartilhados de estilo, tempo e regras operacionais de linhas. */
 
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { isLineAvailableToday } from '../config/specialPeriods';
+import type { Linha } from '../types/data.types';
+import { getSaoPauloDayOfWeek, getSaoPauloMinutesOfDay, getSaoPauloNow } from './time';
 
 /**
  * Mescla classes CSS usando clsx e tailwind-merge.
- * Útil para combinar classes condicionais e evitar conflitos do Tailwind.
  *
- * @param inputs - Classes CSS a serem mescladas
- * @returns String com as classes mescladas e sem duplicatas
+ * @param inputs Classes CSS estáticas e condicionais.
+ * @returns String única com classes normalizadas sem conflito de utilitários Tailwind.
  *
  * @example
  * ```tsx
@@ -20,4 +19,325 @@ import { twMerge } from "tailwind-merge";
  */
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
+}
+
+/**
+ * Converte horário `HH:MM` em minutos desde meia-noite.
+ *
+ * @param horaString Horário no formato textual `HH:MM`.
+ * @returns Total de minutos desde `00:00` ou `NaN` quando o formato é inválido.
+ */
+export function converterHoraParaMinutos(horaString: string): number {
+  if (!horaString) return NaN;
+
+  const colonIndex = horaString.indexOf(':');
+  if (colonIndex === -1) return NaN;
+
+  const horas = Number(horaString.slice(0, colonIndex));
+  const minutos = Number(horaString.slice(colonIndex + 1));
+
+  if (Number.isNaN(horas) || Number.isNaN(minutos)) return NaN;
+
+  return horas * 60 + minutos;
+}
+
+/**
+ * Converte minutos desde meia-noite para `HH:MM` com normalização cíclica de 24h.
+ *
+ * @param minutosTotais Valor absoluto ou relativo em minutos.
+ * @returns Horário formatado em `HH:MM` ou `--:--` para entrada inválida.
+ */
+export function converterMinutosParaHora(minutosTotais: number): string {
+  if (!Number.isFinite(minutosTotais)) return '--:--';
+
+  const minutosNoDia = 24 * 60;
+  const valorNormalizado =
+    ((Math.floor(minutosTotais) % minutosNoDia) + minutosNoDia) % minutosNoDia;
+  const horas = Math.floor(valorNormalizado / 60);
+  const minutos = valorNormalizado % 60;
+
+  return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
+}
+
+interface HorariosPorDia {
+  diasUteis?: string[];
+  sabados?: string[];
+  domingos?: string[];
+}
+
+function parseHorarioValido(horario: string): number | null {
+  if (!horario || !horario.includes(':')) return null;
+  const minutos = converterHoraParaMinutos(horario);
+  return Number.isFinite(minutos) ? minutos : null;
+}
+
+function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
+  const diaSemana = getSaoPauloDayOfWeek(dataAtual);
+  if (diaSemana === 6) return 'sabados';
+  if (diaSemana === 0) return 'domingos';
+  return 'diasUteis';
+}
+
+/**
+ * Retorna os horários válidos da linha para o dia atual.
+ * Suporta formato legado (array) e formato por dia (objeto).
+ *
+ * @param linha Linha com estrutura de horários legada ou segmentada por dia.
+ * @param dataAtual Data usada para escolher o conjunto de horários vigente.
+ * @returns Lista de horários válidos para o dia, já filtrada por formato.
+ */
+export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[] {
+  // Regra de negócio central: somente linhas vigentes no dia entram no motor de horários/ETA.
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const horariosBrutos = linha.horarios as unknown;
+
+  if (Array.isArray(horariosBrutos)) {
+    return horariosBrutos.filter((horario) => parseHorarioValido(horario) !== null);
+  }
+
+  if (!horariosBrutos || typeof horariosBrutos !== 'object') {
+    return [];
+  }
+
+  const horariosPorDia = horariosBrutos as HorariosPorDia;
+  const chaveDia = obterChaveDiaSemana(dataAtual);
+  const horariosDia = horariosPorDia[chaveDia];
+
+  if (!Array.isArray(horariosDia) || horariosDia.length === 0) {
+    return [];
+  }
+
+  return horariosDia.filter((horario) => parseHorarioValido(horario) !== null);
+}
+
+/**
+ * Calcula status operacional da linha no instante atual.
+ *
+ * @param linha Linha a ser classificada.
+ * @param dataAtual Data/hora de referência.
+ * @returns Identificador técnico, texto de exibição e severidade visual do status.
+ */
+export function obterStatusLinha(
+  linha: Linha,
+  dataAtual: Date,
+  horariosPreCalculados?: number[],
+): { id: string; texto: string; cor: string } {
+  // Verifica disponibilidade primeiro, independente de horários pré-calculados.
+  // Sem este guarda, linhas de sábado/férias passariam como "Circulando" em
+  // dias úteis quando `horariosPreCalculados` é fornecido (e não é vazio).
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return { id: 'NAO_CIRCULA_HOJE', texto: 'Não circula hoje', cor: 'danger' };
+  }
+
+  const horariosHoje =
+    horariosPreCalculados ??
+    obterHorariosLinhaNoDia(linha, dataAtual)
+      .map((horario) => converterHoraParaMinutos(horario))
+      .filter((minutos) => Number.isFinite(minutos))
+      .sort((a, b) => a - b);
+
+  if (horariosHoje.length === 0) {
+    return {
+      id: 'NAO_CIRCULA_HOJE',
+      texto: 'Não circula hoje',
+      cor: 'danger',
+    };
+  }
+
+  const agoraMinutos = getSaoPauloMinutesOfDay(dataAtual);
+  const primeiroHorario = horariosHoje[0];
+  const ultimoHorario = horariosHoje[horariosHoje.length - 1];
+
+  if (agoraMinutos < primeiroHorario) {
+    return {
+      id: 'AGUARDANDO_PRIMEIRA_SAIDA',
+      texto: `Próximo às ${converterMinutosParaHora(primeiroHorario)}`,
+      cor: 'warning',
+    };
+  }
+
+  if (agoraMinutos > ultimoHorario) {
+    return {
+      id: 'ENCERRADA',
+      texto: 'Encerrado',
+      cor: 'neutral',
+    };
+  }
+
+  return {
+    id: 'CIRCULANDO',
+    texto: 'Circulando',
+    cor: 'info',
+  };
+}
+
+/**
+ * Calcula a distância em quilômetros entre duas coordenadas geográficas
+ * usando a fórmula de Haversine.
+ *
+ * @param lat1 Latitude do ponto 1.
+ * @param lon1 Longitude do ponto 1.
+ * @param lat2 Latitude do ponto 2.
+ * @param lon2 Longitude do ponto 2.
+ * @returns Distância em quilômetros.
+ *
+ * @example
+ * ```ts
+ * // Distância entre UFMG e Praça da Liberdade
+ * const distancia = calcularDistanciaKm(-19.87055, -43.96775, -19.9319, -43.9387);
+ * console.log(distancia); // ~7.5 km
+ * ```
+ */
+export function calcularDistanciaKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
+  const RAIO_TERRA_KM = 6371;
+
+  const toRad = (graus: number) => (graus * Math.PI) / 180;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return RAIO_TERRA_KM * c;
+}
+
+/**
+ * Encontra o índice do primeiro elemento do array cujo valor é estritamente
+ * maior que o alvo. Retorna o tamanho do array quando não há elemento futuro.
+ * Requer array ordenado em ordem crescente.
+ */
+export function findScheduleIndex<T>(
+  sortedArray: T[],
+  target: number,
+  getVal: (item: T) => number = (item) => item as unknown as number,
+): number {
+  let left = 0;
+  let right = sortedArray.length;
+
+  while (left < right) {
+    const mid = Math.floor((left + right) / 2);
+    if (getVal(sortedArray[mid]) > target) {
+      right = mid;
+    } else {
+      left = mid + 1;
+    }
+  }
+
+  return left;
+}
+
+const _paradasCache = new WeakMap<object, Map<string, unknown>>();
+
+/**
+ * Busca paradas do itinerário pelos IDs fornecidos, preservando a ordem.
+ * Usa WeakMap como cache para evitar recriar o mapa a cada chamada.
+ */
+export function buscarParadasPorIds<T extends { idParada: string }>(
+  itinerarioParadasIds: string[],
+  todasParadas: T[],
+): T[] {
+  let paradasMap = _paradasCache.get(todasParadas) as Map<string, T> | undefined;
+
+  if (!paradasMap) {
+    paradasMap = new Map<string, T>();
+    for (const parada of todasParadas) {
+      paradasMap.set(parada.idParada, parada);
+    }
+    _paradasCache.set(todasParadas, paradasMap);
+  }
+
+  return itinerarioParadasIds
+    .map((id) => (paradasMap as Map<string, T>).get(id))
+    .filter((p): p is T => p !== undefined);
+}
+
+/**
+ * Normaliza o nome de uma linha para busca case-insensitive sem acentos.
+ * Remove conteúdos entre parênteses para evitar diferenças de nomenclatura.
+ */
+export function normalizarNomeLinha(nomeLinha: string): string {
+  return nomeLinha
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s*\(.*?\)\s*/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * Aliases para compatibilidade com código legado que usa nomenclatura em inglês.
+ * Prefira `converterHoraParaMinutos` e `converterMinutosParaHora` em código novo.
+ */
+export const timeToMinutes = converterHoraParaMinutos;
+export const minutesToTime = converterMinutosParaHora;
+
+/**
+ * Calcula o próximo e o anterior horário com base no horário atual de São Paulo.
+ *
+ * @param horarios Lista de horários no formato `HH:MM`.
+ * @returns Objeto com `nextSchedule` e `previousSchedule` formatados em `HH:MM`.
+ */
+export function calculateNextAndPreviousSchedule(horarios: string[]): {
+  nextSchedule: string;
+  previousSchedule: string;
+} {
+  if (!horarios || horarios.length === 0) {
+    return { nextSchedule: '--:--', previousSchedule: '--:--' };
+  }
+
+  const currentMinutes = getSaoPauloMinutesOfDay(getSaoPauloNow());
+
+  const schedulesInMinutes = horarios
+    .filter((time) => time?.includes(':'))
+    .map(converterHoraParaMinutos)
+    .sort((a, b) => a - b);
+
+  if (schedulesInMinutes.length === 0) {
+    return { nextSchedule: '--:--', previousSchedule: '--:--' };
+  }
+
+  const nextIndex = findScheduleIndex(schedulesInMinutes, currentMinutes);
+
+  let nextSchedule: string;
+  let previousSchedule: string;
+
+  if (nextIndex < schedulesInMinutes.length) {
+    nextSchedule = converterMinutosParaHora(schedulesInMinutes[nextIndex]);
+
+    let prevIndex = nextIndex - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] >= currentMinutes) {
+      prevIndex--;
+    }
+
+    previousSchedule =
+      prevIndex >= 0
+        ? converterMinutosParaHora(schedulesInMinutes[prevIndex])
+        : converterMinutosParaHora(schedulesInMinutes[schedulesInMinutes.length - 1]);
+  } else {
+    nextSchedule = converterMinutosParaHora(schedulesInMinutes[0]);
+
+    let prevIndex = schedulesInMinutes.length - 1;
+    while (prevIndex >= 0 && schedulesInMinutes[prevIndex] >= currentMinutes) {
+      prevIndex--;
+    }
+
+    previousSchedule =
+      prevIndex >= 0
+        ? converterMinutosParaHora(schedulesInMinutes[prevIndex])
+        : converterMinutosParaHora(schedulesInMinutes[schedulesInMinutes.length - 1]);
+  }
+
+  return { nextSchedule, previousSchedule };
 }

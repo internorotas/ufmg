@@ -1,5 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
+
+/* Garante que html/body/#root preencham 100% da viewport — crítico para iOS/WebKit */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
 
 /*
   Design System - Interno Rotas
@@ -65,6 +74,7 @@
   --color-internoRotas-cinza-grafite: #3a3b3c;
 
   /* Fontes */
+  --font-family-sans: Poppins, sans-serif;
   --font-poppins: Poppins, sans-serif;
 }
 
@@ -171,10 +181,9 @@ body {
   font-family: var(--font-poppins);
   background: var(--background);
   color: var(--text-primary);
-  /* Transição suave para troca de tema */
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  height: 100%;
+  width: 100%;
+  /* REMOVIDA: transition de background/color causa colapso de renderização no WebKit */
 }
 
 /* Scrollbar Personalizada */
@@ -210,7 +219,28 @@ body {
 }
 
 .leaflet-popup-content p {
+  margin: 0 !important;
   color: var(--text-secondary) !important;
+}
+
+.leaflet-popup-close-button {
+  top: 6px !important;
+  right: 6px !important;
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  font-size: 20px !important;
+  border-radius: 9999px;
+  color: var(--text-secondary) !important;
+  background: transparent;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--text-primary) !important;
+  background-color: var(--card-hover);
 }
 
 /* Dialog/Modal Backdrop - Ensure it covers everything including Leaflet */
@@ -390,32 +420,16 @@ body {
 @keyframes enter {
   from {
     opacity: var(--tw-enter-opacity, 1);
-    transform: translate3d(
-        var(--tw-enter-translate-x, 0),
-        var(--tw-enter-translate-y, 0),
-        0
-      )
-      scale3d(
-        var(--tw-enter-scale, 1),
-        var(--tw-enter-scale, 1),
-        var(--tw-enter-scale, 1)
-      );
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1));
   }
 }
 
 @keyframes exit {
   to {
     opacity: var(--tw-exit-opacity, 1);
-    transform: translate3d(
-        var(--tw-exit-translate-x, 0),
-        var(--tw-exit-translate-y, 0),
-        0
-      )
-      scale3d(
-        var(--tw-exit-scale, 1),
-        var(--tw-exit-scale, 1),
-        var(--tw-exit-scale, 1)
-      );
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0)
+      scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1));
   }
 }
 
@@ -456,4 +470,36 @@ body {
 path.leaflet-ant-path {
   fill: none;
   animation: linear infinite leaflet-ant-path-animation;
+}
+
+/* ============================================================================
+   MOBILE VIEWPORT FIX
+   Resolve o problema da barra de endereço do Chrome mobile
+   que aparece/desaparece durante scroll, causando problemas de layout.
+   ============================================================================ */
+
+/* Garante que o body não tenha overflow indesejado no mobile */
+html,
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* ============================================================================
+   CUSTOM TEXT SIZE CLASSES
+   Classes customizadas para tamanhos de texto comuns sem valores arbitrários
+   ============================================================================ */
+.text-micro {
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.text-tiny {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.text-sm-medium {
+  font-size: 15px;
+  line-height: 1.4;
 }

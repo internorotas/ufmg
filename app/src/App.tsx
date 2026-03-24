@@ -1,20 +1,26 @@
-import { lazy, Suspense, useEffect, useCallback } from "react";
-import ReactGA from "react-ga4";
-import { MenuLateral } from "./components/MenuLateral";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import { RotasProvider, useRotas } from "./contexts/RotasContext";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { useAnalytics } from "./hooks/useAnalytics";
-import type { Linha, Parada } from "./types/data.types";
+import { lazy, Suspense, useCallback, useEffect } from 'react';
+import { AdminLayout } from './components/admin/AdminLayout';
+import { AnalyticsProvider } from './components/app/AnalyticsProvider';
+import { DataStatusScreen } from './components/app/DataStatusScreen';
+import { ModalManager } from './components/app/ModalManager';
+import { OfflineToast } from './components/app/OfflineToast';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { MenuLateral } from './components/MenuLateral';
+import { RotasProvider, useRotas } from './contexts/RotasContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { useAnalytics } from './hooks/useAnalytics';
+import { useAppConnectivity } from './hooks/useAppConnectivity';
+import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
+import { useMapAutoCenter } from './hooks/useMapAutoCenter';
+import { ga4Analytics } from './services/analytics';
+import type { Linha, Parada } from './types/data.types';
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
-const Mapa = lazy(() =>
-  import("./components/Mapa").then((module) => ({ default: module.Mapa })),
-);
+const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default: module.Mapa })));
 
 // Componente simples de Loading
 const LoadingMap = () => (
-  <div className="flex items-center justify-center h-full w-full bg-gray-100">
+  <div className="flex items-center justify-center h-full w-full bg-background-secondary">
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
   </div>
 );
@@ -24,7 +30,7 @@ const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 // Inicializa o Google Analytics APENAS se a ID existir
 if (GA_MEASUREMENT_ID) {
-  ReactGA.initialize(GA_MEASUREMENT_ID);
+  ga4Analytics.initialize();
 }
 
 /**
@@ -35,6 +41,8 @@ function AppContent() {
   const {
     linhasData,
     todasParadas,
+    isLoadingData,
+    dataError,
     linhaSelecionada,
     paradaSelecionada,
     selecionarLinha,
@@ -43,9 +51,31 @@ function AppContent() {
   } = useRotas();
 
   const { trackEvent, trackPageView } = useAnalytics();
+  const { isOffline, showOfflineToast } = useAppConnectivity();
+
+  // Hook de localização do usuário
+  const {
+    localizacao,
+    heading,
+    permissaoConcedida,
+    carregando: carregandoLocalizacao,
+    erro: erroLocalizacao,
+    mostrarModalPermissao,
+    mostrarModalLonge,
+    fecharModalPermissao,
+    fecharModalLonge,
+    iniciarRastreamento,
+    solicitarPermissaoNavegador,
+  } = useLocalizacaoUsuario();
+  const { solicitarAutoCenter, consumirAutoCenter } = useMapAutoCenter({
+    mapaRef,
+    localizacao,
+    carregandoLocalizacao,
+    mostrarModalLonge,
+  });
 
   useEffect(() => {
-    trackPageView();
+    trackPageView('/home');
   }, [trackPageView]);
 
   // Handlers com tracking de analytics
@@ -53,82 +83,144 @@ function AppContent() {
     (linha: Linha) => {
       selecionarLinha(linha);
       trackEvent({
-        category: "Engajamento",
-        action: "Selecionar Linha",
+        event: 'select_line',
+        category: 'engagement',
+        action: 'select_line',
         label: linha.nome,
       });
+      trackPageView(`/line/${linha.idRota}`);
     },
-    [selecionarLinha, trackEvent],
+    [selecionarLinha, trackEvent, trackPageView],
   );
 
   const handleParadaClick = useCallback(
     (parada: Parada) => {
       selecionarParada(parada);
+      mapaRef.current?.centralizarParada(parada);
       trackEvent({
-        category: "Engajamento",
-        action: "Selecionar Parada",
+        event: 'select_stop',
+        category: 'map_interaction',
+        action: 'select_stop',
         label: parada.nome,
       });
     },
-    [selecionarParada, trackEvent],
+    [selecionarParada, mapaRef, trackEvent],
   );
 
+  // Handler para voltar ao campus UFMG
+  const handleVoltarParaUFMG = useCallback(() => {
+    consumirAutoCenter();
+    mapaRef.current?.centralizarCoordenada(COORDENADAS_UFMG, 15);
+    fecharModalLonge();
+  }, [consumirAutoCenter, mapaRef, fecharModalLonge]);
+
+  // Handler para ficar na localização atual do usuário
+  const handleContinuarAqui = useCallback(() => {
+    if (localizacao) {
+      mapaRef.current?.centralizarCoordenada(localizacao, 17);
+      consumirAutoCenter();
+    }
+    fecharModalLonge();
+  }, [localizacao, consumirAutoCenter, mapaRef, fecharModalLonge]);
+
   // Validação dos dados
+  if (isLoadingData) {
+    return (
+      <DataStatusScreen
+        title="Carregando dados..."
+        description="Buscando linhas e paradas em /public/data."
+      />
+    );
+  }
+
+  if (dataError) {
+    return (
+      <DataStatusScreen title="Erro ao carregar dados" description={dataError} variant="warning" />
+    );
+  }
+
   if (!todasParadas || todasParadas.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen w-screen bg-gray-100 text-gray-800">
-        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-red-600">
-            ⚠️ Dados não encontrados
-          </h2>
-          <p className="text-gray-600">
+      <DataStatusScreen
+        title="⚠️ Dados não encontrados"
+        variant="warning"
+        description={
+          <>
             Não foi possível carregar os dados de paradas.
             <br />
-            Verifique a integridade dos arquivos em{" "}
-            <code>/src/data/paradas.ts</code>.
-          </p>
-        </div>
-      </div>
+            Verifique a integridade dos arquivos em <code>/public/data/paradas.json</code>.
+          </>
+        }
+      />
     );
   }
 
   if (!linhasData || !linhasData.categoriasDias) {
     return (
-      <div className="flex items-center justify-center h-screen w-screen bg-gray-100 text-gray-800">
-        <div className="text-center p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-2 text-red-600">
-            ⚠️ Erro nos Dados de Linhas
-          </h2>
-          <p className="text-gray-600">
+      <DataStatusScreen
+        title="⚠️ Erro nos Dados de Linhas"
+        variant="warning"
+        description={
+          <>
             Não foi possível carregar os dados das linhas.
             <br />
-            Verifique a integridade dos arquivos em{" "}
-            <code>/src/data/linhas.ts</code>.
-          </p>
-        </div>
-      </div>
+            Verifique a integridade dos arquivos em <code>/public/data/linhas.json</code>.
+          </>
+        }
+      />
     );
   }
 
   return (
-    <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
+    <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
       <MenuLateral
         linhasData={linhasData}
         todasParadas={todasParadas}
         onLinhaSelect={handleLinhaSelect}
         onParadaClick={handleParadaClick}
         linhaSelecionada={linhaSelecionada}
+        isOffline={isOffline}
       />
-      <main role="main" className="h-full w-full grow">
+      <main className="h-full w-full grow">
         <Suspense fallback={<LoadingMap />}>
           <Mapa
             ref={mapaRef}
             todasParadas={todasParadas}
             linhaSelecionada={linhaSelecionada}
             paradaSelecionada={paradaSelecionada}
+            localizacaoUsuario={localizacao}
+            headingUsuario={heading}
+            permissaoLocalizacao={permissaoConcedida}
+            carregandoLocalizacao={carregandoLocalizacao}
+            onPedirLocalizacao={() => {
+              solicitarAutoCenter();
+              iniciarRastreamento();
+            }}
           />
         </Suspense>
       </main>
+
+      <ModalManager
+        erroLocalizacao={erroLocalizacao}
+        carregandoLocalizacao={carregandoLocalizacao}
+        mostrarModalPermissao={mostrarModalPermissao}
+        mostrarModalLonge={mostrarModalLonge}
+        onClosePermissao={fecharModalPermissao}
+        onCloseLonge={fecharModalLonge}
+        onPermitirLocalizacao={() => {
+          solicitarAutoCenter();
+          solicitarPermissaoNavegador();
+          trackEvent({
+            event: 'location_permission_granted',
+            category: 'preferences',
+            action: 'location_permission_granted',
+          });
+        }}
+        onVoltarUFMG={handleVoltarParaUFMG}
+        onContinuarAqui={handleContinuarAqui}
+      />
+
+      <OfflineToast show={showOfflineToast} />
     </div>
   );
 }
@@ -140,11 +232,21 @@ function AppContent() {
  * @returns {JSX.Element} O componente principal da aplicação renderizado.
  */
 export function App() {
+  if (import.meta.env.DEV && window.location.search.includes('admin=true')) {
+    return (
+      <ThemeProvider>
+        <AdminLayout />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <ThemeProvider>
         <RotasProvider>
-          <AppContent />
+          <AnalyticsProvider>
+            <AppContent />
+          </AnalyticsProvider>
         </RotasProvider>
       </ThemeProvider>
     </ErrorBoundary>
