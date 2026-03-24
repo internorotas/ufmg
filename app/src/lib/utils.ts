@@ -125,6 +125,13 @@ export function obterStatusLinha(
   dataAtual: Date,
   horariosPreCalculados?: number[],
 ): { id: string; texto: string; cor: string } {
+  // Verifica disponibilidade primeiro, independente de horários pré-calculados.
+  // Sem este guarda, linhas de sábado/férias passariam como "Circulando" em
+  // dias úteis quando `horariosPreCalculados` é fornecido (e não é vazio).
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return { id: 'NAO_CIRCULA_HOJE', texto: 'Não circula hoje', cor: 'danger' };
+  }
+
   const horariosHoje =
     horariosPreCalculados ??
     obterHorariosLinhaNoDia(linha, dataAtual)
