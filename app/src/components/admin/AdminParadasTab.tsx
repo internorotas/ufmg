@@ -328,9 +328,8 @@ export function AdminParadasTab({
 
               {/* Coordenadas */}
               <div>
-                  <span className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide">
-                  Coordenadas{' '}
-                  <span className="normal-case font-normal">(ou arraste no mapa)</span>
+                <span className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide">
+                  Coordenadas <span className="normal-case font-normal">(ou arraste no mapa)</span>
                 </span>
                 <div className="flex gap-2">
                   <div className="flex-1">
