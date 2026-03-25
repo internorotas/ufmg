@@ -34,7 +34,7 @@ export function ModalManager({
         title={
           <div className="flex items-center gap-2">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary/10">
-              <Navigation className="h-4 w-4 text-brand-primary" />
+              <Navigation aria-hidden="true" className="h-4 w-4 text-brand-primary" />
             </span>
             <span>Ativar Localização</span>
           </div>
@@ -44,7 +44,7 @@ export function ModalManager({
         <div className="space-y-4 p-4">
           <div className="text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary shadow-sm">
-              <MapPin className="h-8 w-8 text-white" />
+              <MapPin aria-hidden="true" className="h-8 w-8 text-white" />
             </div>
             <p className="text-text-secondary">
               Para mostrar sua localização no mapa e te ajudar a encontrar a parada mais próxima,

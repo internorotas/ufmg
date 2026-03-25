@@ -1,4 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+/* Poppins via @fontsource — processado pelo Vite junto com o CSS crítico,
+   eliminando o request externo ao Google Fonts e os imports síncronos em JS. */
+@import "@fontsource/poppins/300.css";
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
+@import "@fontsource/poppins/600.css";
+@import "@fontsource/poppins/700.css";
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
