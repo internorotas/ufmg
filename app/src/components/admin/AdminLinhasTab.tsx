@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { type DragEndEvent } from 'leaflet';
@@ -22,11 +22,7 @@ const vertexIcon = L.divIcon({
 });
 
 /** Calcula a distância de um ponto a um segmento de reta (em graus — serve para coordenadas próximas) */
-function distToSegment(
-  p: [number, number],
-  a: [number, number],
-  b: [number, number],
-): number {
+function distToSegment(p: [number, number], a: [number, number], b: [number, number]): number {
   const dx = b[1] - a[1];
   const dy = b[0] - a[0];
   const lenSq = dx * dx + dy * dy;
@@ -68,8 +64,7 @@ function MapEvents({
   return null;
 }
 
-const FIELD_LABEL =
-  'block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide';
+const FIELD_LABEL = 'block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide';
 const FIELD_INPUT =
   'w-full h-9 border border-input-border bg-input text-text-primary px-3 rounded text-sm';
 const BTN_SMALL = 'px-2.5 py-1.5 text-xs rounded border transition-colors';
@@ -132,7 +127,10 @@ function LinhaSelector({
         <div className="absolute z-9999 top-full left-0 right-0 mt-1 bg-card border border-card-border rounded shadow-xl max-h-64 overflow-y-auto">
           <button
             type="button"
-            onClick={() => { onChange(null); setOpen(false); }}
+            onClick={() => {
+              onChange(null);
+              setOpen(false);
+            }}
             className="w-full text-left px-3 py-2 text-sm text-text-secondary hover:bg-card-hover border-b border-card-border"
           >
             -- Selecione --
@@ -141,7 +139,10 @@ function LinhaSelector({
             <button
               key={l.idRota}
               type="button"
-              onClick={() => { onChange(l.idRota); setOpen(false); }}
+              onClick={() => {
+                onChange(l.idRota);
+                setOpen(false);
+              }}
               className={`w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-card-hover transition-colors border-b border-card-border last:border-0 ${
                 l.idRota === selectedId ? 'bg-brand-primary/10' : ''
               }`}
@@ -359,12 +360,12 @@ export function AdminLinhasTab({
 
         {/* Seletor de linha + adicionar/excluir */}
         <div className="p-3 border-b border-card-border">
-          <label className={FIELD_LABEL}>
+          <p className={FIELD_LABEL}>
             Linha{' '}
             <span className="normal-case font-normal">
               ({activeCategory?.linhas.length ?? 0} cadastradas)
             </span>
-          </label>
+          </p>
           <div className="flex gap-1.5">
             <LinhaSelector
               linhas={activeCategory?.linhas ?? []}
@@ -418,9 +419,7 @@ export function AdminLinhasTab({
         {/* Editor da linha */}
         <div className="flex-1 overflow-y-auto p-3">
           {!selectedLinha ? (
-            <p className="text-sm text-text-secondary">
-              Selecione ou crie uma linha para editar.
-            </p>
+            <p className="text-sm text-text-secondary">Selecione ou crie uma linha para editar.</p>
           ) : (
             <div className="flex flex-col gap-3">
               {/* Nome */}
