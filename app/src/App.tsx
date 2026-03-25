@@ -182,22 +182,42 @@ function AppContent() {
         isOffline={isOffline}
       />
       <main className="h-full w-full grow">
-        <Suspense fallback={<LoadingMap />}>
-          <Mapa
-            ref={mapaRef}
-            todasParadas={todasParadas}
-            linhaSelecionada={linhaSelecionada}
-            paradaSelecionada={paradaSelecionada}
-            localizacaoUsuario={localizacao}
-            headingUsuario={heading}
-            permissaoLocalizacao={permissaoConcedida}
-            carregandoLocalizacao={carregandoLocalizacao}
-            onPedirLocalizacao={() => {
-              solicitarAutoCenter();
-              iniciarRastreamento();
-            }}
-          />
-        </Suspense>
+        <ErrorBoundary
+          fallback={
+            <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-background-secondary p-8 text-center">
+              <p className="text-lg font-semibold text-text-primary">
+                Não foi possível carregar o mapa
+              </p>
+              <p className="text-sm text-text-secondary">
+                Recarregue a página para tentar novamente.
+              </p>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white"
+              >
+                Recarregar
+              </button>
+            </div>
+          }
+        >
+          <Suspense fallback={<LoadingMap />}>
+            <Mapa
+              ref={mapaRef}
+              todasParadas={todasParadas}
+              linhaSelecionada={linhaSelecionada}
+              paradaSelecionada={paradaSelecionada}
+              localizacaoUsuario={localizacao}
+              headingUsuario={heading}
+              permissaoLocalizacao={permissaoConcedida}
+              carregandoLocalizacao={carregandoLocalizacao}
+              onPedirLocalizacao={() => {
+                solicitarAutoCenter();
+                iniciarRastreamento();
+              }}
+            />
+          </Suspense>
+        </ErrorBoundary>
       </main>
 
       <ModalManager

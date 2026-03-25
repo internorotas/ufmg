@@ -243,7 +243,13 @@ export const MenuLateral = React.memo(function MenuLateral({
           }`}
         >
           <div className="rounded-xl bg-brand-primary px-4 py-2 shadow-lg backdrop-blur-sm">
-            <img src={logo} alt="Logo Interno Rotas" className="h-5 w-auto" />
+            <img
+              src={logo}
+              alt="Logo Interno Rotas"
+              className="h-5 w-auto"
+              width="115"
+              height="20"
+            />
           </div>
         </div>
       </div>
@@ -298,7 +304,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           className="flex shrink-0 items-center justify-between bg-brand-primary p-2 shadow-sm"
         >
           <div className="flex flex-1 items-center justify-center">
-            <img src={logo} alt="Logo Interno Rotas" className="h-6" />
+            <img src={logo} alt="Logo Interno Rotas" className="h-6" width="138" height="24" />
           </div>
 
           <div className="flex items-center gap-2">
