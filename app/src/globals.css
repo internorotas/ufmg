@@ -1,12 +1,13 @@
 /* Poppins via @fontsource — apenas subset latin (pt-BR não usa devanagari/latin-ext),
-   eliminando ~10 preloads desnecessários de subsets não utilizados. */
-@import "@fontsource/poppins/latin-300.css";
+   eliminando ~10 preloads desnecessários de subsets não utilizados.
+   Weight 300 (font-light) não é usado no projeto. */
 @import "@fontsource/poppins/latin-400.css";
 @import "@fontsource/poppins/latin-500.css";
 @import "@fontsource/poppins/latin-600.css";
 @import "@fontsource/poppins/latin-700.css";
 @import "tailwindcss";
-@import "leaflet/dist/leaflet.css";
+/* leaflet.css movido para Mapa.tsx (componente lazy) para não gerar
+   preloads das imagens do Leaflet durante o carregamento inicial. */
 
 /* Garante que html/body/#root preencham 100% da viewport — crítico para iOS/WebKit */
 html,
