@@ -1,10 +1,10 @@
-/* Poppins via @fontsource — processado pelo Vite junto com o CSS crítico,
-   eliminando o request externo ao Google Fonts e os imports síncronos em JS. */
-@import "@fontsource/poppins/300.css";
-@import "@fontsource/poppins/400.css";
-@import "@fontsource/poppins/500.css";
-@import "@fontsource/poppins/600.css";
-@import "@fontsource/poppins/700.css";
+/* Poppins via @fontsource — apenas subset latin (pt-BR não usa devanagari/latin-ext),
+   eliminando ~10 preloads desnecessários de subsets não utilizados. */
+@import "@fontsource/poppins/latin-300.css";
+@import "@fontsource/poppins/latin-400.css";
+@import "@fontsource/poppins/latin-500.css";
+@import "@fontsource/poppins/latin-600.css";
+@import "@fontsource/poppins/latin-700.css";
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
