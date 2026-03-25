@@ -216,7 +216,7 @@ function getAllLineSchedules(linha: Linha): string[] {
 
   if (Array.isArray(horariosRaw)) {
     return horariosRaw
-      .filter((h) => h?.includes(':'))
+      .filter((h): h is string => typeof h === 'string' && h.includes(':'))
       .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
   }
 
@@ -235,7 +235,7 @@ function getAllLineSchedules(linha: Linha): string[] {
       ...(horariosPorDia.domingos ?? []),
     ]),
   )
-    .filter((h) => h?.includes(':'))
+    .filter((h) => h.includes(':'))
     .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
 }
 
@@ -281,7 +281,6 @@ export function LinhaDetalhesModal({
     const horariosDaLinha = getAllLineSchedules(linha);
 
     return horariosDaLinha
-      .filter((h) => h?.includes(':'))
       .map((horario, idx) => ({
         id: `${horario}-${idx}`,
         horario,
