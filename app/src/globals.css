@@ -479,6 +479,26 @@ path.leaflet-ant-path {
   animation: linear infinite leaflet-ant-path-animation;
 }
 
+/* Marcador destacado — pisca para chamar atenção do usuário após selecionar
+   uma parada no modal de itinerário. A animação combina escala e opacidade
+   para um efeito natural sem causar layout shift. */
+@keyframes marker-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px transparent);
+  }
+  50% {
+    transform: scale(1.25);
+    filter: drop-shadow(0 0 8px rgba(44, 14, 235, 0.8));
+  }
+}
+
+.marker-highlighted img {
+  animation: marker-pulse 0.6s ease-in-out 3;
+  transform-origin: bottom center;
+}
+
 /* ============================================================================
    MOBILE VIEWPORT FIX
    Resolve o problema da barra de endereço do Chrome mobile
