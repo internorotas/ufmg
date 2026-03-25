@@ -1,163 +1,353 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { type DragEndEvent } from 'leaflet';
 import icon from '../../assets/marker.svg';
 import type { CategoriaLinhas, Linha, Parada } from '../../types/data.types';
 
+const DEFAULT_CENTER: [number, number] = [-19.87055, -43.96775];
+
 const stationIcon = L.icon({
   iconUrl: icon,
-  iconSize: [30, 30],
-  iconAnchor: [15, 30],
-  popupAnchor: [0, -30],
+  iconSize: [24, 24],
+  iconAnchor: [12, 24],
+  popupAnchor: [0, -24],
 });
 
-// Create a small custom icon for vertices
 const vertexIcon = L.divIcon({
-  className: 'custom-vertex-icon',
-  html: '<div style="width:10px;height:10px;background:white;border:2px solid black;border-radius:50%"></div>',
+  className: '',
+  html: '<div style="width:10px;height:10px;background:white;border:2px solid #333;border-radius:50%;cursor:pointer"></div>',
   iconSize: [14, 14],
   iconAnchor: [7, 7],
 });
 
-function RouteEditorEvents({
-  enabled,
+/** Calcula a distância de um ponto a um segmento de reta (em graus — serve para coordenadas próximas) */
+function distToSegment(
+  p: [number, number],
+  a: [number, number],
+  b: [number, number],
+): number {
+  const dx = b[1] - a[1];
+  const dy = b[0] - a[0];
+  const lenSq = dx * dx + dy * dy;
+  if (lenSq === 0) return Math.hypot(p[1] - a[1], p[0] - a[0]);
+  const t = Math.max(0, Math.min(1, ((p[1] - a[1]) * dx + (p[0] - a[0]) * dy) / lenSq));
+  return Math.hypot(p[1] - (a[1] + t * dx), p[0] - (a[0] + t * dy));
+}
+
+/** Insere um ponto entre os dois vértices do segmento mais próximo */
+function insertNearestSegment(
+  coords: [number, number][],
+  point: [number, number],
+): [number, number][] {
+  if (coords.length < 2) return [...coords, point];
+  let best = 0;
+  let bestDist = Infinity;
+  for (let i = 0; i < coords.length - 1; i++) {
+    const d = distToSegment(point, coords[i], coords[i + 1]);
+    if (d < bestDist) {
+      bestDist = d;
+      best = i;
+    }
+  }
+  return [...coords.slice(0, best + 1), point, ...coords.slice(best + 1)];
+}
+
+function MapEvents({
+  drawMode,
   onAddPoint,
 }: {
-  enabled: boolean;
-  onAddPoint: (latlng: [number, number]) => void;
+  drawMode: boolean;
+  onAddPoint: (p: [number, number]) => void;
 }) {
   useMapEvents({
     click(e) {
-      if (enabled) {
-        onAddPoint([e.latlng.lat, e.latlng.lng]);
-      }
+      if (drawMode) onAddPoint([e.latlng.lat, e.latlng.lng]);
     },
   });
   return null;
+}
+
+const FIELD_LABEL =
+  'block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide';
+const FIELD_INPUT =
+  'w-full h-9 border border-input-border bg-input text-text-primary px-3 rounded text-sm';
+const BTN_SMALL = 'px-2.5 py-1.5 text-xs rounded border transition-colors';
+
+/** Seletor customizado com swatch de cor, nome, sublinha e idRota para fácil diferenciação */
+function LinhaSelector({
+  linhas,
+  selectedId,
+  onChange,
+}: {
+  linhas: Linha[];
+  selectedId: string | null;
+  onChange: (id: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Fecha ao clicar fora
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const selected = linhas.find((l) => l.idRota === selectedId) ?? null;
+
+  return (
+    <div ref={ref} className="relative flex-1 min-w-0">
+      {/* Botão de trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full h-9 flex items-center gap-2 border border-input-border bg-input text-text-primary px-2.5 rounded text-sm text-left truncate hover:bg-card-hover transition-colors"
+      >
+        {selected ? (
+          <>
+            <span
+              className="w-3.5 h-3.5 rounded-full shrink-0 border border-black/20"
+              style={{ background: selected.corHex }}
+            />
+            <span className="truncate flex-1 min-w-0">
+              <span className="font-medium">{selected.linha}.</span> {selected.nome}
+              {selected.sublinha ? (
+                <span className="text-text-secondary"> · {selected.sublinha}</span>
+              ) : null}
+            </span>
+            <span className="text-text-tertiary font-mono text-xs shrink-0">{selected.idRota}</span>
+          </>
+        ) : (
+          <span className="text-text-secondary">-- Selecione --</span>
+        )}
+        <span className="ml-auto text-text-secondary text-xs shrink-0">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {/* Lista dropdown */}
+      {open && (
+        <div className="absolute z-9999 top-full left-0 right-0 mt-1 bg-card border border-card-border rounded shadow-xl max-h-64 overflow-y-auto">
+          <button
+            type="button"
+            onClick={() => { onChange(null); setOpen(false); }}
+            className="w-full text-left px-3 py-2 text-sm text-text-secondary hover:bg-card-hover border-b border-card-border"
+          >
+            -- Selecione --
+          </button>
+          {linhas.map((l) => (
+            <button
+              key={l.idRota}
+              type="button"
+              onClick={() => { onChange(l.idRota); setOpen(false); }}
+              className={`w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-card-hover transition-colors border-b border-card-border last:border-0 ${
+                l.idRota === selectedId ? 'bg-brand-primary/10' : ''
+              }`}
+            >
+              {/* Swatch */}
+              <span
+                className="w-3.5 h-3.5 rounded-full shrink-0 border border-black/20"
+                style={{ background: l.corHex }}
+              />
+              {/* Nome principal */}
+              <span className="flex-1 min-w-0">
+                <span className="text-sm font-medium text-text-primary">
+                  <span className="text-text-secondary">{l.linha}.</span> {l.nome}
+                </span>
+                {l.sublinha && (
+                  <span className="block text-xs text-text-secondary">{l.sublinha}</span>
+                )}
+              </span>
+              {/* ID único */}
+              <span className="text-xs font-mono text-text-tertiary shrink-0 bg-background-secondary px-1.5 py-0.5 rounded">
+                {l.idRota}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function AdminLinhasTab({
   linhasData,
   setLinhasData,
   paradas,
-  setActiveTab,
-  onExport,
 }: {
   linhasData: CategoriaLinhas;
-  setLinhasData: (l: CategoriaLinhas) => void;
+  setLinhasData: (l: CategoriaLinhas | ((prev: CategoriaLinhas) => CategoriaLinhas)) => void;
   paradas: Parada[];
-  setActiveTab: (tab: 'paradas' | 'linhas') => void;
-  onExport: () => void;
 }) {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [drawMode, setDrawMode] = useState(false);
   const [activeCategoryIdx, setActiveCategoryIdx] = useState(0);
-  const [itinerarioDrafts, setItinerarioDrafts] = useState<Record<string, string>>({});
-  const [horariosDrafts, setHorariosDrafts] = useState<Record<string, string>>({});
+  const [itinerarioDraft, setItinerarioDraft] = useState<string | null>(null);
+  const [horariosDraft, setHorariosDraft] = useState<string | null>(null);
+  const [showDeleteLinhaConfirm, setShowDeleteLinhaConfirm] = useState(false);
 
-  // Helper flatten to get the active line
   const activeCategory = linhasData.categoriasDias[activeCategoryIdx];
-  const selectedLinha = activeCategory?.linhas.find((l) => l.idRota === selectedRouteId) || null;
-  const selectedLinhaKey = selectedLinha ? `${activeCategoryIdx}-${selectedLinha.idRota}` : null;
+  const selectedLinha = activeCategory?.linhas.find((l) => l.idRota === selectedRouteId) ?? null;
+
   const uniqueParadas = useMemo(() => {
     const byId = new Map<string, Parada>();
-    for (const parada of paradas) {
-      if (!byId.has(parada.idParada)) {
-        byId.set(parada.idParada, parada);
-      }
+    for (const p of paradas) {
+      if (!byId.has(p.idParada)) byId.set(p.idParada, p);
     }
     return Array.from(byId.values());
   }, [paradas]);
 
-  const itinerarioInput = selectedLinhaKey
-    ? (itinerarioDrafts[selectedLinhaKey] ?? selectedLinha?.itinerarioParadasIds.join(', ') ?? '')
-    : '';
-  const horariosInput = selectedLinhaKey
-    ? (horariosDrafts[selectedLinhaKey] ?? JSON.stringify(selectedLinha?.horarios ?? [], null, 2))
-    : '[]';
+  const updateCats = useCallback(
+    (updater: (cats: CategoriaLinhas['categoriasDias']) => CategoriaLinhas['categoriasDias']) => {
+      setLinhasData({ categoriasDias: updater(linhasData.categoriasDias) });
+    },
+    [linhasData, setLinhasData],
+  );
 
-  const handleUpdateLinha = (updated: Linha) => {
-    const newCategories = [...linhasData.categoriasDias];
-    newCategories[activeCategoryIdx] = {
-      ...newCategories[activeCategoryIdx],
-      linhas: newCategories[activeCategoryIdx].linhas.map((l) =>
-        l.idRota === updated.idRota ? updated : l,
-      ),
-    };
-    setLinhasData({ categoriasDias: newCategories });
-  };
+  const updateLinha = useCallback(
+    (updated: Linha) => {
+      updateCats((cats) =>
+        cats.map((cat, i) =>
+          i === activeCategoryIdx
+            ? { ...cat, linhas: cat.linhas.map((l) => (l.idRota === updated.idRota ? updated : l)) }
+            : cat,
+        ),
+      );
+    },
+    [activeCategoryIdx, updateCats],
+  );
 
-  const handleDragVertex = (idx: number, e: DragEndEvent) => {
+  const handleDragVertex = useCallback(
+    (idx: number, e: DragEndEvent) => {
+      if (!selectedLinha) return;
+      const { lat, lng } = e.target.getLatLng();
+      const newCoords = [...selectedLinha.coordenadasTrajeto];
+      newCoords[idx] = [lat, lng];
+      updateLinha({ ...selectedLinha, coordenadasTrajeto: newCoords });
+    },
+    [selectedLinha, updateLinha],
+  );
+
+  const handleDeleteVertex = useCallback(
+    (idx: number) => {
+      if (!selectedLinha) return;
+      updateLinha({
+        ...selectedLinha,
+        coordenadasTrajeto: selectedLinha.coordenadasTrajeto.filter((_, i) => i !== idx),
+      });
+    },
+    [selectedLinha, updateLinha],
+  );
+
+  const handleAddPoint = useCallback(
+    (point: [number, number]) => {
+      if (!selectedLinha) return;
+      updateLinha({
+        ...selectedLinha,
+        coordenadasTrajeto: [...selectedLinha.coordenadasTrajeto, point],
+      });
+    },
+    [selectedLinha, updateLinha],
+  );
+
+  const handlePolylineClick = useCallback(
+    (e: L.LeafletMouseEvent) => {
+      if (!selectedLinha || drawMode) return;
+      L.DomEvent.stopPropagation(e);
+      const point: [number, number] = [e.latlng.lat, e.latlng.lng];
+      updateLinha({
+        ...selectedLinha,
+        coordenadasTrajeto: insertNearestSegment(selectedLinha.coordenadasTrajeto, point),
+      });
+    },
+    [selectedLinha, drawMode, updateLinha],
+  );
+
+  const handleReverseRoute = useCallback(() => {
     if (!selectedLinha) return;
-    const latlng = e.target.getLatLng();
-    const newCoords = [...selectedLinha.coordenadasTrajeto];
-    newCoords[idx] = [latlng.lat, latlng.lng];
-    handleUpdateLinha({ ...selectedLinha, coordenadasTrajeto: newCoords });
-  };
-
-  const handleDeleteVertex = (idx: number) => {
-    if (!selectedLinha) return;
-    const newCoords = selectedLinha.coordenadasTrajeto.filter((_, i) => i !== idx);
-    handleUpdateLinha({ ...selectedLinha, coordenadasTrajeto: newCoords });
-  };
-
-  const handleAddPoint = (point: [number, number]) => {
-    if (!selectedLinha) return;
-    handleUpdateLinha({
+    updateLinha({
       ...selectedLinha,
-      coordenadasTrajeto: [...selectedLinha.coordenadasTrajeto, point],
+      coordenadasTrajeto: [...selectedLinha.coordenadasTrajeto].reverse(),
     });
+  }, [selectedLinha, updateLinha]);
+
+  const handleClearRoute = useCallback(() => {
+    if (!selectedLinha) return;
+    updateLinha({ ...selectedLinha, coordenadasTrajeto: [] });
+  }, [selectedLinha, updateLinha]);
+
+  const handleAddLinha = useCallback(() => {
+    if (!activeCategory) return;
+    const newId = `${activeCategory.categoriaDia}_NEW_${Date.now()}`;
+    const nova: Linha = {
+      idRota: newId,
+      linha: 99,
+      nome: 'Nova Linha',
+      tipo: 'circular',
+      sublinha: null,
+      categoriaDia: activeCategory.categoriaDia,
+      corHex: '#888888',
+      descricao: '',
+      horarios: [],
+      itinerarioParadasIds: [],
+      coordenadasTrajeto: [],
+    };
+    updateCats((cats) =>
+      cats.map((cat, i) =>
+        i === activeCategoryIdx ? { ...cat, linhas: [...cat.linhas, nova] } : cat,
+      ),
+    );
+    setSelectedRouteId(newId);
+    setItinerarioDraft(null);
+    setHorariosDraft(null);
+    setShowDeleteLinhaConfirm(false);
+    setDrawMode(false);
+  }, [activeCategory, activeCategoryIdx, updateCats]);
+
+  const handleDeleteLinha = useCallback(() => {
+    if (!selectedRouteId) return;
+    updateCats((cats) =>
+      cats.map((cat, i) =>
+        i === activeCategoryIdx
+          ? { ...cat, linhas: cat.linhas.filter((l) => l.idRota !== selectedRouteId) }
+          : cat,
+      ),
+    );
+    setSelectedRouteId(null);
+    setShowDeleteLinhaConfirm(false);
+  }, [selectedRouteId, activeCategoryIdx, updateCats]);
+
+  const itinerarioValue = itinerarioDraft ?? selectedLinha?.itinerarioParadasIds.join(', ') ?? '';
+  const horariosValue = horariosDraft ?? JSON.stringify(selectedLinha?.horarios ?? [], null, 2);
+  const vertexCount = selectedLinha?.coordenadasTrajeto.length ?? 0;
+
+  const selectLinha = (id: string | null) => {
+    setSelectedRouteId(id);
+    setItinerarioDraft(null);
+    setHorariosDraft(null);
+    setShowDeleteLinhaConfirm(false);
+    setDrawMode(false);
   };
 
   return (
     <>
-      <div className="w-96 flex flex-col bg-sidebar shadow-lg z-1000 h-full overflow-hidden border-r border-card-border">
-        {/* Header Options */}
-        <div className="p-4 border-b border-card-border flex justify-between items-center bg-card">
-          <h1 className="text-xl font-bold text-text-primary">Admin Panel</h1>
-          <button
-            type="button"
-            onClick={onExport}
-            className="px-4 py-2 bg-brand-primary text-text-inverse rounded hover:opacity-90 text-sm font-medium"
-          >
-            Export All
-          </button>
-        </div>
-
-        {/* Tabs inside sidebar */}
-        <div className="flex border-b border-card-border bg-card">
-          <button
-            type="button"
-            className={`flex-1 py-3 text-center font-medium text-text-secondary hover:text-text-primary`}
-            onClick={() => setActiveTab('paradas')}
-          >
-            Paradas
-          </button>
-          <button
-            type="button"
-            className={`flex-1 py-3 text-center font-medium border-b-2 border-brand-primary text-brand-primary`}
-            onClick={() => setActiveTab('linhas')}
-          >
-            Linhas
-          </button>
-        </div>
-
-        <div className="p-4 border-b border-card-border">
-          <label
-            htmlFor="admin-linhas-categoria"
-            className="block text-sm font-bold text-text-primary mb-1"
-          >
-            Categoria (Dia)
+      {/* Sidebar */}
+      <div className="w-96 flex flex-col bg-sidebar h-full overflow-hidden border-r border-card-border shrink-0">
+        {/* Seletor de categoria */}
+        <div className="p-3 border-b border-card-border">
+          <label htmlFor="al-categoria" className={FIELD_LABEL}>
+            Categoria do Dia
           </label>
           <select
-            id="admin-linhas-categoria"
+            id="al-categoria"
             value={activeCategoryIdx}
             onChange={(e) => {
               setActiveCategoryIdx(Number(e.target.value));
-              setSelectedRouteId(null);
+              selectLinha(null);
             }}
-            className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+            className={FIELD_INPUT}
           >
             {linhasData.categoriasDias.map((cat, idx) => (
               <option key={cat.id} value={idx}>
@@ -167,241 +357,354 @@ export function AdminLinhasTab({
           </select>
         </div>
 
-        <div className="p-4 border-b border-card-border">
-          <label
-            htmlFor="admin-linhas-rota"
-            className="block text-sm font-bold text-text-primary mb-1"
-          >
-            Selecionar Linha
+        {/* Seletor de linha + adicionar/excluir */}
+        <div className="p-3 border-b border-card-border">
+          <label className={FIELD_LABEL}>
+            Linha{' '}
+            <span className="normal-case font-normal">
+              ({activeCategory?.linhas.length ?? 0} cadastradas)
+            </span>
           </label>
-          <select
-            id="admin-linhas-rota"
-            value={selectedRouteId || ''}
-            onChange={(e) => setSelectedRouteId(e.target.value)}
-            className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
-          >
-            <option value="">-- Selecione --</option>
-            {activeCategory?.linhas.map((l) => (
-              <option key={l.idRota} value={l.idRota}>
-                {l.nome} ({l.linha})
-              </option>
-            ))}
-          </select>
+          <div className="flex gap-1.5">
+            <LinhaSelector
+              linhas={activeCategory?.linhas ?? []}
+              selectedId={selectedRouteId}
+              onChange={selectLinha}
+            />
+            <button
+              type="button"
+              onClick={handleAddLinha}
+              title="Nova linha nesta categoria"
+              className="px-2.5 py-1.5 text-xs rounded border border-success-border text-success-text bg-success-bg hover:opacity-90 transition-opacity"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowDeleteLinhaConfirm(true)}
+              disabled={!selectedRouteId}
+              title="Excluir linha selecionada"
+              className="px-2.5 py-1.5 text-xs rounded border border-warning-border text-warning-text bg-warning-bg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              −
+            </button>
+          </div>
+
+          {showDeleteLinhaConfirm && (
+            <div className="mt-2 flex flex-col gap-1.5">
+              <p className="text-xs font-semibold text-red-600 dark:text-red-400">
+                Excluir esta linha? Use Ctrl+Z para desfazer.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleDeleteLinha}
+                  className="flex-1 py-1.5 bg-red-600 border border-red-700 text-white rounded text-xs font-bold hover:bg-red-700 transition-colors"
+                >
+                  Confirmar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteLinhaConfirm(false)}
+                  className="flex-1 py-1.5 border border-card-border text-text-secondary rounded text-xs hover:bg-background-secondary"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="p-4 flex-1 overflow-y-auto w-full bg-sidebar">
+        {/* Editor da linha */}
+        <div className="flex-1 overflow-y-auto p-3">
           {!selectedLinha ? (
-            <p className="text-text-secondary text-sm">
-              Selecione uma linha para editar seu trajeto, dados e horários.
+            <p className="text-sm text-text-secondary">
+              Selecione ou crie uma linha para editar.
             </p>
           ) : (
             <div className="flex flex-col gap-3">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-lg text-text-primary">
-                  Editando {selectedLinha.nome}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setDrawMode(!drawMode)}
-                  className={`px-3 py-1 rounded text-sm font-medium ${drawMode ? 'bg-warning-bg text-warning-text border border-warning-border' : 'bg-info-bg text-info-text border border-info-border'}`}
-                >
-                  {drawMode ? 'Parar Desenho' : 'Desenhar Rota'}
-                </button>
-              </div>
-
+              {/* Nome */}
               <div>
-                <label
-                  htmlFor="admin-linhas-id-rota"
-                  className="block text-sm font-bold text-text-primary mb-1"
-                >
-                  ID da Rota
+                <label htmlFor="al-nome" className={FIELD_LABEL}>
+                  Nome
                 </label>
-                <input
-                  id="admin-linhas-id-rota"
-                  type="text"
-                  value={selectedLinha.idRota}
-                  onChange={(e) =>
-                    handleUpdateLinha({
-                      ...selectedLinha,
-                      idRota: e.target.value,
-                    })
-                  }
-                  className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                <textarea
+                  id="al-nome"
+                  rows={2}
+                  value={selectedLinha.nome}
+                  onChange={(e) => updateLinha({ ...selectedLinha, nome: e.target.value })}
+                  className="w-full border border-input-border bg-input text-text-primary px-3 py-2 rounded text-sm resize-none"
                 />
               </div>
 
+              {/* Número + Cor */}
               <div className="flex gap-2">
-                <div className="flex-1">
-                  <label
-                    htmlFor="admin-linhas-numero"
-                    className="block text-sm font-bold text-text-primary mb-1"
-                  >
-                    Número
+                <div style={{ width: '80px' }}>
+                  <label htmlFor="al-numero" className={FIELD_LABEL}>
+                    Nº
                   </label>
                   <input
-                    id="admin-linhas-numero"
+                    id="al-numero"
                     type="number"
                     value={selectedLinha.linha}
                     onChange={(e) =>
-                      handleUpdateLinha({
-                        ...selectedLinha,
-                        linha: Number(e.target.value),
-                      })
+                      updateLinha({ ...selectedLinha, linha: Number(e.target.value) })
                     }
-                    className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                    className="w-full h-9 border border-input-border bg-input text-text-primary px-2 rounded text-sm"
                   />
                 </div>
                 <div className="flex-1">
-                  <label
-                    htmlFor="admin-linhas-cor"
-                    className="block text-sm font-bold text-text-primary mb-1"
-                  >
-                    Cor Hex
+                  <label htmlFor="al-cor-hex" className={FIELD_LABEL}>
+                    Cor
+                  </label>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="color"
+                      value={selectedLinha.corHex}
+                      onChange={(e) => updateLinha({ ...selectedLinha, corHex: e.target.value })}
+                      title="Selecionar cor"
+                      className="h-9 w-10 rounded border border-input-border cursor-pointer p-0.5 bg-transparent shrink-0"
+                    />
+                    <input
+                      id="al-cor-hex"
+                      type="text"
+                      value={selectedLinha.corHex}
+                      onChange={(e) => updateLinha({ ...selectedLinha, corHex: e.target.value })}
+                      maxLength={7}
+                      className="flex-1 h-9 border border-input-border bg-input text-text-primary px-2 rounded text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ID + Tipo */}
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label htmlFor="al-id" className={FIELD_LABEL}>
+                    ID da Rota
                   </label>
                   <input
-                    id="admin-linhas-cor"
+                    id="al-id"
                     type="text"
-                    value={selectedLinha.corHex}
-                    onChange={(e) =>
-                      handleUpdateLinha({
-                        ...selectedLinha,
-                        corHex: e.target.value,
-                      })
-                    }
-                    className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                    value={selectedLinha.idRota}
+                    onChange={(e) => updateLinha({ ...selectedLinha, idRota: e.target.value })}
+                    className="w-full h-9 border border-input-border bg-input text-text-primary px-2 rounded text-xs font-mono"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="al-tipo" className={FIELD_LABEL}>
+                    Tipo
+                  </label>
+                  <input
+                    id="al-tipo"
+                    type="text"
+                    value={selectedLinha.tipo}
+                    onChange={(e) => updateLinha({ ...selectedLinha, tipo: e.target.value })}
+                    className="w-full h-9 border border-input-border bg-input text-text-primary px-3 rounded text-xs"
                   />
                 </div>
               </div>
 
+              {/* Sublinha */}
               <div>
-                <label
-                  htmlFor="admin-linhas-nome"
-                  className="block text-sm font-bold text-text-primary mb-1"
-                >
-                  Nome
+                <label htmlFor="al-sublinha" className={FIELD_LABEL}>
+                  Sublinha
                 </label>
                 <input
-                  id="admin-linhas-nome"
+                  id="al-sublinha"
                   type="text"
-                  value={selectedLinha.nome}
+                  value={selectedLinha.sublinha ?? ''}
+                  placeholder="(nenhuma)"
                   onChange={(e) =>
-                    handleUpdateLinha({
-                      ...selectedLinha,
-                      nome: e.target.value,
-                    })
+                    updateLinha({ ...selectedLinha, sublinha: e.target.value || null })
                   }
-                  className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                  className={FIELD_INPUT}
                 />
               </div>
 
+              {/* Descrição */}
               <div>
-                <label
-                  htmlFor="admin-linhas-itinerario"
-                  className="block text-sm font-bold text-text-primary mb-1"
-                >
-                  IDs das Paradas (Ordenadas por vírgula)
+                <label htmlFor="al-desc" className={FIELD_LABEL}>
+                  Descrição
                 </label>
                 <textarea
-                  id="admin-linhas-itinerario"
-                  rows={6}
-                  value={itinerarioInput}
+                  id="al-desc"
+                  rows={2}
+                  value={selectedLinha.descricao}
+                  onChange={(e) => updateLinha({ ...selectedLinha, descricao: e.target.value })}
+                  className="w-full border border-input-border bg-input text-text-primary px-3 py-2 rounded text-sm resize-none"
+                />
+              </div>
+
+              {/* Itinerário */}
+              <div>
+                <label htmlFor="al-itinerario" className={FIELD_LABEL}>
+                  Itinerário{' '}
+                  <span className="normal-case font-normal">(IDs das paradas, por vírgula)</span>
+                </label>
+                <textarea
+                  id="al-itinerario"
+                  rows={4}
+                  value={itinerarioValue}
                   onChange={(e) => {
-                    const text = e.target.value;
-                    if (selectedLinhaKey) {
-                      setItinerarioDrafts((prev) => ({
-                        ...prev,
-                        [selectedLinhaKey]: text,
-                      }));
-                    }
-                    const parsed = text
+                    setItinerarioDraft(e.target.value);
+                    const ids = e.target.value
                       .split(',')
                       .map((s) => s.trim())
                       .filter(Boolean);
-                    handleUpdateLinha({
-                      ...selectedLinha,
-                      itinerarioParadasIds: parsed,
-                    });
+                    updateLinha({ ...selectedLinha, itinerarioParadasIds: ids });
                   }}
-                  className="w-full min-h-32 border border-input-border bg-input text-text-primary p-3 rounded text-sm"
+                  className="w-full border border-input-border bg-input text-text-primary p-3 rounded text-xs font-mono resize-none"
                 />
+                <p className="text-xs text-text-secondary mt-0.5">
+                  {selectedLinha.itinerarioParadasIds.length} paradas no itinerário
+                </p>
               </div>
 
+              {/* Horários */}
               <div>
-                <label
-                  htmlFor="admin-linhas-horarios"
-                  className="block text-sm font-bold text-text-primary mb-1"
-                >
-                  Horários (JSON Array)
+                <label htmlFor="al-horarios" className={FIELD_LABEL}>
+                  Horários <span className="normal-case font-normal">(JSON array de strings)</span>
                 </label>
                 <textarea
-                  id="admin-linhas-horarios"
-                  rows={8}
-                  value={horariosInput}
+                  id="al-horarios"
+                  rows={6}
+                  value={horariosValue}
                   onChange={(e) => {
-                    const text = e.target.value;
-                    if (selectedLinhaKey) {
-                      setHorariosDrafts((prev) => ({
-                        ...prev,
-                        [selectedLinhaKey]: text,
-                      }));
-                    }
+                    setHorariosDraft(e.target.value);
                     try {
-                      const val = JSON.parse(text);
-                      if (Array.isArray(val)) {
-                        handleUpdateLinha({ ...selectedLinha, horarios: val });
-                      }
+                      const val = JSON.parse(e.target.value);
+                      if (Array.isArray(val)) updateLinha({ ...selectedLinha, horarios: val });
                     } catch {
-                      // ignore parse errors while typing
+                      // aguarda JSON válido
                     }
                   }}
-                  className="w-full min-h-44 border border-input-border bg-input text-text-primary p-3 rounded text-sm font-mono"
+                  className="w-full border border-input-border bg-input text-text-primary p-3 rounded text-xs font-mono resize-none"
                 />
+                <p className="text-xs text-text-secondary mt-0.5">
+                  {selectedLinha.horarios.length} horários cadastrados
+                </p>
+              </div>
+
+              {/* Seção do Trajeto */}
+              <div className="border-t border-card-border pt-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className={FIELD_LABEL}>Trajeto no Mapa</span>
+                  <span className="text-xs text-text-secondary font-mono">
+                    {vertexCount} vértices
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {/* Modo desenho */}
+                  <button
+                    type="button"
+                    onClick={() => setDrawMode((v) => !v)}
+                    className={`${BTN_SMALL} ${
+                      drawMode
+                        ? 'bg-info-bg text-info-text border-info-border'
+                        : 'border-card-border text-text-secondary hover:bg-background-secondary'
+                    }`}
+                  >
+                    {drawMode ? '✏️ Desenhando...' : '✏️ Desenhar'}
+                  </button>
+
+                  {/* Inverter rota */}
+                  <button
+                    type="button"
+                    onClick={handleReverseRoute}
+                    disabled={vertexCount < 2}
+                    title="Inverter sentido do trajeto"
+                    className={`${BTN_SMALL} border-card-border text-text-secondary hover:bg-background-secondary disabled:opacity-40 disabled:cursor-not-allowed`}
+                  >
+                    ⇄ Inverter
+                  </button>
+
+                  {/* Limpar rota */}
+                  <button
+                    type="button"
+                    onClick={handleClearRoute}
+                    disabled={vertexCount === 0}
+                    title="Apagar todo o trajeto"
+                    className={`${BTN_SMALL} border-warning-border text-warning-text bg-warning-bg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed`}
+                  >
+                    🗑 Limpar
+                  </button>
+                </div>
+
+                {/* Dica contextual */}
+                {drawMode ? (
+                  <p className="text-xs text-info-text mt-2">
+                    Clique no mapa para adicionar vértices ao <strong>final</strong> do trajeto.
+                    Clique em um vértice (marcador branco) para excluí-lo.
+                  </p>
+                ) : vertexCount > 1 ? (
+                  <p className="text-xs text-text-secondary mt-2">
+                    Clique sobre a <strong>linha colorida</strong> para inserir um vértice no
+                    segmento mais próximo. Clique em um vértice para excluí-lo.
+                  </p>
+                ) : null}
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Map Area */}
-      <div className="flex-1 relative z-0">
-        <MapContainer center={[-19.87055, -43.96775]} zoom={15} className="h-full w-full">
+      {/* Mapa */}
+      <div className="flex-1 relative">
+        <MapContainer center={DEFAULT_CENTER} zoom={15} className="h-full w-full">
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <RouteEditorEvents enabled={drawMode} onAddPoint={handleAddPoint} />
+          <MapEvents drawMode={drawMode} onAddPoint={handleAddPoint} />
 
-          {/* Render all paradas so you can see them while drawing routes */}
+          {/* Todas as paradas */}
           {uniqueParadas.map((p) => (
             <Marker key={p.idParada} position={p.coordenadas} icon={stationIcon}>
               <Popup>
-                {p.nome} ({p.idParada})
+                <strong>{p.nome}</strong>
+                <br />
+                <code className="text-xs">{p.idParada}</code>
               </Popup>
             </Marker>
           ))}
 
-          {selectedLinha && (
-            <>
+          {/* Rotas de outras linhas em modo fantasma */}
+          {linhasData.categoriasDias
+            .flatMap((cd) => cd.linhas)
+            .filter((l) => l.idRota !== selectedRouteId && l.coordenadasTrajeto.length > 1)
+            .map((l) => (
               <Polyline
-                positions={selectedLinha.coordenadasTrajeto}
-                pathOptions={{ color: selectedLinha.corHex, weight: 4 }}
+                key={`bg-${l.idRota}`}
+                positions={l.coordenadasTrajeto}
+                pathOptions={{ color: l.corHex, weight: 2, opacity: 0.25, dashArray: '4,4' }}
               />
-              {selectedLinha.coordenadasTrajeto.map((coord, idx) => (
-                <Marker
-                  key={`coord-${coord[0]}-${coord[1]}`}
-                  position={coord}
-                  icon={vertexIcon}
-                  draggable={true}
-                  eventHandlers={{
-                    dragend: (e) => handleDragVertex(idx, e),
-                    click: () => handleDeleteVertex(idx),
-                  }}
-                >
-                  <Popup>Vértice {idx}. Clique para excluir.</Popup>
-                </Marker>
-              ))}
-            </>
+            ))}
+
+          {/* Rota selecionada */}
+          {selectedLinha && selectedLinha.coordenadasTrajeto.length > 1 && (
+            <Polyline
+              positions={selectedLinha.coordenadasTrajeto}
+              pathOptions={{ color: selectedLinha.corHex, weight: 5, opacity: 0.9 }}
+              eventHandlers={{ click: handlePolylineClick }}
+            />
           )}
+
+          {/* Vértices da rota selecionada */}
+          {selectedLinha?.coordenadasTrajeto.map((coord, idx) => (
+            <Marker
+              // biome-ignore lint/suspicious/noArrayIndexKey: a ordem dos vértices é intencional e estável
+              key={`v${idx}`}
+              position={coord}
+              icon={vertexIcon}
+              draggable
+              eventHandlers={{
+                dragend: (e) => handleDragVertex(idx, e),
+                click: () => handleDeleteVertex(idx),
+              }}
+            />
+          ))}
         </MapContainer>
       </div>
     </>

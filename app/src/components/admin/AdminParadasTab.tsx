@@ -1,10 +1,12 @@
 import L, { type DragEndEvent } from 'leaflet';
-import { useMemo, useState } from 'react';
-import { MapContainer, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import icon from '../../assets/marker.svg';
 import type { CategoriaLinhas, Parada } from '../../types/data.types';
+
+const DEFAULT_CENTER: [number, number] = [-19.87055, -43.96775];
 
 const stationIcon = L.icon({
   iconUrl: icon,
@@ -21,247 +23,463 @@ const highlightedIcon = L.icon({
   className: 'marker-highlighted',
 });
 
+const CATEGORIA_OPTIONS = [
+  'Ponto de Origem/Destino',
+  'Parada Regular',
+  'Terminal',
+  'Externo',
+  'Especial',
+];
+
+/** Componente interno: atualiza coordenadas via ref (sem re-render na raiz) */
+function MapInteraction({
+  addMode,
+  onAdd,
+  coordRef,
+}: {
+  addMode: boolean;
+  onAdd: (lat: number, lng: number) => void;
+  coordRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  useMapEvents({
+    click(e) {
+      if (addMode) onAdd(e.latlng.lat, e.latlng.lng);
+    },
+    mousemove(e) {
+      if (coordRef.current) {
+        coordRef.current.textContent = `${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`;
+      }
+    },
+  });
+  return null;
+}
+
 export function AdminParadasTab({
   paradas,
   setParadas,
   linhasData,
-  setActiveTab,
-  onExport,
 }: {
   paradas: Parada[];
-  setParadas: (p: Parada[]) => void;
+  setParadas: (p: Parada[] | ((prev: Parada[]) => Parada[])) => void;
   linhasData: CategoriaLinhas;
-  setActiveTab: (tab: 'paradas' | 'linhas') => void;
-  onExport: () => void;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [addMode, setAddMode] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const coordRef = useRef<HTMLDivElement>(null);
+
   const uniqueParadas = useMemo(() => {
     const byId = new Map<string, Parada>();
-    for (const parada of paradas) {
-      if (!byId.has(parada.idParada)) {
-        byId.set(parada.idParada, parada);
-      }
+    for (const p of paradas) {
+      if (!byId.has(p.idParada)) byId.set(p.idParada, p);
     }
     return Array.from(byId.values());
   }, [paradas]);
 
-  const selectedParada = paradas.find((p) => p.idParada === selectedId) || null;
-
-  const handleDragEnd = (id: string, e: DragEndEvent) => {
-    const latLng = e.target.getLatLng();
-    setParadas(
-      paradas.map((p) => (p.idParada === id ? { ...p, coordenadas: [latLng.lat, latLng.lng] } : p)),
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return uniqueParadas;
+    return uniqueParadas.filter(
+      (p) =>
+        p.nome.toLowerCase().includes(q) ||
+        p.idParada.toLowerCase().includes(q) ||
+        p.descricao?.toLowerCase().includes(q),
     );
-  };
+  }, [uniqueParadas, search]);
 
-  const handleUpdate = (updated: Parada) => {
-    setParadas(paradas.map((p) => (p.idParada === updated.idParada ? updated : p)));
-  };
+  const selected = paradas.find((p) => p.idParada === selectedId) ?? null;
 
-  const handleAdd = () => {
-    const newId = `p_new_${Date.now()}`;
-    const newParada: Parada = {
-      idParada: newId,
-      nome: 'Nova Parada',
-      linhasAtendidas: [],
-      categoria: 'padrao',
-      descricao: '',
-      coordenadas: [-19.869, -43.966], // default UFMG center
-    };
-    setParadas([...paradas, newParada]);
-    setSelectedId(newId);
-  };
+  const update = useCallback(
+    (updated: Parada) => {
+      setParadas(paradas.map((p) => (p.idParada === updated.idParada ? updated : p)));
+    },
+    [paradas, setParadas],
+  );
 
-  const handleDelete = () => {
+  const handleDragEnd = useCallback(
+    (id: string, e: DragEndEvent) => {
+      const { lat, lng } = e.target.getLatLng();
+      setParadas(
+        paradas.map((p) =>
+          p.idParada === id ? { ...p, coordenadas: [lat, lng] as [number, number] } : p,
+        ),
+      );
+    },
+    [paradas, setParadas],
+  );
+
+  const handleAdd = useCallback(
+    (lat = DEFAULT_CENTER[0], lng = DEFAULT_CENTER[1]) => {
+      const id = `P_NEW_${Date.now()}`;
+      const nova: Parada = {
+        idParada: id,
+        nome: 'Nova Parada',
+        linhasAtendidas: [],
+        categoria: 'Parada Regular',
+        descricao: '',
+        coordenadas: [lat, lng],
+      };
+      setParadas([...paradas, nova]);
+      setSelectedId(id);
+      setAddMode(false);
+      setShowDeleteConfirm(false);
+    },
+    [paradas, setParadas],
+  );
+
+  const handleDelete = useCallback(() => {
     if (!selectedId) return;
     setParadas(paradas.filter((p) => p.idParada !== selectedId));
     setSelectedId(null);
+    setShowDeleteConfirm(false);
+  }, [selectedId, paradas, setParadas]);
+
+  const selectParada = (id: string) => {
+    setSelectedId(id);
+    setShowDeleteConfirm(false);
   };
 
   return (
     <>
-      <div className="w-96 flex flex-col bg-sidebar shadow-lg z-1000 h-full overflow-hidden border-r border-card-border">
-        {/* Header Options */}
-        <div className="p-4 border-b border-card-border flex justify-between items-center bg-card">
-          <h1 className="text-xl font-bold text-text-primary">Admin Panel</h1>
+      {/* Sidebar */}
+      <div className="w-96 flex flex-col bg-sidebar h-full overflow-hidden border-r border-card-border shrink-0">
+        {/* Cabeçalho: contagem + ações */}
+        <div className="p-3 border-b border-card-border bg-card flex items-center gap-2">
+          <span className="text-sm font-semibold text-text-primary">
+            {uniqueParadas.length} paradas
+          </span>
+          {filtered.length !== uniqueParadas.length && (
+            <span className="text-xs text-text-secondary">({filtered.length} filtradas)</span>
+          )}
+          <div className="flex-1" />
           <button
             type="button"
-            onClick={onExport}
-            className="px-4 py-2 bg-brand-primary text-text-inverse rounded hover:opacity-90 text-sm font-medium"
+            onClick={() => setAddMode((v) => !v)}
+            className={`px-2.5 py-1 text-xs rounded font-medium border transition-colors ${
+              addMode
+                ? 'bg-success-bg text-success-text border-success-border'
+                : 'border-card-border text-text-secondary hover:bg-background-secondary'
+            }`}
           >
-            Export All
+            {addMode ? '🖱️ Clique no mapa...' : '+ Clicar no mapa'}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleAdd()}
+            className="px-2.5 py-1 text-xs rounded font-medium border border-card-border text-text-secondary hover:bg-background-secondary transition-colors"
+          >
+            + Centro
           </button>
         </div>
 
-        {/* Tabs inside sidebar */}
-        <div className="flex border-b border-card-border bg-card">
-          <button
-            type="button"
-            className={`flex-1 py-3 text-center font-medium border-b-2 border-brand-primary text-brand-primary`}
-            onClick={() => setActiveTab('paradas')}
-          >
-            Paradas
-          </button>
-          <button
-            type="button"
-            className={`flex-1 py-3 text-center font-medium text-text-secondary hover:text-text-primary`}
-            onClick={() => setActiveTab('linhas')}
-          >
-            Linhas
-          </button>
+        {/* Busca */}
+        <div className="p-2 border-b border-card-border">
+          <input
+            type="search"
+            placeholder="Buscar por nome ou ID..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full h-9 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+          />
         </div>
 
-        <div className="p-4 flex-1 overflow-y-auto w-full bg-sidebar">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-text-primary">Gerenciar Paradas</h2>
-            <button
-              type="button"
-              onClick={handleAdd}
-              className="bg-success-bg border border-success-border text-success-text px-3 py-1 rounded text-sm hover:opacity-90"
-            >
-              + Adicionar
-            </button>
-          </div>
-
-          {!selectedParada ? (
-            <p className="text-text-secondary text-sm">
-              Selecione uma parada no mapa ou crie uma nova.
-            </p>
+        {/* Lista de paradas */}
+        <div className="flex-1 overflow-y-auto">
+          {filtered.length === 0 ? (
+            <p className="p-4 text-sm text-text-secondary">Nenhuma parada encontrada.</p>
           ) : (
-            <div className="flex flex-col gap-3">
+            filtered.map((p) => (
+              <button
+                key={p.idParada}
+                type="button"
+                onClick={() => selectParada(p.idParada)}
+                className={`w-full text-left px-3 py-2.5 border-b border-card-border hover:bg-card-hover transition-colors ${
+                  selectedId === p.idParada
+                    ? 'bg-brand-primary/10 border-l-[3px] border-l-brand-primary pl-2.25'
+                    : ''
+                }`}
+              >
+                <div className="text-sm font-medium text-text-primary truncate">{p.nome}</div>
+                <div className="text-xs text-text-secondary font-mono">{p.idParada}</div>
+              </button>
+            ))
+          )}
+        </div>
+
+        {/* Painel de edição da parada selecionada */}
+        {selected && (
+          <div className="border-t-2 border-brand-primary bg-card flex flex-col overflow-hidden max-h-[58%]">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-card-border shrink-0">
+              <span className="text-xs font-bold text-text-secondary uppercase tracking-wide">
+                Editando
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedId(null);
+                  setShowDeleteConfirm(false);
+                }}
+                className="text-text-secondary hover:text-text-primary text-lg leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="overflow-y-auto flex flex-col gap-3 p-3">
+              {/* ID */}
               <div>
                 <label
-                  htmlFor="admin-paradas-id"
-                  className="block text-sm font-bold text-text-primary mb-1"
+                  htmlFor="ap-id"
+                  className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide"
                 >
-                  ID (Obrigatório)
+                  ID
                 </label>
                 <input
-                  id="admin-paradas-id"
+                  id="ap-id"
                   type="text"
-                  value={selectedParada.idParada}
-                  onChange={(e) =>
-                    handleUpdate({
-                      ...selectedParada,
-                      idParada: e.target.value,
-                    })
-                  }
-                  className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                  value={selected.idParada}
+                  onChange={(e) => update({ ...selected, idParada: e.target.value })}
+                  className="w-full h-9 border border-input-border bg-input text-text-primary px-3 rounded text-sm font-mono"
                 />
               </div>
+
+              {/* Nome */}
               <div>
                 <label
-                  htmlFor="admin-paradas-nome"
-                  className="block text-sm font-bold text-text-primary mb-1"
+                  htmlFor="ap-nome"
+                  className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide"
                 >
                   Nome
                 </label>
-                <input
-                  id="admin-paradas-nome"
-                  type="text"
-                  value={selectedParada.nome}
-                  onChange={(e) => handleUpdate({ ...selectedParada, nome: e.target.value })}
-                  className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                <textarea
+                  id="ap-nome"
+                  rows={2}
+                  value={selected.nome}
+                  onChange={(e) => update({ ...selected, nome: e.target.value })}
+                  className="w-full border border-input-border bg-input text-text-primary px-3 py-2 rounded text-sm resize-none"
                 />
               </div>
+
+              {/* Descrição */}
               <div>
                 <label
-                  htmlFor="admin-paradas-descricao"
-                  className="block text-sm font-bold text-text-primary mb-1"
+                  htmlFor="ap-desc"
+                  className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide"
                 >
                   Descrição
                 </label>
-                <input
-                  id="admin-paradas-descricao"
-                  type="text"
-                  value={selectedParada.descricao || ''}
-                  onChange={(e) =>
-                    handleUpdate({
-                      ...selectedParada,
-                      descricao: e.target.value,
-                    })
-                  }
-                  className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                <textarea
+                  id="ap-desc"
+                  rows={2}
+                  value={selected.descricao ?? ''}
+                  onChange={(e) => update({ ...selected, descricao: e.target.value })}
+                  className="w-full border border-input-border bg-input text-text-primary px-3 py-2 rounded text-sm resize-none"
                 />
               </div>
+
+              {/* Categoria */}
               <div>
                 <label
-                  htmlFor="admin-paradas-linhas"
-                  className="block text-sm font-bold text-text-primary mb-1"
+                  htmlFor="ap-cat"
+                  className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide"
                 >
-                  Linhas (separadas por vírgula)
+                  Categoria
+                </label>
+                <select
+                  id="ap-cat"
+                  value={selected.categoria}
+                  onChange={(e) => update({ ...selected, categoria: e.target.value })}
+                  className="w-full h-9 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                >
+                  {CATEGORIA_OPTIONS.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Linhas atendidas */}
+              <div>
+                <label
+                  htmlFor="ap-linhas"
+                  className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide"
+                >
+                  Linhas Atendidas{' '}
+                  <span className="normal-case font-normal">(separadas por vírgula)</span>
                 </label>
                 <input
-                  id="admin-paradas-linhas"
+                  id="ap-linhas"
                   type="text"
-                  value={selectedParada.linhasAtendidas.join(', ')}
+                  value={selected.linhasAtendidas.join(', ')}
                   onChange={(e) =>
-                    handleUpdate({
-                      ...selectedParada,
+                    update({
+                      ...selected,
                       linhasAtendidas: e.target.value
                         .split(',')
                         .map((s) => s.trim())
                         .filter(Boolean),
                     })
                   }
-                  className="w-full h-11 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                  className="w-full h-9 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
                 />
               </div>
 
-              <div className="mt-4 pt-4 border-t border-card-border">
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  className="w-full bg-warning-bg border border-warning-border text-warning-text py-2 rounded text-sm font-bold hover:opacity-90"
-                >
-                  Excluir Parada
-                </button>
+              {/* Coordenadas */}
+              <div>
+                  <span className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide">
+                  Coordenadas{' '}
+                  <span className="normal-case font-normal">(ou arraste no mapa)</span>
+                </span>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label
+                      htmlFor="ap-lat"
+                      className="block text-xs font-semibold text-text-primary mb-1"
+                    >
+                      Latitude
+                    </label>
+                    <input
+                      id="ap-lat"
+                      type="number"
+                      step="0.00001"
+                      value={selected.coordenadas[0]}
+                      onChange={(e) =>
+                        update({
+                          ...selected,
+                          coordenadas: [Number(e.target.value), selected.coordenadas[1]],
+                        })
+                      }
+                      className="w-full h-9 border border-input-border bg-input text-text-primary px-2 rounded text-xs font-mono"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label
+                      htmlFor="ap-lng"
+                      className="block text-xs font-semibold text-text-primary mb-1"
+                    >
+                      Longitude
+                    </label>
+                    <input
+                      id="ap-lng"
+                      type="number"
+                      step="0.00001"
+                      value={selected.coordenadas[1]}
+                      onChange={(e) =>
+                        update({
+                          ...selected,
+                          coordenadas: [selected.coordenadas[0], Number(e.target.value)],
+                        })
+                      }
+                      className="w-full h-9 border border-input-border bg-input text-text-primary px-2 rounded text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Exclusão */}
+              <div className="pt-1 border-t border-card-border">
+                {showDeleteConfirm ? (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs font-semibold text-red-600 dark:text-red-400">
+                      Tem certeza? Use Ctrl+Z para desfazer depois.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleDelete}
+                        className="flex-1 py-2 bg-red-600 border border-red-700 text-white rounded text-xs font-bold hover:bg-red-700 transition-colors"
+                      >
+                        Confirmar exclusão
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className="flex-1 py-2 border border-card-border text-text-secondary rounded text-xs hover:bg-background-secondary"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="w-full py-2 bg-red-600 border border-red-700 text-white rounded text-xs font-bold hover:bg-red-700 transition-colors"
+                  >
+                    Excluir parada
+                  </button>
+                )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Map Area */}
-      <div className="flex-1 relative z-0">
-        <MapContainer center={[-19.87055, -43.96775]} zoom={15} className="h-full w-full">
+      {/* Mapa */}
+      <div className="flex-1 relative">
+        {/* Display de coordenadas (atualizado via ref, sem re-render) */}
+        <div
+          ref={coordRef}
+          className="absolute bottom-2 left-2 z-1000 bg-card/90 text-text-secondary text-xs px-2 py-1 rounded border border-card-border font-mono pointer-events-none select-none"
+        >
+          Mova o cursor...
+        </div>
+
+        {/* Banner de modo adição */}
+        {addMode && (
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-1000 bg-success-bg text-success-text text-sm px-4 py-2 rounded-full border border-success-border font-medium shadow-lg pointer-events-none">
+            🖱️ Clique no mapa para adicionar uma parada
+          </div>
+        )}
+
+        <MapContainer
+          center={DEFAULT_CENTER}
+          zoom={15}
+          className="h-full w-full"
+          style={addMode ? { cursor: 'crosshair' } : undefined}
+        >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <MapInteraction addMode={addMode} onAdd={handleAdd} coordRef={coordRef} />
+
           {uniqueParadas.map((p) => (
             <Marker
               key={p.idParada}
               position={p.coordenadas}
               icon={p.idParada === selectedId ? highlightedIcon : stationIcon}
-              draggable={true}
+              draggable
               eventHandlers={{
                 dragend: (e) => handleDragEnd(p.idParada, e),
-                click: () => setSelectedId(p.idParada),
+                click: () => selectParada(p.idParada),
               }}
             >
               <Popup>
-                {p.nome} ({p.idParada})
+                <strong>{p.nome}</strong>
+                <br />
+                <code className="text-xs">{p.idParada}</code>
+                <br />
+                <code className="text-xs">
+                  {p.coordenadas[0].toFixed(5)}, {p.coordenadas[1].toFixed(5)}
+                </code>
               </Popup>
             </Marker>
           ))}
+
+          {/* Rotas das linhas em modo fantasma */}
           {linhasData.categoriasDias
-            .flatMap((cd, categoryIdx) => cd.linhas.map((linha) => ({ linha, categoryIdx })))
-            .map(
-              ({ linha, categoryIdx }) =>
-                linha.coordenadasTrajeto.length > 0 && (
-                  <Polyline
-                    key={`${categoryIdx}-${linha.idRota}`}
-                    positions={linha.coordenadasTrajeto}
-                    pathOptions={{
-                      color: linha.corHex,
-                      weight: 3,
-                      opacity: 0.5,
-                      dashArray: '5, 5',
-                    }}
-                  />
-                ),
-            )}
+            .flatMap((cd) => cd.linhas)
+            .filter((l) => l.coordenadasTrajeto.length > 1)
+            .map((l) => (
+              <Polyline
+                key={l.idRota}
+                positions={l.coordenadasTrajeto}
+                pathOptions={{ color: l.corHex, weight: 2, opacity: 0.3, dashArray: '4,4' }}
+              />
+            ))}
         </MapContainer>
       </div>
     </>
