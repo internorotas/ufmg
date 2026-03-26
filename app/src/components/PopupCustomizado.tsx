@@ -9,8 +9,8 @@ import { useMemo } from 'react';
 import { Popup } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { isLineAvailableToday } from '../config/specialPeriods';
-import { useRotasData } from '../contexts/RotasContext';
 import { useNotificacaoContext } from '../contexts/NotificacaoContext';
+import { useRotasData } from '../contexts/RotasContext';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
@@ -18,7 +18,6 @@ import { cn, normalizarNomeLinha } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { DisclaimerEstimativa } from './DisclaimerEstimativa';
 import { PrevisaoBadge } from './PrevisaoBadge';
-import { Tooltip } from './ui/Tooltip';
 
 /**
  * Variantes do container do popup
@@ -214,10 +213,11 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                   {linha ? (
                     <div className="flex shrink-0 items-center gap-1">
                       <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
-                      {suportado && minutosFaltantes !== null && (() => {
-                        const alarmado = isAlarmado(linha.idRota, parada.idParada);
-                        return (
-                          <Tooltip content="Avisar quando o ônibus chegar" position="top">
+                      {suportado &&
+                        minutosFaltantes !== null &&
+                        (() => {
+                          const alarmado = isAlarmado(linha.idRota, parada.idParada);
+                          return (
                             <button
                               type="button"
                               onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
@@ -227,8 +227,15 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                                   ? 'bg-brand-primary/10 hover:bg-brand-primary/20'
                                   : 'hover:bg-card-hover',
                               )}
-                              aria-label={alarmado ? 'Cancelar alarme de chegada' : 'Ativar alarme de chegada'}
+                              aria-label={
+                                alarmado ? 'Cancelar alarme de chegada' : 'Ativar alarme de chegada'
+                              }
                               aria-pressed={alarmado}
+                              title={
+                                alarmado
+                                  ? 'Cancelar alarme de chegada'
+                                  : 'Avisar quando o ônibus chegar'
+                              }
                             >
                               {alarmado ? (
                                 <BellRing size={15} className="text-brand-primary" />
@@ -236,9 +243,8 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                                 <Bell size={15} className="text-text-tertiary" />
                               )}
                             </button>
-                          </Tooltip>
-                        );
-                      })()}
+                          );
+                        })()}
                     </div>
                   ) : (
                     <span

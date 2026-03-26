@@ -6,10 +6,10 @@
 import { AlertTriangle, Bell, BellRing, Bus, Clock, Map as MapIcon, MapPin } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
+import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { usePrevisaoChegada } from '../hooks/usePrevisaoChegada';
-import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import {
   buscarParadasPorIds,
   cn,
@@ -19,7 +19,6 @@ import {
 } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
-import { Tooltip } from './ui/Tooltip';
 
 /**
  * Variantes do container do título
@@ -162,7 +161,10 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
         aria-label={`Ver localização da parada ${parada.nome} no mapa`}
         title={`Ver localização da parada ${parada.nome} no mapa`}
       >
-        <div className={stopIconContainerVariants()} style={{ backgroundColor: `${linha.corHex}20` }}>
+        <div
+          className={stopIconContainerVariants()}
+          style={{ backgroundColor: `${linha.corHex}20` }}
+        >
           <MapPin size={18} style={{ color: linha.corHex }} />
         </div>
 
@@ -220,26 +222,23 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
 
       {/* Botão de alarme — mínimo 44px de touch target */}
       {bellVisible && (
-        <Tooltip content="Avisar quando o ônibus chegar" position="left">
-          <button
-            type="button"
-            onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
-            className={cn(
-              'mt-1 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
-              alarmado
-                ? 'bg-brand-primary/10 hover:bg-brand-primary/20'
-                : 'hover:bg-card-hover',
-            )}
-            aria-label={alarmado ? 'Cancelar alarme de chegada' : 'Ativar alarme de chegada'}
-            aria-pressed={alarmado}
-          >
-            {alarmado ? (
-              <BellRing size={20} className="text-brand-primary" />
-            ) : (
-              <Bell size={20} className="text-text-tertiary" />
-            )}
-          </button>
-        </Tooltip>
+        <button
+          type="button"
+          onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
+          className={cn(
+            'mt-1 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
+            alarmado ? 'bg-brand-primary/10 hover:bg-brand-primary/20' : 'hover:bg-card-hover',
+          )}
+          aria-label={alarmado ? 'Cancelar alarme de chegada' : 'Ativar alarme de chegada'}
+          aria-pressed={alarmado}
+          title={alarmado ? 'Cancelar alarme de chegada' : 'Avisar quando o ônibus chegar'}
+        >
+          {alarmado ? (
+            <BellRing size={20} className="text-brand-primary" />
+          ) : (
+            <Bell size={20} className="text-text-tertiary" />
+          )}
+        </button>
       )}
     </div>
   );

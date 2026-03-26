@@ -20,7 +20,7 @@ import { Button } from './ui/Button';
 import { SearchEmptyState } from './ui/EmptyState';
 import { SearchInput } from './ui/Input';
 import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
-import { Tooltip } from './ui/Tooltip';
+
 import { VacationBanner } from './VacationBanner';
 
 const LinhaDetalhesModal = React.lazy(() =>
@@ -99,19 +99,17 @@ function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) 
       onValueChange={handleValueChange}
       className="border-b border-card-border bg-background px-4 py-3 md:border-none"
     >
-      <Tooltip content="Deslize para ver outros dias" position="bottom" className="w-full">
-        <TabsList variant="pills" className="gap-2 bg-transparent p-0">
-          {categories.map((categoria) => (
-            <TabsTrigger
-              key={categoria.id}
-              value={String(categoria.id)}
-              className={categoryTabVariants()}
-            >
-              {categoria.displayName}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tooltip>
+      <TabsList variant="pills" className="gap-2 bg-transparent p-0">
+        {categories.map((categoria) => (
+          <TabsTrigger
+            key={categoria.id}
+            value={String(categoria.id)}
+            className={categoryTabVariants()}
+          >
+            {categoria.displayName}
+          </TabsTrigger>
+        ))}
+      </TabsList>
     </Tabs>
   );
 }
