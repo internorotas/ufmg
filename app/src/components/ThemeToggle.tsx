@@ -9,6 +9,7 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
+import { Tooltip } from './ui/Tooltip';
 
 /**
  * Variantes do botão de tema
@@ -76,20 +77,22 @@ export function ThemeToggle({
   };
 
   return (
-    <button
-      data-slot="toggle"
-      data-state={isDark ? 'dark' : 'light'}
-      onClick={handleToggle}
-      className={cn(themeToggleVariants({ variant, size }), className)}
-      aria-label={`Alternar para tema ${isDark ? 'claro' : 'escuro'}`}
-      title={`Alternar para tema ${isDark ? 'claro' : 'escuro'}`}
-      {...props}
-    >
-      {isDark ? (
-        <Sun size={iconSize} className="text-brand-accent" />
-      ) : (
-        <Moon size={iconSize} className="text-text-primary" />
-      )}
-    </button>
+    <Tooltip content={`Alternar para tema ${isDark ? 'claro' : 'escuro'}`}>
+      <button
+        data-slot="toggle"
+        data-state={isDark ? 'dark' : 'light'}
+        onClick={handleToggle}
+        className={cn(themeToggleVariants({ variant, size }), className)}
+        aria-label={`Alternar para tema ${isDark ? 'claro' : 'escuro'}`}
+        title={`Alternar para tema ${isDark ? 'claro' : 'escuro'}`}
+        {...props}
+      >
+        {isDark ? (
+          <Sun size={iconSize} className="text-brand-accent" />
+        ) : (
+          <Moon size={iconSize} className="text-text-primary" />
+        )}
+      </button>
+    </Tooltip>
   );
 }
