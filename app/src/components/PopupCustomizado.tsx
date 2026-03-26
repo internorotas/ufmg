@@ -168,8 +168,8 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
           <div data-slot="lines-section" className={popupLinesSectionVariants()}>
             <div className="mb-1.5 flex items-center gap-2">
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-internoRotas-azul-eletrico/20">
-                <Bus className="text-shadow-internoRotas-laranja-ambar" size={13} />
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-internoRotas-azul-eletrico/50">
+                <Bus className="text-internoRotas-bege-areia/40" size={13} />
               </div>
               <p className="text-xs font-semibold text-text-primary">
                 {parada.linhasAtendidas.length} linha
@@ -224,7 +224,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                               className={cn(
                                 'flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
                                 alarmado
-                                  ? 'bg-brand-primary/10 hover:bg-brand-primary/20'
+                                  ? 'bg-brand-primary/30 hover:bg-brand-primary/20'
                                   : 'hover:bg-card-hover',
                               )}
                               aria-label={
@@ -238,7 +238,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                               }
                             >
                               {alarmado ? (
-                                <BellRing size={15} className="text-brand-primary" />
+                                <BellRing size={15} className="text-brand-secondary/70" />
                               ) : (
                                 <Bell size={15} className="text-text-tertiary" />
                               )}
