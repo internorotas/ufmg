@@ -4,10 +4,21 @@
  *
  * Segue o mesmo padrão do modal de permissão de GPS (useLocalizacaoUsuario):
  * o prompt nativo NUNCA é chamado diretamente — sempre passa por este modal educativo primeiro.
+ *
+ * Compatibilidade iOS:
+ *   - iOS < 16.4: Notificações web não suportadas (nem no Safari, nem em PWAs)
+ *   - iOS ≥ 16.4 + PWA instalado: suportadas via Web Push (exige permissão normal)
+ *   O modal exibe uma nota contextual para usuários iOS sobre a necessidade de instalar.
  */
 
-import { Bell } from 'lucide-react';
+import { Bell, Info } from 'lucide-react';
 import { Modal } from './Modal';
+
+// Detecta iOS de forma simples para exibir nota contextual
+function isIOS(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
 
 interface NotificacaoPermissionModalProps {
   isOpen: boolean;
@@ -21,6 +32,8 @@ export function NotificacaoPermissionModal({
   onClose,
   onConfirmar,
 }: NotificacaoPermissionModalProps) {
+  const showIOSNote = isIOS();
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Ativar Notificações" size="sm">
       <div className="flex flex-col items-center gap-5 py-4 text-center">
@@ -37,9 +50,21 @@ export function NotificacaoPermissionModal({
             permita o envio de notificações.
           </p>
           <p className="text-xs text-text-tertiary">
-            Você receberá um aviso quando faltar aproximadamente 5 minutos para o ônibus chegar.
+            Você receberá alertas a cada 5 minutos e uma confirmação ao ônibus chegar.
           </p>
         </div>
+
+        {/* Nota para usuários iOS */}
+        {showIOSNote && (
+          <div className="flex w-full items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-left">
+            <Info size={16} className="mt-0.5 shrink-0 text-amber-500" />
+            <p className="text-xs leading-relaxed text-amber-700 dark:text-amber-400">
+              No iPhone, as notificações só funcionam se o app estiver instalado na tela inicial.
+              Toque em <strong>Compartilhar → Adicionar à Tela de Início</strong> no Safari para
+              ativá-las.
+            </p>
+          </div>
+        )}
 
         {/* Botões de ação — coluna no mobile, linha no desktop */}
         <div className="flex w-full flex-col gap-3 sm:flex-row">
