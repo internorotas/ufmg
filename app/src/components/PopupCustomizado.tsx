@@ -3,13 +3,14 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { Bus, MapPin } from 'lucide-react';
+import { Bell, BellRing, Bus, MapPin } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { useMemo } from 'react';
 import { Popup } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { isLineAvailableToday } from '../config/specialPeriods';
 import { useRotasData } from '../contexts/RotasContext';
+import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { calcularPrevisaoChegada } from '../hooks/usePrevisaoChegada';
@@ -17,6 +18,7 @@ import { cn, normalizarNomeLinha } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { DisclaimerEstimativa } from './DisclaimerEstimativa';
 import { PrevisaoBadge } from './PrevisaoBadge';
+import { Tooltip } from './ui/Tooltip';
 
 /**
  * Variantes do container do popup
@@ -81,6 +83,7 @@ export interface PopupCustomizadoProps
 export function PopupCustomizado({ parada, className, ...props }: PopupCustomizadoProps) {
   const analytics = useAnalytics();
   const { rotasService } = useRotasData();
+  const { suportado, isAlarmado, toggleNotificacao } = useNotificacaoContext();
   // Faz o popup re-renderizar a cada tick (30s) para que a seleção de subLinha
   // seja sempre reavaliada com o horário atual — evita que a escolha feita no
   // primeiro render fique obsoleta enquanto o PrevisaoBadge interno atualiza o
@@ -131,10 +134,17 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
   // biome-ignore lint/correctness/useExhaustiveDependencies: currentTime é a dependência reativa propositalmente
   const linhasResolvidas = useMemo(
     () =>
-      (parada.linhasAtendidas ?? []).map((nomeLinha) => ({
-        nomeLinha,
-        linha: resolverLinhaPorNome(nomeLinha, parada.idParada),
-      })),
+      (parada.linhasAtendidas ?? []).map((nomeLinha) => {
+        const linha = resolverLinhaPorNome(nomeLinha, parada.idParada);
+        const previsao = linha
+          ? calcularPrevisaoChegada(linha, parada.idParada, currentTime)
+          : null;
+        return {
+          nomeLinha,
+          linha,
+          minutosFaltantes: previsao?.proximoOnibus?.minutosFaltantes ?? null,
+        };
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [parada.idParada, parada.linhasAtendidas, rotasService, currentTime],
   );
@@ -173,7 +183,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
               <span>Previsão</span>
             </div>
             <div className="space-y-1">
-              {linhasResolvidas.map(({ nomeLinha, linha }) => (
+              {linhasResolvidas.map(({ nomeLinha, linha, minutosFaltantes }) => (
                 <div
                   key={nomeLinha}
                   className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
@@ -199,8 +209,37 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                       {getNomeExibicao(linha, nomeLinha)}
                     </button>
                   </span>
+
+                  {/* Coluna direita: badge de previsão + sino */}
                   {linha ? (
-                    <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                    <div className="flex shrink-0 items-center gap-1">
+                      <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                      {suportado && minutosFaltantes !== null && (() => {
+                        const alarmado = isAlarmado(linha.idRota, parada.idParada);
+                        return (
+                          <Tooltip content="Avisar quando o ônibus chegar" position="top">
+                            <button
+                              type="button"
+                              onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
+                              className={cn(
+                                'flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
+                                alarmado
+                                  ? 'bg-brand-primary/10 hover:bg-brand-primary/20'
+                                  : 'hover:bg-card-hover',
+                              )}
+                              aria-label={alarmado ? 'Cancelar alarme de chegada' : 'Ativar alarme de chegada'}
+                              aria-pressed={alarmado}
+                            >
+                              {alarmado ? (
+                                <BellRing size={15} className="text-brand-primary" />
+                              ) : (
+                                <Bell size={15} className="text-text-tertiary" />
+                              )}
+                            </button>
+                          </Tooltip>
+                        );
+                      })()}
+                    </div>
                   ) : (
                     <span
                       className="rounded-full px-2 py-0.5 text-[11px] font-medium"

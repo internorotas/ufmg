@@ -6,6 +6,7 @@ import { ModalManager } from './components/app/ModalManager';
 import { OfflineToast } from './components/app/OfflineToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MenuLateral } from './components/MenuLateral';
+import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useAnalytics } from './hooks/useAnalytics';
@@ -265,7 +266,9 @@ export function App() {
       <ThemeProvider>
         <RotasProvider>
           <AnalyticsProvider>
-            <AppContent />
+            <NotificacaoProvider>
+              <AppContent />
+            </NotificacaoProvider>
           </AnalyticsProvider>
         </RotasProvider>
       </ThemeProvider>
