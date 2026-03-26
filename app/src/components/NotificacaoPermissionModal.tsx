@@ -38,8 +38,8 @@ export function NotificacaoPermissionModal({
     <Modal isOpen={isOpen} onClose={onClose} title="Ativar Notificações" size="sm">
       <div className="flex flex-col items-center gap-5 py-4 text-center">
         {/* Ícone ilustrativo */}
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/10">
-          <Bell size={32} className="text-brand-primary" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary">
+          <Bell size={32} className="text-white" />
         </div>
 
         {/* Texto explicativo */}
