@@ -167,6 +167,7 @@ export function ControlesUsuarioMapa({
           type="button"
           onClick={handleCentralizar}
           disabled={carregandoLocalizacao}
+          aria-busy={carregandoLocalizacao}
           className={cn(
             // Tamanho mínimo para touch (48x48px) - Mobile friendly
             'flex h-12 w-12 cursor-pointer items-center justify-center',
@@ -178,10 +179,18 @@ export function ControlesUsuarioMapa({
             'disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100',
           )}
           aria-label={
-            permissaoConcedida ? 'Centralizar mapa na minha localização' : 'Ativar localização'
+            carregandoLocalizacao
+              ? 'Buscando localização...'
+              : permissaoConcedida
+                ? 'Centralizar mapa na minha localização'
+                : 'Ativar localização'
           }
           title={
-            permissaoConcedida ? 'Centralizar mapa na minha localização' : 'Ativar localização'
+            carregandoLocalizacao
+              ? 'Buscando localização...'
+              : permissaoConcedida
+                ? 'Centralizar mapa na minha localização'
+                : 'Ativar localização'
           }
         >
           {carregandoLocalizacao ? (
