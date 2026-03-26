@@ -224,7 +224,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                               className={cn(
                                 'flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
                                 alarmado
-                                  ? 'bg-brand-primary/30 hover:bg-brand-primary/20'
+                                  ? 'bg-brand-accent/30 hover:bg-brand-accent/40'
                                   : 'hover:bg-card-hover',
                               )}
                               aria-label={
@@ -238,7 +238,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                               }
                             >
                               {alarmado ? (
-                                <BellRing size={15} className="text-brand-secondary/70" />
+                                <BellRing size={15} className="text-brand-secondary" />
                               ) : (
                                 <Bell size={15} className="text-text-tertiary" />
                               )}
