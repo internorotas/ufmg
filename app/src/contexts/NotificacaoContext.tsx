@@ -6,7 +6,8 @@
  * conjunto de alarmes e o fluxo de permissão seja executado uma única vez.
  */
 
-import { createContext, type ReactNode, useCallback, useContext, useRef } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import { IosInstallModal } from '../components/IosInstallModal';
 import { NotificacaoPermissionModal } from '../components/NotificacaoPermissionModal';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useNotificacao } from '../hooks/useNotificacao';
@@ -31,6 +32,8 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   const { trackEvent } = useAnalytics();
   const {
     suportado,
+    isIOS,
+    isPwaInstalled,
     podeNotificar,
     mostrarModalPermissao,
     iniciarSolicitacaoPermissao,
@@ -44,8 +47,17 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   // Alarme que aguardou a concessão de permissão pelo usuário
   const pendingRef = useRef<{ linha: Linha; parada: Parada; minutos: number } | null>(null);
 
+  const [mostrarModalIos, setMostrarModalIos] = useState(false);
+
   const toggleNotificacao = useCallback(
     (linha: Linha, parada: Parada, minutosFaltantes: number) => {
+      // Interceptador Apple: iOS não-PWA não tem acesso à API Notification.
+      // Mostramos o modal educativo em vez de tentar pedir permissão.
+      if (isIOS && !isPwaInstalled) {
+        setMostrarModalIos(true);
+        return;
+      }
+
       // Toggle off
       if (isAlarmado(linha.idRota, parada.idParada)) {
         cancelarNotificacao(linha.idRota, parada.idParada);
@@ -77,6 +89,8 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
       cancelarNotificacao,
       iniciarSolicitacaoPermissao,
       isAlarmado,
+      isIOS,
+      isPwaInstalled,
       podeNotificar,
       trackEvent,
     ],
@@ -125,6 +139,7 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         onClose={handleFechar}
         onConfirmar={handleConfirmar}
       />
+      <IosInstallModal isOpen={mostrarModalIos} onClose={() => setMostrarModalIos(false)} />
     </NotificacaoContext.Provider>
   );
 }

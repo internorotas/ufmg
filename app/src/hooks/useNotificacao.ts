@@ -136,6 +136,10 @@ export type PermissaoNotificacao = NotificationPermission;
 export interface UseNotificacaoReturn {
   permissao: PermissaoNotificacao;
   suportado: boolean;
+  /** Verdadeiro se o dispositivo é iPhone/iPad/iPod */
+  isIOS: boolean;
+  /** Verdadeiro se o PWA está instalado na Tela de Início */
+  isPwaInstalled: boolean;
   podeNotificar: boolean;
   alarmes: Set<string>;
   mostrarModalPermissao: boolean;
@@ -150,11 +154,22 @@ export interface UseNotificacaoReturn {
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useNotificacao(): UseNotificacaoReturn {
-  const suportado = typeof window !== 'undefined' && 'Notification' in window;
+  const isIOS = typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isPwaInstalled =
+    typeof window !== 'undefined' &&
+    (window.matchMedia('(display-mode: standalone)').matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true);
 
-  const [permissao, setPermissao] = useState<PermissaoNotificacao>(() =>
-    suportado ? Notification.permission : 'denied',
-  );
+  // Suportado se a API nativa existir (Android/Desktop/iOS-PWA)
+  // OU se for iOS (mostramos o sino para exibir o modal educativo).
+  const suportado = (typeof window !== 'undefined' && 'Notification' in window) || isIOS;
+
+  const [permissao, setPermissao] = useState<PermissaoNotificacao>(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      return Notification.permission;
+    }
+    return 'denied';
+  });
   const [alarmes, setAlarmes] = useState<Set<string>>(new Set());
   const [mostrarModalPermissao, setMostrarModalPermissao] = useState(false);
 
@@ -331,7 +346,7 @@ export function useNotificacao(): UseNotificacaoReturn {
   }, []);
 
   const iniciarSolicitacaoPermissao = useCallback(() => {
-    if (!suportado) return;
+    if (!suportado || !('Notification' in window)) return;
     if (Notification.permission === 'granted') {
       setPermissao('granted');
       return;
@@ -340,7 +355,7 @@ export function useNotificacao(): UseNotificacaoReturn {
   }, [suportado]);
 
   const confirmarPermissao = useCallback(async () => {
-    if (!suportado) return;
+    if (!suportado || !('Notification' in window)) return;
     setMostrarModalPermissao(false);
     const result = await Notification.requestPermission();
     setPermissao(result);
@@ -351,6 +366,8 @@ export function useNotificacao(): UseNotificacaoReturn {
   return {
     permissao,
     suportado,
+    isIOS,
+    isPwaInstalled,
     podeNotificar,
     alarmes,
     mostrarModalPermissao,
