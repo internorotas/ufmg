@@ -296,6 +296,7 @@ function LineCardComponent({
         <button
           type="button"
           aria-label={`Ver detalhes da linha ${linha.nome}`}
+          title={`Ver detalhes da linha ${linha.nome}`}
           data-slot="action"
           onClick={handleDetailsClickInternal}
           className={detailsButtonVariants()}
