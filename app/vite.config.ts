@@ -12,15 +12,19 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
 
+          // Leaflet e dependências de mapa — chunk separado, muda raramente
+          if (
+            id.includes("leaflet")
+          ) {
+            return "vendor-leaflet";
+          }
+
+          // React core — chunk separado para cache independente
           if (
             id.includes("react") ||
-            id.includes("react-dom") ||
-            id.includes("scheduler") ||
-            id.includes("leaflet") ||
-            id.includes("react-leaflet") ||
-            id.includes("leaflet-ant-path")
+            id.includes("scheduler")
           ) {
-            return "vendor-framework-map";
+            return "vendor-react";
           }
 
           if (id.includes("lucide-react")) {

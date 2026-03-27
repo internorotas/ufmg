@@ -11,6 +11,7 @@
  */
 
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import { useAnalytics } from '../hooks/useAnalytics';
 import type { Linha, Parada } from '../types/data.types';
