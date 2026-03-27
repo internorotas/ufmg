@@ -55,7 +55,7 @@ function buildNotificationPayload(opts: OpcaoAviso): {
   if (opts.tipo === 'chegando') {
     return {
       titulo: '🚌 Ônibus chegando agora!',
-      corpo: `A linha ${opts.linhaNome} está chegando à parada "${opts.paradaNome}" agora! (±5 min de margem)`,
+      corpo: `A ${opts.linhaNome} está chegando à parada "${opts.paradaNome}" agora! (±5 min de margem)`,
       tag: `${base}-chegando`,
     };
   }
@@ -63,7 +63,7 @@ function buildNotificationPayload(opts: OpcaoAviso): {
   if (opts.tipo === 'aviso_5min') {
     return {
       titulo: '⏰ Prepare-se! Ônibus em ~5 min',
-      corpo: `A linha ${opts.linhaNome} chegará à parada "${opts.paradaNome}" em aproximadamente 5 minutos. (±5 min de margem)`,
+      corpo: `A ${opts.linhaNome} chegará à parada "${opts.paradaNome}" em aproximadamente 5 minutos. (±5 min de margem)`,
       tag: `${base}-5min`,
     };
   }
@@ -71,7 +71,7 @@ function buildNotificationPayload(opts: OpcaoAviso): {
   // contagem regressiva
   return {
     titulo: `🚌 Ônibus em ~${opts.minRestantes} min`,
-    corpo: `Linha ${opts.linhaNome} → "${opts.paradaNome}" em ~${opts.minRestantes} minutos.`,
+    corpo: `${opts.linhaNome} → "${opts.paradaNome}" em ~${opts.minRestantes} minutos.`,
     tag: `${base}-${opts.minRestantes}min`,
   };
 }
