@@ -17,6 +17,34 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function timeToMinutes(time: string): number {
   if (!time) return NaN;
+
+  const len = time.length;
+  // Optimization for fixed strings HH:MM or H:MM avoids string allocations
+  if (len === 5 && time.charCodeAt(2) === 58) { // "HH:MM"
+    const h1 = time.charCodeAt(0) - 48;
+    const h2 = time.charCodeAt(1) - 48;
+    const m1 = time.charCodeAt(3) - 48;
+    const m2 = time.charCodeAt(4) - 48;
+
+    // Verify all characters are valid digits (0-9)
+    if (h1 >= 0 && h1 <= 9 && h2 >= 0 && h2 <= 9 &&
+        m1 >= 0 && m1 <= 9 && m2 >= 0 && m2 <= 9) {
+      return (h1 * 10 + h2) * 60 + (m1 * 10 + m2);
+    }
+  }
+
+  if (len === 4 && time.charCodeAt(1) === 58) { // "H:MM"
+    const h1 = time.charCodeAt(0) - 48;
+    const m1 = time.charCodeAt(2) - 48;
+    const m2 = time.charCodeAt(3) - 48;
+
+    // Verify all characters are valid digits (0-9)
+    if (h1 >= 0 && h1 <= 9 && m1 >= 0 && m1 <= 9 && m2 >= 0 && m2 <= 9) {
+      return h1 * 60 + (m1 * 10 + m2);
+    }
+  }
+
+  // Fallback
   const colonIndex = time.indexOf(":");
   if (colonIndex === -1) return NaN;
 
