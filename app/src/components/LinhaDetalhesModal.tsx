@@ -227,14 +227,14 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
           onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
           className={cn(
             'mt-1 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
-            alarmado ? 'bg-brand-primary/10 hover:bg-brand-primary/20' : 'hover:bg-card-hover',
+            alarmado ? 'bg-brand-accent/30 hover:bg-brand-accent/40' : 'hover:bg-card-hover',
           )}
           aria-label={alarmado ? 'Cancelar alarme de chegada' : 'Ativar alarme de chegada'}
           aria-pressed={alarmado}
           title={alarmado ? 'Cancelar alarme de chegada' : 'Avisar quando o ônibus chegar'}
         >
           {alarmado ? (
-            <BellRing size={20} className="text-brand-primary" />
+            <BellRing size={20} className="text-brand-accent" />
           ) : (
             <Bell size={20} className="text-text-tertiary" />
           )}
