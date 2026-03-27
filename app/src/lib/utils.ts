@@ -30,6 +30,19 @@ export function cn(...inputs: ClassValue[]): string {
 export function converterHoraParaMinutos(horaString: string): number {
   if (!horaString) return NaN;
 
+  // Fast path: if the string matches "HH:MM", we avoid string slicing/allocations
+  // and parse digits directly using character codes.
+  if (horaString.length === 5 && horaString[2] === ':') {
+    const h1 = horaString.charCodeAt(0) - 48;
+    const h2 = horaString.charCodeAt(1) - 48;
+    const m1 = horaString.charCodeAt(3) - 48;
+    const m2 = horaString.charCodeAt(4) - 48;
+
+    if (h1 >= 0 && h1 <= 9 && h2 >= 0 && h2 <= 9 && m1 >= 0 && m1 <= 9 && m2 >= 0 && m2 <= 9) {
+      return (h1 * 10 + h2) * 60 + (m1 * 10 + m2);
+    }
+  }
+
   const colonIndex = horaString.indexOf(':');
   if (colonIndex === -1) return NaN;
 

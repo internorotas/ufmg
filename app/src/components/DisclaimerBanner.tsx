@@ -58,7 +58,7 @@ export function DisclaimerBanner({
         <div className="flex-1">
           {isOffline && (
             <p className="mb-2 text-xs font-semibold leading-relaxed">
-              Conexao perdida. Mapas podem nao carregar, mas previsoes estaticas continuam
+              Conexão perdida. Mapas podem não carregar, mas previsões estáticas continuam
               funcionando.
             </p>
           )}

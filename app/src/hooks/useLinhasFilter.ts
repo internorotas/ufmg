@@ -9,8 +9,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { getCurrentSpecialPeriod } from '../config/specialPeriods';
 import { getSaoPauloDayOfWeek, getSaoPauloNow } from '../lib/time';
+import { converterHoraParaMinutos, obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
 import type { CategoriaLinhas, DadosLinhas, Linha } from '../types/data.types';
 import { useAnalytics } from './useAnalytics';
+import { useCurrentTime } from './useCurrentTime';
 
 interface UseLinhasFilterOptions {
   debounceMs?: number;
@@ -94,6 +96,49 @@ function getInitialCategory(linhasData: CategoriaLinhas): number {
 }
 
 /**
+ * Retorna o grupo de ordenação da linha baseado no status atual:
+ *   0 → ativa (circulando ou aguardando 1ª saída)
+ *   1 → encerrada (ultimo horário já passou)
+ *   2 → não circula hoje
+ */
+function getStatusGroup(linha: Linha, agora: Date): number {
+  const { id } = obterStatusLinha(linha, agora);
+  if (id === 'ENCERRADA') return 1;
+  if (id === 'NAO_CIRCULA_HOJE') return 2;
+  return 0;
+}
+
+function getUltimoHorarioMinutos(linha: Linha, agora: Date): number {
+  const minutos = obterHorariosLinhaNoDia(linha, agora)
+    .map(converterHoraParaMinutos)
+    .filter(Number.isFinite);
+  return minutos.length > 0 ? Math.max(...minutos) : 0;
+}
+
+/**
+ * Ordena as linhas por estado operacional:
+ *  1. Ativas (circulando / aguardando) → ordem crescente pelo número da linha
+ *  2. Encerradas → ordem decrescente pelo último horário (passou por último = topo)
+ *  3. Não circulam hoje → ordem crescente pelo número da linha
+ */
+function sortLinhas(linhas: Linha[], agora: Date): Linha[] {
+  return [...linhas].sort((a, b) => {
+    const groupA = getStatusGroup(a, agora);
+    const groupB = getStatusGroup(b, agora);
+
+    if (groupA !== groupB) return groupA - groupB;
+
+    // Encerradas: mais recentemente encerrada fica no topo (último horário desc)
+    if (groupA === 1) {
+      return getUltimoHorarioMinutos(b, agora) - getUltimoHorarioMinutos(a, agora);
+    }
+
+    // Ativas e não-circulam-hoje: por número da linha crescente
+    return a.linha - b.linha;
+  });
+}
+
+/**
  * Filtra as linhas baseado no termo de busca.
  * Busca no nome, sublinha e descrição da linha.
  */
@@ -143,6 +188,7 @@ export function useLinhasFilter(
 ): UseLinhasFilterReturn {
   const { debounceMs = 300, trackSearch = true } = options;
   const { trackEvent, trackPageView } = useAnalytics();
+  const currentTime = useCurrentTime();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, debounceMs);
@@ -172,8 +218,8 @@ export function useLinhasFilter(
   const linhasDaCategoriaAtiva = useMemo(() => categoriaAtual?.linhas ?? [], [categoriaAtual]);
 
   const linhasFiltradas = useMemo(() => {
-    return filterLinhas(linhasDaCategoriaAtiva, searchTerm);
-  }, [linhasDaCategoriaAtiva, searchTerm]);
+    return sortLinhas(filterLinhas(linhasDaCategoriaAtiva, searchTerm), currentTime);
+  }, [linhasDaCategoriaAtiva, searchTerm, currentTime]);
 
   const hasResults = linhasFiltradas.length > 0;
 
