@@ -154,7 +154,7 @@ export function ControlesUsuarioMapa({
             'flex h-12 w-12 cursor-pointer items-center justify-center',
             'rounded-full shadow-lg transition-all duration-200',
             'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
-            'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
           )}
           aria-label="Centralizar mapa no campus UFMG"
           title="Voltar para a UFMG"
@@ -175,7 +175,7 @@ export function ControlesUsuarioMapa({
             'rounded-full shadow-lg transition-all duration-200',
             'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
             // Focus state para acessibilidade
-            'focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
             'disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100',
           )}
           aria-label={
