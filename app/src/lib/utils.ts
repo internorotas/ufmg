@@ -43,6 +43,7 @@ export function converterHoraParaMinutos(horaString: string): number {
     }
   }
 
+  // Fast path for "H:MM" format
   if (horaString.length === 4 && horaString[1] === ':') {
     const h1 = horaString.charCodeAt(0) - 48;
     const m1 = horaString.charCodeAt(2) - 48;
