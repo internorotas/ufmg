@@ -1,0 +1,3 @@
+## 2024-03-30 - Added ARIA alert roles to critical UI notices
+**Learning:** React components that render dynamically based on state (like EmptyState, Input validation errors, or suspended line notices) often lack built-in accessibility semantics. When these notices appear asynchronously, screen readers won't announce them automatically unless they possess `role="alert"` or `aria-live="polite"`. Applying these attributes ensures screen reader users are immediately informed of important status changes without needing to navigate to the new element.
+**Action:** Always verify that components intended to communicate critical state changes, errors, or zero-state search results to the user include `role="alert"` or `role="status"` and an appropriate `aria-live` attribute.
