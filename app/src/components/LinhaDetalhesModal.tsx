@@ -442,6 +442,8 @@ export function LinhaDetalhesModal({
           {!isLineRunningToday && (
             <div
               data-slot="not-running-notice"
+              role="status"
+              aria-live="polite"
               className="rounded-lg border border-amber-600/50 bg-amber-900/20 p-4"
             >
               <div className="flex items-center gap-3">
