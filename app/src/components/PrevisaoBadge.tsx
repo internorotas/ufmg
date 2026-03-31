@@ -49,7 +49,7 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
     });
   }, [idParada, linha.idRota, previsao?.proximoOnibus, trackEvent]);
 
-  if (!linhaVigente || !previsao || !previsao.proximoOnibus) {
+  if (!linhaVigente || !previsao?.proximoOnibus) {
     return (
       <span
         role="status"
