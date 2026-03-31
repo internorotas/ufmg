@@ -2,8 +2,8 @@
  * Arquivo de funcoes utilitarias do projeto UFMG
  */
 
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 /**
  * Mescla classes CSS usando clsx e tailwind-merge.
@@ -17,7 +17,7 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function timeToMinutes(time: string): number {
   if (!time) return NaN;
-  const colonIndex = time.indexOf(":");
+  const colonIndex = time.indexOf(':');
   if (colonIndex === -1) return NaN;
 
   const hours = Number(time.slice(0, colonIndex));
@@ -30,12 +30,10 @@ export function timeToMinutes(time: string): number {
  * Converte minutos desde meia-noite para formato HH:MM.
  */
 export function minutesToTime(minutes: number): string {
-  if (minutes === undefined || isNaN(minutes)) return "--:--";
+  if (minutes === undefined || Number.isNaN(minutes)) return '--:--';
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  return `${hours.toString().padStart(2, "0")}:${mins
-    .toString()
-    .padStart(2, "0")}`;
+  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
 }
 
 /**
@@ -85,19 +83,19 @@ export function findScheduleIndex<T>(
  */
 export function calculateNextAndPreviousSchedule(horarios: string[]) {
   if (!horarios || horarios.length === 0) {
-    return { nextSchedule: "--:--", previousSchedule: "--:--" };
+    return { nextSchedule: '--:--', previousSchedule: '--:--' };
   }
 
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   const schedulesInMinutes = horarios
-    .filter((time) => time && time.includes(":"))
+    .filter((time) => time?.includes(':'))
     .map(timeToMinutes)
     .sort((a, b) => a - b);
 
   if (schedulesInMinutes.length === 0) {
-    return { nextSchedule: "--:--", previousSchedule: "--:--" };
+    return { nextSchedule: '--:--', previousSchedule: '--:--' };
   }
 
   let nextSchedule: string;
@@ -116,9 +114,7 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
     if (prevIndex >= 0) {
       previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
     } else {
-      previousSchedule = minutesToTime(
-        schedulesInMinutes[schedulesInMinutes.length - 1],
-      );
+      previousSchedule = minutesToTime(schedulesInMinutes[schedulesInMinutes.length - 1]);
     }
   } else {
     nextSchedule = minutesToTime(schedulesInMinutes[0]);
@@ -130,9 +126,7 @@ export function calculateNextAndPreviousSchedule(horarios: string[]) {
     if (prevIndex >= 0) {
       previousSchedule = minutesToTime(schedulesInMinutes[prevIndex]);
     } else {
-      previousSchedule = minutesToTime(
-        schedulesInMinutes[schedulesInMinutes.length - 1],
-      );
+      previousSchedule = minutesToTime(schedulesInMinutes[schedulesInMinutes.length - 1]);
     }
   }
 
@@ -159,7 +153,7 @@ export function buscarParadasPorIds<T extends { idParada: string }>(
   }
 
   return itinerarioParadasIds
-    .map((idParada) => paradasMap!.get(idParada))
+    .map((idParada) => paradasMap?.get(idParada))
     .filter((p): p is T => p !== undefined);
 }
 
@@ -168,9 +162,9 @@ export function buscarParadasPorIds<T extends { idParada: string }>(
  */
 export function normalizarNomeLinha(nomeLinha: string): string {
   return nomeLinha
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s*\(.*?\)\s*/g, "")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s*\(.*?\)\s*/g, '')
     .trim()
     .toLowerCase();
 }
