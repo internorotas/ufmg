@@ -79,7 +79,7 @@ interface HorariosPorDia {
 }
 
 function parseHorarioValido(horario: string): number | null {
-  if (!horario || !horario.includes(':')) return null;
+  if (!horario?.includes(':')) return null;
   const minutos = converterHoraParaMinutos(horario);
   return Number.isFinite(minutos) ? minutos : null;
 }
