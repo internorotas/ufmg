@@ -43,17 +43,6 @@ export function converterHoraParaMinutos(horaString: string): number {
     }
   }
 
-  // Fast path for "H:MM" format
-  if (horaString.length === 4 && horaString[1] === ':') {
-    const h1 = horaString.charCodeAt(0) - 48;
-    const m1 = horaString.charCodeAt(2) - 48;
-    const m2 = horaString.charCodeAt(3) - 48;
-
-    if (h1 >= 0 && h1 <= 9 && m1 >= 0 && m1 <= 9 && m2 >= 0 && m2 <= 9) {
-      return h1 * 60 + (m1 * 10 + m2);
-    }
-  }
-
   const colonIndex = horaString.indexOf(':');
   if (colonIndex === -1) return NaN;
 
@@ -74,23 +63,13 @@ export function converterHoraParaMinutos(horaString: string): number {
 export function converterMinutosParaHora(minutosTotais: number): string {
   if (!Number.isFinite(minutosTotais)) return '--:--';
 
-  const minutosNoDia = 1440; // 24 * 60
-  // Fast path for positive values within a day (most common case) avoids expensive modulo math
-  let m = Math.floor(minutosTotais);
-  if (m < 0 || m >= minutosNoDia) {
-    m = ((m % minutosNoDia) + minutosNoDia) % minutosNoDia;
-  }
+  const minutosNoDia = 24 * 60;
+  const valorNormalizado =
+    ((Math.floor(minutosTotais) % minutosNoDia) + minutosNoDia) % minutosNoDia;
+  const horas = Math.floor(valorNormalizado / 60);
+  const minutos = valorNormalizado % 60;
 
-  const horas = Math.floor(m / 60);
-  const minutos = m % 60;
-
-  // biome-ignore lint/style/useTemplate: manual zero padding is faster
-  const hStr = horas < 10 ? '0' + horas : '' + horas;
-  // biome-ignore lint/style/useTemplate: manual zero padding is faster
-  const mStr = minutos < 10 ? '0' + minutos : '' + minutos;
-
-  // biome-ignore lint/style/useTemplate: string concatenation is faster
-  return hStr + ':' + mStr;
+  return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
 }
 
 interface HorariosPorDia {

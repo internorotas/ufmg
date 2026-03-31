@@ -3,12 +3,13 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { Bus, MapPin } from 'lucide-react';
+import { Bell, BellRing, Bus, MapPin } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { useMemo } from 'react';
 import { Popup } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { isLineAvailableToday } from '../config/specialPeriods';
+import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import { useRotasData } from '../contexts/RotasContext';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
@@ -81,6 +82,7 @@ export interface PopupCustomizadoProps
 export function PopupCustomizado({ parada, className, ...props }: PopupCustomizadoProps) {
   const analytics = useAnalytics();
   const { rotasService } = useRotasData();
+  const { suportado, isAlarmado, toggleNotificacao } = useNotificacaoContext();
   // Faz o popup re-renderizar a cada tick (30s) para que a seleção de subLinha
   // seja sempre reavaliada com o horário atual — evita que a escolha feita no
   // primeiro render fique obsoleta enquanto o PrevisaoBadge interno atualiza o
@@ -131,10 +133,17 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
   // biome-ignore lint/correctness/useExhaustiveDependencies: currentTime é a dependência reativa propositalmente
   const linhasResolvidas = useMemo(
     () =>
-      (parada.linhasAtendidas ?? []).map((nomeLinha) => ({
-        nomeLinha,
-        linha: resolverLinhaPorNome(nomeLinha, parada.idParada),
-      })),
+      (parada.linhasAtendidas ?? []).map((nomeLinha) => {
+        const linha = resolverLinhaPorNome(nomeLinha, parada.idParada);
+        const previsao = linha
+          ? calcularPrevisaoChegada(linha, parada.idParada, currentTime)
+          : null;
+        return {
+          nomeLinha,
+          linha,
+          minutosFaltantes: previsao?.proximoOnibus?.minutosFaltantes ?? null,
+        };
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [parada.idParada, parada.linhasAtendidas, rotasService, currentTime],
   );
@@ -159,8 +168,8 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
           <div data-slot="lines-section" className={popupLinesSectionVariants()}>
             <div className="mb-1.5 flex items-center gap-2">
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-internoRotas-azul-eletrico/20">
-                <Bus className="text-shadow-internoRotas-laranja-ambar" size={13} />
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-internoRotas-azul-eletrico/50">
+                <Bus className="text-internoRotas-bege-areia/40" size={13} />
               </div>
               <p className="text-xs font-semibold text-text-primary">
                 {parada.linhasAtendidas.length} linha
@@ -173,7 +182,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
               <span>Previsão</span>
             </div>
             <div className="space-y-1">
-              {linhasResolvidas.map(({ nomeLinha, linha }) => (
+              {linhasResolvidas.map(({ nomeLinha, linha, minutosFaltantes }) => (
                 <div
                   key={nomeLinha}
                   className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
@@ -199,8 +208,44 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                       {getNomeExibicao(linha, nomeLinha)}
                     </button>
                   </span>
+
+                  {/* Coluna direita: badge de previsão + sino */}
                   {linha ? (
-                    <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                    <div className="flex shrink-0 items-center gap-1">
+                      <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                      {suportado &&
+                        minutosFaltantes !== null &&
+                        (() => {
+                          const alarmado = isAlarmado(linha.idRota, parada.idParada);
+                          return (
+                            <button
+                              type="button"
+                              onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
+                              className={cn(
+                                'flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
+                                alarmado
+                                  ? 'bg-brand-accent/30 hover:bg-brand-accent/40'
+                                  : 'hover:bg-card-hover',
+                              )}
+                              aria-label={
+                                alarmado ? 'Cancelar alarme de chegada' : 'Ativar alarme de chegada'
+                              }
+                              aria-pressed={alarmado}
+                              title={
+                                alarmado
+                                  ? 'Cancelar alarme de chegada'
+                                  : 'Avisar quando o ônibus chegar'
+                              }
+                            >
+                              {alarmado ? (
+                                <BellRing size={15} className="text-brand-secondary" />
+                              ) : (
+                                <Bell size={15} className="text-text-tertiary" />
+                              )}
+                            </button>
+                          );
+                        })()}
+                    </div>
                   ) : (
                     <span
                       className="rounded-full px-2 py-0.5 text-[11px] font-medium"

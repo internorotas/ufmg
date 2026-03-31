@@ -20,6 +20,7 @@ import { Button } from './ui/Button';
 import { SearchEmptyState } from './ui/EmptyState';
 import { SearchInput } from './ui/Input';
 import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
+
 import { VacationBanner } from './VacationBanner';
 
 const LinhaDetalhesModal = React.lazy(() =>
