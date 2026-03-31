@@ -133,7 +133,7 @@ export function useMapMarkers() {
   }, []);
 
   const destacarParada = useCallback((parada: Parada) => {
-    if (!parada || !parada.idParada) return;
+    if (!parada?.idParada) return;
 
     setParadaDestacadaId(parada.idParada);
 
