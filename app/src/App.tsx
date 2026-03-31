@@ -156,7 +156,7 @@ function AppContent() {
     );
   }
 
-  if (!linhasData || !linhasData.categoriasDias) {
+  if (!linhasData?.categoriasDias) {
     return (
       <DataStatusScreen
         title="⚠️ Erro nos Dados de Linhas"

@@ -7,17 +7,17 @@
  *   node scripts/generate-og-image.mjs
  */
 
-import { chromium } from "@playwright/test";
-import path from "path";
-import { fileURLToPath } from "url";
-import { readFileSync } from "fs";
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { chromium } from '@playwright/test';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const publicDir = path.resolve(__dirname, "../public");
-const outputPath = path.resolve(publicDir, "og-image.png");
+const publicDir = path.resolve(__dirname, '../public');
+const outputPath = path.resolve(publicDir, 'og-image.png');
 
-const iconSvg = readFileSync(path.join(publicDir, "logo_Icone.svg"), "utf-8");
-const iconBase64 = Buffer.from(iconSvg).toString("base64");
+const iconSvg = readFileSync(path.join(publicDir, 'logo_Icone.svg'), 'utf-8');
+const iconBase64 = Buffer.from(iconSvg).toString('base64');
 const iconDataUrl = `data:image/svg+xml;base64,${iconBase64}`;
 
 const html = `<!DOCTYPE html>
@@ -156,19 +156,16 @@ const html = `<!DOCTYPE html>
 </html>`;
 
 // Tenta Edge (pré-instalado no Windows) antes de tentar baixar Chromium
-const browser = await chromium
-  .launch({ channel: "msedge" })
-  .catch(() => chromium.launch());
+const browser = await chromium.launch({ channel: 'msedge' }).catch(() => chromium.launch());
 const page = await browser.newPage();
 await page.setViewportSize({ width: 1200, height: 630 });
-await page.setContent(html, { waitUntil: "networkidle" });
+await page.setContent(html, { waitUntil: 'networkidle' });
 await page.waitForTimeout(1200);
 
 await page.screenshot({
   path: outputPath,
-  type: "png",
+  type: 'png',
   clip: { x: 0, y: 0, width: 1200, height: 630 },
 });
 
 await browser.close();
-console.log("✅ og-image.png gerada com sucesso em public/og-image.png");

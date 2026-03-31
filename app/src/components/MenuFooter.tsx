@@ -5,15 +5,23 @@
 
 import { Heart } from 'lucide-react';
 import type { ComponentProps } from 'react';
+
 import { tv, type VariantProps } from 'tailwind-variants';
+
 import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
+
+// Obtém a versão do app do ambiente
+const appVersion = import.meta.env.VITE_APP_VERSION;
 
 /**
  * Variantes do container do footer
  */
 export const footerContainerVariants = tv({
-  base: ['shrink-0 space-y-2 border-t p-2', 'border-card-border bg-sidebar transition-colors'],
+  base: [
+    'shrink-0 space-y-2 border-t px-4 py-2',
+    'border-card-border bg-sidebar transition-colors',
+  ],
 });
 
 /**
@@ -44,7 +52,7 @@ export const footerButtonVariants = tv({
  */
 export const creditLinkVariants = tv({
   base: [
-    'flex w-full items-center justify-center gap-1.5 py-2 cursor-pointer',
+    'flex items-center justify-center gap-1.5 py-1 cursor-pointer',
     'text-xs font-bold text-text-secondary transition-colors',
     'hover:text-text-primary',
   ],
@@ -113,17 +121,22 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
       </div>
 
       {/* Desenvolvido por */}
-      <a
-        href="https://github.com/igormartins4"
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() => handleLinkClick('Dev Profile')}
-        className={creditLinkVariants()}
-      >
-        Desenvolvido com
-        <Heart size={14} fill="currentColor" className="text-red-500" />
-        por Igor Martins
-      </a>
+      <div className="flex flex-row flex-wrap items-center justify-center gap-x-2 gap-y-0.5 py-1">
+        <a
+          href="https://github.com/igormartins4"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => handleLinkClick('Dev Profile')}
+          className={creditLinkVariants()}
+        >
+          Desenvolvido com
+          <Heart size={14} fill="currentColor" className="text-red-500" />
+          por Igor Martins
+        </a>
+        {appVersion && (
+          <span className="text-xs font-semibold text-brand-secondary/20"> / v{appVersion}</span>
+        )}
+      </div>
     </div>
   );
 }

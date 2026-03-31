@@ -398,6 +398,8 @@ export function LinhaDetalhesModal({
           aria-controls="panel-itinerario"
           id="tab-itinerario"
           onClick={() => handleTabChange('itinerario')}
+          aria-label="Ver itinerário da linha"
+          title="Ver itinerário da linha"
           className={tabVariants({ active: tabAtiva === 'itinerario' })}
           style={tabAtiva === 'itinerario' ? { borderColor: linha.corHex } : {}}
         >
@@ -411,6 +413,8 @@ export function LinhaDetalhesModal({
           aria-controls="panel-horarios"
           id="tab-horarios"
           onClick={() => handleTabChange('horarios')}
+          aria-label="Ver todos os horários da linha"
+          title="Ver todos os horários da linha"
           className={tabVariants({ active: tabAtiva === 'horarios' })}
           style={tabAtiva === 'horarios' ? { borderColor: linha.corHex } : {}}
         >
