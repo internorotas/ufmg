@@ -161,8 +161,6 @@ function SuspendedNotice({ message }: SuspendedNoticeProps) {
   return (
     <div
       data-slot="notice"
-      role="status"
-      aria-live="polite"
       className="mb-4 rounded-lg border border-warning-border bg-warning-bg p-3 text-center"
     >
       <p className="text-xs font-semibold text-warning-text md:text-sm">{message}</p>
@@ -298,7 +296,6 @@ function LineCardComponent({
         <button
           type="button"
           aria-label={`Ver detalhes da linha ${linha.nome}`}
-          title={`Ver detalhes da linha ${linha.nome}`}
           data-slot="action"
           onClick={handleDetailsClickInternal}
           className={detailsButtonVariants()}
