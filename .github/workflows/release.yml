@@ -1,47 +1,28 @@
-name: Release and Deploy Frontend
+name: Release
+
 on:
   push:
-    branches: [main]
-
-permissions:
-  contents: write # Necessário para o Semantic Release criar tags e commits
-  pages: write    # Necessário para publicar no GH Pages
-  id-token: write
+    branches:
+      - main
 
 jobs:
-  release-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Necessário para o Semantic Release ler o histórico
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - uses: pnpm/action-setup@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          version: 8
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+          node-version: '22.14.0'
           cache: 'pnpm'
 
-      - name: Instalar dependências
+      - name: Install dependencies
         run: pnpm install
 
-      - name: Rodar Verificações (Biome)
-        run: pnpm run check
+      - name: Build
+        run: pnpm build
 
-      - name: Semantic Release (Gera a Versão)
-        id: semantic
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
-
-      - name: Build e Deploy (Publica no GH Pages)
-        # Este passo só corre se o build e a versão estiverem OK
-        run: |
-          pnpm run build
-          pnpm run deploy
-        env:
-          # Injeta o token para o comando 'gh-pages' conseguir fazer push
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run tests
+        run: pnpm test
