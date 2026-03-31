@@ -190,18 +190,17 @@ export async function loadRotasService(): Promise<IRotasService> {
   }
 
   loadingServicePromise = (async () => {
-    if (import.meta.env.DEV) {
-      // Em desenvolvimento, evita 404 ruidoso no console quando /public/data ainda nao foi gerado.
-      const { linhas, paradas } = await loadFromSourceFallback();
-      cachedService = RotasServiceImpl.fromData(linhas, paradas);
-      return cachedService;
-    }
-
     try {
       const { linhas, paradas } = await loadFromPublic();
       cachedService = RotasServiceImpl.fromData(linhas, paradas);
       return cachedService;
     } catch {
+      if (import.meta.env.DEV) {
+        // Fallback para os módulos TypeScript quando /public/data ainda não foi gerado.
+        const { linhas, paradas } = await loadFromSourceFallback();
+        cachedService = RotasServiceImpl.fromData(linhas, paradas);
+        return cachedService;
+      }
       throw new Error('Falha ao carregar dados de rotas em /public/data');
     }
   })();

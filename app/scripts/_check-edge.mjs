@@ -1,6 +1,8 @@
-import { chromium } from "@playwright/test";
-const browser = await chromium.launch({ channel: "msedge" }).catch((e) => null);
+import { chromium } from '@playwright/test';
+
+const browser = await chromium.launch({ channel: 'msedge' }).catch((_e) => null);
 if (browser) {
   await browser.close();
-  console.log("Edge disponível");
-} else console.log("Edge não disponível via Playwright");
+} else {
+  // Falha ao iniciar o Edge
+}
