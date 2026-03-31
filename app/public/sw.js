@@ -113,3 +113,26 @@ function offlineResponse() {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
   });
 }
+
+/**
+ * Trata o clique em uma notificação do sistema:
+ * - Fecha a notificação
+ * - Foca uma janela já aberta do app ou abre uma nova
+ */
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        for (const client of clientList) {
+          if (client.url.includes(BASE) && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        if (clients.openWindow) {
+          return clients.openWindow(`${BASE}/`);
+        }
+      }),
+  );
+});
