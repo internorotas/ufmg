@@ -3,14 +3,16 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { AlertTriangle, Bus, Clock, Map as MapIcon, MapPin } from 'lucide-react';
+import { AlertTriangle, Bell, BellRing, Bus, Clock, Map as MapIcon, MapPin } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
+import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { usePrevisaoChegada } from '../hooks/usePrevisaoChegada';
 import {
   buscarParadasPorIds,
+  cn,
   findScheduleIndex,
   obterStatusLinha,
   timeToMinutes,
@@ -120,6 +122,7 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
   isLast,
   onClick,
 }: ParadaItinerarioRowProps) {
+  const { suportado, isAlarmado, toggleNotificacao } = useNotificacaoContext();
   const previsao = usePrevisaoChegada(linha, parada.idParada);
 
   const textoChegada = useMemo(() => {
@@ -145,69 +148,99 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
     };
   }, [previsao]);
 
+  const bellVisible = suportado && !!previsao?.proximoOnibus;
+  const minutosFaltantes = previsao?.proximoOnibus?.minutosFaltantes ?? 0;
+  const alarmado = isAlarmado(linha.idRota, parada.idParada);
+
   return (
-    <button
-      type="button"
-      onClick={() => onClick(parada)}
-      className={stopButtonVariants()}
-      aria-label={`Ver localização da parada ${parada.nome} no mapa`}
-      title={`Ver localização da parada ${parada.nome} no mapa`}
-    >
-      <div className={stopIconContainerVariants()} style={{ backgroundColor: `${linha.corHex}20` }}>
-        <MapPin size={18} style={{ color: linha.corHex }} />
-      </div>
+    <div className="flex w-full items-start">
+      <button
+        type="button"
+        onClick={() => onClick(parada)}
+        className={cn(stopButtonVariants(), 'mx-0 flex-1')}
+        aria-label={`Ver localização da parada ${parada.nome} no mapa`}
+        title={`Ver localização da parada ${parada.nome} no mapa`}
+      >
+        <div
+          className={stopIconContainerVariants()}
+          style={{ backgroundColor: `${linha.corHex}20` }}
+        >
+          <MapPin size={18} style={{ color: linha.corHex }} />
+        </div>
 
-      <div className="min-w-0 flex-1 pt-0.5">
-        <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
-          {parada.nome}
-        </h4>
+        <div className="min-w-0 flex-1 pt-0.5">
+          <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
+            {parada.nome}
+          </h4>
 
-        {(isFirst || isLast) && (
-          <p className="mt-0.5 text-xs text-text-secondary">Ponto de Origem/Destino</p>
-        )}
-        {!isFirst && !isLast && (
-          <p className="mt-0.5 text-xs text-text-secondary">Parada Regular</p>
-        )}
+          {(isFirst || isLast) && (
+            <p className="mt-0.5 text-xs text-text-secondary">Ponto de Origem/Destino</p>
+          )}
+          {!isFirst && !isLast && (
+            <p className="mt-0.5 text-xs text-text-secondary">Parada Regular</p>
+          )}
 
-        {isFirst && (
-          <span
-            className="mt-1 inline-block px-0 text-xs font-semibold"
-            style={{ color: linha.corHex }}
-          >
-            Partida
-          </span>
-        )}
-        {isLast && (
-          <span
-            className="mt-1 inline-block px-0 text-xs font-semibold"
-            style={{ color: linha.corHex }}
-          >
-            Chegada
-          </span>
-        )}
-
-        {textoChegada && badgeStyle && (
-          <div
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            className="mt-1.5 flex flex-col gap-0.5"
-          >
+          {isFirst && (
             <span
-              className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
-              style={badgeStyle}
+              className="mt-1 inline-block px-0 text-xs font-semibold"
+              style={{ color: linha.corHex }}
             >
-              {textoChegada}
+              Partida
             </span>
-            {previsao?.onibusAnterior && (
-              <span className="text-[10px] text-text-tertiary">
-                Último passou há {previsao.onibusAnterior.minutosQuePassou} min
+          )}
+          {isLast && (
+            <span
+              className="mt-1 inline-block px-0 text-xs font-semibold"
+              style={{ color: linha.corHex }}
+            >
+              Chegada
+            </span>
+          )}
+
+          {textoChegada && badgeStyle && (
+            <div
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              className="mt-1.5 flex flex-col gap-0.5"
+            >
+              <span
+                className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+                style={badgeStyle}
+              >
+                {textoChegada}
               </span>
-            )}
-          </div>
-        )}
-      </div>
-    </button>
+              {previsao?.onibusAnterior && (
+                <span className="text-[10px] text-text-tertiary">
+                  Último passou há {previsao.onibusAnterior.minutosQuePassou} min
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </button>
+
+      {/* Botão de alarme — mínimo 44px de touch target */}
+      {bellVisible && (
+        <button
+          type="button"
+          onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
+          className={cn(
+            'mt-1 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
+            alarmado ? 'bg-brand-accent/30 hover:bg-brand-accent/40' : 'hover:bg-card-hover',
+          )}
+          aria-label={alarmado ? 'Cancelar alarme de chegada' : 'Ativar alarme de chegada'}
+          aria-pressed={alarmado}
+          title={alarmado ? 'Cancelar alarme de chegada' : 'Avisar quando o ônibus chegar'}
+        >
+          {alarmado ? (
+            <BellRing size={20} className="text-brand-accent" />
+          ) : (
+            <Bell size={20} className="text-text-tertiary" />
+          )}
+        </button>
+      )}
+    </div>
   );
 });
 
@@ -365,6 +398,8 @@ export function LinhaDetalhesModal({
           aria-controls="panel-itinerario"
           id="tab-itinerario"
           onClick={() => handleTabChange('itinerario')}
+          aria-label="Ver itinerário da linha"
+          title="Ver itinerário da linha"
           className={tabVariants({ active: tabAtiva === 'itinerario' })}
           style={tabAtiva === 'itinerario' ? { borderColor: linha.corHex } : {}}
         >
@@ -378,6 +413,8 @@ export function LinhaDetalhesModal({
           aria-controls="panel-horarios"
           id="tab-horarios"
           onClick={() => handleTabChange('horarios')}
+          aria-label="Ver todos os horários da linha"
+          title="Ver todos os horários da linha"
           className={tabVariants({ active: tabAtiva === 'horarios' })}
           style={tabAtiva === 'horarios' ? { borderColor: linha.corHex } : {}}
         >
@@ -442,8 +479,6 @@ export function LinhaDetalhesModal({
           {!isLineRunningToday && (
             <div
               data-slot="not-running-notice"
-              role="status"
-              aria-live="polite"
               className="rounded-lg border border-amber-600/50 bg-amber-900/20 p-4"
             >
               <div className="flex items-center gap-3">
