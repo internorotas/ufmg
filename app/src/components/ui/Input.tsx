@@ -145,11 +145,7 @@ export function Input({
       )}
 
       {errorMessage && error && (
-        <p
-          data-slot="input-error"
-          role="alert"
-          className="mt-1 text-xs text-warning-text"
-        >
+        <p data-slot="input-error" role="alert" className="mt-1 text-xs text-warning-text">
           {errorMessage}
         </p>
       )}

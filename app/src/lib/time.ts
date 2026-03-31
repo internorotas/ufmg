@@ -11,19 +11,27 @@ const saoPauloFormatter = new Intl.DateTimeFormat('en-CA', {
   hour12: false,
 });
 
-function getPart(parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPartTypes): number {
-  const value = parts.find((part) => part.type === type)?.value;
-  return value ? Number(value) : 0;
-}
-
 export function toSaoPauloDate(date: Date): Date {
   const parts = saoPauloFormatter.formatToParts(date);
-  const year = getPart(parts, 'year');
-  const month = getPart(parts, 'month');
-  const day = getPart(parts, 'day');
-  const hour = getPart(parts, 'hour');
-  const minute = getPart(parts, 'minute');
-  const second = getPart(parts, 'second');
+
+  // Single pass over parts is faster than multiple find() calls
+  // and avoids creating intermediate arrays/functions.
+  let year = 0;
+  let month = 0;
+  let day = 0;
+  let hour = 0;
+  let minute = 0;
+  let second = 0;
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    if (part.type === 'year') year = Number(part.value);
+    else if (part.type === 'month') month = Number(part.value);
+    else if (part.type === 'day') day = Number(part.value);
+    else if (part.type === 'hour') hour = Number(part.value);
+    else if (part.type === 'minute') minute = Number(part.value);
+    else if (part.type === 'second') second = Number(part.value);
+  }
 
   return new Date(year, month - 1, day, hour, minute, second);
 }
