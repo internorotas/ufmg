@@ -27,12 +27,13 @@ jobs:
       - name: Instalar dependências
         run: pnpm install --recursive --frozen-lockfile
 
-      - name: Build e Deploy (Publica no GH Pages)
-        # Este passo só corre se o build e a versão estiverem OK
-        working-directory: ./app
+      - name: Configurar identidade do git para deploy
         run: |
-          pnpm run build
-          pnpm run deploy
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Deploy no GH Pages
+        working-directory: ./app
+        run: pnpm run deploy
         env:
-          # Injeta o token para o comando 'gh-pages' conseguir fazer push
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
