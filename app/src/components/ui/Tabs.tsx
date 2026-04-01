@@ -235,6 +235,8 @@ export function TabsTrigger({
       data-slot="tabs-trigger"
       role="tab"
       type="button"
+      id={`tab-${value}`}
+      aria-controls={`panel-${value}`}
       data-state={isActive ? 'active' : 'inactive'}
       aria-selected={isActive}
       disabled={disabled}
@@ -258,6 +260,8 @@ export function TabsContent({ value, children, className, ...props }: TabsConten
     <div
       data-slot="tabs-content"
       role="tabpanel"
+      id={`panel-${value}`}
+      aria-labelledby={`tab-${value}`}
       data-state={isActive ? 'active' : 'inactive'}
       hidden={!isActive}
       className={cn(tabsContentVariants(), className)}
