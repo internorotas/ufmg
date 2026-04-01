@@ -13,8 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        # versão lida automaticamente de packageManager no package.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,12 +24,8 @@ jobs:
             pnpm-lock.yaml
             app/pnpm-lock.yaml
 
-      - name: Instalar dependências da raiz
-        run: pnpm install
-
-      - name: Instalar dependências do app
-        working-directory: ./app
-        run: pnpm install
+      - name: Instalar dependências
+        run: pnpm install --recursive --frozen-lockfile
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
