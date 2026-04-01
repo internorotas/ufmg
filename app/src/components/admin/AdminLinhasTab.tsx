@@ -573,7 +573,10 @@ export function AdminLinhasTab({
                     setHorariosDraft(e.target.value);
                     try {
                       const val = JSON.parse(e.target.value);
-                      if (Array.isArray(val)) updateLinha({ ...selectedLinha, horarios: val });
+                      // 🛡️ Sentinel: Validate array elements to prevent insecure deserialization
+                      if (Array.isArray(val) && val.every((item) => typeof item === 'string')) {
+                        updateLinha({ ...selectedLinha, horarios: val });
+                      }
                     } catch {
                       // aguarda JSON válido
                     }
