@@ -17,8 +17,7 @@ jobs:
           fetch-depth: 0 # Necessário para o Semantic Release ler o histórico
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        # versão lida automaticamente de packageManager no package.json
 
       - uses: actions/setup-node@v4
         with:
@@ -28,12 +27,8 @@ jobs:
             pnpm-lock.yaml
             app/pnpm-lock.yaml
 
-      - name: Instalar dependências da raiz
-        run: pnpm install
-
-      - name: Instalar dependências do app
-        working-directory: ./app
-        run: pnpm install
+      - name: Instalar dependências
+        run: pnpm install --recursive --frozen-lockfile
 
       - name: Rodar Verificações (Biome)
         run: pnpm run check
