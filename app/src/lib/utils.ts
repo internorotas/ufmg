@@ -69,12 +69,15 @@ export function converterMinutosParaHora(minutosTotais: number): string {
   const horas = Math.floor(valorNormalizado / 60);
   const minutos = valorNormalizado % 60;
 
-  // biome-ignore lint/style/useTemplate: string concatenation is measurably faster here
+  // Manual conditional formatting is significantly faster than using .padStart()
+  // or template literals because it avoids object creation and string allocations
+  // in high-volume paths.
+  // biome-ignore lint/style/useTemplate: string concatenation is faster for this specific format
   const hStr = horas < 10 ? '0' + horas : '' + horas;
-  // biome-ignore lint/style/useTemplate: string concatenation is measurably faster here
+  // biome-ignore lint/style/useTemplate: string concatenation is faster for this specific format
   const mStr = minutos < 10 ? '0' + minutos : '' + minutos;
 
-  // biome-ignore lint/style/useTemplate: string concatenation is measurably faster here
+  // biome-ignore lint/style/useTemplate: string concatenation is faster for this specific format
   return hStr + ':' + mStr;
 }
 
