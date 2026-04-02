@@ -63,13 +63,19 @@ export function converterHoraParaMinutos(horaString: string): number {
 export function converterMinutosParaHora(minutosTotais: number): string {
   if (!Number.isFinite(minutosTotais)) return '--:--';
 
-  const minutosNoDia = 24 * 60;
+  const minutosNoDia = 1440; // 24 * 60
   const valorNormalizado =
     ((Math.floor(minutosTotais) % minutosNoDia) + minutosNoDia) % minutosNoDia;
   const horas = Math.floor(valorNormalizado / 60);
   const minutos = valorNormalizado % 60;
 
-  return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
+  // biome-ignore lint/style/useTemplate: string concatenation is measurably faster here
+  const hStr = horas < 10 ? '0' + horas : '' + horas;
+  // biome-ignore lint/style/useTemplate: string concatenation is measurably faster here
+  const mStr = minutos < 10 ? '0' + minutos : '' + minutos;
+
+  // biome-ignore lint/style/useTemplate: string concatenation is measurably faster here
+  return hStr + ':' + mStr;
 }
 
 interface HorariosPorDia {
