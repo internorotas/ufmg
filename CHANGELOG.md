@@ -1,7 +1,6 @@
 # 1.0.0 (2026-04-01)
 
-
-### Bug Fixes
+## Bug Fixes
 
 * add missing newline at end of site.webmanifest file ([f26f8fc](https://github.com/internorotas/ufmg/commit/f26f8fc375a146219dcb232a8b4482b94e0cf95c))
 * adicionar container ao botão "Ver Linhas" para melhor alinhamento ([553b614](https://github.com/internorotas/ufmg/commit/553b614fae2e4dd3899b783b63d9add3781f6368))
@@ -72,7 +71,6 @@
 * sempre exibir todas as paradas, independente da linha selecionada ([70e340d](https://github.com/internorotas/ufmg/commit/70e340d309b8a70234c6b5be98d7e88764cb523a))
 * update footer copyright year to 2025 ([fce9b69](https://github.com/internorotas/ufmg/commit/fce9b69f1e68ebb9c051c1247f3fc572937dc506))
 * **verificaDia:** Corrigir horário de sábado [#6](https://github.com/internorotas/ufmg/issues/6) ([9314f44](https://github.com/internorotas/ufmg/commit/9314f44ab4e21942eab356e74d006ca25eeac0b4))
-
 
 ### Features
 
@@ -433,7 +431,6 @@
 * **ui:** add title tooltip to map locate button ([0c8d333](https://github.com/internorotas/ufmg/commit/0c8d333fcddd62ccd69da02a0f777b82460bcd3a))
 * update configuration and add deployment scripts for GitHub Pages ([8c40227](https://github.com/internorotas/ufmg/commit/8c40227dcdbd145674083d1a0ab7857d598b3cd9))
 * **ux:** add native tooltip to line details button ([51e58f9](https://github.com/internorotas/ufmg/commit/51e58f98f029a59da2ca4471712ba92d8dfb42a2))
-
 
 ### Performance Improvements
 

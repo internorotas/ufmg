@@ -1,4 +1,0 @@
-## 2025-02-23 - [MEDIUM] Insecure JSON Deserialization in Admin Panel
-**Vulnerability:** The admin panel for bus lines (`AdminLinhasTab.tsx`) parsed a draft JSON string for schedules (`horarios`) using `JSON.parse` and blindly trusted the structure as long as it was an array (`Array.isArray(val)`).
-**Learning:** Checking `Array.isArray` is not sufficient validation. An array containing deeply nested objects, prototype pollution payloads, or unexpected data types could be ingested directly into the `selectedLinha` state, potentially causing client-side crashes or cross-site scripting (XSS) downstream if rendered unsafely.
-**Prevention:** Always validate the structure and individual element types of user-provided JSON immediately after parsing (e.g., `val.every(item => typeof item === 'string')`) before merging it into application state.
