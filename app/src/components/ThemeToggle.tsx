@@ -83,6 +83,7 @@ export function ThemeToggle({
       className={cn(themeToggleVariants({ variant, size }), className)}
       aria-label={`Alternar para tema ${isDark ? 'claro' : 'escuro'}`}
       title={`Alternar para tema ${isDark ? 'claro' : 'escuro'}`}
+      aria-pressed={isDark}
       {...props}
     >
       {isDark ? (
