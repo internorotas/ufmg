@@ -122,20 +122,27 @@ function getUltimoHorarioMinutos(linha: Linha, agora: Date): number {
  *  3. Não circulam hoje → ordem crescente pelo número da linha
  */
 function sortLinhas(linhas: Linha[], agora: Date): Linha[] {
-  return [...linhas].sort((a, b) => {
-    const groupA = getStatusGroup(a, agora);
-    const groupB = getStatusGroup(b, agora);
+  // Schwartzian transform to avoid O(N log N) recalculations of expensive status evaluations.
+  // We map the lines to an object with pre-calculated keys, sort them, and map them back.
+  return linhas
+    .map((linha) => {
+      const group = getStatusGroup(linha, agora);
+      // Calculate ultimoHorario only for group 1 (Encerradas) to save compute
+      const ultimoHorario = group === 1 ? getUltimoHorarioMinutos(linha, agora) : 0;
+      return { linha, group, ultimoHorario };
+    })
+    .sort((a, b) => {
+      if (a.group !== b.group) return a.group - b.group;
 
-    if (groupA !== groupB) return groupA - groupB;
+      // Encerradas: mais recentemente encerrada fica no topo (último horário desc)
+      if (a.group === 1) {
+        return b.ultimoHorario - a.ultimoHorario;
+      }
 
-    // Encerradas: mais recentemente encerrada fica no topo (último horário desc)
-    if (groupA === 1) {
-      return getUltimoHorarioMinutos(b, agora) - getUltimoHorarioMinutos(a, agora);
-    }
-
-    // Ativas e não-circulam-hoje: por número da linha crescente
-    return a.linha - b.linha;
-  });
+      // Ativas e não-circulam-hoje: por número da linha crescente
+      return a.linha.linha - b.linha.linha;
+    })
+    .map((item) => item.linha);
 }
 
 /**
