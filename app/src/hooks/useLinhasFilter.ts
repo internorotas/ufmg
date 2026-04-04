@@ -104,7 +104,7 @@ function getInitialCategory(linhasData: CategoriaLinhas): number {
 function sortLinhas(linhas: Linha[], agora: Date): Linha[] {
   return linhas
     .map((linha) => {
-      // Pré-calcula os horários para evitar chamadas redundantes (O(N log N) -> O(N))
+      // Pré-calcula os horários uma vez por linha para evitar recomputações redundantes no comparator
       const horariosHoje = obterHorariosLinhaNoDia(linha, agora)
         .map(converterHoraParaMinutos)
         .filter(Number.isFinite)
@@ -118,7 +118,7 @@ function sortLinhas(linhas: Linha[], agora: Date): Linha[] {
 
       const ultimoHorario = horariosHoje.length > 0 ? horariosHoje[horariosHoje.length - 1] : 0;
 
-      return { linha, group, ultimoHorario };
+      return { item: linha, group, ultimoHorario };
     })
     .sort((a, b) => {
       if (a.group !== b.group) return a.group - b.group;
@@ -127,9 +127,9 @@ function sortLinhas(linhas: Linha[], agora: Date): Linha[] {
       if (a.group === 1) return b.ultimoHorario - a.ultimoHorario;
 
       // Ativas e não-circulam-hoje: por número da linha crescente
-      return a.linha.linha - b.linha.linha;
+      return a.item.linha - b.item.linha;
     })
-    .map((item) => item.linha);
+    .map((wrapper) => wrapper.item);
 }
 
 /**
