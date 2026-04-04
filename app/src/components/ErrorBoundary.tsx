@@ -52,16 +52,6 @@ export class ErrorBoundary extends Component<Props, State> {
               >
                 Recarregar Página
               </button>
-              {this.state.error && (
-                <details className="mt-6 text-left">
-                  <summary className="cursor-pointer text-sm text-text-tertiary hover:text-text-secondary">
-                    Detalhes técnicos
-                  </summary>
-                  <pre className="mt-2 text-xs bg-card-hover p-3 rounded overflow-auto max-h-40">
-                    {this.state.error.toString()}
-                  </pre>
-                </details>
-              )}
             </div>
           </div>
         )
