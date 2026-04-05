@@ -143,12 +143,10 @@ function filterLinhas(linhas: Linha[], searchTerm: string): Linha[] {
 
   const termLower = searchTerm.toLowerCase();
 
-  return linhas.filter(
-    (linha) =>
-      linha.nome.toLowerCase().includes(termLower) ||
-      linha.sublinha?.toLowerCase().includes(termLower) ||
-      linha.descricao.toLowerCase().includes(termLower),
-  );
+  return linhas.filter((linha) => {
+    const searchTarget = `${linha.nome} ${linha.sublinha || ''} ${linha.descricao}`.toLowerCase();
+    return searchTarget.includes(termLower);
+  });
 }
 
 /**
