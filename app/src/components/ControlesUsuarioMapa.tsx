@@ -157,9 +157,9 @@ export function ControlesUsuarioMapa({
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
           )}
           aria-label="Centralizar mapa no campus UFMG"
-          title="Voltar para a UFMG"
+          title="Centralizar mapa no campus UFMG"
         >
-          <CornerUpLeft className="h-6 w-6 text-white" />
+          <CornerUpLeft className="h-6 w-6 text-white" aria-hidden="true" />
         </button>
 
         {/* Botão: centralizar na localização do usuário */}
@@ -194,9 +194,9 @@ export function ControlesUsuarioMapa({
           }
         >
           {carregandoLocalizacao ? (
-            <LoaderCircle className="h-6 w-6 animate-spin text-white" />
+            <LoaderCircle className="h-6 w-6 animate-spin text-white" aria-hidden="true" />
           ) : (
-            <LocateFixed className="h-6 w-6 text-white" />
+            <LocateFixed className="h-6 w-6 text-white" aria-hidden="true" />
           )}
         </button>
       </div>
