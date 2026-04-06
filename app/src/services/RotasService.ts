@@ -57,11 +57,7 @@ class RotasServiceImpl implements IRotasService {
     this.linhasCache = linhasData;
     this.paradasCache = paradas;
 
-    this.linhasMap.clear();
-    this.paradasMap.clear();
-    this.linhasPorNomeNormalizadoMap.clear();
-
-    // Cria mapas para acesso O(1) por ID e Nome Normalizado
+    // Recria os mapas para acesso O(1) por ID e Nome Normalizado
     this.linhasMap = new Map();
     this.paradasMap = new Map();
     this.linhasPorNomeNormalizadoMap = new Map();
