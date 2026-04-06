@@ -1,19 +1,27 @@
-name: Release
+name: Release and Deploy Frontend
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Necessário para o Semantic Release ler o histórico de commits
+          fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
-        # versão lida automaticamente de packageManager no package.json
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,18 +35,18 @@ jobs:
       - name: Instalar dependências
         run: pnpm install --recursive --frozen-lockfile
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Build e Deploy (Publica no GH Pages)
-        # Este passo só corre se o build e a versão estiverem OK
-        working-directory: ./app
-        run: |
-          pnpm run build
-          pnpm run deploy
+      - name: Semantic Release (Gera a Versão e o Changelog)
         env:
-          # Injeta o token para o comando 'gh-pages' conseguir fazer push
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Isto é o que gera a tag, atualiza o package.json e cria o CHANGELOG.md!
+        run: pnpm exec semantic-release
+
+      - name: Configurar identidade do git para deploy
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Deploy no GH Pages
+        working-directory: ./app
+        run: pnpm run deploy
