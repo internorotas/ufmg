@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/internorotas/ufmg/compare/v1.0.0...v1.1.0) (2026-04-06)
+
+
+### Features
+
+* **a11y:** add aria-pressed to ThemeToggle button ([d5bef1a](https://github.com/internorotas/ufmg/commit/d5bef1aed347eecb455e971fe0ed93399f4017c3))
+
+
+### Performance Improvements
+
+* **useLinhasFilter:** optimize line sorting with schwartzian transform ([8a6b1a6](https://github.com/internorotas/ufmg/commit/8a6b1a61eb81eb57f9dccec76c9ac940fe760e88))
+* **useLinhasFilter:** optimize line sorting with schwartzian transform ([1077b52](https://github.com/internorotas/ufmg/commit/1077b5272ec2387e54cadb2c353ba0b5b26d9cb6))
+* **utils:** optimize converterMinutosParaHora ([631ffe4](https://github.com/internorotas/ufmg/commit/631ffe42fb2dffa546444ae537cafd576233324a))
+
 # 1.0.0 (2026-04-01)
 
 ## Bug Fixes
