@@ -1,3 +1,0 @@
-## 2024-03-24 - Schwartzian Transform for Array Sorting
-**Learning:** Sorting arrays in JavaScript using `.sort()` triggers the comparator function `O(N log N)` times. If the comparator performs expensive operations (like parsing schedules, date manipulation, or calling complex status resolution functions), those operations are redundantly executed.
-**Action:** When a sort operation relies on derived data that is expensive to compute, use a Schwartzian transform pattern (Map -> Sort -> Map). First, map the original array to an array of objects containing both the original item and the pre-computed sort keys. Second, sort this new array using only the simple pre-computed keys. Finally, map the result back to the original items to significantly improve performance.
