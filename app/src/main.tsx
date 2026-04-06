@@ -4,10 +4,10 @@ import { createRoot } from 'react-dom/client';
 import './globals.css';
 
 import { App } from './App';
-import { ThemeProvider } from './contexts/ThemeContext';
 
 /**
- * O ponto de entrada da aplicação. Renderiza o componente principal (`App`) dentro do `StrictMode` e do `ThemeProvider`.
+ * O ponto de entrada da aplicação. Renderiza o componente principal (`App`) dentro do `StrictMode`.
+ * O ThemeProvider está dentro do componente App para manter o contexto co-localizado.
  */
 // Registra o Service Worker para caching offline (apenas em produção)
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
@@ -26,8 +26,6 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
+    <App />
   </StrictMode>,
 );

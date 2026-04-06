@@ -1,3 +1,4 @@
+import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -7,6 +8,12 @@ import packageJson from '../package.json';
 export default defineConfig({
   plugins: [react(), tailwindcss(), ghPages()],
   base: '/ufmg/',
+  resolve: {
+    alias: {
+      // Deve corresponder ao paths em tsconfig.json e tsconfig.app.json
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
   server: {
     fs: {
       // Permite que o servidor de desenvolvimento acesse node_modules do workspace

@@ -1,9 +1,8 @@
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
+import { GA_MEASUREMENT_ID } from '../config/analytics';
 import { ga4Analytics } from '../services/analytics';
 
 type Theme = 'light' | 'dark';
-
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 interface ThemeContextType {
   theme: Theme;

@@ -6,7 +6,7 @@
  */
 
 import L from 'leaflet';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Marker } from 'react-leaflet';
 import icon from '../../assets/marker.svg';
 import { useAnalytics } from '../../hooks/useAnalytics';
@@ -123,6 +123,16 @@ export const MapMarkers = React.memo(function MapMarkers({
 export function useMapMarkers() {
   const markersRef = useRef<{ [key: string]: L.Marker | null }>({});
   const [paradaDestacadaId, setParadaDestacadaId] = useState<string | null>(null);
+  const highlightTimeoutRef = useRef<number | null>(null);
+
+  // Limpa o timer pendente ao desmontar para evitar state update em componente morto
+  useEffect(() => {
+    return () => {
+      if (highlightTimeoutRef.current !== null) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleMarkerRef = useCallback((id: string, marker: L.Marker | null) => {
     if (marker) {
@@ -143,8 +153,13 @@ export function useMapMarkers() {
       marker.openPopup();
     }
 
-    // Resetar destaque após 3 segundos
-    setTimeout(() => {
+    // Resetar destaque após 3 segundos — limpa o timer se chamado novamente
+    // antes do timeout expirar para evitar state update em componente desmontado.
+    if (highlightTimeoutRef.current !== null) {
+      clearTimeout(highlightTimeoutRef.current);
+    }
+    highlightTimeoutRef.current = window.setTimeout(() => {
+      highlightTimeoutRef.current = null;
       setParadaDestacadaId(null);
     }, 3000);
   }, []);
