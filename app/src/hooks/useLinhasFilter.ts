@@ -96,46 +96,40 @@ function getInitialCategory(linhasData: CategoriaLinhas): number {
 }
 
 /**
- * Retorna o grupo de ordenação da linha baseado no status atual:
- *   0 → ativa (circulando ou aguardando 1ª saída)
- *   1 → encerrada (ultimo horário já passou)
- *   2 → não circula hoje
- */
-function getStatusGroup(linha: Linha, agora: Date): number {
-  const { id } = obterStatusLinha(linha, agora);
-  if (id === 'ENCERRADA') return 1;
-  if (id === 'NAO_CIRCULA_HOJE') return 2;
-  return 0;
-}
-
-function getUltimoHorarioMinutos(linha: Linha, agora: Date): number {
-  const minutos = obterHorariosLinhaNoDia(linha, agora)
-    .map(converterHoraParaMinutos)
-    .filter(Number.isFinite);
-  return minutos.length > 0 ? Math.max(...minutos) : 0;
-}
-
-/**
  * Ordena as linhas por estado operacional:
  *  1. Ativas (circulando / aguardando) → ordem crescente pelo número da linha
  *  2. Encerradas → ordem decrescente pelo último horário (passou por último = topo)
  *  3. Não circulam hoje → ordem crescente pelo número da linha
  */
 function sortLinhas(linhas: Linha[], agora: Date): Linha[] {
-  return [...linhas].sort((a, b) => {
-    const groupA = getStatusGroup(a, agora);
-    const groupB = getStatusGroup(b, agora);
+  return linhas
+    .map((linha) => {
+      // Pré-calcula os horários uma vez por linha para evitar recomputações redundantes no comparator
+      const horariosHoje = obterHorariosLinhaNoDia(linha, agora)
+        .map(converterHoraParaMinutos)
+        .filter(Number.isFinite)
+        .sort((a, b) => a - b);
 
-    if (groupA !== groupB) return groupA - groupB;
+      const status = obterStatusLinha(linha, agora, horariosHoje);
 
-    // Encerradas: mais recentemente encerrada fica no topo (último horário desc)
-    if (groupA === 1) {
-      return getUltimoHorarioMinutos(b, agora) - getUltimoHorarioMinutos(a, agora);
-    }
+      let group = 0;
+      if (status.id === 'ENCERRADA') group = 1;
+      else if (status.id === 'NAO_CIRCULA_HOJE') group = 2;
 
-    // Ativas e não-circulam-hoje: por número da linha crescente
-    return a.linha - b.linha;
-  });
+      const ultimoHorario = horariosHoje.length > 0 ? horariosHoje[horariosHoje.length - 1] : 0;
+
+      return { item: linha, group, ultimoHorario };
+    })
+    .sort((a, b) => {
+      if (a.group !== b.group) return a.group - b.group;
+
+      // Encerradas: mais recentemente encerrada fica no topo (último horário desc)
+      if (a.group === 1) return b.ultimoHorario - a.ultimoHorario;
+
+      // Ativas e não-circulam-hoje: por número da linha crescente
+      return a.item.linha - b.item.linha;
+    })
+    .map((wrapper) => wrapper.item);
 }
 
 /**

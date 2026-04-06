@@ -90,7 +90,13 @@ export function EmptyState({
   ...props
 }: EmptyStateProps) {
   return (
-    <div data-slot="empty-state" className={cn(emptyStateVariants({ size }), className)} {...props}>
+    <div
+      data-slot="empty-state"
+      className={cn(emptyStateVariants({ size }), className)}
+      role="status"
+      aria-live="polite"
+      {...props}
+    >
       {icon && (
         <div data-slot="empty-state-icon" className={emptyStateIconVariants({ size })}>
           {icon}
