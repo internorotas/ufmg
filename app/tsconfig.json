@@ -18,7 +18,6 @@
     "ignoreDeprecations": "5.0",
 
     // --- ADIÇÕES IMPORTANTES ---
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
