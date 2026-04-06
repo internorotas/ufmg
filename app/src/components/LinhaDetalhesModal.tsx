@@ -244,13 +244,22 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
   );
 });
 
+function sortSchedulesOptimized(schedules: string[]): string[] {
+  // Schwartzian transform to avoid O(N log N) redundant timeToMinutes calls
+  return schedules
+    .map((h) => ({ h, min: timeToMinutes(h) }))
+    .sort((a, b) => a.min - b.min)
+    .map((x) => x.h);
+}
+
 function getAllLineSchedules(linha: Linha): string[] {
   const horariosRaw = linha.horarios as unknown;
 
   if (Array.isArray(horariosRaw)) {
-    return horariosRaw
-      .filter((h): h is string => typeof h === 'string' && h.includes(':'))
-      .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+    const validSchedules = horariosRaw.filter(
+      (h): h is string => typeof h === 'string' && h.includes(':'),
+    );
+    return sortSchedulesOptimized(validSchedules);
   }
 
   if (!horariosRaw || typeof horariosRaw !== 'object') {
@@ -261,15 +270,15 @@ function getAllLineSchedules(linha: Linha): string[] {
     Record<'diasUteis' | 'sabados' | 'domingos', string[]>
   >;
 
-  return Array.from(
+  const allSchedules = Array.from(
     new Set([
       ...(horariosPorDia.diasUteis ?? []),
       ...(horariosPorDia.sabados ?? []),
       ...(horariosPorDia.domingos ?? []),
     ]),
-  )
-    .filter((h) => h.includes(':'))
-    .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+  ).filter((h) => h.includes(':'));
+
+  return sortSchedulesOptimized(allSchedules);
 }
 
 /**
