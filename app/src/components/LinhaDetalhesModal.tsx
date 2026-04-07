@@ -234,9 +234,9 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
           title={alarmado ? 'Cancelar alarme de chegada' : 'Avisar quando o ônibus chegar'}
         >
           {alarmado ? (
-            <BellRing size={20} className="text-brand-accent" />
+            <BellRing size={20} className="text-brand-accent" aria-hidden="true" />
           ) : (
-            <Bell size={20} className="text-text-tertiary" />
+            <Bell size={20} className="text-text-tertiary" aria-hidden="true" />
           )}
         </button>
       )}
@@ -403,7 +403,7 @@ export function LinhaDetalhesModal({
           className={tabVariants({ active: tabAtiva === 'itinerario' })}
           style={tabAtiva === 'itinerario' ? { borderColor: linha.corHex } : {}}
         >
-          <MapIcon size={20} />
+          <MapIcon size={20} aria-hidden="true" />
           Itinerário
         </button>
         <button
@@ -418,7 +418,7 @@ export function LinhaDetalhesModal({
           className={tabVariants({ active: tabAtiva === 'horarios' })}
           style={tabAtiva === 'horarios' ? { borderColor: linha.corHex } : {}}
         >
-          <Clock size={20} />
+          <Clock size={20} aria-hidden="true" />
           Todos os Horários
         </button>
       </div>
