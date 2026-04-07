@@ -318,7 +318,7 @@ function DialogClose({
       title={ariaLabel}
       {...props}
     >
-      {children ?? <X className="size-6" />}
+      {children ?? <X className="size-6" aria-hidden="true" />}
     </button>
   );
 }
