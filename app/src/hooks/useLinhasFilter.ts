@@ -101,14 +101,11 @@ function getInitialCategory(linhasData: CategoriaLinhas): number {
  *  2. Encerradas → ordem decrescente pelo último horário (passou por último = topo)
  *  3. Não circulam hoje → ordem crescente pelo número da linha
  */
-function sortLinhas(linhas: Linha[], agora: Date): Linha[] {
+function sortLinhas(linhas: Linha[], agora: Date, horariosMap: Map<string, number[]>): Linha[] {
   return linhas
     .map((linha) => {
-      // Pré-calcula os horários uma vez por linha para evitar recomputações redundantes no comparator
-      const horariosHoje = obterHorariosLinhaNoDia(linha, agora)
-        .map(converterHoraParaMinutos)
-        .filter(Number.isFinite)
-        .sort((a, b) => a - b);
+      // Usa os horários pré-calculados injetados via Map
+      const horariosHoje = horariosMap.get(linha.idRota) ?? [];
 
       const status = obterStatusLinha(linha, agora, horariosHoje);
 
@@ -211,9 +208,29 @@ export function useLinhasFilter(
 
   const linhasDaCategoriaAtiva = useMemo(() => categoriaAtual?.linhas ?? [], [categoriaAtual]);
 
+  const todayKey = currentTime.toDateString();
+  const referenceDate = useMemo(() => new Date(todayKey), [todayKey]);
+
+  const linhasBusca = useMemo(
+    () => filterLinhas(linhasDaCategoriaAtiva, searchTerm),
+    [linhasDaCategoriaAtiva, searchTerm],
+  );
+
+  const linhasHorariosMap = useMemo(() => {
+    return new Map(
+      linhasBusca.map((l) => [
+        l.idRota,
+        obterHorariosLinhaNoDia(l, referenceDate)
+          .map(converterHoraParaMinutos)
+          .filter(Number.isFinite)
+          .sort((a, b) => a - b),
+      ]),
+    );
+  }, [linhasBusca, referenceDate]);
+
   const linhasFiltradas = useMemo(() => {
-    return sortLinhas(filterLinhas(linhasDaCategoriaAtiva, searchTerm), currentTime);
-  }, [linhasDaCategoriaAtiva, searchTerm, currentTime]);
+    return sortLinhas(linhasBusca, currentTime, linhasHorariosMap);
+  }, [linhasBusca, currentTime, linhasHorariosMap]);
 
   const hasResults = linhasFiltradas.length > 0;
 
