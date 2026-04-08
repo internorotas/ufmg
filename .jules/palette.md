@@ -1,3 +1,3 @@
-## 2024-04-05 - Redundant Screen Reader Announcements in Icon-only Buttons
-**Learning:** Screen readers often attempt to read both the `aria-label` of an icon-only button and the fallback/internal content of the icon element itself if it isn't properly hidden, leading to confusing double announcements.
-**Action:** When adding `aria-label` to icon-only buttons (like FABs or action icons), ensure the internal SVG or icon components (like Lucide React icons) explicitly set `aria-hidden="true"`.
+## 2024-05-15 - [Add aria-hidden to decorative icons]
+**Learning:** Found several decorative Lucide React icons (`<Bus>`, `<Clock>`, `<ChevronRight>`, `<Heart>`, `<Menu>`, `<ArrowLeft>`) across `LineCard`, `MenuFooter`, and `MenuLateral` that were missing the `aria-hidden="true"` attribute. This causes screen readers to attempt to read their SVG content, which is redundant or confusing since the surrounding text/labels already convey the meaning.
+**Action:** When adding or reviewing purely decorative icons in this app's UI components, ensure `aria-hidden="true"` is explicitly passed to prevent screen reader clutter and improve the auditory experience.
