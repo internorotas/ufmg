@@ -130,7 +130,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           className={creditLinkVariants()}
         >
           Desenvolvido com
-          <Heart size={14} fill="currentColor" className="text-red-500" />
+          <Heart size={14} fill="currentColor" className="text-red-500" aria-hidden="true" />
           por Igor Martins
         </a>
         {appVersion && (
