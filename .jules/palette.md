@@ -1,0 +1,3 @@
+## 2024-05-15 - [Add aria-hidden to decorative icons]
+**Learning:** Found several decorative Lucide React icons (`<Bus>`, `<Clock>`, `<ChevronRight>`, `<Heart>`, `<Menu>`, `<ArrowLeft>`) across `LineCard`, `MenuFooter`, and `MenuLateral` that were missing the `aria-hidden="true"` attribute. This causes screen readers to attempt to read their SVG content, which is redundant or confusing since the surrounding text/labels already convey the meaning.
+**Action:** When adding or reviewing purely decorative icons in this app's UI components, ensure `aria-hidden="true"` is explicitly passed to prevent screen reader clutter and improve the auditory experience.

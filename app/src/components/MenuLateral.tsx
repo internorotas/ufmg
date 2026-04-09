@@ -272,7 +272,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           title="Ver Linhas"
         >
           <span className="flex items-center gap-2 text-white">
-            <Menu size={24} />
+            <Menu size={24} aria-hidden="true" />
             Ver Linhas
           </span>
         </Button>
@@ -326,7 +326,7 @@ export const MenuLateral = React.memo(function MenuLateral({
               aria-label="Fechar menu lateral"
               title="Fechar menu lateral"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={24} aria-hidden="true" />
             </Button>
           </div>
         </header>

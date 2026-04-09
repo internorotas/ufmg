@@ -231,7 +231,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             aria-label="Limpar busca"
             title="Limpar busca"
           >
-            <X size={16} />
+            <X size={16} aria-hidden="true" />
           </button>
         ) : shortcut ? (
           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 hidden md:block">
