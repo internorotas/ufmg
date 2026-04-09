@@ -123,7 +123,7 @@ function LineIcon({ color }: LineIconProps) {
       className="flex size-12 shrink-0 items-center justify-center rounded-lg shadow-sm"
       style={{ backgroundColor: color }}
     >
-      <Bus className="size-6 text-white drop-shadow-sm" />
+      <Bus className="size-6 text-white drop-shadow-sm" aria-hidden="true" />
     </div>
   );
 }
@@ -138,7 +138,7 @@ function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
   return (
     <div data-slot="schedule" className="rounded-lg bg-background-secondary/50 p-2 text-center">
       <p className="mb-1 flex items-center justify-center gap-1 text-xs text-text-secondary">
-        <Clock className="size-3.5" />
+        <Clock className="size-3.5" aria-hidden="true" />
         {label}
       </p>
       <p
@@ -278,7 +278,7 @@ function LineCardComponent({
           </div>
           <div className="flex items-center gap-2">
             <LineStatusBadge status={statusType} label={status} size="xs" />
-            <ChevronRight className="size-5 shrink-0 text-text-secondary" />
+            <ChevronRight className="size-5 shrink-0 text-text-secondary" aria-hidden="true" />
           </div>
         </div>
       </div>
