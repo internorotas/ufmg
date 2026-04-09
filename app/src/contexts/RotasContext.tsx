@@ -93,7 +93,7 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
         setRotasService(loadedService);
       } catch {
         if (!isMounted) return;
-        setDataError('Nao foi possivel carregar os dados de linhas e paradas.');
+        setDataError('Não foi possível carregar os dados de linhas e paradas.');
       } finally {
         if (isMounted) {
           setIsLoadingData(false);

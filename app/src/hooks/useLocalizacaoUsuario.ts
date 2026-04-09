@@ -25,9 +25,11 @@ import { useAnalytics } from './useAnalytics';
 export const COORDENADAS_UFMG: [number, number] = [-19.87055, -43.96775];
 
 /**
- * Distância máxima em km para considerar o usuário "perto" da UFMG
+ * Distância máxima em km para considerar o usuário "perto" da UFMG.
+ * Exportada para que mensagens de UI possam referenciar o mesmo valor
+ * sem duplicar a constante.
  */
-const DISTANCIA_MAXIMA_KM = 4;
+export const DISTANCIA_MAXIMA_KM = 4;
 
 /** Extende DeviceOrientationEvent com a propriedade proprietária do WebKit/iOS. */
 type DeviceOrientationEventWebkit = DeviceOrientationEvent & {
