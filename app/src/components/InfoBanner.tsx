@@ -46,7 +46,7 @@ export function InfoBanner({ className, ...props }: InfoBannerProps) {
       className={cn(bannerVariants({ intent: 'info' }), className)}
       {...props}
     >
-      <Info className="mt-0.5 size-5 shrink-0" />
+      <Info className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
       <p className="text-xs leading-relaxed lg:text-sm">
         Todas as rotas iniciam e terminam próximas à <strong>Escola de Música</strong>. Os horários
         indicam a saída dos ônibus deste ponto.
