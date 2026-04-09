@@ -1,0 +1,294 @@
+/**
+ * Hook de instrumentação automática de analytics.
+ *
+ * Separado de useAnalytics.ts por ter responsabilidade própria: registra
+ * listeners globais (performance, erros, cliques, web vitals) no mount e os
+ * remove no unmount. O arquivo é longo por natureza — cada seção corresponde
+ * a um tipo de sinal que queremos capturar.
+ *
+ * Uso: monte uma única vez no topo da árvore via <AnalyticsProvider />.
+ */
+
+import { useEffect, useRef } from 'react';
+import type { AnalyticsEvent, TimingEvent } from '../services/analytics';
+import { useAnalytics } from './useAnalytics';
+
+// ---------------------------------------------------------------------------
+// Helpers privados
+// ---------------------------------------------------------------------------
+
+function truncateLabel(value: string, maxLength: number = 120): string {
+  return value.replace(/\s+/g, ' ').trim().slice(0, maxLength);
+}
+
+function getNavigationTiming(): PerformanceNavigationTiming | null {
+  const [entry] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+  return entry ?? null;
+}
+
+function trackNavigationTimings(trackTiming: (timing: TimingEvent) => void): void {
+  const nav = getNavigationTiming();
+  if (!nav) return;
+
+  const ttfb = Math.round(nav.responseStart);
+  const domReady = Math.round(nav.domContentLoadedEventEnd);
+  const totalLoad = Math.round(nav.loadEventEnd);
+
+  trackTiming({ category: 'navigation', name: 'ttfb', value: ttfb, label: nav.type });
+  trackTiming({ category: 'navigation', name: 'dom_ready', value: domReady, label: nav.type });
+  trackTiming({ category: 'navigation', name: 'page_load', value: totalLoad, label: nav.type });
+}
+
+function trackResourceSummary(trackEvent: (event: AnalyticsEvent) => void): void {
+  const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+  if (resources.length === 0) return;
+
+  const jsCount = resources.filter((entry) => entry.initiatorType === 'script').length;
+  const cssCount = resources.filter((entry) => entry.initiatorType === 'css').length;
+  const imageCount = resources.filter((entry) => entry.initiatorType === 'img').length;
+  const fetchCount = resources.filter((entry) => entry.initiatorType === 'fetch').length;
+  const totalTransferKb = Math.round(
+    resources.reduce((acc, entry) => acc + entry.transferSize, 0) / 1024,
+  );
+
+  trackEvent({
+    event: 'resource_summary',
+    category: 'engagement',
+    action: 'resource_summary',
+    label: `total=${resources.length};js=${jsCount};css=${cssCount};img=${imageCount};fetch=${fetchCount}`,
+    value: totalTransferKb,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Hook principal
+// ---------------------------------------------------------------------------
+
+/**
+ * Instrumentação automática para maximizar cobertura de métricas do app.
+ * Inclui: performance de carregamento, web vitals (quando suportado), erros globais,
+ * status de rede, visibilidade da aba e cliques em elementos interativos.
+ *
+ * Monte uma única vez no topo da árvore (via AnalyticsProvider).
+ */
+export function useAnalyticsAutoTracking() {
+  const { trackEvent, trackTiming, trackError, setUserProperty, isEnabled } = useAnalytics();
+  const sessionStartRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    if (!isEnabled) return;
+
+    const viewport = `${window.innerWidth}x${window.innerHeight}`;
+    setUserProperty('viewport', viewport);
+    setUserProperty('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown');
+    setUserProperty('language', navigator.language || 'unknown');
+    setUserProperty('platform', navigator.platform || 'unknown');
+
+    const nav = getNavigationTiming();
+    trackEvent({
+      event: 'app_boot',
+      category: 'navigation',
+      action: 'app_boot',
+      label: nav?.type || 'navigate',
+    });
+
+    const onLoad = () => {
+      trackNavigationTimings(trackTiming);
+      trackResourceSummary(trackEvent);
+      if ('memory' in performance) {
+        const memory = performance.memory as { usedJSHeapSize: number };
+        trackTiming({
+          category: 'engagement',
+          name: 'used_js_heap_mb',
+          value: Math.round(memory.usedJSHeapSize / 1024 / 1024),
+          label: 'onLoad',
+        });
+      }
+    };
+
+    // Se a página já carregou (caso típico num SPA), dispara imediatamente.
+    let loadListenerAdded = false;
+    if (document.readyState === 'complete') {
+      onLoad();
+    } else {
+      loadListenerAdded = true;
+      window.addEventListener('load', onLoad);
+    }
+
+    const onVisibilityChange = () => {
+      trackEvent({
+        event: 'visibility_change',
+        category: 'engagement',
+        action: 'visibility_change',
+        label: document.visibilityState,
+      });
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    const onWindowError = (event: ErrorEvent) => {
+      const message = truncateLabel(`${event.message} @ ${event.filename}:${event.lineno}`);
+      trackError(new Error(message), true);
+    };
+
+    const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const reasonText =
+        typeof event.reason === 'string'
+          ? event.reason
+          : JSON.stringify(event.reason ?? 'unknown rejection');
+      trackError(new Error(truncateLabel(`Unhandled rejection: ${reasonText}`)), true);
+    };
+
+    window.addEventListener('error', onWindowError);
+    window.addEventListener('unhandledrejection', onUnhandledRejection);
+
+    const onClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+
+      const interactiveElement = target.closest(
+        'button, a, [role="button"], input[type="button"], input[type="submit"]',
+      ) as HTMLElement | null;
+      if (!interactiveElement) return;
+
+      // data-no-track="true" suprime o evento genérico quando o elemento já
+      // dispara um evento mais específico.
+      if (interactiveElement.dataset.noTrack === 'true') return;
+
+      const role =
+        interactiveElement.getAttribute('role') || interactiveElement.tagName.toLowerCase();
+      const label =
+        interactiveElement.getAttribute('aria-label') ||
+        interactiveElement.getAttribute('title') ||
+        interactiveElement.textContent ||
+        'sem-label';
+
+      trackEvent({
+        event: 'global_click',
+        category: 'engagement',
+        action: 'global_click',
+        label: truncateLabel(`${role}: ${label}`),
+      });
+    };
+
+    document.addEventListener('click', onClick, { capture: true });
+
+    // ---- Web Vitals (LCP, CLS, INP, FCP) ----------------------------------
+    let lcpValue = 0;
+    let clsValue = 0;
+    let inpValue = 0;
+
+    const observers: PerformanceObserver[] = [];
+
+    if ('PerformanceObserver' in window) {
+      const paintObserver = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          if (entry.name === 'first-contentful-paint') {
+            trackTiming({
+              category: 'engagement',
+              name: 'fcp',
+              value: Math.round(entry.startTime),
+            });
+          }
+        });
+      });
+      paintObserver.observe({ type: 'paint', buffered: true });
+      observers.push(paintObserver);
+
+      const lcpObserver = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const last = entries[entries.length - 1];
+        if (last) lcpValue = Math.round(last.startTime);
+      });
+      lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+      observers.push(lcpObserver);
+
+      const clsObserver = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          const layoutShift = entry as PerformanceEntry & {
+            value?: number;
+            hadRecentInput?: boolean;
+          };
+          if (!layoutShift.hadRecentInput) {
+            clsValue += layoutShift.value ?? 0;
+          }
+        });
+      });
+      clsObserver.observe({ type: 'layout-shift', buffered: true });
+      observers.push(clsObserver);
+
+      const inpObserver = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          const timingEntry = entry as PerformanceEntry & {
+            duration?: number;
+            interactionId?: number;
+          };
+          if ((timingEntry.interactionId ?? 0) > 0) {
+            inpValue = Math.max(inpValue, Math.round(timingEntry.duration ?? 0));
+          }
+        });
+      });
+      inpObserver.observe({
+        type: 'event',
+        buffered: true,
+        durationThreshold: 16,
+      } as PerformanceObserverInit);
+      observers.push(inpObserver);
+    }
+
+    const flushVitals = () => {
+      if (lcpValue > 0) {
+        trackTiming({ category: 'engagement', name: 'lcp', value: lcpValue });
+      }
+      if (clsValue > 0) {
+        trackEvent({
+          event: 'web_vital_cls',
+          category: 'engagement',
+          action: 'web_vital_cls',
+          label: clsValue.toFixed(4),
+          value: Math.round(clsValue * 10000),
+        });
+      }
+      if (inpValue > 0) {
+        trackTiming({ category: 'engagement', name: 'inp_candidate', value: inpValue });
+      }
+    };
+
+    const onPageHide = () => {
+      flushVitals();
+      const durationMs = Date.now() - sessionStartRef.current;
+      trackTiming({
+        category: 'engagement',
+        name: 'session_duration_ms',
+        value: durationMs,
+        label: 'page_hide',
+      });
+    };
+
+    window.addEventListener('pagehide', onPageHide);
+
+    const heartbeatId = window.setInterval(() => {
+      const elapsedMs = Date.now() - sessionStartRef.current;
+      trackTiming({
+        category: 'engagement',
+        name: 'session_heartbeat_s',
+        value: Math.round(elapsedMs / 1000),
+        label: window.location.pathname,
+      });
+    }, 60000);
+
+    return () => {
+      if (loadListenerAdded) window.removeEventListener('load', onLoad);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('error', onWindowError);
+      window.removeEventListener('unhandledrejection', onUnhandledRejection);
+      document.removeEventListener('click', onClick, { capture: true });
+      window.removeEventListener('pagehide', onPageHide);
+      window.clearInterval(heartbeatId);
+      flushVitals();
+      observers.forEach((observer) => {
+        observer.disconnect();
+      });
+    };
+  }, [isEnabled, setUserProperty, trackError, trackEvent, trackTiming]);
+}

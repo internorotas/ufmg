@@ -15,13 +15,13 @@ export const CONFIG_TRAFEGO: PeriodoTrafego[] = [
     inicioMinutos: h(7, 0),
     fimMinutos: h(8, 30),
     multiplicador: 1.2,
-    label: 'Pico manha',
+    label: 'Pico manhã',
   },
   {
     inicioMinutos: h(11, 30),
     fimMinutos: h(13, 30),
     multiplicador: 1.15,
-    label: 'Almoco',
+    label: 'Almoço',
   },
   {
     inicioMinutos: h(17, 0),
