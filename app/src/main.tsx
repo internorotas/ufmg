@@ -12,9 +12,25 @@ import { App } from './App';
 // Registra o Service Worker para caching offline (apenas em produção)
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, {
-      scope: import.meta.env.BASE_URL,
-    });
+    navigator.serviceWorker
+      .register(`${import.meta.env.BASE_URL}sw.js`, {
+        scope: import.meta.env.BASE_URL,
+      })
+      .then((reg) => {
+        // Detecta quando um novo SW foi instalado e força reload para aplicar o cache limpo.
+        // A condição navigator.serviceWorker.controller garante que o reload só ocorre
+        // para usuários que já tinham um SW antigo ativo (os afetados pela tela branca).
+        reg.onupdatefound = () => {
+          const installingWorker = reg.installing;
+          if (installingWorker) {
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                window.location.reload();
+              }
+            };
+          }
+        };
+      });
   });
 }
 
