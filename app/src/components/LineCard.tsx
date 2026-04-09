@@ -123,7 +123,7 @@ function LineIcon({ color }: LineIconProps) {
       className="flex size-12 shrink-0 items-center justify-center rounded-lg shadow-sm"
       style={{ backgroundColor: color }}
     >
-      <Bus className="size-6 text-white drop-shadow-sm" />
+      <Bus className="size-6 text-white drop-shadow-sm" aria-hidden="true" />
     </div>
   );
 }
