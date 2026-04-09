@@ -87,9 +87,9 @@ export function ThemeToggle({
       {...props}
     >
       {isDark ? (
-        <Sun size={iconSize} className="text-brand-accent" />
+        <Sun size={iconSize} className="text-brand-accent" aria-hidden="true" />
       ) : (
-        <Moon size={iconSize} className="text-text-primary" />
+        <Moon size={iconSize} className="text-text-primary" aria-hidden="true" />
       )}
     </button>
   );
