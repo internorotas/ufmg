@@ -54,7 +54,7 @@ export function DisclaimerBanner({
       {...props}
     >
       <div className="flex items-start gap-2">
-        <AlertTriangle className="mt-0.5 size-4.5 shrink-0" />
+        <AlertTriangle className="mt-0.5 size-4.5 shrink-0" aria-hidden="true" />
         <div className="flex-1">
           {isOffline && (
             <p className="mb-2 text-xs font-semibold leading-relaxed">
@@ -82,11 +82,11 @@ export function DisclaimerBanner({
 
           <div className="mt-2 flex flex-col gap-2 border-t border-warning-border pt-2 lg:grid lg:grid-cols-2">
             <a href="tel:3409-4601" className={contactButtonVariants()}>
-              <Phone className="size-4 shrink-0" />
+              <Phone className="size-4 shrink-0" aria-hidden="true" />
               <span>3409-4601 / 4606</span>
             </a>
             <a href="mailto:sfrota@dsg.ufmg.br" className={contactButtonVariants()}>
-              <Mail className="size-4 shrink-0" />
+              <Mail className="size-4 shrink-0" aria-hidden="true" />
               <span>sfrota@dsg.ufmg.br</span>
             </a>
           </div>
