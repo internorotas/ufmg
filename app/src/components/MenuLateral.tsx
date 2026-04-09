@@ -326,7 +326,7 @@ export const MenuLateral = React.memo(function MenuLateral({
               aria-label="Fechar menu lateral"
               title="Fechar menu lateral"
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={24} aria-hidden="true" />
             </Button>
           </div>
         </header>
