@@ -1,3 +1,17 @@
+# [1.2.0](https://github.com/internorotas/ufmg/compare/v1.1.0...v1.2.0) (2026-04-09)
+
+
+### Bug Fixes
+
+* atualizar versão do cache para v2 ([f4c48fb](https://github.com/internorotas/ufmg/commit/f4c48fb29681a1b511c82b2899f44ecbe5c93f2e))
+* remover branch 'develop' da configuração do semantic-release ([9552c61](https://github.com/internorotas/ufmg/commit/9552c61932c9d06e277b031118e3262003065c1b))
+
+
+### Features
+
+* adicionar arquivos de ambiente ao .gitignore ([bd1bd32](https://github.com/internorotas/ufmg/commit/bd1bd3261598d1ceb3ed48cca96d1e8304b17af2))
+* refatorar hooks de analytics e melhorar a estrutura da aplicação ([f00fd71](https://github.com/internorotas/ufmg/commit/f00fd71fc4a37e163b6eceb3efdff7247368c2a3))
+
 # [1.1.0](https://github.com/internorotas/ufmg/compare/v1.0.0...v1.1.0) (2026-04-06)
 
 
