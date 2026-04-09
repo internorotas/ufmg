@@ -1,0 +1,4 @@
+## 2025-04-09 - Missing HTTP Security Headers in Local Servers
+**Vulnerability:** The Vite development (`server`) and preview (`preview`) environments were missing crucial security headers like `X-Content-Type-Options: nosniff` and `X-Frame-Options: DENY`.
+**Learning:** Even though the app is destined for static hosting (GitHub Pages) where custom headers might not be applicable directly, local dev and preview servers should still mirror production security best practices. The `X-Content-Type-Options: nosniff` header is especially tricky; the browser ignores it if delivered via an HTML `<meta>` tag, meaning it MUST be set as an actual HTTP response header.
+**Prevention:** Always configure explicit HTTP security headers in modern frontend tooling (like Vite) under `server.headers` and `preview.headers` to ensure a "secure by default" posture across all deployment and development stages.
