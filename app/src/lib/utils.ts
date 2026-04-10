@@ -292,8 +292,10 @@ export function buscarParadasPorIds<T extends { idParada: string }>(
 export function normalizarNomeLinha(nomeLinha: string): string {
   return nomeLinha
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s*\(.*?\)\s*/g, '')
+    .replace(/[\u0300-\u036f]/g, '') // remove diacríticos (acentos)
+    .replace(/\s*\(.*?\)\s*/g, ' ') // remove conteúdo entre parênteses
+    .replace(/[^\w\s]/g, ' ') // substitui pontuação/símbolos por espaço
+    .replace(/\s+/g, ' ') // colapsa múltiplos espaços
     .trim()
     .toLowerCase();
 }
