@@ -49,4 +49,6 @@ jobs:
 
       - name: Deploy no GH Pages
         working-directory: ./app
+        env:
+          VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
         run: pnpm run deploy
