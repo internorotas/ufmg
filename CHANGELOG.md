@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/internorotas/ufmg/compare/v1.2.0...v1.2.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* adicionar VITE_GA_MEASUREMENT_ID no  workflows de deployment ([fdb5b24](https://github.com/internorotas/ufmg/commit/fdb5b2492b8d43732a790ea924c855dc4f993104))
+
 # [1.2.0](https://github.com/internorotas/ufmg/compare/v1.1.0...v1.2.0) (2026-04-09)
 
 
