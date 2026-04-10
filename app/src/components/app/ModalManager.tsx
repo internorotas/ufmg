@@ -1,5 +1,6 @@
 import { MapPin, Navigation } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { DISTANCIA_MAXIMA_KM } from '../../hooks/useLocalizacaoUsuario';
 import { Modal } from '../Modal';
 import { Button } from '../ui/Button';
 
@@ -82,8 +83,8 @@ export function ModalManager({
         <div className="space-y-4 p-4">
           <div className="text-center">
             <p className="text-text-secondary">
-              Parece que você está a mais de 4km da UFMG. Deseja voltar a visualizar o campus no
-              mapa?
+              Parece que você está a mais de {DISTANCIA_MAXIMA_KM}km da UFMG. Deseja voltar a
+              visualizar o campus no mapa?
             </p>
           </div>
           <div className="flex flex-col gap-2">

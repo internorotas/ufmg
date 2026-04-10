@@ -6,6 +6,7 @@ import { ModalManager } from './components/app/ModalManager';
 import { OfflineToast } from './components/app/OfflineToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MenuLateral } from './components/MenuLateral';
+import { GA_MEASUREMENT_ID } from './config/analytics';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -26,9 +27,7 @@ const LoadingMap = () => (
   </div>
 );
 
-// Lê a ID de Medição a partir das variáveis de ambiente
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
-
+// Lê a ID de Medição a partir das variáveis de ambiente (via src/config/analytics.ts)
 // Inicializa o Google Analytics APENAS se a ID existir
 if (GA_MEASUREMENT_ID) {
   ga4Analytics.initialize();

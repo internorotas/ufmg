@@ -9,7 +9,7 @@
  * Atualizar CACHE_VERSION a cada novo deploy que mude o conteúdo.
  */
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const STATIC_CACHE = `interno-rotas-static-${CACHE_VERSION}`;
 const DATA_CACHE = `interno-rotas-data-${CACHE_VERSION}`;
 const BASE = '/ufmg';

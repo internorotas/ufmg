@@ -10,6 +10,7 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
+import { getSaoPauloMinutesOfDay } from '../lib/time';
 import {
   cn,
   findScheduleIndex,
@@ -205,7 +206,7 @@ function LineCardComponent({
   // Passa schedulesInMinutes para obterStatusLinha para evitar recálculo O(N log N)
   const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
 
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const currentMinutes = getSaoPauloMinutesOfDay(now);
   const { nextSchedule, previousSchedule } = calculateSchedules(schedulesInMinutes, currentMinutes);
 
   const status =

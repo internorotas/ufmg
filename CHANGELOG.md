@@ -1,3 +1,31 @@
+# [1.2.0](https://github.com/internorotas/ufmg/compare/v1.1.0...v1.2.0) (2026-04-09)
+
+
+### Bug Fixes
+
+* atualizar versão do cache para v2 ([f4c48fb](https://github.com/internorotas/ufmg/commit/f4c48fb29681a1b511c82b2899f44ecbe5c93f2e))
+* remover branch 'develop' da configuração do semantic-release ([9552c61](https://github.com/internorotas/ufmg/commit/9552c61932c9d06e277b031118e3262003065c1b))
+
+
+### Features
+
+* adicionar arquivos de ambiente ao .gitignore ([bd1bd32](https://github.com/internorotas/ufmg/commit/bd1bd3261598d1ceb3ed48cca96d1e8304b17af2))
+* refatorar hooks de analytics e melhorar a estrutura da aplicação ([f00fd71](https://github.com/internorotas/ufmg/commit/f00fd71fc4a37e163b6eceb3efdff7247368c2a3))
+
+# [1.1.0](https://github.com/internorotas/ufmg/compare/v1.0.0...v1.1.0) (2026-04-06)
+
+
+### Features
+
+* **a11y:** add aria-pressed to ThemeToggle button ([d5bef1a](https://github.com/internorotas/ufmg/commit/d5bef1aed347eecb455e971fe0ed93399f4017c3))
+
+
+### Performance Improvements
+
+* **useLinhasFilter:** optimize line sorting with schwartzian transform ([8a6b1a6](https://github.com/internorotas/ufmg/commit/8a6b1a61eb81eb57f9dccec76c9ac940fe760e88))
+* **useLinhasFilter:** optimize line sorting with schwartzian transform ([1077b52](https://github.com/internorotas/ufmg/commit/1077b5272ec2387e54cadb2c353ba0b5b26d9cb6))
+* **utils:** optimize converterMinutosParaHora ([631ffe4](https://github.com/internorotas/ufmg/commit/631ffe42fb2dffa546444ae537cafd576233324a))
+
 # 1.0.0 (2026-04-01)
 
 ## Bug Fixes

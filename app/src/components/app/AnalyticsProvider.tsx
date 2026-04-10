@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useAnalyticsAutoTracking } from '../../hooks/useAnalytics';
+import { useAnalyticsAutoTracking } from '../../hooks/useAnalyticsAutoTracking';
 
 interface AnalyticsProviderProps {
   children: ReactNode;

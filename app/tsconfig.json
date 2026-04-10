@@ -17,18 +17,10 @@
     "noFallthroughCasesInSwitch": true,
     "ignoreDeprecations": "5.0",
 
-    // --- ADIÇÕES IMPORTANTES ---
+    // --- Path aliases (deve corresponder ao vite.config.ts) ---
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/@types" // Aponta para a pasta onde criaremos os nossos tipos
-    ]
+    }
   },
-  "include": [
-    "src",
-    "src/@types.d.ts" // Inclui o nosso ficheiro de forma explícita
-  ]
-  // "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"]
 }
