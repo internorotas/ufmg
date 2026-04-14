@@ -8,31 +8,12 @@ import { App } from './App';
 /**
  * O ponto de entrada da aplicação. Renderiza o componente principal (`App`) dentro do `StrictMode`.
  * O ThemeProvider está dentro do componente App para manter o contexto co-localizado.
+ *
+ * O registro do Service Worker é gerenciado pelo vite-plugin-pwa (Workbox).
+ * O sw.js é gerado automaticamente no build com um precache manifest baseado nos
+ * hashes dos assets — a versão muda a cada deploy, garantindo que todos os usuários
+ * recebam a versão mais recente sem precisar limpar o cache manualmente.
  */
-// Registra o Service Worker para caching offline (apenas em produção)
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register(`${import.meta.env.BASE_URL}sw.js`, {
-        scope: import.meta.env.BASE_URL,
-      })
-      .then((reg) => {
-        // Detecta quando um novo SW foi instalado e força reload para aplicar o cache limpo.
-        // A condição navigator.serviceWorker.controller garante que o reload só ocorre
-        // para usuários que já tinham um SW antigo ativo (os afetados pela tela branca).
-        reg.onupdatefound = () => {
-          const installingWorker = reg.installing;
-          if (installingWorker) {
-            installingWorker.onstatechange = () => {
-              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                window.location.reload();
-              }
-            };
-          }
-        };
-      });
-  });
-}
 
 const rootElement = document.getElementById('root');
 
