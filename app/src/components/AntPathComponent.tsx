@@ -40,7 +40,11 @@ export function AntPathComponent({ coordinates, options }: AntPathProps) {
       map.removeLayer(antPathRef.current);
     }
 
-    const antPath = new L.Polyline.AntPath(coordinates, options);
+    const antPath = new (
+      L.Polyline as unknown as {
+        AntPath: new (latlngs: LatLngExpression[], options?: AntPathOptions) => L.Polyline;
+      }
+    ).AntPath(coordinates, options);
 
     antPathRef.current = antPath;
     map.addLayer(antPath);
