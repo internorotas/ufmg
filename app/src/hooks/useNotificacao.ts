@@ -119,6 +119,7 @@ async function dispararNotificacaoSistema(opts: OpcaoAviso): Promise<void> {
   } catch {
     // Navegadores que não suportam new Notification() diretamente (ex: alguns iOS)
     if (import.meta.env.DEV) {
+      // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
       console.warn('[useNotificacao] new Notification() falhou:', titulo);
     }
   }
@@ -360,6 +361,7 @@ export function useNotificacao(): UseNotificacaoReturn {
             if (!current) return;
             void processarAlarme(key, current).catch((err) => {
               if (import.meta.env.DEV) {
+                // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
                 console.warn('[useNotificacao] erro em processarAlarme:', err);
               }
             });
@@ -368,6 +370,7 @@ export function useNotificacao(): UseNotificacaoReturn {
         })
         .catch((err) => {
           if (import.meta.env.DEV) {
+            // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
             console.warn('[useNotificacao] erro ao agendar notificação:', err);
           }
         });
@@ -385,6 +388,7 @@ export function useNotificacao(): UseNotificacaoReturn {
       for (const [key, entry] of alarmesRef.current) {
         void processarAlarme(key, entry).catch((err) => {
           if (import.meta.env.DEV) {
+            // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
             console.warn('[useNotificacao] erro em visibilitychange processarAlarme:', err);
           }
         });
