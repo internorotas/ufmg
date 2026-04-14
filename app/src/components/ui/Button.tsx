@@ -125,6 +125,7 @@ export function Button({
       data-disabled={isDisabled || undefined}
       className={cn(buttonVariants({ variant, size, fullWidth }), className)}
       disabled={isDisabled}
+      aria-busy={loading || undefined}
       {...props}
     >
       {loading ? (
