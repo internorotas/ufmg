@@ -115,6 +115,12 @@ function AppContent() {
   );
 
   // Handler para voltar ao campus UFMG
+  const handlePedirLocalizacao = useCallback(() => {
+    solicitarAutoCenter();
+    iniciarRastreamento();
+  }, [solicitarAutoCenter, iniciarRastreamento]);
+
+  // Handler para voltar ao campus UFMG
   const handleVoltarParaUFMG = useCallback(() => {
     consumirAutoCenter();
     mapaRef.current?.centralizarCoordenada(COORDENADAS_UFMG, 15);
@@ -201,7 +207,7 @@ function AppContent() {
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white"
+                className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-text-inverse"
               >
                 Recarregar
               </button>
@@ -218,10 +224,7 @@ function AppContent() {
               headingUsuario={heading}
               permissaoLocalizacao={permissaoConcedida}
               carregandoLocalizacao={carregandoLocalizacao}
-              onPedirLocalizacao={() => {
-                solicitarAutoCenter();
-                iniciarRastreamento();
-              }}
+              onPedirLocalizacao={handlePedirLocalizacao}
             />
           </Suspense>
         </ErrorBoundary>
