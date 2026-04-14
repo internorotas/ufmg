@@ -145,7 +145,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   const lastListSummaryRef = useRef<string>('');
 
   const [shortcutLabel] = useState(() => {
-    if (typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform)) {
+    if (typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/i.test(navigator.userAgent)) {
       return '⌘K';
     }
     return 'Ctrl+K';
@@ -298,6 +298,7 @@ export const MenuLateral = React.memo(function MenuLateral({
       <aside
         data-slot="sidebar"
         data-state={isMenuVisible ? 'open' : 'closed'}
+        aria-label="Menu de linhas de ônibus"
         className={sidebarVariants({ visible: isMenuVisible })}
       >
         <header
