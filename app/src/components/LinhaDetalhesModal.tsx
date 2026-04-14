@@ -150,6 +150,7 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
 
   const bellVisible = suportado && !!previsao?.proximoOnibus;
   const minutosFaltantes = previsao?.proximoOnibus?.minutosFaltantes ?? 0;
+  const horarioChegada = previsao?.proximoOnibus?.horarioChegada ?? '';
   const alarmado = isAlarmado(linha.idRota, parada.idParada);
 
   return (
@@ -224,7 +225,7 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
       {bellVisible && (
         <button
           type="button"
-          onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
+          onClick={() => toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)}
           className={cn(
             'mt-1 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
             alarmado ? 'bg-brand-accent/30 hover:bg-brand-accent/40' : 'hover:bg-card-hover',
@@ -371,7 +372,7 @@ export function LinhaDetalhesModal({
       title={
         <div className={titleContainerVariants()}>
           <div className={titleIconVariants()} style={{ backgroundColor: linha.corHex }}>
-            <Bus size={24} className="text-white drop-shadow-sm" />
+            <Bus size={24} className="text-text-inverse drop-shadow-sm" />
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="truncate text-lg font-bold leading-tight text-text-primary">
@@ -463,7 +464,7 @@ export function LinhaDetalhesModal({
             </div>
           )}
 
-          <div className={`mt-6 ${infoCardVariants()}`}>
+          <div className={cn(infoCardVariants(), 'mt-6')}>
             <p className="text-text-secondary">💡 Clique em uma parada para visualizá-la no mapa</p>
           </div>
         </div>
@@ -479,11 +480,11 @@ export function LinhaDetalhesModal({
           {!isLineRunningToday && (
             <div
               data-slot="not-running-notice"
-              className="rounded-lg border border-amber-600/50 bg-amber-900/20 p-4"
+              className="rounded-lg border border-warning-border bg-warning-bg p-4"
             >
               <div className="flex items-center gap-3">
-                <AlertTriangle size={24} className="shrink-0 text-amber-400" />
-                <p className="text-sm font-medium text-amber-300">{statusLinha.texto}</p>
+                <AlertTriangle size={24} className="shrink-0 text-warning-text" />
+                <p className="text-sm font-medium text-warning-text">{statusLinha.texto}</p>
               </div>
             </div>
           )}
