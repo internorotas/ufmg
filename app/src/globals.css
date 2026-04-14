@@ -106,7 +106,7 @@ body,
   /* Texto */
   --text-primary: #111827; /* Gray 900 */
   --text-secondary: #4b5563; /* Gray 600 - Melhor contraste que o antigo 6b7280 */
-  --text-tertiary: #9ca3af; /* Gray 400 */
+  --text-tertiary: #6b7280; /* Gray 500 - Melhor contraste WCAG vs #9ca3af (Gray 400) */
   --text-inverse: #ffffff;
 
   /* Semantic: Success (Verde) - Ajustado para WCAG */
@@ -177,7 +177,6 @@ body,
 /* Global Reset & Typography */
 * {
   font-family: var(--font-poppins);
-  font-display: swap;
   /* Melhora a renderização de fontes */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
