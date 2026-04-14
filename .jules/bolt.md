@@ -1,0 +1,3 @@
+## 2024-04-14 - Optimizing Hot Loops with Precalculated Constants
+**Learning:** When optimizing mathematical formulas heavily used in hot loops (like Haversine calculations applied across many coordinates), precalculating constants, avoiding inline closures, and caching intermediate math values (e.g. `Math.sin()`) provides significant performance improvements without compromising readability or logic.
+**Action:** Before optimizing inner loops, verify if any mathematical constants or repeated calculations can be lifted out of the loop or cached locally. Avoid inline functions that add call overhead in performance-critical code paths.

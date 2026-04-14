@@ -213,22 +213,23 @@ export function obterStatusLinha(
  * console.log(distancia); // ~7.5 km
  * ```
  */
+const DEG2RAD = Math.PI / 180;
+const RAIO_TERRA_KM = 6371;
+
 export function calcularDistanciaKm(
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number,
 ): number {
-  const RAIO_TERRA_KM = 6371;
+  const dLat = (lat2 - lat1) * DEG2RAD;
+  const dLon = (lon2 - lon1) * DEG2RAD;
 
-  const toRad = (graus: number) => (graus * Math.PI) / 180;
-
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  const sinDLat2 = Math.sin(dLat / 2);
+  const sinDLon2 = Math.sin(dLon / 2);
 
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    sinDLat2 * sinDLat2 + Math.cos(lat1 * DEG2RAD) * Math.cos(lat2 * DEG2RAD) * sinDLon2 * sinDLon2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
