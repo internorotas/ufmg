@@ -40,8 +40,9 @@ export const SPECIAL_PERIODS: SpecialPeriod[] = [
  * @returns {SpecialPeriod | null} O período especial ativo ou null se não houver nenhum
  */
 export function getCurrentSpecialPeriod(): SpecialPeriod | null {
-  const now = getSaoPauloNow();
-  now.setHours(0, 0, 0, 0);
+  // Cria novo Date para não mutar o objeto retornado por getSaoPauloNow()
+  const nowSp = getSaoPauloNow();
+  const now = new Date(nowSp.getFullYear(), nowSp.getMonth(), nowSp.getDate(), 0, 0, 0, 0);
 
   for (const period of SPECIAL_PERIODS) {
     if (!period.isActive) continue;
