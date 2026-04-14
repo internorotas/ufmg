@@ -439,7 +439,7 @@ export function LinhaDetalhesModal({
                   <div key={parada.idParada} className="relative flex">
                     {!isLast && (
                       <div
-                        className="absolute left-2.75 top-7 h-full w-0.5"
+                        className="absolute left-5 top-7 h-full w-0.5"
                         style={{
                           backgroundColor: `${linha.corHex}40`,
                           backgroundImage: `repeating-linear-gradient(0deg, ${linha.corHex}40, ${linha.corHex}40 6px, transparent 6px, transparent 12px)`,
