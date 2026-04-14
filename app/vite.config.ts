@@ -3,10 +3,61 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { ghPages } from 'vite-plugin-gh-pages';
+import { VitePWA } from 'vite-plugin-pwa';
 import packageJson from '../package.json';
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), ghPages()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    ghPages(),
+    VitePWA({
+      // O novo SW é instalado e ativado automaticamente em background.
+      // Quando o Workbox detecta que o sw.js mudou (hash novo a cada build),
+      // o novo SW toma controle sem interação do usuário.
+      registerType: 'autoUpdate',
+
+      // Usa injectRegister: null pois o registro é feito manualmente em main.tsx,
+      // permitindo controle sobre o ciclo de vida (skipWaiting + clients.claim).
+      injectRegister: null,
+
+      // Workbox gera o sw.js automaticamente com precache manifest baseado nos
+      // hashes do build — zero manutenção manual de versão.
+      strategies: 'generateSW',
+
+      workbox: {
+        // Precacheia todos os assets estáticos gerados pelo build
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2}'],
+
+        // SPA fallback: todas as navegações servem o index.html
+        navigateFallback: '/ufmg/index.html',
+
+        // Não intercepta requests para os dados JSON (tratados separadamente)
+        navigateFallbackDenylist: [/^\/ufmg\/data\//],
+
+        // Ativa imediatamente ao instalar (sem esperar fechar todas as abas)
+        skipWaiting: true,
+
+        // Toma controle de todas as abas abertas assim que ativa
+        clientsClaim: true,
+
+        runtimeCaching: [
+          {
+            // Dados JSON: stale-while-revalidate
+            // Serve do cache imediatamente e atualiza em background
+            urlPattern: /\/ufmg\/data\/.+\.json$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'interno-rotas-data',
+            },
+          },
+        ],
+      },
+
+      // Não sobrescreve o site.webmanifest existente em public/
+      manifest: false,
+    }),
+  ],
   base: '/ufmg/',
   resolve: {
     alias: {
