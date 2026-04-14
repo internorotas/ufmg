@@ -34,8 +34,8 @@ export const footerButtonVariants = tv({
   ],
   variants: {
     intent: {
-      danger: 'bg-red-600 text-white hover:bg-red-700',
-      primary: 'bg-brand-primary text-white hover:bg-brand-primary/90',
+      danger: 'bg-brand-accent text-text-inverse hover:bg-brand-accent/90',
+      primary: 'bg-brand-primary text-text-inverse hover:bg-brand-primary/90',
       ghost: [
         'border border-card-border bg-background text-text-primary',
         'hover:bg-background-secondary hover:text-text-primary',
@@ -90,6 +90,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => handleLinkClick('Contato')}
+          aria-label="Reportar problema ou entrar em contato (abre em nova aba)"
           className={footerButtonVariants({ intent: 'danger' })}
         >
           Contato
@@ -101,6 +102,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => handleLinkClick('Sobre o Projeto')}
+          aria-label="Sobre o projeto no GitHub (abre em nova aba)"
           className={footerButtonVariants({ intent: 'primary' })}
         >
           Sobre
@@ -127,14 +129,15 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => handleLinkClick('Dev Profile')}
+          aria-label="Perfil do desenvolvedor Igor Martins no GitHub (abre em nova aba)"
           className={creditLinkVariants()}
         >
           Desenvolvido com
-          <Heart size={14} fill="currentColor" className="text-red-500" aria-hidden="true" />
+          <Heart size={14} fill="currentColor" className="text-brand-accent" aria-hidden="true" />
           por Igor Martins
         </a>
         {appVersion && (
-          <span className="text-xs font-semibold text-brand-secondary/20"> / v{appVersion}</span>
+          <span className="text-xs font-semibold text-text-tertiary"> / v{appVersion}</span>
         )}
       </div>
     </div>
