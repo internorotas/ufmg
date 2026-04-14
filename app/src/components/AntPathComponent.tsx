@@ -59,6 +59,7 @@ export function AntPathComponent({ coordinates, options }: AntPathProps) {
       map.fitBounds(antPath.getBounds(), { padding: [50, 50] });
     } catch (e) {
       if (import.meta.env.DEV) {
+        // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
         console.warn('[AntPathComponent] fitBounds falhou:', e);
       }
     }
