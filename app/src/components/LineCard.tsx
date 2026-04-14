@@ -48,7 +48,7 @@ export const lineCardVariants = tv({
  */
 export const detailsButtonVariants = tv({
   base: [
-    'w-full py-2.5 rounded-lg text-white font-semibold cursor-pointer',
+    'w-full py-2.5 rounded-lg text-text-inverse font-semibold cursor-pointer',
     'text-xs md:text-sm shadow-sm',
     'hover:brightness-110 active:scale-[0.97] transition-all duration-150',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
@@ -124,7 +124,7 @@ function LineIcon({ color }: LineIconProps) {
       className="flex size-12 shrink-0 items-center justify-center rounded-lg shadow-sm"
       style={{ backgroundColor: color }}
     >
-      <Bus className="size-6 text-white drop-shadow-sm" aria-hidden="true" />
+      <Bus className="size-6 text-text-inverse drop-shadow-sm" aria-hidden="true" />
     </div>
   );
 }
