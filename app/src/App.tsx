@@ -22,8 +22,15 @@ const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default:
 
 // Componente simples de Loading
 const LoadingMap = () => (
-  <div className="flex items-center justify-center h-full w-full bg-background-secondary">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
+  <div
+    role="status"
+    aria-label="Carregando mapa"
+    className="flex items-center justify-center h-full w-full bg-background-secondary"
+  >
+    <div
+      aria-hidden="true"
+      className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
+    />
   </div>
 );
 
