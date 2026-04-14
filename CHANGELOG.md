@@ -1,3 +1,13 @@
+## [1.2.3](https://github.com/internorotas/ufmg/compare/v1.2.2...v1.2.3) (2026-04-14)
+
+
+### Bug Fixes
+
+* adicionar suporte ao PWA com configuração do VitePWA ([2d5e7da](https://github.com/internorotas/ufmg/commit/2d5e7dab960451412d6f13afd41b22a1d32cf173))
+* adicionar vite-plugin-pwa como dependência ([e8a51d1](https://github.com/internorotas/ufmg/commit/e8a51d1a015bef4082d7248aaa4b09d56ce17675))
+* remover o arquivo sw.js do projeto ([55a6567](https://github.com/internorotas/ufmg/commit/55a6567ec926bee84411361c428965ada0b0da9d))
+* remover registro do Service Worker do ponto de entrada da aplicação ([da6e97f](https://github.com/internorotas/ufmg/commit/da6e97f72e033227e4ff844449262089bf0f0f6a))
+
 ## [1.2.2](https://github.com/internorotas/ufmg/compare/v1.2.1...v1.2.2) (2026-04-14)
 
 
