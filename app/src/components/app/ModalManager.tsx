@@ -45,7 +45,7 @@ export function ModalManager({
         <div className="space-y-4 p-4">
           <div className="text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary shadow-sm">
-              <MapPin aria-hidden="true" className="h-8 w-8 text-white" />
+              <MapPin aria-hidden="true" className="h-8 w-8 text-text-inverse" />
             </div>
             <p className="text-text-secondary">
               Para mostrar sua localização no mapa e te ajudar a encontrar a parada mais próxima,
@@ -61,7 +61,6 @@ export function ModalManager({
             <Button
               variant="primary"
               fullWidth
-              className="text-white"
               disabled={carregandoLocalizacao}
               onClick={onPermitirLocalizacao}
             >
@@ -88,7 +87,7 @@ export function ModalManager({
             </p>
           </div>
           <div className="flex flex-col gap-2">
-            <Button variant="primary" fullWidth className="text-white" onClick={onVoltarUFMG}>
+            <Button variant="primary" fullWidth onClick={onVoltarUFMG}>
               Voltar para a UFMG
             </Button>
             <Button variant="ghost" fullWidth onClick={onContinuarAqui}>
