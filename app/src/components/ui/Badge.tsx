@@ -60,7 +60,10 @@ export const badgeVariants = tv({
   },
 });
 
-export interface BadgeProps extends ComponentProps<'span'>, VariantProps<typeof badgeVariants> {
+/** Props comuns a <span> e <button> para o Badge */
+type SharedHTMLProps = Omit<ComponentProps<'span'> & ComponentProps<'button'>, 'children'>;
+
+export interface BadgeProps extends SharedHTMLProps, VariantProps<typeof badgeVariants> {
   /** Ícone à esquerda */
   leftIcon?: ReactNode;
   /** Ícone à direita */
@@ -96,17 +99,11 @@ export function Badge({
   clickable,
   leftIcon,
   rightIcon,
+  onClick,
   ...props
 }: BadgeProps) {
-  return (
-    <span
-      data-slot="badge"
-      data-variant={variant}
-      role={clickable ? 'button' : undefined}
-      tabIndex={clickable ? 0 : undefined}
-      className={cn(badgeVariants({ variant, size, clickable }), className)}
-      {...props}
-    >
+  const inner = (
+    <>
       {leftIcon && (
         <span data-slot="badge-left-icon" className="shrink-0">
           {leftIcon}
@@ -118,6 +115,32 @@ export function Badge({
           {rightIcon}
         </span>
       )}
+    </>
+  );
+
+  if (clickable) {
+    return (
+      <button
+        type="button"
+        data-slot="badge"
+        data-variant={variant}
+        onClick={onClick}
+        className={cn(badgeVariants({ variant, size, clickable }), className)}
+        {...(props as ComponentProps<'button'>)}
+      >
+        {inner}
+      </button>
+    );
+  }
+
+  return (
+    <span
+      data-slot="badge"
+      data-variant={variant}
+      className={cn(badgeVariants({ variant, size, clickable }), className)}
+      {...props}
+    >
+      {inner}
     </span>
   );
 }
