@@ -12,6 +12,7 @@
  */
 
 import { Bell, Info } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import { Modal } from './Modal';
 
 // Detecta iOS de forma simples para exibir nota contextual
@@ -33,13 +34,24 @@ export function NotificacaoPermissionModal({
   onConfirmar,
 }: NotificacaoPermissionModalProps) {
   const showIOSNote = isIOS();
+  const [confirmando, setConfirmando] = useState(false);
+
+  const handleConfirmar = useCallback(async () => {
+    if (confirmando) return;
+    setConfirmando(true);
+    try {
+      await onConfirmar();
+    } finally {
+      setConfirmando(false);
+    }
+  }, [confirmando, onConfirmar]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Ativar Notificações" size="sm">
       <div className="flex flex-col items-center gap-5 py-4 text-center">
         {/* Ícone ilustrativo */}
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary">
-          <Bell size={32} className="text-white" />
+          <Bell size={32} className="text-text-inverse" aria-hidden="true" />
         </div>
 
         {/* Texto explicativo */}
@@ -56,9 +68,9 @@ export function NotificacaoPermissionModal({
 
         {/* Nota para usuários iOS */}
         {showIOSNote && (
-          <div className="flex w-full items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-left">
-            <Info size={16} className="mt-0.5 shrink-0 text-amber-500" />
-            <p className="text-xs leading-relaxed text-amber-700 dark:text-amber-400">
+          <div className="flex w-full items-start gap-2 rounded-lg border border-warning-border bg-warning-bg p-3 text-left">
+            <Info size={16} className="mt-0.5 shrink-0 text-warning-text" aria-hidden="true" />
+            <p className="text-xs leading-relaxed text-warning-text">
               No iPhone, as notificações só funcionam se o app estiver instalado na tela inicial.
               Toque em <strong>Compartilhar → Adicionar à Tela de Início</strong> no Safari para
               ativá-las.
@@ -70,10 +82,12 @@ export function NotificacaoPermissionModal({
         <div className="flex w-full flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            onClick={onConfirmar}
-            className="min-h-11 flex-1 rounded-lg bg-brand-primary px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95"
+            onClick={handleConfirmar}
+            disabled={confirmando}
+            aria-busy={confirmando}
+            className="min-h-11 flex-1 rounded-lg bg-brand-primary px-6 py-3 text-sm font-semibold text-text-inverse transition-colors hover:bg-brand-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Permitir
+            {confirmando ? 'Aguardando...' : 'Permitir'}
           </button>
           <button
             type="button"
