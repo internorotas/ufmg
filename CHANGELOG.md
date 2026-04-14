@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/internorotas/ufmg/compare/v1.2.3...v1.2.4) (2026-04-14)
+
+
+### Bug Fixes
+
+* remover a política de segurança de conteúdo do HTML ([06959ad](https://github.com/internorotas/ufmg/commit/06959adbace8d97714fac5b318a2625bba683135))
+
 ## [1.2.3](https://github.com/internorotas/ufmg/compare/v1.2.2...v1.2.3) (2026-04-14)
 
 
