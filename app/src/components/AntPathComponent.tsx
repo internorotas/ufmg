@@ -57,7 +57,11 @@ export function AntPathComponent({ coordinates, options }: AntPathProps) {
 
     try {
       map.fitBounds(antPath.getBounds(), { padding: [50, 50] });
-    } catch (_e) {}
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        console.warn('[AntPathComponent] fitBounds falhou:', e);
+      }
+    }
 
     return () => {
       if (antPathRef.current) {
