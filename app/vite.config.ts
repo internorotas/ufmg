@@ -17,9 +17,9 @@ export default defineConfig({
       // o novo SW toma controle sem interação do usuário.
       registerType: 'autoUpdate',
 
-      // Usa injectRegister: null pois o registro é feito manualmente em main.tsx,
-      // permitindo controle sobre o ciclo de vida (skipWaiting + clients.claim).
-      injectRegister: null,
+      // Injeta automaticamente o script de registro do SW no index.html.
+      // O registro acontece silenciosamente ao carregar a página.
+      injectRegister: 'auto',
 
       // Workbox gera o sw.js automaticamente com precache manifest baseado nos
       // hashes do build — zero manutenção manual de versão.
@@ -32,8 +32,11 @@ export default defineConfig({
         // SPA fallback: todas as navegações servem o index.html
         navigateFallback: '/ufmg/index.html',
 
-        // Não intercepta requests para os dados JSON (tratados separadamente)
-        navigateFallbackDenylist: [/^\/ufmg\/data\//],
+        // Não intercepta requests para os dados JSON nem para o manifesto PWA.
+        // O manifesto é fetchado pelo browser como navigate request em alguns browsers
+        // (Chrome); sem esta exclusão o SW retornaria index.html no lugar do JSON,
+        // causando "Manifest: Line 1, column 1, Syntax error".
+        navigateFallbackDenylist: [/^\/ufmg\/data\//, /\/site\.webmanifest$/],
 
         // Ativa imediatamente ao instalar (sem esperar fechar todas as abas)
         skipWaiting: true,
