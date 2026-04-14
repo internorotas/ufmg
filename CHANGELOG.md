@@ -1,3 +1,12 @@
+## [1.2.2](https://github.com/internorotas/ufmg/compare/v1.2.1...v1.2.2) (2026-04-14)
+
+
+### Bug Fixes
+
+* ajustar posição do elemento no modal de detalhes da linha ([a1cc33b](https://github.com/internorotas/ufmg/commit/a1cc33bc397e3ff65d19ea9a5440eba3e284c082))
+* atualizar CACHE_VERSION para v3 ([3a3d21a](https://github.com/internorotas/ufmg/commit/3a3d21aeb7f81f4402bbc4606d2671a4af4dc484))
+* corrigir a criação do ant-path para garantir a tipagem correta ([0864762](https://github.com/internorotas/ufmg/commit/086476233a807fcba4784efb044b9b33abd88cf9))
+
 ## [1.2.1](https://github.com/internorotas/ufmg/compare/v1.2.0...v1.2.1) (2026-04-10)
 
 
