@@ -14,6 +14,7 @@
 import { Bell, Info } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Modal } from './Modal';
+import { Button } from './ui/Button';
 
 // Detecta iOS de forma simples para exibir nota contextual
 function isIOS(): boolean {
@@ -80,22 +81,18 @@ export function NotificacaoPermissionModal({
 
         {/* Botões de ação — coluna no mobile, linha no desktop */}
         <div className="flex w-full flex-col gap-3 sm:flex-row">
-          <button
+          <Button
+            variant="primary"
             type="button"
             onClick={handleConfirmar}
-            disabled={confirmando}
-            aria-busy={confirmando}
-            className="min-h-11 flex-1 rounded-lg bg-brand-primary px-6 py-3 text-sm font-semibold text-text-inverse transition-colors hover:bg-brand-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            loading={confirmando}
+            className="flex-1 min-h-11"
           >
             {confirmando ? 'Aguardando...' : 'Permitir'}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 flex-1 rounded-lg border border-card-border px-6 py-3 text-sm font-semibold text-text-secondary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
-          >
+          </Button>
+          <Button variant="outline" type="button" onClick={onClose} className="flex-1 min-h-11">
             Agora Não
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>
