@@ -88,7 +88,7 @@ export function NotificacaoPermissionModal({
             loading={confirmando}
             className="flex-1 min-h-11"
           >
-            {confirmando ? 'Aguardando...' : 'Permitir'}
+            Permitir
           </Button>
           <Button variant="outline" type="button" onClick={onClose} className="flex-1 min-h-11">
             Agora Não
