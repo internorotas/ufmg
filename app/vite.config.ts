@@ -74,6 +74,16 @@ export default defineConfig({
       // raiz (pnpm usa symlinks que resolvem para fora do diretório app/).
       allow: ['..'],
     },
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
+  },
+  preview: {
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
   },
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version),
