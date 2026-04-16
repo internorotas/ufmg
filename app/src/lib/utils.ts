@@ -88,6 +88,19 @@ interface HorariosPorDia {
 }
 
 function parseHorarioValido(horario: string): number | null {
+  // ⚡ Bolt: Fast path for "HH:mm" strings to avoid string allocations and function calls.
+  // Using charCodeAt and inline math provides a significant performance boost in hot loops
+  // like array filtering, as it bypasses string slicing and general number parsing overhead.
+  if (horario && horario.length === 5 && horario[2] === ':') {
+    const h1 = horario.charCodeAt(0) - 48;
+    const h2 = horario.charCodeAt(1) - 48;
+    const m1 = horario.charCodeAt(3) - 48;
+    const m2 = horario.charCodeAt(4) - 48;
+    if (h1 >= 0 && h1 <= 9 && h2 >= 0 && h2 <= 9 && m1 >= 0 && m1 <= 9 && m2 >= 0 && m2 <= 9) {
+      return (h1 * 10 + h2) * 60 + (m1 * 10 + m2);
+    }
+  }
+
   if (!horario?.includes(':')) return null;
   const minutos = converterHoraParaMinutos(horario);
   return Number.isFinite(minutos) ? minutos : null;
