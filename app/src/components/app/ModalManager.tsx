@@ -32,6 +32,8 @@ export function ModalManager({
       <Modal
         isOpen={mostrarModalPermissao}
         onClose={onClosePermissao}
+        titleLabel="Ativar localização"
+        description="Permita acesso à localização para mostrar sua posição no mapa e encontrar paradas próximas."
         title={
           <div className="flex items-center gap-2">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary/10">
@@ -62,6 +64,7 @@ export function ModalManager({
               variant="primary"
               fullWidth
               disabled={carregandoLocalizacao}
+              data-autofocus="true"
               onClick={onPermitirLocalizacao}
             >
               {carregandoLocalizacao ? 'Obtendo localização...' : 'Permitir Localização'}
@@ -77,6 +80,7 @@ export function ModalManager({
         isOpen={mostrarModalLonge}
         onClose={onCloseLonge}
         title="Você está longe do campus"
+        description={`Você está a mais de ${DISTANCIA_MAXIMA_KM} quilômetros da UFMG e pode voltar a centralizar o mapa no campus ou continuar na posição atual.`}
         size="sm"
       >
         <div className="space-y-4 p-4">
@@ -87,7 +91,7 @@ export function ModalManager({
             </p>
           </div>
           <div className="flex flex-col gap-2">
-            <Button variant="primary" fullWidth onClick={onVoltarUFMG}>
+            <Button variant="primary" fullWidth data-autofocus="true" onClick={onVoltarUFMG}>
               Voltar para a UFMG
             </Button>
             <Button variant="ghost" fullWidth onClick={onContinuarAqui}>
