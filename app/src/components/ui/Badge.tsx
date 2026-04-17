@@ -16,7 +16,7 @@ import { cn } from '../../lib/utils';
 export const badgeVariants = tv({
   base: [
     'inline-flex items-center justify-center gap-1 rounded-full',
-    'font-medium whitespace-nowrap border',
+    'font-semibold whitespace-nowrap border',
     'transition-colors duration-150',
   ],
   variants: {
@@ -33,10 +33,7 @@ export const badgeVariants = tv({
         'bg-internoRotas-azul-eletrico/20 text-internoRotas-azul-eletrico',
         'border-internoRotas-azul-eletrico/30',
       ],
-      secondary: [
-        'bg-internoRotas-laranja-ambar/20 text-internoRotas-laranja-ambar',
-        'border-internoRotas-laranja-ambar/30',
-      ],
+      secondary: ['bg-warning-bg text-warning-text', 'border-warning-border'],
 
       // Minimal badges
       outline: ['bg-transparent text-text-secondary border-card-border'],
@@ -49,7 +46,7 @@ export const badgeVariants = tv({
       lg: 'h-8 px-3 text-sm',
     },
     clickable: {
-      true: 'cursor-pointer hover:opacity-80 active:scale-95',
+      true: 'cursor-pointer hover:opacity-80 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1',
       false: '',
     },
   },
