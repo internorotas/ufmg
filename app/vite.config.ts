@@ -74,6 +74,20 @@ export default defineConfig({
       // raiz (pnpm usa symlinks que resolvem para fora do diretório app/).
       allow: ['..'],
     },
+    headers: {
+      // 🛡️ Sentinel: Add security headers
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+    },
+  },
+  preview: {
+    headers: {
+      // 🛡️ Sentinel: Add security headers
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+    },
   },
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version),
