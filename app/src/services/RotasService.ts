@@ -8,6 +8,8 @@
 import { normalizarNomeLinha } from '../lib/utils';
 import type { CategoriaLinhas, DadosLinhas, Linha, Parada } from '../types/data.types';
 
+const DATA_BUILD_ID = import.meta.env.VITE_BUILD_ID;
+
 interface ParadasPayload {
   paradas: Parada[];
 }
@@ -137,13 +139,16 @@ class RotasServiceImpl implements IRotasService {
 }
 
 async function loadFromPublic(): Promise<{ linhas: CategoriaLinhas; paradas: ParadasPayload }> {
-  const baseUrl = import.meta.env.BASE_URL || '/';
-  const linhasUrl = `${baseUrl}data/linhas.json`;
-  const paradasUrl = `${baseUrl}data/paradas.json`;
+  const publicBaseUrl = new URL(import.meta.env.BASE_URL || '/', window.location.origin);
+  const linhasUrl = new URL('data/linhas.json', publicBaseUrl);
+  const paradasUrl = new URL('data/paradas.json', publicBaseUrl);
+
+  linhasUrl.searchParams.set('v', DATA_BUILD_ID);
+  paradasUrl.searchParams.set('v', DATA_BUILD_ID);
 
   const [linhasResponse, paradasResponse] = await Promise.all([
-    fetch(linhasUrl),
-    fetch(paradasUrl),
+    fetch(linhasUrl, { cache: 'no-store' }),
+    fetch(paradasUrl, { cache: 'no-store' }),
   ]);
 
   if (!linhasResponse.ok || !paradasResponse.ok) {
