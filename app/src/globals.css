@@ -151,7 +151,7 @@ body,
   --text-primary: #f9fafb; /* Gray 50 */
   --text-secondary: #d1d5db; /* Gray 300 - Mais claro para contraste no dark */
   --text-tertiary: #9ca3af; /* Gray 400 */
-  --text-inverse: #111827;
+  --text-inverse: #ffffff;
 
   /* Semantic: Success (Verde) - Dark Mode */
   --success-bg: #064e3b; /* Green 900 */
@@ -190,6 +190,10 @@ body {
   height: 100%;
   width: 100%;
   /* REMOVIDA: transition de background/color causa colapso de renderização no WebKit */
+}
+
+body {
+  text-rendering: optimizeLegibility;
 }
 
 /* Scrollbar Personalizada */
@@ -247,6 +251,11 @@ body {
 .leaflet-popup-close-button:hover {
   color: var(--text-primary) !important;
   background-color: var(--card-hover);
+}
+
+.leaflet-popup-close-button:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
 }
 
 /* Dialog/Modal Backdrop - Ensure it covers everything including Leaflet */
@@ -461,6 +470,17 @@ body {
 
 .animate-pulse-soft {
   animation: pulse-soft 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Leaflet Ant Path Animation */
