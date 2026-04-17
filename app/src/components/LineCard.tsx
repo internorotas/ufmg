@@ -14,12 +14,14 @@ import { getSaoPauloMinutesOfDay } from '../lib/time';
 import {
   cn,
   findScheduleIndex,
+  hexToRgba,
   minutesToTime,
   obterHorariosLinhaNoDia,
   obterStatusLinha,
   timeToMinutes,
 } from '../lib/utils';
 import type { Linha } from '../types/data.types';
+import { PrevisaoBadge } from './PrevisaoBadge';
 import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 
 /**
@@ -28,9 +30,9 @@ import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 export const lineCardVariants = tv({
   base: [
     'relative overflow-hidden rounded-xl border bg-card shadow-sm',
-    'cursor-pointer transition-all duration-200 ease-out',
+    'transition-all duration-200 ease-out',
     'hover:shadow-lg hover:-translate-y-0.5',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+    'focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-primary focus-within:ring-offset-2',
   ],
   variants: {
     selected: {
@@ -48,9 +50,9 @@ export const lineCardVariants = tv({
  */
 export const detailsButtonVariants = tv({
   base: [
-    'w-full py-2.5 rounded-lg text-text-inverse font-semibold cursor-pointer',
-    'text-xs md:text-sm shadow-sm',
-    'hover:brightness-110 active:scale-[0.97] transition-all duration-150',
+    'w-full rounded-lg border bg-background px-4 py-3 font-semibold cursor-pointer',
+    'text-sm shadow-sm',
+    'hover:bg-card-hover active:scale-[0.97] transition-all duration-150',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
   ],
 });
@@ -121,12 +123,19 @@ function LineIcon({ color }: LineIconProps) {
   return (
     <div
       data-slot="icon"
-      className="flex size-12 shrink-0 items-center justify-center rounded-lg shadow-sm"
-      style={{ backgroundColor: color }}
+      className="flex size-12 shrink-0 items-center justify-center rounded-lg border shadow-sm"
+      style={{
+        backgroundColor: hexToRgba(color, 0.12),
+        borderColor: hexToRgba(color, 0.24),
+      }}
     >
-      <Bus className="size-6 text-text-inverse drop-shadow-sm" aria-hidden="true" />
+      <Bus className="size-6 drop-shadow-sm" style={{ color }} aria-hidden="true" />
     </div>
   );
+}
+
+function getLineDescriptionId(idRota: string): string {
+  return `line-card-description-${idRota}`;
 }
 
 interface ScheduleDisplayProps {
@@ -190,6 +199,7 @@ function LineCardComponent({
   onClick,
   onDetailsClick,
   isSelected = false,
+  idParada,
   className,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
@@ -246,65 +256,84 @@ function LineCardComponent({
     onDetailsClick(linha);
   };
 
-  const handleCardKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onClick(linha);
-    }
-  };
-
   return (
     <article
       data-slot="card"
       data-state={isSelected ? 'selected' : undefined}
-      aria-label={`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ''}. Status: ${status}`}
-      // biome-ignore lint/a11y/noNoninteractiveTabindex: Card contains interactive elements and must be focusable via tabIndex instead of role="button"
-      tabIndex={0}
-      onClick={handleCardClick}
-      onKeyDown={handleCardKeyDown}
       className={cn(lineCardVariants({ selected: isSelected }), 'mb-3', className)}
     >
-      <div data-slot="header" className="relative w-full p-4 pb-3 text-left">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex flex-1 items-start gap-3">
-            <LineIcon color={linha.corHex} />
-            <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-bold leading-tight text-text-primary md:text-base">
-                {linha.nome}
-              </h3>
-              {linha.sublinha && (
-                <p className="mt-0.5 text-xs text-text-secondary md:text-sm">{linha.sublinha}</p>
-              )}
+      <button
+        type="button"
+        data-slot="select-line"
+        onClick={handleCardClick}
+        aria-pressed={isSelected}
+        aria-describedby={getLineDescriptionId(linha.idRota)}
+        className="w-full cursor-pointer text-left focus-visible:outline-none"
+      >
+        <div data-slot="header" className="relative w-full p-4 pb-3 text-left">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex flex-1 items-start gap-3">
+              <LineIcon color={linha.corHex} />
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-bold leading-tight text-text-primary">
+                  {linha.nome}
+                </h3>
+                {linha.sublinha && (
+                  <p className="mt-0.5 text-sm text-text-secondary">{linha.sublinha}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <LineStatusBadge status={statusType} label={status} size="xs" />
+              <ChevronRight className="size-5 shrink-0 text-text-secondary" aria-hidden="true" />
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <LineStatusBadge status={statusType} label={status} size="xs" />
-            <ChevronRight className="size-5 shrink-0 text-text-secondary" aria-hidden="true" />
-          </div>
         </div>
-      </div>
 
-      <div data-slot="body" className="px-4 pb-4">
-        {shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE' ? (
-          <SuspendedNotice
-            message={shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto}
-          />
-        ) : (
-          <div className="mb-4 grid grid-cols-2 gap-3">
-            <ScheduleDisplay label="Último Partiu" time={previousSchedule} />
-            <ScheduleDisplay label="Próximo" time={nextSchedule} highlight />
-          </div>
-        )}
+        <div data-slot="body" className="px-4 pb-4">
+          {shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE' ? (
+            <SuspendedNotice
+              message={shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto}
+            />
+          ) : (
+            <div className="mb-4 grid grid-cols-2 gap-3">
+              <ScheduleDisplay label="Último Partiu" time={previousSchedule} />
+              <ScheduleDisplay label="Próximo" time={nextSchedule} highlight />
+            </div>
+          )}
 
+          {idParada ? (
+            <div className="mt-1 flex justify-end">
+              <PrevisaoBadge linha={linha} idParada={idParada} />
+            </div>
+          ) : null}
+
+          <p id={getLineDescriptionId(linha.idRota)} className="sr-only">
+            {`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ''}. Status: ${status}. Próximo horário: ${nextSchedule}.`}
+          </p>
+        </div>
+      </button>
+
+      <div data-slot="actions" className="px-4 pb-4">
         <button
           type="button"
           aria-label={`Ver detalhes da linha ${linha.nome}`}
           data-slot="action"
           onClick={handleDetailsClickInternal}
           className={detailsButtonVariants()}
-          style={{ backgroundColor: linha.corHex }}
+          style={{
+            borderColor: hexToRgba(linha.corHex, 0.35),
+            color: linha.corHex,
+          }}
         >
-          Ver Detalhes
+          <span className="flex items-center justify-between gap-3">
+            <span>Ver Detalhes</span>
+            <span
+              aria-hidden="true"
+              className="size-2 shrink-0 rounded-full"
+              style={{ backgroundColor: linha.corHex }}
+            />
+          </span>
         </button>
       </div>
     </article>
