@@ -2,24 +2,25 @@ import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import { ghPages } from 'vite-plugin-gh-pages';
 import { VitePWA } from 'vite-plugin-pwa';
 import packageJson from '../package.json';
+
+const buildId = new Date().toISOString();
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    ghPages(),
     VitePWA({
       // O novo SW é instalado e ativado automaticamente em background.
       // Quando o Workbox detecta que o sw.js mudou (hash novo a cada build),
       // o novo SW toma controle sem interação do usuário.
       registerType: 'autoUpdate',
 
-      // Injeta automaticamente o script de registro do SW no index.html.
-      // O registro acontece silenciosamente ao carregar a página.
-      injectRegister: 'auto',
+      // O registro é manual em src/main.tsx via virtual:pwa-register.
+      // Em vite-plugin-pwa@1.x, use `false` para impedir a injeção automática
+      // de registerSW.js no HTML gerado.
+      injectRegister: false,
 
       // Workbox gera o sw.js automaticamente com precache manifest baseado nos
       // hashes do build — zero manutenção manual de versão.
@@ -44,17 +45,8 @@ export default defineConfig({
         // Toma controle de todas as abas abertas assim que ativa
         clientsClaim: true,
 
-        runtimeCaching: [
-          {
-            // Dados JSON: stale-while-revalidate
-            // Serve do cache imediatamente e atualiza em background
-            urlPattern: /\/ufmg\/data\/.+\.json$/,
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'interno-rotas-data',
-            },
-          },
-        ],
+        // Remove caches antigos do Workbox quando a estratégia mudar entre builds.
+        cleanupOutdatedCaches: true,
       },
 
       // Não sobrescreve o site.webmanifest existente em public/
@@ -70,13 +62,16 @@ export default defineConfig({
   },
   server: {
     fs: {
-      // Permite que o servidor de desenvolvimento acesse node_modules do workspace
-      // raiz (pnpm usa symlinks que resolvem para fora do diretório app/).
-      allow: ['..'],
+      // Permite que o servidor de desenvolvimento acesse o workspace e o
+      // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
+      // do @fontsource/poppins resolvidos via pnpm ficam fora da allow list
+      // e retornam 403 no ambiente local.
+      allow: ['..', '../..'],
     },
   },
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version),
+    'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId),
   },
   build: {
     rollupOptions: {
