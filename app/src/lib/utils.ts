@@ -21,6 +21,39 @@ export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
+function normalizarHexCor(valor: string): string | null {
+  const cor = valor.trim();
+
+  if (!cor.startsWith('#')) {
+    return null;
+  }
+
+  if (/^#[\da-fA-F]{3}$/.test(cor)) {
+    return `#${cor[1]}${cor[1]}${cor[2]}${cor[2]}${cor[3]}${cor[3]}`.toLowerCase();
+  }
+
+  if (/^#[\da-fA-F]{6}$/.test(cor)) {
+    return cor.toLowerCase();
+  }
+
+  return null;
+}
+
+/**
+ * Converte uma cor hexadecimal para rgba com alpha configurável.
+ * Retorna a cor de marca como fallback quando o valor informado é inválido.
+ */
+export function hexToRgba(hexColor: string, alpha = 1): string {
+  const normalizedColor = normalizarHexCor(hexColor) ?? '#2c0eeb';
+  const clampedAlpha = Math.min(1, Math.max(0, alpha));
+
+  const red = Number.parseInt(normalizedColor.slice(1, 3), 16);
+  const green = Number.parseInt(normalizedColor.slice(3, 5), 16);
+  const blue = Number.parseInt(normalizedColor.slice(5, 7), 16);
+
+  return `rgba(${red}, ${green}, ${blue}, ${clampedAlpha})`;
+}
+
 /**
  * Converte horário `HH:MM` em minutos desde meia-noite.
  *
