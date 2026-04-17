@@ -48,6 +48,10 @@ export interface ModalProps
   onClose: () => void;
   /** Título do modal (pode ser string ou ReactNode) */
   title: string | ReactNode;
+  /** Rótulo acessível quando o título visual não é texto simples */
+  titleLabel?: string;
+  /** Descrição acessível do modal */
+  description?: ReactNode;
   /** Conteúdo do modal */
   children: ReactNode;
 }
@@ -67,7 +71,25 @@ export interface ModalProps
  * </Modal>
  * ```
  */
-export function Modal({ isOpen, onClose, title, children, size, className, ...props }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  titleLabel,
+  description,
+  children,
+  size,
+  className,
+  ...props
+}: ModalProps) {
+  const accessibleDescription =
+    description ??
+    (typeof title === 'string'
+      ? `Janela modal: ${title}`
+      : titleLabel
+        ? `Janela modal: ${titleLabel}`
+        : 'Janela modal');
+
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
@@ -77,12 +99,16 @@ export function Modal({ isOpen, onClose, title, children, size, className, ...pr
             {typeof title === 'string' ? (
               <Dialog.Title>{title}</Dialog.Title>
             ) : (
-              <div className="flex-1">{title}</div>
+              <>
+                <Dialog.Title className="sr-only">{titleLabel ?? 'Modal'}</Dialog.Title>
+                <div className="flex-1">{title}</div>
+              </>
             )}
             <Dialog.Close aria-label="Fechar modal" />
           </div>
 
           <div data-slot="body" className="flex-1 overflow-y-auto rounded-b-xl bg-modal p-4">
+            <Dialog.Description className="sr-only">{accessibleDescription}</Dialog.Description>
             {children}
           </div>
         </Dialog.Popup>

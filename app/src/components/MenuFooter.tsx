@@ -29,13 +29,19 @@ export const footerContainerVariants = tv({
  */
 export const footerButtonVariants = tv({
   base: [
-    'flex w-full items-center justify-center rounded-md px-2 py-1.5',
-    'text-xs font-semibold transition-colors cursor-pointer',
+    'flex w-full items-center justify-center rounded-md border px-3 py-2',
+    'text-sm font-semibold transition-colors cursor-pointer',
   ],
   variants: {
     intent: {
-      danger: 'bg-brand-accent text-text-inverse hover:bg-brand-accent/90',
-      primary: 'bg-brand-primary text-text-inverse hover:bg-brand-primary/90',
+      danger: [
+        'border-card-border bg-background text-text-primary',
+        'hover:bg-background-secondary hover:text-text-primary',
+      ],
+      primary: [
+        'border-card-border bg-background text-text-primary',
+        'hover:bg-background-secondary hover:text-text-primary',
+      ],
       ghost: [
         'border border-card-border bg-background text-text-primary',
         'hover:bg-background-secondary hover:text-text-primary',
@@ -133,7 +139,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           className={creditLinkVariants()}
         >
           Desenvolvido com
-          <Heart size={14} fill="currentColor" className="text-brand-accent" aria-hidden="true" />
+          <Heart size={14} fill="currentColor" className="text-red-500" aria-hidden="true" />
           por Igor Martins
         </a>
         {appVersion && (
