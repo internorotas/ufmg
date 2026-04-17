@@ -17,7 +17,13 @@ interface TabsContextValue {
   onValueChange: (value: string) => void;
 }
 
+interface TabsListContextValue {
+  variant: NonNullable<VariantProps<typeof tabsListVariants>['variant']>;
+  fullWidth: boolean;
+}
+
 const TabsContext = createContext<TabsContextValue | null>(null);
+const TabsListContext = createContext<TabsListContextValue | null>(null);
 
 function useTabsContext() {
   const context = useContext(TabsContext);
@@ -193,15 +199,23 @@ export function Tabs({
  * Lista que contém os triggers das tabs
  */
 export function TabsList({ children, className, variant, fullWidth, ...props }: TabsListProps) {
+  const contextValue = {
+    variant: variant ?? 'default',
+    fullWidth: fullWidth ?? true,
+  } satisfies TabsListContextValue;
+
   return (
-    <div
-      data-slot="tabs-list"
-      role="tablist"
-      className={cn(tabsListVariants({ variant, fullWidth }), className)}
-      {...props}
-    >
-      {children}
-    </div>
+    <TabsListContext.Provider value={contextValue}>
+      <div
+        data-slot="tabs-list"
+        role="tablist"
+        aria-orientation="horizontal"
+        className={cn(tabsListVariants({ variant, fullWidth }), className)}
+        {...props}
+      >
+        {children}
+      </div>
+    </TabsListContext.Provider>
   );
 }
 
@@ -215,19 +229,61 @@ export function TabsTrigger({
   fullWidth,
   disabled,
   onClick,
+  onKeyDown,
   ...props
 }: TabsTriggerProps) {
   const { activeValue, onValueChange } = useTabsContext();
+  const listContext = useContext(TabsListContext);
   const isActive = activeValue === value;
-
-  // Detecta a variante do pai TabsList (simplificado, usa default)
-  const variant = 'default';
+  const variant = listContext?.variant ?? 'default';
+  const resolvedFullWidth = fullWidth ?? listContext?.fullWidth ?? true;
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled) {
       onValueChange(value);
     }
     onClick?.(e);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    onKeyDown?.(e);
+
+    if (e.defaultPrevented) {
+      return;
+    }
+
+    const tabList = e.currentTarget.closest('[role="tablist"]');
+    if (!tabList) {
+      return;
+    }
+
+    const triggers = Array.from(
+      tabList.querySelectorAll<HTMLButtonElement>('[role="tab"]:not([disabled])'),
+    );
+    const currentIndex = triggers.indexOf(e.currentTarget);
+
+    if (currentIndex === -1) {
+      return;
+    }
+
+    let nextIndex = currentIndex;
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % triggers.length;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + triggers.length) % triggers.length;
+    } else if (e.key === 'Home') {
+      nextIndex = 0;
+    } else if (e.key === 'End') {
+      nextIndex = triggers.length - 1;
+    } else {
+      return;
+    }
+
+    e.preventDefault();
+    const nextTrigger = triggers[nextIndex];
+    nextTrigger.focus();
+    onValueChange(nextTrigger.dataset.value ?? nextTrigger.id.replace(/^tab-/, ''));
   };
 
   return (
@@ -237,11 +293,14 @@ export function TabsTrigger({
       type="button"
       id={`tab-${value}`}
       aria-controls={`panel-${value}`}
+      tabIndex={isActive ? 0 : -1}
+      data-value={value}
       data-state={isActive ? 'active' : 'inactive'}
       aria-selected={isActive}
       disabled={disabled}
       onClick={handleClick}
-      className={cn(tabsTriggerVariants({ variant, fullWidth }), className)}
+      onKeyDown={handleKeyDown}
+      className={cn(tabsTriggerVariants({ variant, fullWidth: resolvedFullWidth }), className)}
       {...props}
     >
       {children}
