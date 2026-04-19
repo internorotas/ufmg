@@ -246,22 +246,27 @@ export function obterStatusLinha(
  * console.log(distancia); // ~7.5 km
  * ```
  */
+// ⚡ Bolt: Pre-calculating PI / 180 avoids redundant division on every distance calculation.
+const PI_OVER_180 = Math.PI / 180;
+const RAIO_TERRA_KM = 6371;
+
 export function calcularDistanciaKm(
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number,
 ): number {
-  const RAIO_TERRA_KM = 6371;
+  // ⚡ Bolt: Inline degree-to-radian conversion removes inline function closure overhead.
+  const dLat = (lat2 - lat1) * PI_OVER_180;
+  const dLon = (lon2 - lon1) * PI_OVER_180;
 
-  const toRad = (graus: number) => (graus * Math.PI) / 180;
-
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  // ⚡ Bolt: Caching Math.sin prevents calling expensive trigonometric functions multiple times.
+  const sinDLat2 = Math.sin(dLat / 2);
+  const sinDLon2 = Math.sin(dLon / 2);
 
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    sinDLat2 * sinDLat2 +
+    Math.cos(lat1 * PI_OVER_180) * Math.cos(lat2 * PI_OVER_180) * sinDLon2 * sinDLon2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
