@@ -23,21 +23,21 @@ import { PrevisaoBadge } from './PrevisaoBadge';
  * Variantes do container do popup
  */
 export const popupContainerVariants = tv({
-  base: 'min-w-[220px] max-w-[330px]',
+  base: 'min-w-[238px] max-w-[350px]',
 });
 
 /**
  * Variantes do header do popup
  */
 export const popupHeaderVariants = tv({
-  base: 'mb-2 flex items-start gap-2',
+  base: 'mb-2.5 flex items-start gap-2.5',
 });
 
 /**
  * Variantes da seção de linhas
  */
 export const popupLinesSectionVariants = tv({
-  base: 'mt-2 border-t border-card-border pt-2',
+  base: 'mt-2.5 border-t border-card-border pt-2.5',
 });
 
 /**
@@ -45,7 +45,7 @@ export const popupLinesSectionVariants = tv({
  */
 export const lineBadgeVariants = tv({
   base: [
-    'inline-flex min-h-[2.5rem] w-full items-center rounded-md border px-2 py-1.5 text-[11px] font-semibold leading-tight',
+    'inline-flex min-h-[2.75rem] w-full items-center rounded-lg border px-2.5 py-2 text-[11px] font-semibold leading-tight',
     'border-card-border bg-card text-text-primary',
   ],
 });
@@ -153,7 +153,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
     <Popup className={cn('popup-customizado', className)} minWidth={220} {...props}>
       <div data-slot="container" className={popupContainerVariants()}>
         <div data-slot="header" className={popupHeaderVariants()}>
-          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-internoRotas-laranja-ambar/20">
+          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-internoRotas-laranja-ambar/20">
             <MapPin className="text-internoRotas-laranja-ambar" size={18} />
           </div>
           <div>
@@ -178,7 +178,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                 {parada.linhasAtendidas.length === 1 ? '' : 'm'} aqui:
               </p>
             </div>
-            <div className="mb-1 grid grid-cols-[1fr_auto] gap-2 px-1 text-[10px] font-semibold uppercase tracking-wide text-text-tertiary">
+            <div className="mb-1 grid grid-cols-[1fr_auto] gap-2 px-1 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
               <span>Linha</span>
               <span>Previsão</span>
             </div>
@@ -186,7 +186,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
               {linhasResolvidas.map(({ nomeLinha, linha, minutosFaltantes, horarioChegada }) => (
                 <div
                   key={nomeLinha}
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-card-border/70 bg-background-secondary/40 px-2 py-2"
                 >
                   <span
                     className={cn(lineBadgeVariants(), 'border-l-[3px]')}
@@ -225,7 +225,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                                 toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)
                               }
                               className={cn(
-                                'flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
+                                'flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
                                 alarmado
                                   ? 'bg-brand-accent/30 hover:bg-brand-accent/40'
                                   : 'hover:bg-card-hover',
@@ -243,7 +243,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                               {alarmado ? (
                                 <BellRing size={15} className="text-brand-secondary" />
                               ) : (
-                                <Bell size={15} className="text-text-tertiary" />
+                                <Bell size={15} className="text-text-secondary" />
                               )}
                             </button>
                           );

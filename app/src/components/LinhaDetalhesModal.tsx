@@ -41,7 +41,7 @@ export const titleIconVariants = tv({
  */
 export const tabVariants = tv({
   base: [
-    'flex items-center gap-2 px-4 py-3 font-semibold transition-all duration-200 cursor-pointer',
+    'flex min-h-11 items-center gap-2 px-3 py-3 font-semibold transition-all duration-200 cursor-pointer sm:px-4',
     'hover:bg-card-hover/50 rounded-t-lg',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-inset',
   ],
@@ -60,7 +60,7 @@ export const tabVariants = tv({
  * Variantes do botão de parada
  */
 export const stopButtonVariants = tv({
-  base: 'group flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+  base: 'group flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left cursor-pointer transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
 });
 
 /**
@@ -74,7 +74,7 @@ export const stopIconContainerVariants = tv({
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: 'rounded-lg border bg-card p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+  base: 'rounded-xl border bg-card p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
   variants: {
     status: {
       upcoming:
@@ -92,7 +92,7 @@ export const scheduleCardVariants = tv({
  * Variantes do card de informação
  */
 export const infoCardVariants = tv({
-  base: ['rounded-lg border p-4 text-center text-sm', 'border-card-border bg-card'],
+  base: ['rounded-xl border p-4 text-center text-sm', 'border-card-border bg-card'],
 });
 
 export interface LinhaDetalhesModalProps {
@@ -214,7 +214,7 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
                 {textoChegada}
               </span>
               {previsao?.onibusAnterior && (
-                <span className="text-[10px] text-text-tertiary">
+                <span className="text-[10px] text-text-secondary">
                   Último passou há {previsao.onibusAnterior.minutosQuePassou} min
                 </span>
               )}
@@ -239,7 +239,7 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
           {alarmado ? (
             <BellRing size={20} className="text-brand-accent" aria-hidden="true" />
           ) : (
-            <Bell size={20} className="text-text-tertiary" aria-hidden="true" />
+            <Bell size={20} className="text-text-secondary" aria-hidden="true" />
           )}
         </button>
       )}
@@ -390,7 +390,7 @@ export function LinhaDetalhesModal({
               {linha.nome}
             </h2>
             {linha.sublinha && (
-              <p className="mt-0.5 truncate text-xs text-text-secondary">{linha.sublinha}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-text-secondary">{linha.sublinha}</p>
             )}
           </div>
         </div>
@@ -401,7 +401,7 @@ export function LinhaDetalhesModal({
         data-slot="tabs"
         role="tablist"
         aria-label="Opções de visualização"
-        className="mb-6 flex gap-2 border-b border-card-border"
+        className="mb-5 flex gap-1.5 border-b border-card-border sm:mb-6 sm:gap-2"
       >
         <button
           type="button"
@@ -455,7 +455,7 @@ export function LinhaDetalhesModal({
           id="panel-itinerario"
           aria-labelledby="tab-itinerario"
           data-slot="itinerary-tab"
-          className="relative animate-in fade-in-0 duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-lg"
+          className="relative animate-in fade-in-0 duration-200 focus-visible:rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {paradasDoItinerario.length > 0 ? (
             <div className="relative">
@@ -489,7 +489,7 @@ export function LinhaDetalhesModal({
             </div>
           )}
 
-          <div className={cn(infoCardVariants(), 'mt-6')}>
+          <div className={cn(infoCardVariants(), 'mt-5 sm:mt-6')}>
             <p className="text-text-secondary">💡 Clique em uma parada para visualizá-la no mapa</p>
           </div>
         </div>
@@ -521,7 +521,7 @@ export function LinhaDetalhesModal({
                 <Clock size={20} aria-hidden="true" style={{ color: linha.corHex }} />
                 Próximos Horários ({proximos.length})
               </h3>
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
                 {proximos.map(({ horario, id }, index) => (
                   <button
                     type="button"
@@ -554,7 +554,7 @@ export function LinhaDetalhesModal({
                 <Clock size={20} />
                 Horários Passados ({passados.length})
               </h3>
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
                 {passados.map(({ horario, id }) => (
                   <button
                     type="button"
@@ -577,7 +577,7 @@ export function LinhaDetalhesModal({
                 <Clock size={20} />
                 Todos os Horários ({todos.length})
               </h3>
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
                 {todos.map(({ horario, id }) => (
                   <div key={`horario-${id}`} className={scheduleCardVariants({ status: 'passed' })}>
                     <p className="text-lg font-semibold text-text-secondary">{horario}</p>

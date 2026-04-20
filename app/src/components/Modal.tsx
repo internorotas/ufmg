@@ -33,7 +33,7 @@ export const modalBackdropVariants = tv({
 
 export const modalCloseButtonVariants = tv({
   base: [
-    'rounded-lg p-2 transition-colors',
+    'rounded-lg p-2.5 transition-colors',
     'hover:bg-card',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   ],

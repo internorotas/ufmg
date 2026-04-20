@@ -44,18 +44,18 @@ export function ModalManager({
         }
         size="sm"
       >
-        <div className="space-y-4 p-4">
+        <div className="space-y-4 p-1 sm:p-2">
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary shadow-sm">
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-primary shadow-sm">
               <MapPin aria-hidden="true" className="h-8 w-8 text-text-inverse" />
             </div>
-            <p className="text-text-secondary">
+            <p className="text-sm leading-relaxed text-text-secondary">
               Para mostrar sua localização no mapa e te ajudar a encontrar a parada mais próxima,
               precisamos acessar seu GPS.
             </p>
           </div>
           {erroLocalizacao && (
-            <div className="rounded-lg bg-warning-bg p-3 text-center text-sm text-warning-text">
+            <div className="rounded-xl border border-warning-border bg-warning-bg p-3 text-center text-sm text-warning-text">
               {erroLocalizacao}
             </div>
           )}
@@ -83,9 +83,9 @@ export function ModalManager({
         description={`Você está a mais de ${DISTANCIA_MAXIMA_KM} quilômetros da UFMG e pode voltar a centralizar o mapa no campus ou continuar na posição atual.`}
         size="sm"
       >
-        <div className="space-y-4 p-4">
+        <div className="space-y-4 p-1 sm:p-2">
           <div className="text-center">
-            <p className="text-text-secondary">
+            <p className="text-sm leading-relaxed text-text-secondary">
               Parece que você está a mais de {DISTANCIA_MAXIMA_KM}km da UFMG. Deseja voltar a
               visualizar o campus no mapa?
             </p>
