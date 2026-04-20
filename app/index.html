@@ -9,73 +9,73 @@
 
     <script>
       (function forceCacheRecovery() {
-              var isLocalhost =
-                window.location.hostname === 'localhost' ||
-                window.location.hostname === '127.0.0.1';
+                          var isLocalhost =
+                            window.location.hostname === 'localhost' ||
+                            window.location.hostname === '127.0.0.1';
 
-              if (isLocalhost) {
-                return;
-              }
-
-              var url = new URL(window.location.href);
-              if (url.searchParams.get('cache-recovery') === 'done') {
-                return;
-              }
-
-              var recoveryKey = 'ufmg:cache-recovery:v2';
-              var alreadyRan = false;
-
-              try {
-                alreadyRan = window.sessionStorage.getItem(recoveryKey) === '1';
-                if (!alreadyRan) {
-                  window.sessionStorage.setItem(recoveryKey, '1');
-                }
-              } catch (_error) {
-                alreadyRan = false;
-              }
-
-              if (alreadyRan) {
-                return;
-              }
-
-              Promise.resolve()
-                .then(() => {
-                  if (!('serviceWorker' in navigator)) {
-                    return;
-                  }
-
-                  return navigator.serviceWorker
-                    .getRegistrations()
-                    .then((registrations) => Promise.all(
-                        registrations.map((registration) => {
-                          var scopePathname = new URL(registration.scope).pathname;
-                          var shouldResetRegistration =
-                            scopePathname === '/' || scopePathname.indexOf('/ufmg/') === 0;
-
-                          if (!shouldResetRegistration) {
-                            return Promise.resolve(false);
+                          if (isLocalhost) {
+                            return;
                           }
 
-                          return registration.unregister();
-                        }),
-                      ));
-                })
-                .then(() => {
-                  if (!('caches' in window)) {
-                    return;
-                  }
+                          var url = new URL(window.location.href);
+                          if (url.searchParams.get('cache-recovery') === 'done') {
+                            return;
+                          }
 
-                  return caches.keys().then((keys) => Promise.all(
-                      keys.map((key) => caches.delete(key)),
-                    ));
-                })
-                .catch(() => undefined)
-                .finally(() => {
-                  url.searchParams.set('cache-recovery', 'done');
-                  url.searchParams.set('v', String(Date.now()));
-                  window.location.replace(url.toString());
-                });
-            })();
+                          var recoveryKey = 'ufmg:cache-recovery:v2';
+                          var alreadyRan = false;
+
+                          try {
+                            alreadyRan = window.sessionStorage.getItem(recoveryKey) === '1';
+                            if (!alreadyRan) {
+                              window.sessionStorage.setItem(recoveryKey, '1');
+                            }
+                          } catch (_error) {
+                            alreadyRan = false;
+                          }
+
+                          if (alreadyRan) {
+                            return;
+                          }
+
+                          Promise.resolve()
+                            .then(() => {
+                              if (!('serviceWorker' in navigator)) {
+                                return;
+                              }
+
+                              return navigator.serviceWorker
+                                .getRegistrations()
+                                .then((registrations) => Promise.all(
+                                    registrations.map((registration) => {
+                                      var scopePathname = new URL(registration.scope).pathname;
+                                      var shouldResetRegistration =
+                                        scopePathname === '/' || scopePathname.indexOf('/ufmg/') === 0;
+
+                                      if (!shouldResetRegistration) {
+                                        return Promise.resolve(false);
+                                      }
+
+                                      return registration.unregister();
+                                    }),
+                                  ));
+                            })
+                            .then(() => {
+                              if (!('caches' in window)) {
+                                return;
+                              }
+
+                              return caches.keys().then((keys) => Promise.all(
+                                  keys.map((key) => caches.delete(key)),
+                                ));
+                            })
+                            .catch(() => undefined)
+                            .finally(() => {
+                              url.searchParams.set('cache-recovery', 'done');
+                              url.searchParams.set('v', String(Date.now()));
+                              window.location.replace(url.toString());
+                            });
+                        })();
     </script>
 
     <title>Interno Rotas 🚌 | Horários e Rotas dos Ônibus da UFMG</title>
