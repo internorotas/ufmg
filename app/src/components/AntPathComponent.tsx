@@ -5,6 +5,8 @@ import 'leaflet-ant-path';
 
 import type { LatLngExpression } from 'leaflet';
 
+// Opções do ant-path (definidas inline para evitar conflitos de tipo com o plugin)
+// Os tipos formais estão documentados em src/types/leaflet-ant-path.d.ts
 interface AntPathOptions {
   delay?: number;
   dashArray?: number[];
@@ -18,7 +20,8 @@ interface AntPathOptions {
 
 interface AntPathProps {
   coordinates: LatLngExpression[];
-  options: AntPathOptions;
+  /** Configuração do ant-path (cor, peso, delay de animação, etc.) */
+  options?: AntPathOptions;
 }
 
 /**
@@ -40,18 +43,26 @@ export function AntPathComponent({ coordinates, options }: AntPathProps) {
       map.removeLayer(antPathRef.current);
     }
 
-    const antPath = new (
+    // O cast duplo é necessário pois leaflet-ant-path não fornece tipos TypeScript.
+    // A definição de tipo está em src/types/leaflet-ant-path.d.ts para documentação.
+    const AntPathConstructor = (
       L.Polyline as unknown as {
         AntPath: new (latlngs: LatLngExpression[], options?: AntPathOptions) => L.Polyline;
       }
-    ).AntPath(coordinates, options);
+    ).AntPath;
+    const antPath = new AntPathConstructor(coordinates, options);
 
     antPathRef.current = antPath;
     map.addLayer(antPath);
 
     try {
       map.fitBounds(antPath.getBounds(), { padding: [50, 50] });
-    } catch (_e) {}
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
+        console.warn('[AntPathComponent] fitBounds falhou:', e);
+      }
+    }
 
     return () => {
       if (antPathRef.current) {

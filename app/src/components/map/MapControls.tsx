@@ -55,7 +55,12 @@ export const CenterOnParada = React.memo(function CenterOnParada({
     if (parada?.coordenadas) {
       try {
         map.setView(parada.coordenadas, zoom, { animate, duration });
-      } catch (_e) {}
+      } catch (e) {
+        if (import.meta.env.DEV) {
+          // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
+          console.warn('[MapControls] setView falhou:', e);
+        }
+      }
     }
   }, [parada, map, zoom, animate, duration]);
 

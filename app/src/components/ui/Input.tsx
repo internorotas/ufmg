@@ -6,7 +6,7 @@
  */
 
 import { Search, X } from 'lucide-react';
-import { type ComponentProps, forwardRef, type ReactNode } from 'react';
+import { type ComponentProps, forwardRef, type ReactNode, useId } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 
@@ -107,13 +107,21 @@ export function Input({
   rightIcon,
   errorMessage,
   fullWidth = true,
+  'aria-describedby': ariaDescribedBy,
+  'aria-invalid': ariaInvalid,
   ...props
 }: InputProps) {
+  const errorId = useId();
+  const describedBy = [ariaDescribedBy, errorMessage && error ? errorId : undefined]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <div data-slot="input-container" className={inputContainerVariants({ fullWidth })}>
       {leftIcon && (
         <span
           data-slot="input-left-icon"
+          aria-hidden="true"
           className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary"
         >
           {leftIcon}
@@ -123,6 +131,8 @@ export function Input({
       <input
         data-slot="input"
         data-error={error || undefined}
+        aria-describedby={describedBy || undefined}
+        aria-invalid={ariaInvalid ?? error ?? undefined}
         className={cn(
           inputVariants({
             size,
@@ -138,6 +148,7 @@ export function Input({
       {rightIcon && (
         <span
           data-slot="input-right-icon"
+          aria-hidden="true"
           className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary"
         >
           {rightIcon}
@@ -145,7 +156,12 @@ export function Input({
       )}
 
       {errorMessage && error && (
-        <p data-slot="input-error" role="alert" className="mt-1 text-xs text-warning-text">
+        <p
+          data-slot="input-error"
+          id={errorId}
+          role="alert"
+          className="mt-1 text-xs text-warning-text"
+        >
           {errorMessage}
         </p>
       )}
@@ -186,6 +202,10 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     { value, onValueChange, onClear, showClear = true, onChange, shortcut, className, ...props },
     ref,
   ) => {
+    const fallbackAriaLabel =
+      props['aria-label'] ??
+      (typeof props.placeholder === 'string' ? props.placeholder : 'Pesquisar');
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       onValueChange?.(e.target.value);
       onChange?.(e);
@@ -211,6 +231,8 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           type="search"
           value={value}
           onChange={handleChange}
+          aria-label={fallbackAriaLabel}
+          enterKeyHint="search"
           className={cn(
             inputVariants({
               hasLeftIcon: true,
@@ -227,6 +249,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             data-slot="clear-button"
             type="button"
             onClick={handleClear}
+            onMouseDown={(e) => e.preventDefault()}
             className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background"
             aria-label="Limpar busca"
             title="Limpar busca"

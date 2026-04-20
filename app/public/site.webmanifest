@@ -1,10 +1,11 @@
 {
   "name": "Interno Rotas - UFMG",
   "short_name": "Interno Rotas",
-  "start_url": ".",
+  "id": "/ufmg/",
+  "start_url": "/ufmg/",
   "scope": "/ufmg/",
   "display": "standalone",
-  "background_color": "#2c0eeb",
+  "background_color": "#ffffff",
   "lang": "pt-BR",
   "dir": "ltr",
   "categories": ["education", "transportation", "navigation"],
@@ -19,7 +20,8 @@
     {
       "src": "android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

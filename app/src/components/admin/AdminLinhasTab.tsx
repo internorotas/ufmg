@@ -393,14 +393,14 @@ export function AdminLinhasTab({
 
           {showDeleteLinhaConfirm && (
             <div className="mt-2 flex flex-col gap-1.5">
-              <p className="text-xs font-semibold text-red-600 dark:text-red-400">
+              <p className="text-xs font-semibold text-warning-text">
                 Excluir esta linha? Use Ctrl+Z para desfazer.
               </p>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={handleDeleteLinha}
-                  className="flex-1 py-1.5 bg-red-600 border border-red-700 text-white rounded text-xs font-bold hover:bg-red-700 transition-colors"
+                  className="flex-1 py-1.5 bg-brand-accent border border-brand-accent/80 text-text-inverse rounded text-xs font-bold hover:bg-brand-accent/90 transition-colors"
                 >
                   Confirmar
                 </button>

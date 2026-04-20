@@ -6,7 +6,7 @@
  * Segue o padrão de acessibilidade com estados visuais.
  */
 
-import type { ComponentProps, ReactNode } from 'react';
+import { type ComponentProps, forwardRef, type ReactNode } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
 
@@ -104,27 +104,32 @@ export interface ButtonProps extends ComponentProps<'button'>, VariantProps<type
  * </Button>
  * ```
  */
-export function Button({
-  children,
-  className,
-  variant,
-  size,
-  fullWidth,
-  leftIcon,
-  rightIcon,
-  loading = false,
-  disabled,
-  ...props
-}: ButtonProps) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    children,
+    className,
+    variant,
+    size,
+    fullWidth,
+    leftIcon,
+    rightIcon,
+    loading = false,
+    disabled,
+    ...props
+  },
+  ref,
+) {
   const isDisabled = disabled || loading;
 
   return (
     <button
+      ref={ref}
       data-slot="button"
       data-loading={loading || undefined}
       data-disabled={isDisabled || undefined}
       className={cn(buttonVariants({ variant, size, fullWidth }), className)}
       disabled={isDisabled}
+      aria-busy={loading || undefined}
       {...props}
     >
       {loading ? (
@@ -148,7 +153,9 @@ export function Button({
       )}
     </button>
   );
-}
+});
+
+Button.displayName = 'Button';
 
 // SUB-COMPONENTS
 

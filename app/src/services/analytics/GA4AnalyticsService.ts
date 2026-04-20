@@ -89,11 +89,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
       return;
     }
 
-    if (!this.measurementId) {
-      return;
-    }
-
-    ReactGA?.initialize(this.measurementId, {
+    ReactGA?.initialize(this.measurementId as string, {
       // testMode bloqueia envio de hits; manter false para aparecer no DebugView.
       testMode: import.meta.env.MODE === 'test',
       gtagOptions: {

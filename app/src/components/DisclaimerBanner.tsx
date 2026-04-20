@@ -81,11 +81,19 @@ export function DisclaimerBanner({
           </p>
 
           <div className="mt-2 flex flex-col gap-2 border-t border-warning-border pt-2 lg:grid lg:grid-cols-2">
-            <a href="tel:3409-4601" className={contactButtonVariants()}>
+            <a
+              href="tel:3409-4601"
+              className={contactButtonVariants()}
+              aria-label="Ligar para a Divisão de Transportes: 3409-4601 ou 4606"
+            >
               <Phone className="size-4 shrink-0" aria-hidden="true" />
               <span>3409-4601 / 4606</span>
             </a>
-            <a href="mailto:sfrota@dsg.ufmg.br" className={contactButtonVariants()}>
+            <a
+              href="mailto:sfrota@dsg.ufmg.br"
+              className={contactButtonVariants()}
+              aria-label="Enviar e-mail para sfrota@dsg.ufmg.br"
+            >
               <Mail className="size-4 shrink-0" aria-hidden="true" />
               <span>sfrota@dsg.ufmg.br</span>
             </a>

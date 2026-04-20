@@ -9,16 +9,30 @@ interface DataStatusScreenProps {
 }
 
 export function DataStatusScreen({ title, description, variant = 'info' }: DataStatusScreenProps) {
+  const isWarning = variant === 'warning';
+
   return (
-    <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
-      <div className="text-center p-8 bg-card rounded-lg shadow-xl">
+    <main
+      className="flex h-screen min-h-dvh w-screen items-center justify-center bg-background-secondary px-4 text-text-primary"
+      aria-labelledby="data-status-title"
+      aria-describedby="data-status-description"
+    >
+      <div
+        className="w-full max-w-lg rounded-xl border border-card-border bg-card p-8 text-center shadow-xl"
+        role={isWarning ? 'alert' : 'status'}
+        aria-live={isWarning ? 'assertive' : 'polite'}
+        aria-atomic="true"
+      >
         <h2
-          className={`text-2xl font-bold mb-2 ${variant === 'warning' ? 'text-warning-text' : 'text-brand-primary'}`}
+          id="data-status-title"
+          className={`mb-2 text-2xl font-bold ${isWarning ? 'text-warning-text' : 'text-brand-primary'}`}
         >
           {title}
         </h2>
-        <div className="text-text-secondary">{description}</div>
+        <div id="data-status-description" className="text-text-secondary">
+          {description}
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
