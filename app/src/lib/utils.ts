@@ -246,6 +246,12 @@ export function obterStatusLinha(
  * console.log(distancia); // ~7.5 km
  * ```
  */
+// ⚡ Bolt Optimization:
+// Precalculated TO_RAD to avoid division on every function call.
+// Removed inline toRad() closure to eliminate function allocation overhead.
+// Cached Math.sin() results to prevent redundant expensive trigonometric calculations.
+const TO_RAD = Math.PI / 180;
+
 export function calcularDistanciaKm(
   lat1: number,
   lon1: number,
@@ -254,14 +260,14 @@ export function calcularDistanciaKm(
 ): number {
   const RAIO_TERRA_KM = 6371;
 
-  const toRad = (graus: number) => (graus * Math.PI) / 180;
+  const dLat = (lat2 - lat1) * TO_RAD;
+  const dLon = (lon2 - lon1) * TO_RAD;
 
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  const sinDLat2 = Math.sin(dLat / 2);
+  const sinDLon2 = Math.sin(dLon / 2);
 
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    sinDLat2 * sinDLat2 + Math.cos(lat1 * TO_RAD) * Math.cos(lat2 * TO_RAD) * sinDLon2 * sinDLon2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
