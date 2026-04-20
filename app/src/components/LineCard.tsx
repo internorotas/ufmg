@@ -274,23 +274,23 @@ function LineCardComponent({
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-1 items-start gap-3">
               <LineIcon color={linha.corHex} />
-              <div className="min-w-0 flex-1">
+              <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-0.5">
                 <h3 className="text-base font-bold leading-tight text-text-primary">
                   {linha.nome}
                 </h3>
                 {linha.sublinha && (
-                  <p className="mt-0.5 text-sm text-text-secondary">{linha.sublinha}</p>
+                  <p className="col-span-2 text-sm text-text-secondary">{linha.sublinha}</p>
                 )}
+                <div className="col-start-2 row-start-1 flex items-center gap-2">
+                  <LineStatusBadge status={statusType} label={status} size="xs" />
+                  <ChevronRight className="size-5 shrink-0 text-text-secondary" aria-hidden="true" />
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <LineStatusBadge status={statusType} label={status} size="xs" />
-              <ChevronRight className="size-5 shrink-0 text-text-secondary" aria-hidden="true" />
             </div>
           </div>
         </div>
 
-        <div data-slot="body" className="px-4 pb-4">
+        <div data-slot="body" className="px-4">
           {shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE' ? (
             <SuspendedNotice
               message={shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto}
