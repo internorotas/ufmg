@@ -283,7 +283,10 @@ function LineCardComponent({
                 )}
                 <div className="col-start-2 row-start-1 flex items-center gap-2">
                   <LineStatusBadge status={statusType} label={status} size="xs" />
-                  <ChevronRight className="size-5 shrink-0 text-text-secondary" aria-hidden="true" />
+                  <ChevronRight
+                    className="size-5 shrink-0 text-text-secondary"
+                    aria-hidden="true"
+                  />
                 </div>
               </div>
             </div>
