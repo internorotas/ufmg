@@ -229,10 +229,6 @@ export const MenuLateral = React.memo(function MenuLateral({
 
     wasMenuVisibleRef.current = true;
 
-    const focusFrame = window.requestAnimationFrame(() => {
-      searchInputRef.current?.focus();
-    });
-
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMenuVisible(false);
@@ -242,7 +238,6 @@ export const MenuLateral = React.memo(function MenuLateral({
     document.addEventListener('keydown', handleEscape);
 
     return () => {
-      window.cancelAnimationFrame(focusFrame);
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isMenuVisible, isMobileViewport]);
