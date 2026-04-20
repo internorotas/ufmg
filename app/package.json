@@ -54,9 +54,9 @@
     "gh-pages": "^6.3.0",
     "globals": "^17.5.0",
     "husky": "^9.1.7",
-    "postcss": "^8.5.9",
+    "postcss": "^8.5.10",
     "tailwindcss": "^4.2.2",
-    "typescript": "~6.0.2",
+    "typescript": "~6.0.3",
     "vite": "^8.0.8",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.1.4"
