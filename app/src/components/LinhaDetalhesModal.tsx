@@ -10,10 +10,12 @@ import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { usePrevisaoChegada } from '../hooks/usePrevisaoChegada';
+import { getSaoPauloMinutesOfDay } from '../lib/time';
 import {
   buscarParadasPorIds,
   cn,
   findScheduleIndex,
+  hexToRgba,
   obterStatusLinha,
   timeToMinutes,
 } from '../lib/utils';
@@ -58,7 +60,7 @@ export const tabVariants = tv({
  * Variantes do botão de parada
  */
 export const stopButtonVariants = tv({
-  base: 'group flex w-full items-start gap-3 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover rounded-lg px-2 -mx-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+  base: 'group flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
 });
 
 /**
@@ -72,7 +74,7 @@ export const stopIconContainerVariants = tv({
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: 'rounded-lg border p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+  base: 'rounded-lg border bg-card p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
   variants: {
     status: {
       upcoming:
@@ -150,6 +152,7 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
 
   const bellVisible = suportado && !!previsao?.proximoOnibus;
   const minutosFaltantes = previsao?.proximoOnibus?.minutosFaltantes ?? 0;
+  const horarioChegada = previsao?.proximoOnibus?.horarioChegada ?? '';
   const alarmado = isAlarmado(linha.idRota, parada.idParada);
 
   return (
@@ -163,9 +166,9 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
       >
         <div
           className={stopIconContainerVariants()}
-          style={{ backgroundColor: `${linha.corHex}20` }}
+          style={{ backgroundColor: hexToRgba(linha.corHex, 0.12) }}
         >
-          <MapPin size={18} style={{ color: linha.corHex }} />
+          <MapPin size={18} style={{ color: linha.corHex }} aria-hidden="true" />
         </div>
 
         <div className="min-w-0 flex-1 pt-0.5">
@@ -224,7 +227,7 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
       {bellVisible && (
         <button
           type="button"
-          onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
+          onClick={() => toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)}
           className={cn(
             'mt-1 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
             alarmado ? 'bg-brand-accent/30 hover:bg-brand-accent/40' : 'hover:bg-card-hover',
@@ -304,7 +307,7 @@ export function LinhaDetalhesModal({
   }, [isOpen, linha.idRota, trackPageView]);
 
   const now = useCurrentTime();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const currentMinutes = getSaoPauloMinutesOfDay(now);
 
   const paradasDoItinerario = useMemo(() => {
     return buscarParadasPorIds(linha.itinerarioParadasIds, todasParadas);
@@ -333,6 +336,7 @@ export function LinhaDetalhesModal({
   const passados = baseHorarios.slice(0, splitIndex);
   const proximos = baseHorarios.slice(splitIndex);
   const todos = baseHorarios;
+  const titleLabel = linha.sublinha ? `${linha.nome} - ${linha.sublinha}` : linha.nome;
 
   const handleTabChange = (tab: TabType) => {
     trackEvent({
@@ -368,10 +372,18 @@ export function LinhaDetalhesModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      titleLabel={`Detalhes da linha ${titleLabel}`}
+      description={`Consulte o itinerário, horários e ações disponíveis para a linha ${titleLabel}.`}
       title={
         <div className={titleContainerVariants()}>
-          <div className={titleIconVariants()} style={{ backgroundColor: linha.corHex }}>
-            <Bus size={24} className="text-white drop-shadow-sm" />
+          <div
+            className={cn(titleIconVariants(), 'border')}
+            style={{
+              backgroundColor: hexToRgba(linha.corHex, 0.12),
+              borderColor: hexToRgba(linha.corHex, 0.24),
+            }}
+          >
+            <Bus size={24} className="drop-shadow-sm" style={{ color: linha.corHex }} />
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="truncate text-lg font-bold leading-tight text-text-primary">
@@ -400,8 +412,15 @@ export function LinhaDetalhesModal({
           onClick={() => handleTabChange('itinerario')}
           aria-label="Ver itinerário da linha"
           title="Ver itinerário da linha"
+          tabIndex={tabAtiva === 'itinerario' ? 0 : -1}
           className={tabVariants({ active: tabAtiva === 'itinerario' })}
           style={tabAtiva === 'itinerario' ? { borderColor: linha.corHex } : {}}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              handleTabChange('horarios');
+            }
+          }}
         >
           <MapIcon size={20} aria-hidden="true" />
           Itinerário
@@ -415,8 +434,15 @@ export function LinhaDetalhesModal({
           onClick={() => handleTabChange('horarios')}
           aria-label="Ver todos os horários da linha"
           title="Ver todos os horários da linha"
+          tabIndex={tabAtiva === 'horarios' ? 0 : -1}
           className={tabVariants({ active: tabAtiva === 'horarios' })}
           style={tabAtiva === 'horarios' ? { borderColor: linha.corHex } : {}}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              handleTabChange('itinerario');
+            }
+          }}
         >
           <Clock size={20} aria-hidden="true" />
           Todos os Horários
@@ -441,8 +467,8 @@ export function LinhaDetalhesModal({
                       <div
                         className="absolute left-5 top-7 h-full w-0.5"
                         style={{
-                          backgroundColor: `${linha.corHex}40`,
-                          backgroundImage: `repeating-linear-gradient(0deg, ${linha.corHex}40, ${linha.corHex}40 6px, transparent 6px, transparent 12px)`,
+                          backgroundColor: hexToRgba(linha.corHex, 0.25),
+                          backgroundImage: `repeating-linear-gradient(0deg, ${hexToRgba(linha.corHex, 0.25)}, ${hexToRgba(linha.corHex, 0.25)} 6px, transparent 6px, transparent 12px)`,
                         }}
                       />
                     )}
@@ -463,7 +489,7 @@ export function LinhaDetalhesModal({
             </div>
           )}
 
-          <div className={`mt-6 ${infoCardVariants()}`}>
+          <div className={cn(infoCardVariants(), 'mt-6')}>
             <p className="text-text-secondary">💡 Clique em uma parada para visualizá-la no mapa</p>
           </div>
         </div>
@@ -479,11 +505,11 @@ export function LinhaDetalhesModal({
           {!isLineRunningToday && (
             <div
               data-slot="not-running-notice"
-              className="rounded-lg border border-amber-600/50 bg-amber-900/20 p-4"
+              className="rounded-lg border border-warning-border bg-warning-bg p-4"
             >
               <div className="flex items-center gap-3">
-                <AlertTriangle size={24} className="shrink-0 text-amber-400" />
-                <p className="text-sm font-medium text-amber-300">{statusLinha.texto}</p>
+                <AlertTriangle size={24} className="shrink-0 text-warning-text" />
+                <p className="text-sm font-medium text-warning-text">{statusLinha.texto}</p>
               </div>
             </div>
           )}
@@ -491,35 +517,30 @@ export function LinhaDetalhesModal({
           {/* Próximos Horários - só mostra quando a linha está circulando */}
           {isLineRunningToday && proximos.length > 0 && (
             <div data-slot="upcoming-schedules">
-              <h3
-                className="mb-3 flex items-center gap-2 text-lg font-semibold"
-                style={{ color: linha.corHex }}
-              >
-                <Clock size={20} />
+              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-primary">
+                <Clock size={20} aria-hidden="true" style={{ color: linha.corHex }} />
                 Próximos Horários ({proximos.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {proximos.map(({ horario, id }) => (
+                {proximos.map(({ horario, id }, index) => (
                   <button
                     type="button"
                     key={`proximo-${id}`}
-                    aria-label={`Próximo horário às ${horario}`}
+                    aria-label={`${index === 0 ? 'Próximo horário' : 'Horário futuro'} às ${horario}`}
                     onClick={() => handleHorarioClick(horario)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleHorarioClick(horario);
-                      }
-                    }}
                     className={scheduleCardVariants({ status: 'upcoming' })}
                     style={{
-                      borderColor: linha.corHex,
-                      backgroundColor: `${linha.corHex}20`,
+                      borderColor: index === 0 ? linha.corHex : hexToRgba(linha.corHex, 0.22),
                     }}
                   >
-                    <p className="text-xl font-bold" style={{ color: linha.corHex }}>
-                      {horario}
-                    </p>
+                    <p className="text-xl font-bold text-text-primary">{horario}</p>
+                    {index === 0 ? (
+                      <p className="mt-1 text-xs font-medium" style={{ color: linha.corHex }}>
+                        Próxima saída
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-xs font-medium text-text-secondary">Saída futura</p>
+                    )}
                   </button>
                 ))}
               </div>
@@ -540,12 +561,6 @@ export function LinhaDetalhesModal({
                     key={`passado-${id}`}
                     aria-label={`Horário passado às ${horario}`}
                     onClick={() => handleHorarioClick(horario)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleHorarioClick(horario);
-                      }
-                    }}
                     className={scheduleCardVariants({ status: 'passed' })}
                   >
                     <p className="text-lg font-semibold text-text-secondary">{horario}</p>

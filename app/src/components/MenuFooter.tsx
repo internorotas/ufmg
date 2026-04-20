@@ -29,13 +29,19 @@ export const footerContainerVariants = tv({
  */
 export const footerButtonVariants = tv({
   base: [
-    'flex w-full items-center justify-center rounded-md px-2 py-1.5',
-    'text-xs font-semibold transition-colors cursor-pointer',
+    'flex w-full items-center justify-center rounded-md border px-3 py-2',
+    'text-sm font-semibold transition-colors cursor-pointer',
   ],
   variants: {
     intent: {
-      danger: 'bg-red-600 text-white hover:bg-red-700',
-      primary: 'bg-brand-primary text-white hover:bg-brand-primary/90',
+      danger: [
+        'border-card-border bg-background text-text-primary',
+        'hover:bg-background-secondary hover:text-text-primary',
+      ],
+      primary: [
+        'border-card-border bg-background text-text-primary',
+        'hover:bg-background-secondary hover:text-text-primary',
+      ],
       ghost: [
         'border border-card-border bg-background text-text-primary',
         'hover:bg-background-secondary hover:text-text-primary',
@@ -90,6 +96,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => handleLinkClick('Contato')}
+          aria-label="Reportar problema ou entrar em contato (abre em nova aba)"
           className={footerButtonVariants({ intent: 'danger' })}
         >
           Contato
@@ -101,6 +108,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => handleLinkClick('Sobre o Projeto')}
+          aria-label="Sobre o projeto no GitHub (abre em nova aba)"
           className={footerButtonVariants({ intent: 'primary' })}
         >
           Sobre
@@ -121,12 +129,13 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
       </div>
 
       {/* Desenvolvido por */}
-      <div className="flex flex-row flex-wrap items-center justify-center gap-x-2 gap-y-0.5 py-1">
+      <div className="flex flex-row flex-wrap items-center justify-center gap-1">
         <a
           href="https://github.com/igormartins4"
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => handleLinkClick('Dev Profile')}
+          aria-label="Perfil do desenvolvedor Igor Martins no GitHub (abre em nova aba)"
           className={creditLinkVariants()}
         >
           Desenvolvido com
@@ -134,7 +143,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           por Igor Martins
         </a>
         {appVersion && (
-          <span className="text-xs font-semibold text-brand-secondary/20"> / v{appVersion}</span>
+          <span className="text-xs font-semibold text-text-tertiary"> / v{appVersion}</span>
         )}
       </div>
     </div>

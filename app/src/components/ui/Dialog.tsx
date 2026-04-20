@@ -13,9 +13,11 @@ import {
   type ComponentProps,
   createContext,
   type ReactNode,
+  type RefObject,
   useContext,
   useEffect,
   useId,
+  useRef,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { tv, type VariantProps } from 'tailwind-variants';
@@ -26,6 +28,7 @@ interface DialogContextValue {
   onOpenChange: (open: boolean) => void;
   titleId: string;
   descriptionId: string;
+  popupRef: RefObject<HTMLDivElement | null>;
 }
 
 const DialogContext = createContext<DialogContextValue | null>(null);
@@ -162,13 +165,36 @@ export interface DialogCloseProps
 function DialogRoot({ open, onOpenChange, children }: DialogRootProps) {
   const titleId = useId();
   const descriptionId = useId();
+  const popupRef = useRef<HTMLDivElement>(null);
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (open) {
       const originalOverflow = document.body.style.overflow;
+      lastFocusedElementRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
       document.body.style.overflow = 'hidden';
+
+      const focusFrame = window.requestAnimationFrame(() => {
+        const popup = popupRef.current;
+        if (!popup) {
+          return;
+        }
+
+        const autofocusTarget = popup.querySelector<HTMLElement>('[data-autofocus="true"]');
+        const firstFocusable = popup.querySelector<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        );
+
+        (autofocusTarget ?? firstFocusable ?? popup).focus();
+      });
+
       return () => {
+        window.cancelAnimationFrame(focusFrame);
         document.body.style.overflow = originalOverflow;
+        if (lastFocusedElementRef.current && document.contains(lastFocusedElementRef.current)) {
+          lastFocusedElementRef.current.focus();
+        }
       };
     }
   }, [open]);
@@ -179,6 +205,52 @@ function DialogRoot({ open, onOpenChange, children }: DialogRootProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onOpenChange(false);
+        return;
+      }
+
+      if (e.key !== 'Tab') {
+        return;
+      }
+
+      const popup = popupRef.current;
+      if (!popup) {
+        return;
+      }
+
+      const focusableElements = Array.from(
+        popup.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter(
+        (element) =>
+          !element.hasAttribute('hidden') && element.getAttribute('aria-hidden') !== 'true',
+      );
+
+      if (focusableElements.length === 0) {
+        e.preventDefault();
+        popup.focus();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (!popup.contains(activeElement)) {
+        e.preventDefault();
+        firstElement.focus();
+        return;
+      }
+
+      if (e.shiftKey && activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+        return;
+      }
+
+      if (!e.shiftKey && activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
       }
     };
 
@@ -189,7 +261,7 @@ function DialogRoot({ open, onOpenChange, children }: DialogRootProps) {
   if (!open) return null;
 
   return (
-    <DialogContext.Provider value={{ open, onOpenChange, titleId, descriptionId }}>
+    <DialogContext.Provider value={{ open, onOpenChange, titleId, descriptionId, popupRef }}>
       {children}
     </DialogContext.Provider>
   );
@@ -223,6 +295,7 @@ function DialogBackdrop({ className, onClick, ...props }: DialogBackdropProps) {
       onClick={handleClick}
       className={cn(dialogBackdropVariants(), className)}
       aria-label="Fechar diálogo"
+      tabIndex={-1}
       {...props}
     />
   );
@@ -232,7 +305,7 @@ function DialogBackdrop({ className, onClick, ...props }: DialogBackdropProps) {
  * Popup - Container do conteúdo do dialog
  */
 function DialogPopup({ size, className, children, ...props }: DialogPopupProps) {
-  const { open, titleId, descriptionId } = useDialogContext();
+  const { open, titleId, descriptionId, popupRef } = useDialogContext();
 
   return (
     <div
@@ -240,12 +313,14 @@ function DialogPopup({ size, className, children, ...props }: DialogPopupProps) 
       role="presentation"
     >
       <div
+        ref={popupRef}
         data-slot="dialog-popup"
         data-state={open ? 'open' : 'closed'}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
+        tabIndex={-1}
         className={cn('pointer-events-auto', dialogPopupVariants({ size }), className)}
         {...props}
       >

@@ -22,8 +22,16 @@ const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default:
 
 // Componente simples de Loading
 const LoadingMap = () => (
-  <div className="flex items-center justify-center h-full w-full bg-background-secondary">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
+  <div
+    role="status"
+    aria-live="polite"
+    aria-label="Carregando mapa"
+    className="flex items-center justify-center h-full w-full bg-background-secondary"
+  >
+    <div
+      aria-hidden="true"
+      className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
+    />
   </div>
 );
 
@@ -108,6 +116,12 @@ function AppContent() {
   );
 
   // Handler para voltar ao campus UFMG
+  const handlePedirLocalizacao = useCallback(() => {
+    solicitarAutoCenter();
+    iniciarRastreamento();
+  }, [solicitarAutoCenter, iniciarRastreamento]);
+
+  // Handler para voltar ao campus UFMG
   const handleVoltarParaUFMG = useCallback(() => {
     consumirAutoCenter();
     mapaRef.current?.centralizarCoordenada(COORDENADAS_UFMG, 15);
@@ -173,6 +187,12 @@ function AppContent() {
 
   return (
     <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
+      <a
+        href="#main-content"
+        className="sr-only absolute left-4 top-4 z-[1400] rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
+      >
+        Pular para o mapa
+      </a>
       <MenuLateral
         linhasData={linhasData}
         todasParadas={todasParadas}
@@ -181,7 +201,12 @@ function AppContent() {
         linhaSelecionada={linhaSelecionada}
         isOffline={isOffline}
       />
-      <main className="h-full w-full grow">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        aria-label="Mapa das rotas"
+        className="h-full w-full grow"
+      >
         <ErrorBoundary
           fallback={
             <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-background-secondary p-8 text-center">
@@ -194,7 +219,7 @@ function AppContent() {
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-white"
+                className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-text-inverse"
               >
                 Recarregar
               </button>
@@ -211,10 +236,7 @@ function AppContent() {
               headingUsuario={heading}
               permissaoLocalizacao={permissaoConcedida}
               carregandoLocalizacao={carregandoLocalizacao}
-              onPedirLocalizacao={() => {
-                solicitarAutoCenter();
-                iniciarRastreamento();
-              }}
+              onPedirLocalizacao={handlePedirLocalizacao}
             />
           </Suspense>
         </ErrorBoundary>

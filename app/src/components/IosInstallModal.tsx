@@ -58,11 +58,11 @@ export function IosInstallModal({ isOpen, onClose }: IosInstallModalProps) {
                 key={passo.id}
                 className="flex items-start gap-3 rounded-lg border border-card-border bg-background-secondary p-3"
               >
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-white">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-text-inverse">
                   {idx + 1}
                 </div>
                 <div className="flex items-start gap-2">
-                  <Icone size={15} className="mt-[3px] shrink-0 text-brand-accent" />
+                  <Icone size={15} className="mt-0.75 shrink-0 text-brand-accent" />
                   <p className="text-sm text-text-primary">{passo.descricao}</p>
                 </div>
               </li>

@@ -283,6 +283,11 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
 
     const cleanup = await iniciarBussola();
     if (cleanup) {
+      // Limpa bússola anterior antes de atribuir nova
+      if (bussolaCleanupRef.current) {
+        bussolaCleanupRef.current();
+        bussolaCleanupRef.current = null;
+      }
       bussolaCleanupRef.current = cleanup;
     }
   }, [carregando, onPosicaoRecebida, onErroGPS, iniciarBussola]);
@@ -340,6 +345,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       }
       if (bussolaCleanupRef.current) {
         bussolaCleanupRef.current();
+        bussolaCleanupRef.current = null;
       }
     };
   }, []);

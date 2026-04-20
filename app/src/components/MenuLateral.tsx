@@ -140,12 +140,17 @@ export const MenuLateral = React.memo(function MenuLateral({
   const { trackEvent } = analytics;
   const { paradaSelecionada } = useRotasSelection();
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false,
+  );
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileTriggerRef = useRef<HTMLButtonElement>(null);
   const lastListSummaryRef = useRef<string>('');
+  const wasMenuVisibleRef = useRef(false);
 
   const [shortcutLabel] = useState(() => {
-    if (typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform)) {
+    if (typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/i.test(navigator.userAgent)) {
       return '⌘K';
     }
     return 'Ctrl+K';
@@ -195,6 +200,52 @@ export const MenuLateral = React.memo(function MenuLateral({
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches);
+
+    updateViewport();
+    mediaQuery.addEventListener('change', updateViewport);
+
+    return () => mediaQuery.removeEventListener('change', updateViewport);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileViewport) {
+      if (isMenuVisible) {
+        setMenuVisible(false);
+      }
+      return;
+    }
+
+    if (!isMenuVisible) {
+      if (wasMenuVisibleRef.current) {
+        mobileTriggerRef.current?.focus();
+      }
+      wasMenuVisibleRef.current = false;
+      return;
+    }
+
+    wasMenuVisibleRef.current = true;
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuVisible(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isMenuVisible, isMobileViewport]);
 
   const handleCardClick = useCallback(
     (linha: Linha) => {
@@ -257,6 +308,7 @@ export const MenuLateral = React.memo(function MenuLateral({
 
       <div className="fixed bottom-6 left-1/2 z-1001 -translate-x-1/2 md:hidden">
         <Button
+          ref={mobileTriggerRef}
           data-slot="mobile-trigger"
           onClick={() => {
             analytics.trackEvent({
@@ -269,6 +321,9 @@ export const MenuLateral = React.memo(function MenuLateral({
           variant="primary"
           size="lg"
           className="gap-3 rounded-full px-6 shadow-lg"
+          aria-controls="menu-lateral-sidebar"
+          aria-expanded={isMenuVisible}
+          aria-haspopup="dialog"
           title="Ver Linhas"
         >
           <span className="flex items-center gap-2 text-white">
@@ -295,9 +350,16 @@ export const MenuLateral = React.memo(function MenuLateral({
         />
       )}
 
+      {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-modal é válido quando role="dialog" está ativo (isMobileViewport) */}
       <aside
+        id="menu-lateral-sidebar"
         data-slot="sidebar"
         data-state={isMenuVisible ? 'open' : 'closed'}
+        role={isMobileViewport ? 'dialog' : undefined}
+        aria-label="Menu de linhas de ônibus"
+        aria-modal={isMobileViewport && isMenuVisible ? true : undefined}
+        aria-hidden={isMobileViewport && !isMenuVisible ? true : undefined}
+        inert={isMobileViewport && !isMenuVisible ? true : undefined}
         className={sidebarVariants({ visible: isMenuVisible })}
       >
         <header
@@ -337,6 +399,7 @@ export const MenuLateral = React.memo(function MenuLateral({
             value={searchTerm}
             onValueChange={setSearchTerm}
             placeholder="Pesquisar linha..."
+            aria-label="Pesquisar linha de ônibus"
             shortcut={shortcutLabel}
           />
         </div>

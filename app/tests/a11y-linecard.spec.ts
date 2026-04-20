@@ -1,25 +1,29 @@
 import { expect, test } from '@playwright/test';
 
-test('has title and LineCard is accessible', async ({ page }) => {
-  // Use the correct base path
-  await page.goto('http://localhost:5173/ufmg/');
+test('LineCard mantém ações acessíveis', async ({ page }) => {
+  await page.goto('/ufmg/');
 
-  // Verify title
   await expect(page).toHaveTitle(/Interno Rotas/);
 
-  // Verify LineCard accessibility
-  // Wait for at least one LineCard to be present
   const lineCard = page.locator('article[data-slot="card"]').first();
   await expect(lineCard).toBeVisible({ timeout: 10000 });
 
-  // Check label used by screen readers
-  const ariaLabel = await lineCard.getAttribute('aria-label');
-  expect(ariaLabel).toBeTruthy();
+  const selectButton = lineCard.locator('button[data-slot="select-line"]');
+  await expect(selectButton).toBeVisible();
+  await expect(selectButton).toHaveAttribute('type', 'button');
+  await expect(selectButton).toHaveAttribute('aria-describedby', /line-card-description-/);
 
-  // Check action button accessibility
-  const detailsButton = lineCard.locator('button:has-text("Ver Detalhes")');
+  const detailsButton = lineCard.locator('button[data-slot="action"]');
   await expect(detailsButton).toBeVisible();
   await expect(detailsButton).toHaveAttribute('type', 'button');
-  const buttonLabel = await detailsButton.getAttribute('aria-label');
-  expect(buttonLabel).toContain('Ver detalhes da linha');
+  await expect(detailsButton).toHaveAttribute('aria-label', /Ver detalhes da linha/);
+
+  const mobileMenuTrigger = page.locator('[data-slot="mobile-trigger"]');
+
+  if (await mobileMenuTrigger.isVisible()) {
+    await mobileMenuTrigger.click();
+    await expect(page.locator('[data-slot="sidebar"]')).toHaveAttribute('data-state', 'open');
+  }
+
+  await expect(page.getByRole('searchbox', { name: 'Pesquisar linha de ônibus' })).toBeVisible();
 });

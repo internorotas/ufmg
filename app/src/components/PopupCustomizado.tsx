@@ -142,6 +142,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
           nomeLinha,
           linha,
           minutosFaltantes: previsao?.proximoOnibus?.minutosFaltantes ?? null,
+          horarioChegada: previsao?.proximoOnibus?.horarioChegada ?? '',
         };
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -182,7 +183,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
               <span>Previsão</span>
             </div>
             <div className="space-y-1">
-              {linhasResolvidas.map(({ nomeLinha, linha, minutosFaltantes }) => (
+              {linhasResolvidas.map(({ nomeLinha, linha, minutosFaltantes, horarioChegada }) => (
                 <div
                   key={nomeLinha}
                   className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
@@ -194,7 +195,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                   >
                     <button
                       type="button"
-                      className="w-full whitespace-normal wrap-break-word text-left"
+                      className="w-full whitespace-normal break-words text-left"
                       aria-label={`Selecionar linha ${getNomeExibicao(linha, nomeLinha)}`}
                       onClick={() => {
                         if (!linha) return;
@@ -220,7 +221,9 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                           return (
                             <button
                               type="button"
-                              onClick={() => toggleNotificacao(linha, parada, minutosFaltantes)}
+                              onClick={() =>
+                                toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)
+                              }
                               className={cn(
                                 'flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90',
                                 alarmado

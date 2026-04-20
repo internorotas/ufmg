@@ -50,7 +50,7 @@ export function VacationBanner({ className, ...props }: VacationBannerProps) {
       className={cn(vacationBannerVariants(), className)}
       {...props}
     >
-      <Info className="mt-0.5 size-5 shrink-0" />
+      <Info className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
       <div className="text-xs leading-relaxed lg:text-sm">
         <p className="mb-1 font-bold">{specialPeriod.name}</p>
         <p>
@@ -60,7 +60,10 @@ export function VacationBanner({ className, ...props }: VacationBannerProps) {
         </p>
         {!isWeekdayToday && (
           <p className="mt-2 font-semibold">
-            ⚠️ Hoje não há circulação de ônibus (apenas em dias úteis).
+            <span role="img" aria-label="Atenção">
+              ⚠️
+            </span>{' '}
+            Hoje não há circulação de ônibus (apenas em dias úteis).
           </p>
         )}
       </div>

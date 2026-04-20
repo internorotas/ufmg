@@ -7,6 +7,85 @@
     <meta name="theme-color" content="#2c0eeb" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
+    <script>
+      (function forceCacheRecovery() {
+        var isLocalhost =
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1';
+
+        if (isLocalhost) {
+          return;
+        }
+
+        var url = new URL(window.location.href);
+        if (url.searchParams.get('cache-recovery') === 'done') {
+          return;
+        }
+
+        var recoveryKey = 'ufmg:cache-recovery:v2';
+        var alreadyRan = false;
+
+        try {
+          alreadyRan = window.sessionStorage.getItem(recoveryKey) === '1';
+          if (!alreadyRan) {
+            window.sessionStorage.setItem(recoveryKey, '1');
+          }
+        } catch (_error) {
+          alreadyRan = false;
+        }
+
+        if (alreadyRan) {
+          return;
+        }
+
+        Promise.resolve()
+          .then(function () {
+            if (!('serviceWorker' in navigator)) {
+              return;
+            }
+
+            return navigator.serviceWorker
+              .getRegistrations()
+              .then(function (registrations) {
+                return Promise.all(
+                  registrations.map(function (registration) {
+                    var scopePathname = new URL(registration.scope).pathname;
+                    var shouldResetRegistration =
+                      scopePathname === '/' || scopePathname.indexOf('/ufmg/') === 0;
+
+                    if (!shouldResetRegistration) {
+                      return Promise.resolve(false);
+                    }
+
+                    return registration.unregister();
+                  }),
+                );
+              });
+          })
+          .then(function () {
+            if (!('caches' in window)) {
+              return;
+            }
+
+            return caches.keys().then(function (keys) {
+              return Promise.all(
+                keys.map(function (key) {
+                  return caches.delete(key);
+                }),
+              );
+            });
+          })
+          .catch(function () {
+            return undefined;
+          })
+          .finally(function () {
+            url.searchParams.set('cache-recovery', 'done');
+            url.searchParams.set('v', String(Date.now()));
+            window.location.replace(url.toString());
+          });
+      })();
+    </script>
+
     <title>Interno Rotas 🚌 | Horários e Rotas dos Ônibus da UFMG</title>
 
     <meta
@@ -21,14 +100,13 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://internorotas.github.io/ufmg/" />
 
-    <!-- Pré-carrega dados críticos para reduzir tempo de carregamento inicial -->
-    <link rel="preload" as="fetch" href="%BASE_URL%data/linhas.json" crossorigin />
-    <link rel="preload" as="fetch" href="%BASE_URL%data/paradas.json" crossorigin />
     <!-- Pré-resolve DNS do servidor de tiles do mapa antes da interação -->
     <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
 
     <link rel="icon" href="/logo_Icone.svg" type="image/svg+xml" />
-    <link rel="shortcut icon" href="/logo_Icone.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
@@ -119,6 +197,7 @@
 
   <body>
     <div id="root"></div>
+    <noscript>Este aplicativo requer JavaScript para funcionar. Por favor, habilite JavaScript no seu navegador.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

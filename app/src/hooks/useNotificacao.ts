@@ -2,9 +2,13 @@
  * useNotificacao - Hook de gerenciamento de alarmes de aproximação
  *
  * Estratégia de alertas múltiplos:
- *  1. ~5 min antes da chegada prevista  → "Prepare-se, o ônibus chegará em breve!"
- *  2. A cada 5 min subsequentes         → contagem regressiva (4 min, 3 min…)
- *  3. No momento da chegada (0 min)     → "O ônibus está chegando agora!"
+ *  1. A cada 5 min antes da chegada prevista (contagem regressiva)
+ *     ex: chegada em 22 min → alertas em t-20min, t-15min, t-10min, t-5min
+ *  2. No momento da chegada (0 min) → "O ônibus está chegando agora!"
+ *
+ * Os timestamps são calculados a partir do horário exato de chegada na parada
+ * (string "HH:MM" do motor de ETA), não a partir de minutosFaltantes — eliminando
+ * o erro de arredondamento de até 59 segundos que causava notificações atrasadas.
  *
  * Compatibilidade:
  *  - Desktop Chrome/Edge/Firefox       → ServiceWorkerRegistration.showNotification
@@ -13,13 +17,18 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toSaoPauloDate } from '../lib/time';
+import { converterHoraParaMinutos } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 
 /** Intervalo de polling (ms) — verifica se algum alarme deve disparar */
-const POLL_MS = 20_000;
+const POLL_MS = 5_000;
 
-/** Ícone da notificação (Android Chrome 192px, declarado no webmanifest) */
-const ICON_URL = '/ufmg/android-chrome-192x192.png';
+/**
+ * Ícone da notificação (Android Chrome 192px, declarado no webmanifest).
+ * Usa BASE_URL para funcionar tanto em /ufmg/ (produção) quanto em / (dev).
+ */
+const ICON_URL = `${import.meta.env.BASE_URL}android-chrome-192x192.png`;
 
 /**
  * Timeout para aguardar o Service Worker antes de cair no fallback.
@@ -28,6 +37,9 @@ const ICON_URL = '/ufmg/android-chrome-192x192.png';
  */
 const SW_READY_TIMEOUT_MS = 2000;
 
+/** Intervalo de alerta antes da chegada (ms) */
+const ALERTA_INTERVALO_MS = 5 * 60_000;
+
 /** Gera a chave única para o par linha+parada */
 export function makeAlarmKey(linhaId: string, paradaId: string): string {
   return `${linhaId}:${paradaId}`;
@@ -35,7 +47,7 @@ export function makeAlarmKey(linhaId: string, paradaId: string): string {
 
 // ─── Helpers de notificação ───────────────────────────────────────────────────
 
-type TipoAviso = 'aviso_5min' | 'contagem' | 'chegando';
+type TipoAviso = 'contagem' | 'chegando';
 
 interface OpcaoAviso {
   tipo: TipoAviso;
@@ -60,18 +72,10 @@ function buildNotificationPayload(opts: OpcaoAviso): {
     };
   }
 
-  if (opts.tipo === 'aviso_5min') {
-    return {
-      titulo: '⏰ Prepare-se! Ônibus em ~5 min',
-      corpo: `A ${opts.linhaNome} chegará à parada "${opts.paradaNome}" em aproximadamente 5 minutos. (±5 min de margem)`,
-      tag: `${base}-5min`,
-    };
-  }
-
-  // contagem regressiva
+  // contagem regressiva — minRestantes é o tempo real calculado no momento do disparo
   return {
     titulo: `🚌 Ônibus em ~${opts.minRestantes} min`,
-    corpo: `${opts.linhaNome} → "${opts.paradaNome}" em ~${opts.minRestantes} minutos.`,
+    corpo: `A ${opts.linhaNome} chegará à parada "${opts.paradaNome}" em ~${opts.minRestantes} minutos.`,
     tag: `${base}-${opts.minRestantes}min`,
   };
 }
@@ -86,7 +90,6 @@ async function dispararNotificacaoSistema(opts: OpcaoAviso): Promise<void> {
     icon: ICON_URL,
     badge: ICON_URL,
     tag,
-    // silent: false é o padrão, mas tornamos explícito para indicar intenção
     silent: false,
   };
 
@@ -111,7 +114,15 @@ async function dispararNotificacaoSistema(opts: OpcaoAviso): Promise<void> {
   // Fallback: new Notification()
   //  - Desktop Safari, iOS PWA (≥16.4 instalado), Firefox sem SW
   //  - Não funciona em background no mobile; no desktop funciona bem
-  new Notification(titulo, opcoes);
+  try {
+    new Notification(titulo, opcoes); // eslint-disable-line no-new
+  } catch {
+    // Navegadores que não suportam new Notification() diretamente (ex: alguns iOS)
+    if (import.meta.env.DEV) {
+      // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
+      console.warn('[useNotificacao] new Notification() falhou:', titulo);
+    }
+  }
 }
 
 // ─── Tipos internos ───────────────────────────────────────────────────────────
@@ -121,6 +132,11 @@ interface AlarmEntry {
   linhaNome: string;
   paradaId: string;
   paradaNome: string;
+  /**
+   * Timestamp Unix (ms) exato da chegada do ônibus na parada.
+   * Calculado a partir do horarioChegada "HH:MM" — não de minutosFaltantes.
+   */
+  chegadaTs: number;
   /**
    * Timestamps Unix (ms) de cada alerta que ainda deve ser disparado.
    * Ordenados cronologicamente. Removidos à medida que são disparados.
@@ -146,7 +162,12 @@ export interface UseNotificacaoReturn {
   iniciarSolicitacaoPermissao: () => void;
   confirmarPermissao: () => Promise<void>;
   fecharModalPermissao: () => void;
-  agendarNotificacao: (linha: Linha, parada: Parada, minutosFaltantes: number) => void;
+  agendarNotificacao: (
+    linha: Linha,
+    parada: Parada,
+    minutosFaltantes: number,
+    horarioChegada: string,
+  ) => void;
   cancelarNotificacao: (linhaId: string, paradaId: string) => void;
   isAlarmado: (linhaId: string, paradaId: string) => boolean;
 }
@@ -154,11 +175,16 @@ export interface UseNotificacaoReturn {
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useNotificacao(): UseNotificacaoReturn {
-  const isIOS = typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isPwaInstalled =
-    typeof window !== 'undefined' &&
-    (window.matchMedia('(display-mode: standalone)').matches ||
-      (navigator as Navigator & { standalone?: boolean }).standalone === true);
+  // useState initializers: executados apenas uma vez na montagem, não em cada render
+  const [isIOS] = useState<boolean>(
+    () => typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent),
+  );
+  const [isPwaInstalled] = useState<boolean>(
+    () =>
+      typeof window !== 'undefined' &&
+      (window.matchMedia('(display-mode: standalone)').matches ||
+        (navigator as Navigator & { standalone?: boolean }).standalone === true),
+  );
 
   // Suportado se a API nativa existir (Android/Desktop/iOS-PWA)
   // OU se for iOS (mostramos o sino para exibir o modal educativo).
@@ -208,32 +234,20 @@ export function useNotificacao(): UseNotificacaoReturn {
   const processarAlarme = useCallback(
     async (key: string, entry: AlarmEntry): Promise<boolean> => {
       const now = Date.now();
-      const totalAlertas = entry.pendingTimestamps.length;
 
       // Filtra timestamps que já chegaram
       const vencidos = entry.pendingTimestamps.filter((ts) => now >= ts);
       entry.pendingTimestamps = entry.pendingTimestamps.filter((ts) => now < ts);
 
       for (const ts of vencidos) {
-        // Descobre qual "slot" este timestamp representa pelo índice original
-        const idxOriginal =
-          totalAlertas - (entry.pendingTimestamps.length + vencidos.indexOf(ts) + 1);
-        const totalSlots = totalAlertas;
+        // Determina o tipo baseado em se é o último timestamp (chegada)
+        const isChegada = ts >= entry.chegadaTs - 1000; // margem de 1s para imprecisão do setInterval
+        const tipo: TipoAviso = isChegada ? 'chegando' : 'contagem';
 
-        let tipo: TipoAviso;
-        if (idxOriginal === totalSlots - 1) {
-          // Último slot = chegada
-          tipo = 'chegando';
-        } else if (idxOriginal === 0) {
-          // Primeiro slot = aviso de 5 min
-          tipo = 'aviso_5min';
-        } else {
-          tipo = 'contagem';
-        }
-
-        // Minutos restantes aproximados no momento do disparo
-        const proximoTs = entry.pendingTimestamps[0];
-        const minRestantes = proximoTs ? Math.round((proximoTs - now) / 60_000) : 0;
+        // Minutos restantes reais no momento do disparo
+        const minRestantes = isChegada
+          ? 0
+          : Math.max(1, Math.round((entry.chegadaTs - now) / 60_000));
 
         await dispararNotificacaoSistema({
           tipo,
@@ -254,7 +268,7 @@ export function useNotificacao(): UseNotificacaoReturn {
   );
 
   const agendarNotificacao = useCallback(
-    (linha: Linha, parada: Parada, minutosFaltantes: number) => {
+    (linha: Linha, parada: Parada, minutosFaltantes: number, horarioChegada: string) => {
       const key = makeAlarmKey(linha.idRota, parada.idParada);
 
       // Toggle off — cancela se já existe
@@ -266,27 +280,59 @@ export function useNotificacao(): UseNotificacaoReturn {
       const now = Date.now();
 
       /**
-       * Monta a lista de timestamps de alerta:
-       *  - A cada 5 min a partir de agora até a chegada (contagem regressiva)
-       *  - O último timestamp é o da chegada (minutosFaltantes)
+       * Calcula o timestamp exato de chegada a partir do horário "HH:MM".
        *
-       * Exemplo com minutosFaltantes = 22:
-       *   now+17min (aviso_5min), now+22min (chegando)
+       * Usa toSaoPauloDate para obter o "início do dia" em São Paulo e depois
+       * adiciona os minutos do horário de chegada — eliminando o erro de
+       * arredondamento de até 59 segundos que ocorria ao usar:
+       *   chegadaTs = now + minutosFaltantes * 60_000
        *
-       * Exemplo com minutosFaltantes = 8:
-       *   now+3min (aviso_5min), now+8min (chegando)
-       *
-       * Exemplo com minutosFaltantes ≤ 5:
-       *   now+0ms (aviso_5min imediato), now+minutosFaltantes (chegando)
+       * Tratamento de virada de meia-noite: se horarioChegada é muito menor que
+       * o horário atual (ex: agora=23:55, chegada=00:10), assume dia seguinte.
        */
-      const chegadaTs = now + minutosFaltantes * 60_000;
+      const chegadaMinutos = converterHoraParaMinutos(horarioChegada);
+      let chegadaTs: number;
+
+      if (Number.isFinite(chegadaMinutos)) {
+        const spNow = toSaoPauloDate(new Date(now));
+        const inicioDiaMs = new Date(
+          spNow.getFullYear(),
+          spNow.getMonth(),
+          spNow.getDate(),
+          0,
+          0,
+          0,
+          0,
+        ).getTime();
+        chegadaTs = inicioDiaMs + chegadaMinutos * 60_000;
+
+        // Se chegada já passou (virada de meia-noite), avança um dia
+        if (chegadaTs < now - 60_000) {
+          chegadaTs += 24 * 60 * 60_000;
+        }
+      } else {
+        // Fallback: usar minutosFaltantes quando horarioChegada é inválido
+        chegadaTs = now + minutosFaltantes * 60_000;
+      }
+
+      /**
+       * Gera timestamps de trás para frente a partir da chegada, de 5 em 5 min.
+       * Exemplo com chegada em 22 min:
+       *   chegadaTs-20min (contagem ~20min)
+       *   chegadaTs-15min (contagem ~15min)
+       *   chegadaTs-10min (contagem ~10min)
+       *   chegadaTs-5min  (contagem ~5min)
+       *   chegadaTs       (chegando)
+       *
+       * Apenas timestamps no futuro (> now) são incluídos.
+       */
       const timestamps: number[] = [];
 
-      // Slots de 5 em 5 min a partir de agora, até antes da chegada
-      let cursor = now;
-      while (cursor + 5 * 60_000 < chegadaTs) {
-        cursor += 5 * 60_000;
-        timestamps.push(cursor);
+      // Slots de 5 em 5 min antes da chegada, do mais distante ao mais próximo
+      let cursor = chegadaTs - ALERTA_INTERVALO_MS;
+      while (cursor > now) {
+        timestamps.unshift(cursor); // insere na frente para manter ordem crescente
+        cursor -= ALERTA_INTERVALO_MS;
       }
 
       // Sempre inclui o timestamp final de chegada
@@ -297,6 +343,7 @@ export function useNotificacao(): UseNotificacaoReturn {
         linhaNome: linha.nome,
         paradaId: parada.idParada,
         paradaNome: parada.nome,
+        chegadaTs,
         pendingTimestamps: timestamps,
         intervalId: null,
       };
@@ -305,16 +352,28 @@ export function useNotificacao(): UseNotificacaoReturn {
       setAlarmes((prev) => new Set([...prev, key]));
 
       // Processa imediatamente (cobre o caso delayMs ≈ 0)
-      void processarAlarme(key, entry).then((continua) => {
-        if (!continua) return;
-        // Inicia polling periódico
-        const intervalId = setInterval(async () => {
-          const current = alarmesRef.current.get(key);
-          if (!current) return;
-          await processarAlarme(key, current);
-        }, POLL_MS);
-        entry.intervalId = intervalId;
-      });
+      void processarAlarme(key, entry)
+        .then((continua) => {
+          if (!continua) return;
+          // Inicia polling periódico
+          const intervalId = setInterval(() => {
+            const current = alarmesRef.current.get(key);
+            if (!current) return;
+            void processarAlarme(key, current).catch((err) => {
+              if (import.meta.env.DEV) {
+                // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
+                console.warn('[useNotificacao] erro em processarAlarme:', err);
+              }
+            });
+          }, POLL_MS);
+          entry.intervalId = intervalId;
+        })
+        .catch((err) => {
+          if (import.meta.env.DEV) {
+            // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
+            console.warn('[useNotificacao] erro ao agendar notificação:', err);
+          }
+        });
     },
     [cancelarNotificacao, processarAlarme],
   );
@@ -324,10 +383,15 @@ export function useNotificacao(): UseNotificacaoReturn {
    * Browsers mobile podem throttlear setInterval em background.
    */
   useEffect(() => {
-    const onVisibilityChange = async () => {
+    const onVisibilityChange = () => {
       if (document.visibilityState !== 'visible') return;
       for (const [key, entry] of alarmesRef.current) {
-        await processarAlarme(key, entry);
+        void processarAlarme(key, entry).catch((err) => {
+          if (import.meta.env.DEV) {
+            // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
+            console.warn('[useNotificacao] erro em visibilitychange processarAlarme:', err);
+          }
+        });
       }
     };
     document.addEventListener('visibilitychange', onVisibilityChange);

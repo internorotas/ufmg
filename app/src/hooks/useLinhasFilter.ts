@@ -5,7 +5,7 @@
  * permitindo que o componente foque apenas na renderização (JSX).
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { getCurrentSpecialPeriod } from '../config/specialPeriods';
 import { getSaoPauloDayOfWeek, getSaoPauloNow } from '../lib/time';
@@ -186,6 +186,7 @@ export function useLinhasFilter(
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, debounceMs);
+  const deferredSearchTerm = useDeferredValue(searchTerm);
 
   const [categoriaAtiva, setCategoriaAtiva] = useState<number>(() =>
     getInitialCategory(linhasData),
@@ -212,8 +213,8 @@ export function useLinhasFilter(
   const linhasDaCategoriaAtiva = useMemo(() => categoriaAtual?.linhas ?? [], [categoriaAtual]);
 
   const linhasFiltradas = useMemo(() => {
-    return sortLinhas(filterLinhas(linhasDaCategoriaAtiva, searchTerm), currentTime);
-  }, [linhasDaCategoriaAtiva, searchTerm, currentTime]);
+    return sortLinhas(filterLinhas(linhasDaCategoriaAtiva, deferredSearchTerm), currentTime);
+  }, [linhasDaCategoriaAtiva, deferredSearchTerm, currentTime]);
 
   const hasResults = linhasFiltradas.length > 0;
 

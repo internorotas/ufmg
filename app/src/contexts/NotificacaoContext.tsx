@@ -23,7 +23,12 @@ interface NotificacaoContextValue {
    * Se não houver permissão, abre o modal amigável e guarda o alarme
    * pendente para ativá-lo automaticamente após a concessão.
    */
-  toggleNotificacao: (linha: Linha, parada: Parada, minutosFaltantes: number) => void;
+  toggleNotificacao: (
+    linha: Linha,
+    parada: Parada,
+    minutosFaltantes: number,
+    horarioChegada: string,
+  ) => void;
 }
 
 const NotificacaoContext = createContext<NotificacaoContextValue | null>(null);
@@ -45,12 +50,17 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   } = useNotificacao();
 
   // Alarme que aguardou a concessão de permissão pelo usuário
-  const pendingRef = useRef<{ linha: Linha; parada: Parada; minutos: number } | null>(null);
+  const pendingRef = useRef<{
+    linha: Linha;
+    parada: Parada;
+    minutos: number;
+    horarioChegada: string;
+  } | null>(null);
 
   const [mostrarModalIos, setMostrarModalIos] = useState(false);
 
   const toggleNotificacao = useCallback(
-    (linha: Linha, parada: Parada, minutosFaltantes: number) => {
+    (linha: Linha, parada: Parada, minutosFaltantes: number, horarioChegada: string) => {
       // Interceptador Apple: iOS não-PWA não tem acesso à API Notification.
       // Mostramos o modal educativo em vez de tentar pedir permissão.
       if (isIOS && !isPwaInstalled) {
@@ -71,11 +81,11 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
       }
       // Sem permissão: guarda pendência e abre modal educativo
       if (!podeNotificar) {
-        pendingRef.current = { linha, parada, minutos: minutosFaltantes };
+        pendingRef.current = { linha, parada, minutos: minutosFaltantes, horarioChegada };
         iniciarSolicitacaoPermissao();
         return;
       }
-      agendarNotificacao(linha, parada, minutosFaltantes);
+      agendarNotificacao(linha, parada, minutosFaltantes, horarioChegada);
       trackEvent({
         event: 'alarm_set',
         category: 'engagement',
@@ -99,9 +109,9 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   const handleConfirmar = useCallback(async () => {
     await confirmarPermissao();
     if (pendingRef.current && Notification.permission === 'granted') {
-      const { linha, parada, minutos } = pendingRef.current;
+      const { linha, parada, minutos, horarioChegada } = pendingRef.current;
       pendingRef.current = null;
-      agendarNotificacao(linha, parada, minutos);
+      agendarNotificacao(linha, parada, minutos, horarioChegada);
       trackEvent({
         event: 'alarm_set',
         category: 'engagement',

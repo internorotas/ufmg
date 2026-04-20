@@ -381,14 +381,14 @@ export function AdminParadasTab({
               <div className="pt-1 border-t border-card-border">
                 {showDeleteConfirm ? (
                   <div className="flex flex-col gap-2">
-                    <p className="text-xs font-semibold text-red-600 dark:text-red-400">
+                    <p className="text-xs font-semibold text-warning-text">
                       Tem certeza? Use Ctrl+Z para desfazer depois.
                     </p>
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={handleDelete}
-                        className="flex-1 py-2 bg-red-600 border border-red-700 text-white rounded text-xs font-bold hover:bg-red-700 transition-colors"
+                        className="flex-1 py-2 bg-brand-accent border border-brand-accent/80 text-text-inverse rounded text-xs font-bold hover:bg-brand-accent/90 transition-colors"
                       >
                         Confirmar exclusão
                       </button>
@@ -405,7 +405,7 @@ export function AdminParadasTab({
                   <button
                     type="button"
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="w-full py-2 bg-red-600 border border-red-700 text-white rounded text-xs font-bold hover:bg-red-700 transition-colors"
+                    className="w-full py-2 bg-brand-accent border border-brand-accent/80 text-text-inverse rounded text-xs font-bold hover:bg-brand-accent/90 transition-colors"
                   >
                     Excluir parada
                   </button>
