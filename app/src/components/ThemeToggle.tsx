@@ -77,6 +77,7 @@ export function ThemeToggle({
 
   return (
     <button
+      type="button"
       data-slot="toggle"
       data-state={isDark ? 'dark' : 'light'}
       onClick={handleToggle}
