@@ -7,6 +7,77 @@
     <meta name="theme-color" content="#2c0eeb" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
+    <script>
+      (function forceCacheRecovery() {
+        var isLocalhost =
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1';
+
+        if (isLocalhost) {
+          return;
+        }
+
+        var url = new URL(window.location.href);
+        if (url.searchParams.get('cache-recovery') === 'done') {
+          return;
+        }
+
+        var recoveryKey = 'ufmg:cache-recovery:v2';
+        var alreadyRan = false;
+
+        try {
+          alreadyRan = window.sessionStorage.getItem(recoveryKey) === '1';
+          if (!alreadyRan) {
+            window.sessionStorage.setItem(recoveryKey, '1');
+          }
+        } catch (_error) {
+          alreadyRan = false;
+        }
+
+        if (alreadyRan) {
+          return;
+        }
+
+        Promise.resolve()
+          .then(() => {
+            if (!('serviceWorker' in navigator)) {
+              return;
+            }
+
+            return navigator.serviceWorker
+              .getRegistrations()
+              .then((registrations) => Promise.all(
+                  registrations.map((registration) => {
+                    var scopePathname = new URL(registration.scope).pathname;
+                    var shouldResetRegistration =
+                      scopePathname === '/' || scopePathname.indexOf('/ufmg/') === 0;
+
+                    if (!shouldResetRegistration) {
+                      return Promise.resolve(false);
+                    }
+
+                    return registration.unregister();
+                  }),
+                ));
+          })
+          .then(() => {
+            if (!('caches' in window)) {
+              return;
+            }
+
+            return caches.keys().then((keys) => Promise.all(
+                keys.map((key) => caches.delete(key)),
+              ));
+          })
+          .catch(() => undefined)
+          .finally(() => {
+            url.searchParams.set('cache-recovery', 'done');
+            url.searchParams.set('v', String(Date.now()));
+            window.location.replace(url.toString());
+          });
+      })();
+    </script>
+
     <title>Interno Rotas 🚌 | Horários e Rotas dos Ônibus da UFMG</title>
 
     <meta
@@ -21,13 +92,13 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://internorotas.github.io/ufmg/" />
 
-    <!-- Pré-carrega dados críticos para reduzir tempo de carregamento inicial -->
-    <link rel="preload" as="fetch" href="/ufmg/data/linhas.json" crossorigin />
-    <link rel="preload" as="fetch" href="/ufmg/data/paradas.json" crossorigin />
     <!-- Pré-resolve DNS do servidor de tiles do mapa antes da interação -->
     <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
 
     <link rel="icon" href="/ufmg/logo_Icone.svg" type="image/svg+xml" />
+    <link rel="icon" href="/ufmg/favicon-32x32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/ufmg/favicon-16x16.png" sizes="16x16" type="image/png" />
+    <link rel="icon" href="/ufmg/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/ufmg/apple-touch-icon.png" />
     <link rel="manifest" href="/ufmg/site.webmanifest" />
 
@@ -114,19 +185,19 @@
         ]
       }
     </script>
-    <script type="module" crossorigin src="/ufmg/assets/index-BHGuwwzp.js"></script>
+    <script type="module" crossorigin src="/ufmg/assets/index-Ck430X_8.js"></script>
     <link rel="modulepreload" crossorigin href="/ufmg/assets/rolldown-runtime-DF2fYuay.js">
     <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-leaflet-Cr7pRb3A.js">
     <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-react-B5X8qM7b.js">
     <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-misc-fXI2UZ8t.js">
-    <link rel="modulepreload" crossorigin href="/ufmg/assets/NotificacaoContext-B0hieCEk.js">
-    <link rel="modulepreload" crossorigin href="/ufmg/assets/RotasContext-DNTJas7n.js">
+    <link rel="modulepreload" crossorigin href="/ufmg/assets/NotificacaoContext-DQfwnj-T.js">
+    <link rel="modulepreload" crossorigin href="/ufmg/assets/PrevisaoBadge-DD5RYlsg.js">
     <link rel="stylesheet" crossorigin href="/ufmg/assets/vendor-leaflet-vh-t_kPv.css">
-    <link rel="stylesheet" crossorigin href="/ufmg/assets/index-B8pT7cNm.css">
-  <script id="vite-plugin-pwa:register-sw" src="/ufmg/registerSW.js"></script></head>
+    <link rel="stylesheet" crossorigin href="/ufmg/assets/index-B69mdaSb.css">
+  </head>
 
   <body>
     <div id="root"></div>
-    <noscript>Este aplicativo requer JavaScript para funcionar. Por favor, habilite JavaScript no seu navegador.</noscript>
+    <noscript>Este aplicativo requer JavaScript para funcionar. Por favor, habilite JavaScript no seu navegador.</noscript>
   </body>
 </html>
