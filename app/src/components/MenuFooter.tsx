@@ -129,7 +129,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
       </div>
 
       {/* Desenvolvido por */}
-      <div className="flex flex-row flex-wrap items-center justify-center gap-x-2 gap-y-0.5 py-1">
+      <div className="flex flex-row flex-wrap items-center justify-center gap-1">
         <a
           href="https://github.com/igormartins4"
           target="_blank"
