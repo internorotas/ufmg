@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/internorotas/ufmg/compare/v1.3.0...v1.4.0) (2026-04-20)
+
+
+### Features
+
+* remover animação de foco no MenuLateral para simplificação do código ([ef4c819](https://github.com/internorotas/ufmg/commit/ef4c81943fa32236408dfe634cdc93fb97425b88))
+
 # [1.3.0](https://github.com/internorotas/ufmg/compare/v1.2.4...v1.3.0) (2026-04-20)
 
 
