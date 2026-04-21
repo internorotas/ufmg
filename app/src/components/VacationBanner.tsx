@@ -47,6 +47,8 @@ export function VacationBanner({ className, ...props }: VacationBannerProps) {
     <div
       data-slot="banner"
       data-intent="warning"
+      role="status"
+      aria-live="polite"
       className={cn(vacationBannerVariants(), className)}
       {...props}
     >

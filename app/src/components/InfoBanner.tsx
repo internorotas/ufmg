@@ -43,6 +43,8 @@ export function InfoBanner({ className, ...props }: InfoBannerProps) {
     <div
       data-slot="banner"
       data-intent="info"
+      role="status"
+      aria-live="polite"
       className={cn(bannerVariants({ intent: 'info' }), className)}
       {...props}
     >

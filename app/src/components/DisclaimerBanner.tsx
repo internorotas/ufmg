@@ -50,6 +50,8 @@ export function DisclaimerBanner({
     <div
       data-slot="banner"
       data-intent="warning"
+      role="status"
+      aria-live="polite"
       className={cn(disclaimerBannerVariants(), className)}
       {...props}
     >
