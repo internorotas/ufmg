@@ -29,10 +29,10 @@ import { LineStatusBadge, type LineStatusType } from './ui/Badge';
  */
 export const lineCardVariants = tv({
   base: [
-    'relative overflow-hidden rounded-xl border bg-card shadow-sm',
+    'relative overflow-hidden rounded-2xl border bg-card shadow-sm',
     'transition-all duration-200 ease-out',
     'hover:shadow-lg hover:-translate-y-0.5',
-    'focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-primary focus-within:ring-offset-2',
+    'focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
   ],
   variants: {
     selected: {
@@ -50,10 +50,10 @@ export const lineCardVariants = tv({
  */
 export const detailsButtonVariants = tv({
   base: [
-    'w-full rounded-lg border bg-background px-4 py-3 font-semibold cursor-pointer',
+    'w-full rounded-xl border bg-background px-4 py-3 font-semibold cursor-pointer',
     'text-sm shadow-sm',
     'hover:bg-card-hover active:scale-[0.97] transition-all duration-150',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring',
   ],
 });
 
@@ -146,7 +146,10 @@ interface ScheduleDisplayProps {
 
 function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
   return (
-    <div data-slot="schedule" className="rounded-lg bg-background-secondary/50 p-2 text-center">
+    <div
+      data-slot="schedule"
+      className="rounded-xl border border-card-border bg-background-secondary/40 p-2 text-center"
+    >
       <p className="mb-1 flex items-center justify-center gap-1 text-xs text-text-secondary">
         <Clock className="size-3.5" aria-hidden="true" />
         {label}
@@ -268,13 +271,13 @@ function LineCardComponent({
         onClick={handleCardClick}
         aria-pressed={isSelected}
         aria-describedby={getLineDescriptionId(linha.idRota)}
-        className="w-full cursor-pointer text-left focus-visible:outline-none"
+        className="w-full cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
       >
         <div data-slot="header" className="relative w-full p-4 pb-3 text-left">
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-1 items-start gap-3">
               <LineIcon color={linha.corHex} />
-              <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-0.5">
+              <div className="grid flex-1 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-0.5">
                 <h3 className="text-base font-bold leading-tight text-text-primary">
                   {linha.nome}
                 </h3>

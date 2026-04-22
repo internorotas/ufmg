@@ -30,8 +30,8 @@ export const badgeVariants = tv({
 
       // Brand badges
       primary: [
-        'bg-internoRotas-azul-eletrico/20 text-internoRotas-azul-eletrico',
-        'border-internoRotas-azul-eletrico/30',
+        'bg-internoRotas-azul-eletrico/15 text-internoRotas-azul-eletrico',
+        'border-internoRotas-azul-eletrico/40',
       ],
       secondary: ['bg-warning-bg text-warning-text', 'border-warning-border'],
 
@@ -46,7 +46,7 @@ export const badgeVariants = tv({
       lg: 'h-8 px-3 text-sm',
     },
     clickable: {
-      true: 'cursor-pointer hover:opacity-80 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1',
+      true: 'cursor-pointer hover:opacity-90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
       false: '',
     },
   },

@@ -47,7 +47,7 @@ export const tabsListVariants = tv({
   base: 'flex',
   variants: {
     variant: {
-      default: 'gap-1 rounded-lg bg-card-hover p-1',
+      default: 'gap-1 rounded-xl border border-card-border bg-card-hover/60 p-1',
       underline: 'gap-2 border-b border-card-border',
       pills: 'gap-2',
     },
@@ -69,7 +69,7 @@ export const tabsTriggerVariants = tv({
   base: [
     'inline-flex items-center justify-center whitespace-nowrap cursor-pointer',
     'font-medium transition-all duration-150 ease-out',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
     'disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed',
     'active:scale-[0.97]',
   ],
@@ -86,9 +86,9 @@ export const tabsTriggerVariants = tv({
         'data-[state=inactive]:text-text-secondary data-[state=inactive]:hover:text-text-primary data-[state=inactive]:hover:bg-card-hover/30',
       ],
       pills: [
-        'rounded-full px-4 py-2 text-sm',
+        'rounded-xl px-4 py-2 text-sm',
         'data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm',
-        'data-[state=inactive]:bg-card data-[state=inactive]:text-text-secondary',
+        'data-[state=inactive]:border data-[state=inactive]:border-card-border data-[state=inactive]:bg-card data-[state=inactive]:text-text-secondary',
         'data-[state=inactive]:hover:bg-card-hover data-[state=inactive]:hover:text-text-primary',
       ],
     },

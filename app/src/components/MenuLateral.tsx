@@ -34,7 +34,7 @@ export const sidebarVariants = tv({
   base: [
     'fixed inset-y-0 left-0 z-[1003] flex flex-col',
     'w-[85vw] max-w-md md:relative md:w-1/2',
-    'border-r border-card-border/50 text-text-primary',
+    'border-r border-card-border text-text-primary',
     'bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150',
     'shadow-2xl md:shadow-none',
     'transform transition-transform duration-300',
@@ -55,7 +55,7 @@ export const sidebarVariants = tv({
  */
 export const categoryTabVariants = tv({
   base: [
-    'flex-1 rounded-md px-2.5 py-2 lg:py-2.5',
+    'flex-1 rounded-xl px-2.5 py-2 lg:py-2.5',
     'text-xs lg:text-sm font-medium',
     'cursor-pointer transition-all duration-150 ease-out',
     'active:scale-[0.97]',
@@ -289,7 +289,7 @@ export const MenuLateral = React.memo(function MenuLateral({
               : 'translate-x-0 opacity-100'
           }`}
         >
-          <div className="rounded-xl bg-brand-primary px-4 py-2 shadow-lg backdrop-blur-sm">
+          <div className="rounded-xl border border-white/20 bg-brand-primary px-4 py-2 shadow-lg backdrop-blur-sm">
             <img
               src={logo}
               alt="Logo Interno Rotas"
@@ -315,7 +315,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           }}
           variant="primary"
           size="lg"
-          className="gap-3 rounded-full px-6 shadow-lg"
+          className="gap-3 rounded-full border border-brand-primary/20 px-6 shadow-lg"
           aria-controls="menu-lateral-sidebar"
           aria-expanded={isMenuVisible}
           aria-haspopup="dialog"
@@ -341,7 +341,7 @@ export const MenuLateral = React.memo(function MenuLateral({
             setMenuVisible(false);
           }}
           aria-label="Fechar menu"
-          className="fixed inset-0 z-1002 animate-fade-in bg-backdrop backdrop-blur-sm cursor-pointer md:hidden"
+          className="fixed inset-0 z-1002 animate-fade-in cursor-pointer bg-backdrop backdrop-blur-sm md:hidden"
         />
       )}
 
@@ -359,7 +359,7 @@ export const MenuLateral = React.memo(function MenuLateral({
       >
         <header
           data-slot="header"
-          className="flex shrink-0 items-center justify-between bg-brand-primary p-2 shadow-sm"
+          className="flex shrink-0 items-center justify-between border-b border-white/20 bg-brand-primary p-2 shadow-sm"
         >
           <div className="flex flex-1 items-center justify-center">
             <img src={logo} alt="Logo Interno Rotas" className="h-6" width="138" height="24" />
@@ -379,7 +379,7 @@ export const MenuLateral = React.memo(function MenuLateral({
               }}
               variant="ghost"
               size="sm"
-              className="rounded-lg p-2 text-white hover:bg-white/20 md:hidden"
+              className="rounded-xl p-2 text-white hover:bg-white/20 md:hidden"
               aria-label="Fechar menu lateral"
               title="Fechar menu lateral"
             >
@@ -388,7 +388,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           </div>
         </header>
 
-        <div className="shrink-0 border-b border-card-border bg-background-secondary p-2 lg:p-4">
+        <div className="shrink-0 border-b border-card-border bg-background-secondary/80 p-2 lg:p-4">
           <SearchInput
             ref={searchInputRef}
             value={searchTerm}

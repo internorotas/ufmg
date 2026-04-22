@@ -14,7 +14,7 @@ import { cn } from '../../lib/utils';
  * Variantes do card root
  */
 export const cardVariants = tv({
-  base: ['rounded-xl border bg-card text-text-primary', 'transition-all duration-200'],
+  base: ['rounded-2xl border bg-card text-text-primary', 'transition-all duration-200'],
   variants: {
     variant: {
       default: 'border-card-border shadow-sm',

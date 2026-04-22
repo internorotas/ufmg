@@ -16,7 +16,10 @@ import { Button } from './Button';
  * Variantes do container de empty state
  */
 export const emptyStateVariants = tv({
-  base: ['flex flex-col items-center justify-center text-center', 'py-8 px-4'],
+  base: [
+    'flex flex-col items-center justify-center text-center',
+    'rounded-2xl border border-card-border bg-card px-4 py-8',
+  ],
   variants: {
     size: {
       sm: 'py-6 gap-2',
@@ -33,7 +36,10 @@ export const emptyStateVariants = tv({
  * Variantes do ícone
  */
 export const emptyStateIconVariants = tv({
-  base: ['flex items-center justify-center rounded-full', 'bg-card-hover text-text-tertiary'],
+  base: [
+    'flex items-center justify-center rounded-full',
+    'border border-card-border bg-card-hover text-text-tertiary',
+  ],
   variants: {
     size: {
       sm: 'size-12',

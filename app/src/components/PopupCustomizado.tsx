@@ -153,8 +153,8 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
     <Popup className={cn('popup-customizado', className)} minWidth={220} {...props}>
       <div data-slot="container" className={popupContainerVariants()}>
         <div data-slot="header" className={popupHeaderVariants()}>
-          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-internoRotas-laranja-ambar/20">
-            <MapPin className="text-internoRotas-laranja-ambar" size={18} />
+          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted">
+            <MapPin className="text-muted-foreground" size={18} />
           </div>
           <div>
             <h3 className="text-base font-bold leading-tight text-text-primary">{parada.nome}</h3>
@@ -169,8 +169,8 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
         {parada.linhasAtendidas && parada.linhasAtendidas.length > 0 && (
           <div data-slot="lines-section" className={popupLinesSectionVariants()}>
             <div className="mb-1.5 flex items-center gap-2">
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-internoRotas-azul-eletrico/50">
-                <Bus className="text-internoRotas-bege-areia/40" size={13} />
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted">
+                <Bus className="text-muted-foreground" size={13} />
               </div>
               <p className="text-xs font-semibold text-text-primary">
                 {parada.linhasAtendidas.length} linha
@@ -189,7 +189,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                   className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-card-border/70 bg-background-secondary/40 px-2 py-2"
                 >
                   <span
-                    className={cn(lineBadgeVariants(), 'border-l-[3px]')}
+                    className={cn(lineBadgeVariants(), 'flex-1 border-l-[3px]')}
                     title={nomeLinha}
                     style={linha ? { borderLeftColor: linha.corHex } : undefined}
                   >
@@ -212,7 +212,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
 
                   {/* Coluna direita: badge de previsão + sino */}
                   {linha ? (
-                    <div className="flex shrink-0 items-center gap-1">
+                    <div className="flex shrink-0 items-center gap-1 sm:ml-auto">
                       <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
                       {suportado &&
                         minutosFaltantes !== null &&

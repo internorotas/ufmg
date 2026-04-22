@@ -15,11 +15,11 @@ import { cn } from '../../lib/utils';
  */
 export const inputVariants = tv({
   base: [
-    'w-full rounded-lg border bg-input',
+    'w-full rounded-xl border bg-input',
     'border-input-border text-text-primary',
     'placeholder:text-text-tertiary',
-    'transition-all duration-200',
-    'focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary',
+    'transition-all duration-150',
+    'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background',
     'disabled:cursor-not-allowed disabled:opacity-50',
   ],
   variants: {
@@ -250,7 +250,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             type="button"
             onClick={handleClear}
             onMouseDown={(e) => e.preventDefault()}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors cursor-pointer hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
             aria-label="Limpar busca"
             title="Limpar busca"
           >

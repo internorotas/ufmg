@@ -99,20 +99,20 @@ export function AdminLayout() {
   }, [linhasState]);
 
   const btnBase =
-    'px-2.5 py-1.5 text-xs rounded border transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
+    'rounded-xl border px-2.5 py-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-40';
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-text-primary">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background text-text-primary">
       {/* Barra de topo fixa */}
-      <header className="flex items-center gap-2 px-3 py-2 bg-card border-b border-card-border shrink-0 flex-wrap">
-        <span className="font-bold text-sm text-text-primary whitespace-nowrap">⚙️ Admin Panel</span>
+      <header className="flex shrink-0 flex-wrap items-center gap-2 border-b border-card-border bg-card px-3 py-2">
+        <span className="whitespace-nowrap text-sm font-bold text-text-primary">⚙️ Admin Panel</span>
 
         {/* Seletor de aba */}
-        <div className="flex rounded-md overflow-hidden border border-card-border text-xs font-medium">
+        <div className="flex overflow-hidden rounded-xl border border-card-border text-xs font-medium">
           <button
             type="button"
             onClick={() => setActiveTab('paradas')}
-            className={`px-3 py-1.5 transition-colors ${
+            className={`px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset ${
               isParadasTab
                 ? 'bg-brand-primary text-text-inverse'
                 : 'text-text-secondary hover:bg-background-secondary'
@@ -123,7 +123,7 @@ export function AdminLayout() {
           <button
             type="button"
             onClick={() => setActiveTab('linhas')}
-            className={`px-3 py-1.5 transition-colors border-l border-card-border ${
+            className={`border-l border-card-border px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset ${
               !isParadasTab
                 ? 'bg-brand-primary text-text-inverse'
                 : 'text-text-secondary hover:bg-background-secondary'
@@ -135,7 +135,7 @@ export function AdminLayout() {
 
         {/* Indicador de alterações */}
         {changesCount > 0 && (
-          <span className="px-2 py-0.5 text-xs bg-warning-bg text-warning-text border border-warning-border rounded-full">
+          <span className="rounded-full border border-warning-border bg-warning-bg px-2 py-0.5 text-xs text-warning-text">
             {changesCount} {changesCount === 1 ? 'alteração' : 'alterações'}
           </span>
         )}
@@ -188,7 +188,7 @@ export function AdminLayout() {
               exportParadas();
               exportLinhas();
             }}
-            className="px-3 py-1.5 text-xs rounded font-semibold bg-brand-primary text-text-inverse hover:opacity-90 transition-opacity"
+            className="rounded-xl bg-brand-primary px-3 py-2 text-xs font-semibold text-text-inverse transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             ↓ Exportar Tudo
           </button>

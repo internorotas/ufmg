@@ -15,41 +15,26 @@ import { cn } from '../../lib/utils';
  */
 export const buttonVariants = tv({
   base: [
-    'inline-flex items-center justify-center gap-2 rounded-lg',
+    'inline-flex items-center justify-center gap-2 rounded-xl',
     'font-semibold transition-all duration-150 ease-out cursor-pointer',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
     'disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed',
-    'active:scale-[0.97] hover:brightness-105',
+    'active:scale-[0.97]',
   ],
   variants: {
     variant: {
-      primary: [
-        'bg-brand-primary text-text-inverse shadow-sm',
-        'hover:bg-brand-primary/90 focus-visible:ring-brand-primary',
-      ],
-      secondary: [
-        'bg-brand-accent text-text-inverse shadow-sm',
-        'hover:bg-brand-accent/90 focus-visible:ring-brand-accent',
-      ],
-      success: [
-        'bg-success-border text-text-inverse shadow-sm',
-        'hover:bg-success-border/90 focus-visible:ring-success-border',
-      ],
-      danger: [
-        'bg-warning-border text-text-inverse shadow-sm',
-        'hover:bg-warning-border/90 focus-visible:ring-warning-border',
-      ],
-      ghost: [
-        'bg-transparent text-text-primary',
-        'hover:bg-card-hover focus-visible:ring-card-border',
-      ],
+      primary: ['bg-brand-primary text-text-inverse shadow-sm', 'hover:bg-brand-primary/90'],
+      secondary: ['bg-brand-accent text-text-inverse shadow-sm', 'hover:bg-brand-accent/90'],
+      success: ['bg-success-border text-text-inverse shadow-sm', 'hover:bg-success-border/90'],
+      danger: ['bg-warning-border text-brand-dark shadow-sm', 'hover:bg-warning-border/90'],
+      ghost: ['bg-transparent text-text-primary', 'hover:bg-card-hover'],
       outline: [
-        'border border-card-border bg-transparent text-text-primary',
-        'hover:bg-card-hover focus-visible:ring-card-border',
+        'border border-card-border-strong bg-transparent text-text-primary',
+        'hover:bg-card-hover',
       ],
       link: [
         'bg-transparent text-internoRotas-azul-eletrico underline-offset-4',
-        'hover:underline focus-visible:ring-brand-primary',
+        'hover:underline',
       ],
     },
     size: {
