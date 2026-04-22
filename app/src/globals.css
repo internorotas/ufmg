@@ -36,8 +36,10 @@ body,
   --color-card: var(--card-background);
   --color-card-hover: var(--card-hover);
   --color-card-border: var(--card-border);
+  --color-card-border-strong: var(--card-border-strong);
   --color-input: var(--input-background);
   --color-input-border: var(--input-border);
+  --color-ring: var(--focus-ring);
 
   /* Textos */
   --color-text-primary: var(--text-primary);
@@ -100,8 +102,10 @@ body,
   --card-background: #ffffff;
   --card-hover: #f9fafb;
   --card-border: #e5e7eb; /* Gray 200 */
+  --card-border-strong: #cbd5e1; /* Slate 300 */
   --input-background: #f9fafb;
   --input-border: #e5e7eb;
+  --focus-ring: #2c0eeb;
 
   /* Texto */
   --text-primary: #111827; /* Gray 900 */
@@ -144,8 +148,10 @@ body,
   --card-background: #1f2937;
   --card-hover: #374151; /* Gray 700 */
   --card-border: #374151;
+  --card-border-strong: #4b5563;
   --input-background: #374151;
   --input-border: #4b5563;
+  --focus-ring: #7d6bff;
 
   /* Texto */
   --text-primary: #f9fafb; /* Gray 50 */
@@ -187,6 +193,7 @@ body {
   font-family: var(--font-poppins);
   background: var(--background);
   color: var(--text-primary);
+  line-height: 1.45;
   height: 100%;
   width: 100%;
   /* REMOVIDA: transition de background/color causa colapso de renderização no WebKit */
