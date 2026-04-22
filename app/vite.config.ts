@@ -60,7 +60,17 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  preview: {
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
+  },
   server: {
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
     fs: {
       // Permite que o servidor de desenvolvimento acesse o workspace e o
       // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
