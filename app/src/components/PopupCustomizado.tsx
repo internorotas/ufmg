@@ -195,7 +195,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                   >
                     <button
                       type="button"
-                      className="w-full whitespace-normal break-words text-left"
+                      className="w-full whitespace-normal break-words text-left rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1"
                       aria-label={`Selecionar linha ${getNomeExibicao(linha, nomeLinha)}`}
                       onClick={() => {
                         if (!linha) return;
