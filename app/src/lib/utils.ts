@@ -253,15 +253,22 @@ export function calcularDistanciaKm(
   lon2: number,
 ): number {
   const RAIO_TERRA_KM = 6371;
+  const PI_180 = Math.PI / 180;
 
-  const toRad = (graus: number) => (graus * Math.PI) / 180;
+  // Precalculating and avoiding inline functions/redundant Math.sin()
+  // reduces execution time in hot loops by avoiding call overhead.
+  const dLat = (lat2 - lat1) * PI_180;
+  const dLon = (lon2 - lon1) * PI_180;
 
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  const halfLat = dLat / 2;
+  const halfLon = dLon / 2;
+
+  const sinHalfLat = Math.sin(halfLat);
+  const sinHalfLon = Math.sin(halfLon);
 
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    sinHalfLat * sinHalfLat +
+    Math.cos(lat1 * PI_180) * Math.cos(lat2 * PI_180) * sinHalfLon * sinHalfLon;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
