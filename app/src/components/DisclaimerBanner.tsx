@@ -24,6 +24,7 @@ export const contactButtonVariants = tv({
     'text-xs font-semibold transition-opacity cursor-pointer',
     'border-warning-border bg-warning-bg text-warning-text',
     'hover:opacity-80',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning-text focus-visible:ring-offset-2 focus-visible:ring-offset-warning-bg',
   ],
 });
 
