@@ -115,6 +115,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     rightIcon,
     loading = false,
     disabled,
+    type = 'button',
     ...props
   },
   ref,
@@ -124,6 +125,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   return (
     <button
       ref={ref}
+      type={type}
       data-slot="button"
       data-loading={loading || undefined}
       data-disabled={isDisabled || undefined}
