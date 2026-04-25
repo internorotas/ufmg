@@ -229,9 +229,12 @@ export function obterStatusLinha(
   };
 }
 
+const TO_RAD = Math.PI / 180;
+const RAIO_TERRA_KM = 6371;
+
 /**
  * Calcula a distância em quilômetros entre duas coordenadas geográficas
- * usando a fórmula de Haversine.
+ * usando a fórmula de Haversine. Otimizado para performance em loops quentes.
  *
  * @param lat1 Latitude do ponto 1.
  * @param lon1 Longitude do ponto 1.
@@ -252,16 +255,16 @@ export function calcularDistanciaKm(
   lat2: number,
   lon2: number,
 ): number {
-  const RAIO_TERRA_KM = 6371;
+  const dLat = (lat2 - lat1) * TO_RAD;
+  const dLon = (lon2 - lon1) * TO_RAD;
 
-  const toRad = (graus: number) => (graus * Math.PI) / 180;
+  const lat1Rad = lat1 * TO_RAD;
+  const lat2Rad = lat2 * TO_RAD;
 
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  const sinDLat2 = Math.sin(dLat / 2);
+  const sinDLon2 = Math.sin(dLon / 2);
 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const a = sinDLat2 * sinDLat2 + Math.cos(lat1Rad) * Math.cos(lat2Rad) * sinDLon2 * sinDLon2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
