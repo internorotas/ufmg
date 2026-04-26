@@ -112,6 +112,7 @@ export function AdminLayout() {
           <button
             type="button"
             onClick={() => setActiveTab('paradas')}
+            aria-label="Selecionar aba de paradas"
             className={`px-3 py-1.5 transition-colors ${
               isParadasTab
                 ? 'bg-brand-primary text-text-inverse'
@@ -123,6 +124,7 @@ export function AdminLayout() {
           <button
             type="button"
             onClick={() => setActiveTab('linhas')}
+            aria-label="Selecionar aba de linhas"
             className={`px-3 py-1.5 transition-colors border-l border-card-border ${
               !isParadasTab
                 ? 'bg-brand-primary text-text-inverse'
@@ -149,6 +151,7 @@ export function AdminLayout() {
             onClick={handleUndo}
             disabled={!canUndo}
             title="Desfazer (Ctrl+Z)"
+            aria-label="Desfazer ação anterior"
             className={`${btnBase} border-card-border hover:enabled:bg-background-secondary`}
           >
             ↩ Desfazer
@@ -158,6 +161,7 @@ export function AdminLayout() {
             onClick={handleRedo}
             disabled={!canRedo}
             title="Refazer (Ctrl+Y)"
+            aria-label="Refazer ação desfeita"
             className={`${btnBase} border-card-border hover:enabled:bg-background-secondary`}
           >
             ↪ Refazer
@@ -170,6 +174,7 @@ export function AdminLayout() {
             type="button"
             onClick={exportParadas}
             title="Baixar paradas.ts atualizado"
+            aria-label="Exportar arquivo paradas.ts"
             className={`${btnBase} border-card-border hover:bg-background-secondary`}
           >
             ↓ paradas.ts
@@ -178,6 +183,7 @@ export function AdminLayout() {
             type="button"
             onClick={exportLinhas}
             title="Baixar linhas.ts atualizado"
+            aria-label="Exportar arquivo linhas.ts"
             className={`${btnBase} border-card-border hover:bg-background-secondary`}
           >
             ↓ linhas.ts
@@ -188,6 +194,7 @@ export function AdminLayout() {
               exportParadas();
               exportLinhas();
             }}
+            aria-label="Exportar todas as alterações"
             className="px-3 py-1.5 text-xs rounded font-semibold bg-brand-primary text-text-inverse hover:opacity-90 transition-opacity"
           >
             ↓ Exportar Tudo
