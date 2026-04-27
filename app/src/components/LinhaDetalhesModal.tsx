@@ -253,7 +253,9 @@ function getAllLineSchedules(linha: Linha): string[] {
   if (Array.isArray(horariosRaw)) {
     return horariosRaw
       .filter((h): h is string => typeof h === 'string' && h.includes(':'))
-      .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+      .map((h) => ({ h, m: timeToMinutes(h) }))
+      .sort((a, b) => a.m - b.m)
+      .map((item) => item.h);
   }
 
   if (!horariosRaw || typeof horariosRaw !== 'object') {
@@ -272,7 +274,9 @@ function getAllLineSchedules(linha: Linha): string[] {
     ]),
   )
     .filter((h) => h.includes(':'))
-    .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+    .map((h) => ({ h, m: timeToMinutes(h) }))
+    .sort((a, b) => a.m - b.m)
+    .map((item) => item.h);
 }
 
 /**
@@ -316,13 +320,11 @@ export function LinhaDetalhesModal({
   const baseHorarios = useMemo(() => {
     const horariosDaLinha = getAllLineSchedules(linha);
 
-    return horariosDaLinha
-      .map((horario, idx) => ({
-        id: `${horario}-${idx}`,
-        horario,
-        minutos: timeToMinutes(horario),
-      }))
-      .sort((a, b) => a.minutos - b.minutos);
+    return horariosDaLinha.map((horario, idx) => ({
+      id: `${horario}-${idx}`,
+      horario,
+      minutos: timeToMinutes(horario),
+    }));
   }, [linha]);
 
   const schedulesInMinutes = useMemo(() => baseHorarios.map((h) => h.minutos), [baseHorarios]);
