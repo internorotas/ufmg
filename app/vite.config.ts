@@ -68,6 +68,18 @@ export default defineConfig({
       // e retornam 403 no ambiente local.
       allow: ['..', '../..'],
     },
+    // 🛡️ Sentinel: Add security headers to the development server
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
+  },
+  preview: {
+    // 🛡️ Sentinel: Add security headers to the local preview server
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
   },
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version),
