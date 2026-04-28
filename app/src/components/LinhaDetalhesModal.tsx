@@ -250,10 +250,16 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
 function getAllLineSchedules(linha: Linha): string[] {
   const horariosRaw = linha.horarios as unknown;
 
+  // ⚡ Bolt: Implementa Schwartzian Transform para otimizar a ordenação
+  // Evita chamadas repetidas a `timeToMinutes` durante a ordenação O(N log N)
   if (Array.isArray(horariosRaw)) {
-    return horariosRaw
-      .filter((h): h is string => typeof h === 'string' && h.includes(':'))
-      .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+    const schedules: { h: string; m: number }[] = [];
+    for (const h of horariosRaw) {
+      if (typeof h === 'string' && h.includes(':')) {
+        schedules.push({ h, m: timeToMinutes(h) });
+      }
+    }
+    return schedules.sort((a, b) => a.m - b.m).map((item) => item.h);
   }
 
   if (!horariosRaw || typeof horariosRaw !== 'object') {
@@ -264,15 +270,26 @@ function getAllLineSchedules(linha: Linha): string[] {
     Record<'diasUteis' | 'sabados' | 'domingos', string[]>
   >;
 
-  return Array.from(
-    new Set([
-      ...(horariosPorDia.diasUteis ?? []),
-      ...(horariosPorDia.sabados ?? []),
-      ...(horariosPorDia.domingos ?? []),
-    ]),
-  )
-    .filter((h) => h.includes(':'))
-    .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+  const visto = new Set<string>();
+  const schedules: { h: string; m: number }[] = [];
+
+  // ⚡ Bolt: Loop explícito com Set evita alocações desnecessárias
+  // da sintaxe de espalhamento [...A, ...B, ...C] e pré-calcula os minutos (Map -> Sort -> Map)
+  const addSchedules = (list?: string[]) => {
+    if (!list) return;
+    for (const h of list) {
+      if (typeof h === 'string' && h.includes(':') && !visto.has(h)) {
+        visto.add(h);
+        schedules.push({ h, m: timeToMinutes(h) });
+      }
+    }
+  };
+
+  addSchedules(horariosPorDia.diasUteis);
+  addSchedules(horariosPorDia.sabados);
+  addSchedules(horariosPorDia.domingos);
+
+  return schedules.sort((a, b) => a.m - b.m).map((item) => item.h);
 }
 
 /**
