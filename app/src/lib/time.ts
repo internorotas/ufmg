@@ -11,7 +11,18 @@ const saoPauloFormatter = new Intl.DateTimeFormat('en-CA', {
   hour12: false,
 });
 
+// We must use LRU cache or primitive keyed cache because Date objects can be mutated
+// However, the number of distinct Dates processed at any given time (e.g. `getSaoPauloNow()`) is very small.
+// Let's cache by timestamp.
+const toSaoPauloDateCache = new Map<number, Date>();
+const cacheKeys: number[] = [];
+const MAX_CACHE_SIZE = 100;
+
 export function toSaoPauloDate(date: Date): Date {
+  const time = date.getTime();
+  const cached = toSaoPauloDateCache.get(time);
+  if (cached) return new Date(cached.getTime()); // return a new instance to prevent mutations from caller
+
   const parts = saoPauloFormatter.formatToParts(date);
 
   // Single pass over parts is faster than multiple find() calls
@@ -33,7 +44,18 @@ export function toSaoPauloDate(date: Date): Date {
     else if (part.type === 'second') second = Number(part.value);
   }
 
-  return new Date(year, month - 1, day, hour, minute, second);
+  const result = new Date(year, month - 1, day, hour, minute, second);
+
+  toSaoPauloDateCache.set(time, result);
+  cacheKeys.push(time);
+  if (cacheKeys.length > MAX_CACHE_SIZE) {
+    const oldestKey = cacheKeys.shift();
+    if (oldestKey !== undefined) {
+      toSaoPauloDateCache.delete(oldestKey);
+    }
+  }
+
+  return new Date(result.getTime()); // safe copy
 }
 
 export function getSaoPauloNow(): Date {

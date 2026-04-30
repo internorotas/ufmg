@@ -133,6 +133,8 @@ function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
   return 'diasUteis';
 }
 
+const _horariosValidosCache = new WeakMap<string[], string[]>();
+
 /**
  * Retorna os horários válidos da linha para o dia atual.
  * Suporta formato legado (array) e formato por dia (objeto).
@@ -149,23 +151,27 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
 
   const horariosBrutos = linha.horarios as unknown;
 
+  let horariosDia: string[] | undefined;
+
   if (Array.isArray(horariosBrutos)) {
-    return horariosBrutos.filter((horario) => parseHorarioValido(horario) !== null);
+    horariosDia = horariosBrutos;
+  } else if (horariosBrutos && typeof horariosBrutos === 'object') {
+    const horariosPorDia = horariosBrutos as HorariosPorDia;
+    const chaveDia = obterChaveDiaSemana(dataAtual);
+    horariosDia = horariosPorDia[chaveDia];
   }
-
-  if (!horariosBrutos || typeof horariosBrutos !== 'object') {
-    return [];
-  }
-
-  const horariosPorDia = horariosBrutos as HorariosPorDia;
-  const chaveDia = obterChaveDiaSemana(dataAtual);
-  const horariosDia = horariosPorDia[chaveDia];
 
   if (!Array.isArray(horariosDia) || horariosDia.length === 0) {
     return [];
   }
 
-  return horariosDia.filter((horario) => parseHorarioValido(horario) !== null);
+  let validos = _horariosValidosCache.get(horariosDia);
+  if (!validos) {
+    validos = horariosDia.filter((horario) => parseHorarioValido(horario) !== null);
+    _horariosValidosCache.set(horariosDia, validos);
+  }
+
+  return validos;
 }
 
 /**
