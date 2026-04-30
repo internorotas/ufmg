@@ -218,6 +218,15 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 
     const hasValue = Boolean(value);
 
+    // Converte o shortcut visual para formato ARIA (ex: ⌘K -> Meta+K, Ctrl+K -> Control+K)
+    const ariaShortcut = shortcut
+      ? shortcut
+          .replace('⌘', 'Meta+')
+          .replace('Ctrl', 'Control')
+          .replace('Shift', 'Shift')
+          .replace('Alt', 'Alt')
+      : undefined;
+
     return (
       <div data-slot="search-input" className="relative w-full">
         <Search
@@ -232,6 +241,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           value={value}
           onChange={handleChange}
           aria-label={fallbackAriaLabel}
+          aria-keyshortcuts={ariaShortcut}
           enterKeyHint="search"
           className={cn(
             inputVariants({
@@ -257,7 +267,10 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             <X size={16} aria-hidden="true" />
           </button>
         ) : shortcut ? (
-          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 hidden md:block">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 hidden md:block"
+          >
             <kbd className="inline-flex h-5 items-center rounded border border-card-border bg-background px-1.5 text-[10px] font-medium text-text-tertiary font-mono">
               {shortcut}
             </kbd>
