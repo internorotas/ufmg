@@ -9,6 +9,7 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import logo from '../assets/logo-horizontal-transparente.svg';
 import { useRotasSelection } from '../contexts/RotasContext';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { useFavoritos } from '../hooks/useFavoritos';
 import { useLinhasFilter } from '../hooks/useLinhasFilter';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 import { DisclaimerBanner } from './DisclaimerBanner';
@@ -167,6 +168,16 @@ export const MenuLateral = React.memo(function MenuLateral({
     handleCategoriaChange,
   } = useLinhasFilter(linhasData);
 
+  const { buscarEmFavoritas, getLinhasFavoritas } = useFavoritos();
+
+  const categoriaDiaAtiva = categoriaAtual?.categoriaDia ?? '';
+
+  const linhasFavoritas = searchTerm
+    ? buscarEmFavoritas(linhasData, searchTerm, categoriaDiaAtiva)
+    : getLinhasFavoritas(linhasData, categoriaDiaAtiva);
+
+  const hasFavoritas = linhasFavoritas.length > 0;
+
   useEffect(() => {
     const categoria = categoriaAtual?.displayName || 'desconhecida';
     const summary = `${categoria}|${debouncedSearchTerm}|${linhasFiltradas.length}`;
@@ -255,6 +266,18 @@ export const MenuLateral = React.memo(function MenuLateral({
       }
     },
     [categoriaAtual?.displayName, onLinhaSelect, trackEvent],
+  );
+
+  const handleFavoritaCardClick = useCallback(
+    (linha: Linha) => {
+      trackEvent({
+        category: 'preferences',
+        action: 'favorite_section_click',
+        label: linha.idRota,
+      });
+      handleCardClick(linha);
+    },
+    [trackEvent, handleCardClick],
   );
 
   const handleDetailsClick = useCallback(
@@ -413,20 +436,51 @@ export const MenuLateral = React.memo(function MenuLateral({
           <VacationBanner />
           <InfoBanner />
 
-          {hasResults ? (
-            linhasFiltradas.map((linha) => (
-              <LineCard
-                key={linha.idRota}
-                linha={linha}
-                onClick={handleCardClick}
-                onDetailsClick={handleDetailsClick}
-                isSelected={linhaSelecionada?.idRota === linha.idRota}
-                idParada={paradaSelecionada?.idParada}
-              />
-            ))
-          ) : (
-            <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
+          {hasFavoritas && (
+            <section aria-label="Linhas favoritas" data-slot="favorites-section">
+              <p
+                className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary"
+                data-slot="section-label"
+              >
+                Favoritas
+              </p>
+              {linhasFavoritas.map((linha) => (
+                <LineCard
+                  key={linha.idRota}
+                  linha={linha}
+                  onClick={handleFavoritaCardClick}
+                  onDetailsClick={handleDetailsClick}
+                  isSelected={linhaSelecionada?.idRota === linha.idRota}
+                  idParada={paradaSelecionada?.idParada}
+                />
+              ))}
+              <div className="mb-3 mt-1 border-b border-card-border" aria-hidden="true" />
+            </section>
           )}
+
+          {hasFavoritas && hasResults && (
+            <p
+              className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary"
+              data-slot="section-label"
+            >
+              Todas as Linhas
+            </p>
+          )}
+
+          {hasResults
+            ? linhasFiltradas.map((linha) => (
+                <LineCard
+                  key={linha.idRota}
+                  linha={linha}
+                  onClick={handleCardClick}
+                  onDetailsClick={handleDetailsClick}
+                  isSelected={linhaSelecionada?.idRota === linha.idRota}
+                  idParada={paradaSelecionada?.idParada}
+                />
+              ))
+            : !hasFavoritas && (
+                <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
+              )}
 
           <DisclaimerBanner isOffline={isOffline} />
         </nav>
