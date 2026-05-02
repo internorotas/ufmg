@@ -1,24 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useRotasData } from '@/contexts/RotasContext';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { retainFavoritosStorageListener, useFavoritosStore } from '@/stores/favoritosStore';
 import type { CategoriaLinhas, Linha } from '@/types/data.types';
-
-const STORAGE_KEY = 'favoritos_v1';
-
-function readFromStorage(): string[] {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeToStorage(ids: string[]): void {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
-}
 
 export interface UseFavoritosReturn {
   favoritosIds: string[];
@@ -31,39 +15,31 @@ export interface UseFavoritosReturn {
 export function useFavoritos(): UseFavoritosReturn {
   const { rotasService } = useRotasData();
   const { trackEvent } = useAnalytics();
-  const [favoritosIds, setFavoritosIds] = useState<string[]>(readFromStorage);
+  const favoritosIds = useFavoritosStore((s) => s.ids);
+  const syncFromStorage = useFavoritosStore((s) => s.syncFromStorage);
+  const toggle = useFavoritosStore((s) => s.toggle);
 
   useEffect(() => {
-    const handler = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) {
-        setFavoritosIds(readFromStorage());
-      }
-    };
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
-  }, []);
+    syncFromStorage();
+    return retainFavoritosStorageListener();
+  }, [syncFromStorage]);
 
   const isFavorito = useCallback((idRota: string) => favoritosIds.includes(idRota), [favoritosIds]);
 
   const toggleFavorito = useCallback(
     (idRota: string, nomeLinha: string) => {
       const linhaNome = rotasService.getLinhaById(idRota)?.nome ?? nomeLinha;
-      setFavoritosIds((prev) => {
-        const isCurrentlyFav = prev.includes(idRota);
-        const next = isCurrentlyFav ? prev.filter((id) => id !== idRota) : [...prev, idRota];
-        writeToStorage(next);
-        trackEvent(
-          {
-            category: 'preferences',
-            action: isCurrentlyFav ? 'favorite_removed' : 'favorite_added',
-            label: linhaNome,
-          },
-          { linha_id: idRota, linha_nome: linhaNome, total_after: next.length },
-        );
-        return next;
-      });
+      const { next, isNowFav } = toggle(idRota);
+      trackEvent(
+        {
+          category: 'preferences',
+          action: isNowFav ? 'favorite_added' : 'favorite_removed',
+          label: linhaNome,
+        },
+        { linha_id: idRota, linha_nome: linhaNome, total_after: next.length },
+      );
     },
-    [rotasService, trackEvent],
+    [rotasService, toggle, trackEvent],
   );
 
   const getLinhasFavoritas = useCallback(
