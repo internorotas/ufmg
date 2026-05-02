@@ -1,9 +1,11 @@
+import { QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import './globals.css';
 
 import { App } from './App';
+import { queryClient } from './lib/queryClient';
 
 const SW_RELOAD_GUARD_KEY = 'ufmg:sw-reload-build-id';
 const UPDATE_STATUS_REGION_ID = 'app-update-status';
@@ -145,7 +147,9 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </StrictMode>,
 );
 
