@@ -2,6 +2,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useFavoritos } from '@/hooks/useFavoritos';
+import { useFavoritosStore } from '@/stores/favoritosStore';
 
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
@@ -38,6 +39,7 @@ vi.mock('@/contexts/RotasContext', () => ({
 describe('useFavoritos', () => {
   beforeEach(() => {
     localStorageMock.clear();
+    useFavoritosStore.setState({ ids: [] });
   });
 
   it('Caso 1: adiciona favorito e persiste em localStorage', () => {

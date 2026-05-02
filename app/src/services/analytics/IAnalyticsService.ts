@@ -3,7 +3,12 @@
  * Permite troca fácil de biblioteca no futuro (Adapter Pattern).
  */
 
-export type EventCategory = 'engagement' | 'navigation' | 'map_interaction' | 'preferences' | 'onboarding';
+export type EventCategory =
+  | 'engagement'
+  | 'navigation'
+  | 'map_interaction'
+  | 'preferences'
+  | 'onboarding';
 
 export interface AnalyticsEvent {
   event?: string;
