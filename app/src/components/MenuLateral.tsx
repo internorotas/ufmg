@@ -6,26 +6,25 @@
 import { ArrowLeft, Menu } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import logo from '../assets/logo-horizontal-transparente.svg';
-import { useRotasSelection } from '../contexts/RotasContext';
-import { useAnalytics } from '../hooks/useAnalytics';
-import { useFavoritos } from '../hooks/useFavoritos';
-import { useLinhasFilter } from '../hooks/useLinhasFilter';
-import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
-import { DisclaimerBanner } from './DisclaimerBanner';
-import { InfoBanner } from './InfoBanner';
-import { LineCard } from './LineCard';
-import { MenuFooter } from './MenuFooter';
-import { ThemeToggle } from './ThemeToggle';
-import { Button } from './ui/Button';
-import { SearchEmptyState } from './ui/EmptyState';
-import { SearchInput } from './ui/Input';
-import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
-
-import { VacationBanner } from './VacationBanner';
+import logo from '@/assets/logo-horizontal-transparente.svg';
+import { DisclaimerBanner } from '@/components/DisclaimerBanner';
+import { InfoBanner } from '@/components/InfoBanner';
+import { LineCard } from '@/components/LineCard';
+import { MenuFooter } from '@/components/MenuFooter';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { Button } from '@/components/ui/Button';
+import { SearchEmptyState } from '@/components/ui/EmptyState';
+import { SearchInput } from '@/components/ui/Input';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { VacationBanner } from '@/components/VacationBanner';
+import { useRotasSelection } from '@/contexts/RotasContext';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useFavoritos } from '@/hooks/useFavoritos';
+import { useLinhasFilter } from '@/hooks/useLinhasFilter';
+import type { CategoriaLinhas, Linha, Parada } from '@/types/data.types';
 
 const LinhaDetalhesModal = React.lazy(() =>
-  import('./LinhaDetalhesModal').then((m) => ({ default: m.LinhaDetalhesModal })),
+  import('@/components/LinhaDetalhesModal').then((m) => ({ default: m.LinhaDetalhesModal })),
 );
 
 /**
