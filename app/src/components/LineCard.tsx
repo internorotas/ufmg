@@ -3,13 +3,14 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { Bus, ChevronRight, Clock } from 'lucide-react';
+import { Bus, ChevronRight, Clock, Star } from 'lucide-react';
 import type React from 'react';
 import { memo, useMemo } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
+import { useFavoritos } from '../hooks/useFavoritos';
 import { getSaoPauloMinutesOfDay } from '../lib/time';
 import {
   cn,
@@ -203,7 +204,10 @@ function LineCardComponent({
   className,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
+  const { isFavorito, toggleFavorito } = useFavoritos();
   const now = useCurrentTime();
+
+  const favoritado = isFavorito(linha.idRota);
 
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
   const getSuspendedMessage = () => getLinhaNotRunningMessage(linha.categoriaDia);
@@ -254,6 +258,11 @@ function LineCardComponent({
       label: linha.nome,
     });
     onDetailsClick(linha);
+  };
+
+  const handleFavoritoClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorito(linha.idRota, linha.nome);
   };
 
   return (
@@ -317,13 +326,37 @@ function LineCardComponent({
         </div>
       </button>
 
-      <div data-slot="actions" className="px-4 pb-4">
+      <div data-slot="actions" className="flex items-center gap-2 px-4 pb-4">
+        <button
+          type="button"
+          data-slot="favorite"
+          onClick={handleFavoritoClick}
+          aria-label={
+            favoritado
+              ? `Remover ${linha.nome} dos favoritos`
+              : `Adicionar ${linha.nome} aos favoritos`
+          }
+          aria-pressed={favoritado}
+          className="flex shrink-0 items-center justify-center rounded-lg border p-3 transition-all duration-150 hover:bg-card-hover active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+          style={{
+            borderColor: hexToRgba(linha.corHex, 0.35),
+            color: linha.corHex,
+          }}
+        >
+          <Star
+            className="size-5"
+            aria-hidden="true"
+            fill={favoritado ? linha.corHex : 'none'}
+            stroke={linha.corHex}
+            strokeWidth={2}
+          />
+        </button>
         <button
           type="button"
           aria-label={`Ver detalhes da linha ${linha.nome}`}
           data-slot="action"
           onClick={handleDetailsClickInternal}
-          className={detailsButtonVariants()}
+          className={cn(detailsButtonVariants(), 'flex-1')}
           style={{
             borderColor: hexToRgba(linha.corHex, 0.35),
             color: linha.corHex,
