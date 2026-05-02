@@ -7,11 +7,13 @@ import { Bus, ChevronRight, Clock, Star } from 'lucide-react';
 import type React from 'react';
 import { memo, useMemo } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
-import { useAnalytics } from '../hooks/useAnalytics';
-import { useCurrentTime } from '../hooks/useCurrentTime';
-import { useFavoritos } from '../hooks/useFavoritos';
-import { getSaoPauloMinutesOfDay } from '../lib/time';
+import { PrevisaoBadge } from '@/components/PrevisaoBadge';
+import { LineStatusBadge, type LineStatusType } from '@/components/ui/Badge';
+import { getLinhaNotRunningMessage, isLineAvailableToday } from '@/config/specialPeriods';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useCurrentTime } from '@/hooks/useCurrentTime';
+import { useFavoritos } from '@/hooks/useFavoritos';
+import { getSaoPauloMinutesOfDay } from '@/lib/time';
 import {
   cn,
   findScheduleIndex,
@@ -20,10 +22,8 @@ import {
   obterHorariosLinhaNoDia,
   obterStatusLinha,
   timeToMinutes,
-} from '../lib/utils';
-import type { Linha } from '../types/data.types';
-import { PrevisaoBadge } from './PrevisaoBadge';
-import { LineStatusBadge, type LineStatusType } from './ui/Badge';
+} from '@/lib/utils';
+import type { Linha } from '@/types/data.types';
 
 /**
  * Variantes do card principal
