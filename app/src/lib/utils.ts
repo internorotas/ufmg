@@ -168,6 +168,62 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
   return horariosDia.filter((horario) => parseHorarioValido(horario) !== null);
 }
 
+const CACHE_MINUTOS = new WeakMap<object, number[]>();
+
+/**
+ * Retorna os horários válidos da linha para o dia atual convertidos em minutos e ordenados.
+ * Faz uso de WeakMap cacheado pela referência do array de horários para evitar
+ * repetidas iterações e ordenações (O(N log N)).
+ *
+ * @param linha Linha com estrutura de horários.
+ * @param dataAtual Data usada para escolher o conjunto de horários vigente.
+ * @returns Lista de horários numéricos (minutos) válidos e ordenados.
+ */
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const horariosBrutos = linha.horarios as unknown;
+
+  if (!horariosBrutos || typeof horariosBrutos !== 'object') {
+    return [];
+  }
+
+  let horariosDia: string[];
+
+  if (Array.isArray(horariosBrutos)) {
+    horariosDia = horariosBrutos;
+  } else {
+    const horariosPorDia = horariosBrutos as HorariosPorDia;
+    const chaveDia = obterChaveDiaSemana(dataAtual);
+    horariosDia = horariosPorDia[chaveDia] || [];
+  }
+
+  if (!Array.isArray(horariosDia) || horariosDia.length === 0) {
+    return [];
+  }
+
+  const cached = CACHE_MINUTOS.get(horariosDia);
+  if (cached) return cached;
+
+  const result: number[] = [];
+  for (let i = 0; i < horariosDia.length; i++) {
+    const timeStr = horariosDia[i];
+    if (typeof timeStr === 'string' && timeStr.length === 5 && timeStr[2] === ':') {
+      const min = converterHoraParaMinutos(timeStr);
+      if (Number.isFinite(min)) {
+        result.push(min);
+      }
+    }
+  }
+
+  result.sort((a, b) => a - b);
+  CACHE_MINUTOS.set(horariosDia, result);
+
+  return result;
+}
+
 /**
  * Calcula status operacional da linha no instante atual.
  *
