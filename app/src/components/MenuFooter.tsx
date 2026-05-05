@@ -104,14 +104,30 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
 
         {/* Botão Sobre o Projeto */}
         <a
-          href="https://github.com/internorotas/ufmg"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => handleLinkClick('Sobre o Projeto')}
-          aria-label="Sobre o projeto no GitHub (abre em nova aba)"
+          href="/sobre"
+          onClick={() => handleLinkClick('Sobre')}
+          aria-label="Sobre o projeto"
           className={footerButtonVariants({ intent: 'primary' })}
         >
           Sobre
+        </a>
+
+        <a
+          href="/privacidade"
+          onClick={() => handleLinkClick('Privacidade')}
+          aria-label="Política de privacidade"
+          className={footerButtonVariants({ intent: 'ghost' })}
+        >
+          Privacidade
+        </a>
+
+        <a
+          href="/termos"
+          onClick={() => handleLinkClick('Termos')}
+          aria-label="Termos de uso"
+          className={footerButtonVariants({ intent: 'ghost' })}
+        >
+          Termos
         </a>
 
         {/* Botão Versão Antiga */}
