@@ -7,13 +7,6 @@ import { Bus, ChevronRight, Clock, Star } from 'lucide-react';
 import type React from 'react';
 import { memo, useMemo } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { PrevisaoBadge } from '@/components/PrevisaoBadge';
-import { LineStatusBadge, type LineStatusType } from '@/components/ui/Badge';
-import { getLinhaNotRunningMessage, isLineAvailableToday } from '@/config/specialPeriods';
-import { useAnalytics } from '@/hooks/useAnalytics';
-import { useCurrentTime } from '@/hooks/useCurrentTime';
-import { useFavoritos } from '@/hooks/useFavoritos';
-import { getSaoPauloMinutesOfDay } from '@/lib/time';
 import {
   cn,
   findScheduleIndex,
@@ -24,6 +17,13 @@ import {
   timeToMinutes,
 } from '@/lib/utils';
 import type { Linha } from '@/types/data.types';
+import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { useCurrentTime } from '../hooks/useCurrentTime';
+import { useFavoritos } from '../hooks/useFavoritos';
+import { getSaoPauloMinutesOfDay } from '../lib/time';
+import { PrevisaoBadge } from './PrevisaoBadge';
+import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 
 /**
  * Variantes do card principal
@@ -206,7 +206,6 @@ function LineCardComponent({
   const { trackEvent } = useAnalytics();
   const { isFavorito, toggleFavorito } = useFavoritos();
   const now = useCurrentTime();
-
   const favoritado = isFavorito(linha.idRota);
 
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
@@ -330,6 +329,7 @@ function LineCardComponent({
         <button
           type="button"
           data-slot="favorite"
+          data-state={favoritado ? 'on' : 'off'}
           onClick={handleFavoritoClick}
           aria-label={
             favoritado
@@ -337,14 +337,20 @@ function LineCardComponent({
               : `Adicionar ${linha.nome} aos favoritos`
           }
           aria-pressed={favoritado}
-          className="flex shrink-0 items-center justify-center rounded-lg border p-3 transition-all duration-150 hover:bg-card-hover active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+          className={cn(
+            'flex shrink-0 items-center justify-center rounded-lg border p-3 transition-all duration-150 hover:bg-card-hover active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+            favoritado && 'shadow-sm',
+          )}
           style={{
             borderColor: hexToRgba(linha.corHex, 0.35),
             color: linha.corHex,
           }}
         >
           <Star
-            className="size-5"
+            className={cn(
+              'size-5 transition-transform duration-200',
+              favoritado && 'motion-safe:animate-pop-in',
+            )}
             aria-hidden="true"
             fill={favoritado ? linha.corHex : 'none'}
             stroke={linha.corHex}
