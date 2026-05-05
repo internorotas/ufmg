@@ -61,12 +61,26 @@ export default defineConfig({
     },
   },
   server: {
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+    },
     fs: {
       // Permite que o servidor de desenvolvimento acesse o workspace e o
       // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
       // do @fontsource/poppins resolvidos via pnpm ficam fora da allow list
       // e retornam 403 no ambiente local.
       allow: ['..', '../..'],
+    },
+  },
+  preview: {
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
     },
   },
   define: {
