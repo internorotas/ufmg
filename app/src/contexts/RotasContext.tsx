@@ -15,7 +15,12 @@ import {
   useRef,
   useState,
 } from 'react';
-import { type IRotasService, loadRotasService, RotasService } from '../services/RotasService';
+import {
+  type IRotasService,
+  loadRotasServiceWithSource,
+  type RotasDataSource,
+  RotasService,
+} from '../services/RotasService';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 
 /**
@@ -34,6 +39,8 @@ interface RotasContextData {
   todasParadas: Parada[];
   isLoadingData: boolean;
   dataError: string | null;
+  dataSource: RotasDataSource | null;
+  isOfflineDataFallback: boolean;
 
   linhaSelecionada: Linha | null;
   paradaSelecionada: Parada | null;
@@ -77,6 +84,8 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
   const [rotasService, setRotasService] = useState<IRotasService>(RotasService);
+  const [dataSource, setDataSource] = useState<RotasDataSource | null>(null);
+  const [isOfflineDataFallback, setIsOfflineDataFallback] = useState(false);
 
   const mapaRef = useRef<MapaRef | null>(null);
 
@@ -84,13 +93,17 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
     let isMounted = true;
 
     const bootstrap = async () => {
-      setIsLoadingData(true);
-      setDataError(null);
+        setIsLoadingData(true);
+        setDataError(null);
+        setDataSource(null);
+        setIsOfflineDataFallback(false);
 
       try {
-        const loadedService = await loadRotasService();
+        const loadedResult = await loadRotasServiceWithSource();
         if (!isMounted) return;
-        setRotasService(loadedService);
+        setRotasService(loadedResult.service);
+        setDataSource(loadedResult.source);
+        setIsOfflineDataFallback(loadedResult.source !== 'api');
       } catch {
         if (!isMounted) return;
         setDataError('Não foi possível carregar os dados de linhas e paradas.');
@@ -138,6 +151,8 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
       todasParadas,
       isLoadingData,
       dataError,
+      dataSource,
+      isOfflineDataFallback,
       linhaSelecionada,
       paradaSelecionada,
       selecionarLinha,
@@ -151,6 +166,8 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
       todasParadas,
       isLoadingData,
       dataError,
+      dataSource,
+      isOfflineDataFallback,
       linhaSelecionada,
       paradaSelecionada,
       selecionarLinha,
@@ -191,8 +208,18 @@ export function useRotas(): RotasContextData {
  * Use quando o componente só precisa dos dados e não das ações.
  */
 export function useRotasData() {
-  const { linhasData, todasParadas, rotasService, isLoadingData, dataError } = useRotas();
-  return { linhasData, todasParadas, rotasService, isLoadingData, dataError };
+  const { linhasData, todasParadas, rotasService, isLoadingData, dataError, dataSource, isOfflineDataFallback } =
+    useRotas();
+
+  return {
+    linhasData,
+    todasParadas,
+    rotasService,
+    isLoadingData,
+    dataError,
+    dataSource,
+    isOfflineDataFallback,
+  };
 }
 
 /**

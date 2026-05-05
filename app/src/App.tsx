@@ -6,6 +6,7 @@ import { ModalManager } from './components/app/ModalManager';
 import { OfflineToast } from './components/app/OfflineToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MenuLateral } from './components/MenuLateral';
+import { OfflineBanner } from './components/OfflineBanner';
 import { OnboardingModal } from './components/OnboardingModal';
 import { GA_MEASUREMENT_ID } from './config/analytics';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
@@ -15,6 +16,9 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
+import { PrivacidadePage } from './routes/legal/PrivacidadePage';
+import { SobrePage } from './routes/legal/SobrePage';
+import { TermosPage } from './routes/legal/TermosPage';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
 
@@ -52,6 +56,7 @@ function AppContent() {
     todasParadas,
     isLoadingData,
     dataError,
+    isOfflineDataFallback,
     linhaSelecionada,
     paradaSelecionada,
     selecionarLinha,
@@ -143,7 +148,7 @@ function AppContent() {
     return (
       <DataStatusScreen
         title="Carregando dados..."
-        description="Buscando linhas e paradas em /public/data."
+        description="Buscando linhas e paradas na API e no cache local."
       />
     );
   }
@@ -189,6 +194,7 @@ function AppContent() {
   return (
     <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
       <OnboardingModal />
+      <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
       <a
         href="#main-content"
         className="sr-only absolute left-4 top-4 z-[1400] rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
@@ -201,7 +207,7 @@ function AppContent() {
         onLinhaSelect={handleLinhaSelect}
         onParadaClick={handleParadaClick}
         linhaSelecionada={linhaSelecionada}
-        isOffline={isOffline}
+        isOffline={isOffline || isOfflineDataFallback}
       />
       <main
         id="main-content"
@@ -276,6 +282,30 @@ function AppContent() {
  * @returns {JSX.Element} O componente principal da aplicação renderizado.
  */
 export function App() {
+  if (window.location.pathname === '/privacidade') {
+    return (
+      <ThemeProvider>
+        <PrivacidadePage />
+      </ThemeProvider>
+    );
+  }
+
+  if (window.location.pathname === '/termos') {
+    return (
+      <ThemeProvider>
+        <TermosPage />
+      </ThemeProvider>
+    );
+  }
+
+  if (window.location.pathname === '/sobre') {
+    return (
+      <ThemeProvider>
+        <SobrePage />
+      </ThemeProvider>
+    );
+  }
+
   if (import.meta.env.DEV && window.location.search.includes('admin=true')) {
     return (
       <ThemeProvider>
