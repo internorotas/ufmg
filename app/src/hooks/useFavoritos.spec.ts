@@ -1,34 +1,26 @@
-// @vitest-environment jsdom
+/* @vitest-environment jsdom */
+
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useFavoritos } from '@/hooks/useFavoritos';
-import { useFavoritosStore } from '@/stores/favoritosStore';
+import type { CategoriaLinhas } from '@/types/data.types';
+import { useFavoritos } from './useFavoritos';
 
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: (key: string) => store[key] ?? null,
-    setItem: (key: string, value: string) => {
-      store[key] = value;
-    },
-    removeItem: (key: string) => {
-      delete store[key];
-    },
-    clear: () => {
-      store = {};
-    },
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+const mockTrackEvent = vi.fn();
 
 vi.mock('@/hooks/useAnalytics', () => ({
-  useAnalytics: () => ({ trackEvent: vi.fn() }),
+  useAnalytics: () => ({
+    trackEvent: mockTrackEvent,
+  }),
 }));
 
 vi.mock('@/contexts/RotasContext', () => ({
   useRotasData: () => ({
-    rotasService: { getLinhaById: (_id: string) => null },
+    rotasService: {
+      getLinhaById: vi.fn((idRota: string) => ({
+        idRota,
+        nome: `Linha ${idRota}`,
+      })),
+    },
     linhasData: { categoriasDias: [] },
     todasParadas: [],
     isLoadingData: false,
@@ -36,36 +28,94 @@ vi.mock('@/contexts/RotasContext', () => ({
   }),
 }));
 
+const categoriasMock: CategoriaLinhas = {
+  categoriasDias: [
+    {
+      id: 1,
+      categoriaDia: 'diasUteis',
+      displayName: 'Dias Uteis',
+      linhas: [
+        {
+          idRota: 'rota-1',
+          linha: 5101,
+          nome: 'Circular Principal',
+          tipo: 'circular',
+          sublinha: null,
+          categoriaDia: 'diasUteis',
+          corHex: '#0f766e',
+          descricao: 'Circuito principal do campus',
+          horarios: [],
+          itinerarioParadasIds: [],
+          coordenadasTrajeto: [],
+        },
+        {
+          idRota: 'rota-2',
+          linha: 5102,
+          nome: 'Expressa Biblioteca',
+          tipo: 'expressa',
+          sublinha: 'Circular Noturno',
+          categoriaDia: 'diasUteis',
+          corHex: '#1d4ed8',
+          descricao: 'Linha rápida para biblioteca',
+          horarios: [],
+          itinerarioParadasIds: [],
+          coordenadasTrajeto: [],
+        },
+      ],
+    },
+    {
+      id: 2,
+      categoriaDia: 'sabado',
+      displayName: 'Sabado',
+      linhas: [
+        {
+          idRota: 'rota-3',
+          linha: 5201,
+          nome: 'Circular Sabado',
+          tipo: 'circular',
+          sublinha: null,
+          categoriaDia: 'sabado',
+          corHex: '#dc2626',
+          descricao: 'Linha de fim de semana',
+          horarios: [],
+          itinerarioParadasIds: [],
+          coordenadasTrajeto: [],
+        },
+      ],
+    },
+  ],
+};
+
 describe('useFavoritos', () => {
   beforeEach(() => {
-    localStorageMock.clear();
-    useFavoritosStore.setState({ ids: [] });
+    window.localStorage.clear();
+    mockTrackEvent.mockReset();
   });
 
-  it('Caso 1: adiciona favorito e persiste em localStorage', () => {
+  it('adiciona favorito e persiste em favoritos_v1', () => {
     const { result } = renderHook(() => useFavoritos());
 
     act(() => {
-      result.current.toggleFavorito('rota-1', 'Linha 1');
+      result.current.toggleFavorito('rota-1', 'Circular Principal');
     });
 
     expect(result.current.isFavorito('rota-1')).toBe(true);
-    expect(window.localStorage.getItem('favoritos_v1')).toBe(JSON.stringify(['rota-1']));
+    expect(window.localStorage.getItem('favoritos_v1')).toBe('["rota-1"]');
   });
 
-  it('Caso 2: toggleFavorito duas vezes remove o favorito', () => {
+  it('toggle em item existente remove favorito', () => {
     const { result } = renderHook(() => useFavoritos());
 
     act(() => {
-      result.current.toggleFavorito('rota-1', 'Linha 1');
-      result.current.toggleFavorito('rota-1', 'Linha 1');
+      result.current.toggleFavorito('rota-1', 'Circular Principal');
+      result.current.toggleFavorito('rota-1', 'Circular Principal');
     });
 
     expect(result.current.isFavorito('rota-1')).toBe(false);
-    expect(window.localStorage.getItem('favoritos_v1')).toBe(JSON.stringify([]));
+    expect(window.localStorage.getItem('favoritos_v1')).toBe('[]');
   });
 
-  it('Caso 3: reconstitui estado do localStorage na montagem', () => {
+  it('hidrata favoritos a partir do localStorage ao montar', () => {
     window.localStorage.setItem('favoritos_v1', JSON.stringify(['rota-x']));
 
     const { result } = renderHook(() => useFavoritos());
@@ -73,78 +123,21 @@ describe('useFavoritos', () => {
     expect(result.current.isFavorito('rota-x')).toBe(true);
   });
 
-  it('Caso 4: buscarEmFavoritas filtra por categoria e termo', () => {
+  it('buscarEmFavoritas filtra por categoria e termo', () => {
     const { result } = renderHook(() => useFavoritos());
 
-    const linhasData = {
-      categoriasDias: [
-        {
-          id: 1,
-          categoriaDia: 'diasUteis',
-          displayName: 'Dias Úteis',
-          linhas: [
-            {
-              idRota: 'rota-1',
-              linha: 101,
-              nome: 'Circular Pampulha',
-              tipo: 'interno',
-              sublinha: null,
-              categoriaDia: 'diasUteis',
-              corHex: '#FF0000',
-              descricao: 'Linha circular',
-              horarios: [],
-              itinerarioParadasIds: [],
-              coordenadasTrajeto: [],
-            },
-            {
-              idRota: 'rota-2',
-              linha: 102,
-              nome: 'Expressa Campus',
-              tipo: 'interno',
-              sublinha: null,
-              categoriaDia: 'diasUteis',
-              corHex: '#00FF00',
-              descricao: 'Linha expressa',
-              horarios: [],
-              itinerarioParadasIds: [],
-              coordenadasTrajeto: [],
-            },
-          ],
-        },
-        {
-          id: 2,
-          categoriaDia: 'sabado',
-          displayName: 'Sábado',
-          linhas: [
-            {
-              idRota: 'rota-3',
-              linha: 201,
-              nome: 'Circular Sábado',
-              tipo: 'interno',
-              sublinha: null,
-              categoriaDia: 'sabado',
-              corHex: '#0000FF',
-              descricao: 'Linha sabado',
-              horarios: [],
-              itinerarioParadasIds: [],
-              coordenadasTrajeto: [],
-            },
-          ],
-        },
-      ],
-    };
-
     act(() => {
-      result.current.toggleFavorito('rota-1', 'Circular Pampulha');
-      result.current.toggleFavorito('rota-3', 'Circular Sábado');
+      result.current.toggleFavorito('rota-1', 'Circular Principal');
+      result.current.toggleFavorito('rota-3', 'Circular Sabado');
     });
 
-    const favoritas = result.current.buscarEmFavoritas(linhasData, 'circular', 'diasUteis');
-    expect(favoritas).toHaveLength(1);
-    expect(favoritas[0]?.idRota).toBe('rota-1');
+    const found = result.current.buscarEmFavoritas(categoriasMock, 'circular', 'diasUteis');
+
+    expect(found).toHaveLength(1);
+    expect(found[0]?.idRota).toBe('rota-1');
   });
 
-  it('Caso 5: evento storage sincroniza estado entre abas', () => {
+  it('sincroniza estado com evento storage entre abas', () => {
     const { result } = renderHook(() => useFavoritos());
 
     act(() => {
@@ -158,5 +151,24 @@ describe('useFavoritos', () => {
     });
 
     expect(result.current.isFavorito('rota-y')).toBe(true);
+  });
+
+  it('compartilha atualizações ao vivo entre múltiplos hooks sem recarregar', () => {
+    const hookA = renderHook(() => useFavoritos());
+    const hookB = renderHook(() => useFavoritos());
+
+    act(() => {
+      hookA.result.current.toggleFavorito('rota-live', 'Linha Live');
+    });
+
+    expect(hookA.result.current.isFavorito('rota-live')).toBe(true);
+    expect(hookB.result.current.isFavorito('rota-live')).toBe(true);
+
+    act(() => {
+      hookB.result.current.toggleFavorito('rota-live', 'Linha Live');
+    });
+
+    expect(hookA.result.current.isFavorito('rota-live')).toBe(false);
+    expect(hookB.result.current.isFavorito('rota-live')).toBe(false);
   });
 });

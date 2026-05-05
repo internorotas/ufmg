@@ -4,24 +4,25 @@
  */
 
 import { ArrowLeft, Menu } from 'lucide-react';
-import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
-import logo from '@/assets/logo-horizontal-transparente.svg';
-import { DisclaimerBanner } from '@/components/DisclaimerBanner';
-import { InfoBanner } from '@/components/InfoBanner';
-import { LineCard } from '@/components/LineCard';
-import { MenuFooter } from '@/components/MenuFooter';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { Button } from '@/components/ui/Button';
-import { SearchEmptyState } from '@/components/ui/EmptyState';
-import { SearchInput } from '@/components/ui/Input';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { VacationBanner } from '@/components/VacationBanner';
-import { useRotasSelection } from '@/contexts/RotasContext';
-import { useAnalytics } from '@/hooks/useAnalytics';
-import { useFavoritos } from '@/hooks/useFavoritos';
-import { useLinhasFilter } from '@/hooks/useLinhasFilter';
-import type { CategoriaLinhas, Linha, Parada } from '@/types/data.types';
+import logo from '../assets/logo-horizontal-transparente.svg';
+import { useRotasSelection } from '../contexts/RotasContext';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { useFavoritos } from '../hooks/useFavoritos';
+import { useLinhasFilter } from '../hooks/useLinhasFilter';
+import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
+import { DisclaimerBanner } from './DisclaimerBanner';
+import { InfoBanner } from './InfoBanner';
+import { LineCard } from './LineCard';
+import { MenuFooter } from './MenuFooter';
+import { ThemeToggle } from './ThemeToggle';
+import { Button } from './ui/Button';
+import { SearchEmptyState } from './ui/EmptyState';
+import { SearchInput } from './ui/Input';
+import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
+
+import { VacationBanner } from './VacationBanner';
 
 const LinhaDetalhesModal = React.lazy(() =>
   import('@/components/LinhaDetalhesModal').then((m) => ({ default: m.LinhaDetalhesModal })),
@@ -148,6 +149,8 @@ export const MenuLateral = React.memo(function MenuLateral({
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
   const lastListSummaryRef = useRef<string>('');
   const wasMenuVisibleRef = useRef(false);
+  const previousFavoritosRef = useRef<Set<string>>(new Set());
+  const [movimentoPorId, setMovimentoPorId] = useState<Record<string, 'up' | 'down'>>({});
 
   const [shortcutLabel] = useState(() => {
     if (typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/i.test(navigator.userAgent)) {
@@ -163,19 +166,60 @@ export const MenuLateral = React.memo(function MenuLateral({
     categoriaAtiva,
     categoriaAtual,
     linhasFiltradas,
-    hasResults,
     handleCategoriaChange,
   } = useLinhasFilter(linhasData);
-
-  const { buscarEmFavoritas, getLinhasFavoritas } = useFavoritos();
+  const { favoritosIds, buscarEmFavoritas, getLinhasFavoritas } = useFavoritos();
 
   const categoriaDiaAtiva = categoriaAtual?.categoriaDia ?? '';
-
   const linhasFavoritas = searchTerm
     ? buscarEmFavoritas(linhasData, searchTerm, categoriaDiaAtiva)
     : getLinhasFavoritas(linhasData, categoriaDiaAtiva);
-
   const hasFavoritas = linhasFavoritas.length > 0;
+  const favoritosIdsSet = useMemo(() => new Set(favoritosIds), [favoritosIds]);
+  const linhasRegulares = linhasFiltradas.filter((linha) => !favoritosIdsSet.has(linha.idRota));
+  const hasRegularResults = linhasRegulares.length > 0;
+
+  useEffect(() => {
+    const previous = previousFavoritosRef.current;
+    const current = new Set(favoritosIds);
+    const changedIds = new Set<string>();
+    const nextMovimentos: Record<string, 'up' | 'down'> = {};
+
+    for (const id of current) {
+      if (!previous.has(id)) {
+        nextMovimentos[id] = 'up';
+        changedIds.add(id);
+      }
+    }
+
+    for (const id of previous) {
+      if (!current.has(id)) {
+        nextMovimentos[id] = 'down';
+        changedIds.add(id);
+      }
+    }
+
+    previousFavoritosRef.current = current;
+
+    const changedArray = Array.from(changedIds);
+    if (changedArray.length === 0) {
+      return;
+    }
+
+    setMovimentoPorId((value) => ({ ...value, ...nextMovimentos }));
+
+    const clearAnimation = window.setTimeout(() => {
+      setMovimentoPorId((value) => {
+        const cleaned = { ...value };
+        for (const id of changedArray) {
+          delete cleaned[id];
+        }
+        return cleaned;
+      });
+    }, 280);
+
+    return () => window.clearTimeout(clearAnimation);
+  }, [favoritosIds]);
 
   useEffect(() => {
     const categoria = categoriaAtual?.displayName || 'desconhecida';
@@ -267,18 +311,6 @@ export const MenuLateral = React.memo(function MenuLateral({
     [categoriaAtual?.displayName, onLinhaSelect, trackEvent],
   );
 
-  const handleFavoritaCardClick = useCallback(
-    (linha: Linha) => {
-      trackEvent({
-        category: 'preferences',
-        action: 'favorite_section_click',
-        label: linha.idRota,
-      });
-      handleCardClick(linha);
-    },
-    [trackEvent, handleCardClick],
-  );
-
   const handleDetailsClick = useCallback(
     (linha: Linha) => {
       trackEvent({
@@ -289,6 +321,18 @@ export const MenuLateral = React.memo(function MenuLateral({
       setLinhaDetalhesAberta(linha);
     },
     [trackEvent],
+  );
+
+  const handleFavoritaCardClick = useCallback(
+    (linha: Linha) => {
+      trackEvent({
+        category: 'preferences',
+        action: 'favorite_section_click',
+        label: linha.idRota,
+      });
+      handleCardClick(linha);
+    },
+    [handleCardClick, trackEvent],
   );
 
   const handleParadaClickWrapper = (parada: Parada) => {
@@ -443,21 +487,29 @@ export const MenuLateral = React.memo(function MenuLateral({
               >
                 Favoritas
               </p>
-              {linhasFavoritas.map((linha) => (
-                <LineCard
-                  key={linha.idRota}
-                  linha={linha}
-                  onClick={handleFavoritaCardClick}
-                  onDetailsClick={handleDetailsClick}
-                  isSelected={linhaSelecionada?.idRota === linha.idRota}
-                  idParada={paradaSelecionada?.idParada}
-                />
-              ))}
+              {linhasFavoritas.map((linha) => {
+                const animationClass =
+                  movimentoPorId[linha.idRota] === 'up'
+                    ? 'motion-safe:animate-line-favorite-up'
+                    : '';
+
+                return (
+                  <div key={linha.idRota} className={animationClass}>
+                    <LineCard
+                      linha={linha}
+                      onClick={handleFavoritaCardClick}
+                      onDetailsClick={handleDetailsClick}
+                      isSelected={linhaSelecionada?.idRota === linha.idRota}
+                      idParada={paradaSelecionada?.idParada}
+                    />
+                  </div>
+                );
+              })}
               <div className="mb-3 mt-1 border-b border-card-border" aria-hidden="true" />
             </section>
           )}
 
-          {hasFavoritas && hasResults && (
+          {hasFavoritas && hasRegularResults && (
             <p
               className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary"
               data-slot="section-label"
@@ -466,17 +518,25 @@ export const MenuLateral = React.memo(function MenuLateral({
             </p>
           )}
 
-          {hasResults
-            ? linhasFiltradas.map((linha) => (
-                <LineCard
-                  key={linha.idRota}
-                  linha={linha}
-                  onClick={handleCardClick}
-                  onDetailsClick={handleDetailsClick}
-                  isSelected={linhaSelecionada?.idRota === linha.idRota}
-                  idParada={paradaSelecionada?.idParada}
-                />
-              ))
+          {hasRegularResults
+            ? linhasRegulares.map((linha) => {
+                const animationClass =
+                  movimentoPorId[linha.idRota] === 'down'
+                    ? 'motion-safe:animate-line-favorite-down'
+                    : '';
+
+                return (
+                  <div key={linha.idRota} className={animationClass}>
+                    <LineCard
+                      linha={linha}
+                      onClick={handleCardClick}
+                      onDetailsClick={handleDetailsClick}
+                      isSelected={linhaSelecionada?.idRota === linha.idRota}
+                      idParada={paradaSelecionada?.idParada}
+                    />
+                  </div>
+                );
+              })
             : !hasFavoritas && (
                 <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
               )}
