@@ -19,8 +19,9 @@ const appVersion = import.meta.env.VITE_APP_VERSION;
  */
 export const footerContainerVariants = tv({
   base: [
-    'shrink-0 space-y-2 border-t px-4 py-2',
+    'shrink-0 space-y-2 border-t px-3 py-2 sm:px-4',
     'border-card-border bg-sidebar transition-colors',
+    'overflow-x-hidden',
   ],
 });
 
@@ -29,8 +30,10 @@ export const footerContainerVariants = tv({
  */
 export const footerButtonVariants = tv({
   base: [
-    'flex w-full items-center justify-center rounded-md border px-3 py-2',
+    'flex min-h-11 w-full items-center justify-center rounded-md border px-2.5 py-2',
+    'text-center text-[0.8rem] leading-tight sm:text-sm',
     'text-sm font-semibold transition-colors cursor-pointer',
+    'truncate',
   ],
   variants: {
     intent: {
@@ -89,7 +92,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
 
   return (
     <div data-slot="footer" className={cn(footerContainerVariants(), className)} {...props}>
-      <div className="flex flex-row gap-1.5">
+      <div className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
         {/* Botão Reportar Problema */}
         <a
           href="https://forms.gle/5e9MHq9pp1p8T5Px5"
@@ -129,7 +132,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
       </div>
 
       {/* Desenvolvido por */}
-      <div className="flex flex-row flex-wrap items-center justify-center gap-1">
+      <div className="flex flex-row flex-wrap items-center justify-center gap-1 text-center">
         <a
           href="https://github.com/igormartins4"
           target="_blank"
