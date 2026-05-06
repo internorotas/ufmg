@@ -12,6 +12,7 @@ import { useAnalytics } from '../hooks/useAnalytics';
 import { useFavoritos } from '../hooks/useFavoritos';
 import { useLinhasFilter } from '../hooks/useLinhasFilter';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
+import type { LegalModalType } from '../types/legal.types';
 import { DisclaimerBanner } from './DisclaimerBanner';
 import { InfoBanner } from './InfoBanner';
 import { LineCard } from './LineCard';
@@ -73,6 +74,7 @@ export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
   todasParadas: Parada[];
   onLinhaSelect: (linha: Linha) => void;
   onParadaClick: (parada: Parada) => void;
+  onOpenLegalModal: (modalType: LegalModalType) => void;
   linhaSelecionada: Linha | null;
   isOffline: boolean;
 }
@@ -134,6 +136,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   todasParadas,
   onLinhaSelect,
   onParadaClick,
+  onOpenLegalModal,
   linhaSelecionada,
   isOffline,
 }: MenuLateralProps) {
@@ -544,7 +547,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           <DisclaimerBanner isOffline={isOffline} />
         </nav>
 
-        <MenuFooter />
+        <MenuFooter onOpenLegalModal={onOpenLegalModal} />
       </aside>
 
       {linhaDetalhesAberta && (
