@@ -63,3 +63,9 @@ Sobre, Privacidade e Termos agora abrem em modal no próprio app, sem navegaçã
 - Abertura via botões no rodapé lateral.
 - Modal com foco trap + ESC + botão explícito de fechar (ícone `X`).
 - Link do onboarding para privacidade também abre modal.
+
+## Ajustes mobile (2026-05-06)
+
+- Footer lateral em mobile ajustado para grid `2x2`, evitando vazamento horizontal.
+- Tabs de categoria com labels longas agora quebram linha de forma controlada (sem corte).
+- Sidebar com `overflow` horizontal bloqueado para evitar conteúdo fora do container.
