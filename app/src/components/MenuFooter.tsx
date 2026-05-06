@@ -32,6 +32,7 @@ export const footerContainerVariants = tv({
 export const footerButtonVariants = tv({
   base: [
     'flex w-full items-center justify-center rounded-md border px-2.5 py-1.5',
+    'flex w-full items-center justify-center rounded-md border px-2.5 py-1.5',
     'text-center text-[0.8rem] leading-tight sm:text-sm',
     'text-sm font-semibold transition-colors cursor-pointer',
     'truncate',
