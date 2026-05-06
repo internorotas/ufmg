@@ -20,6 +20,7 @@ import {
   loadRotasServiceWithSource,
   type RotasDataSource,
   RotasService,
+  tryUpgradeRotasServiceToApi,
 } from '../services/RotasService';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 
@@ -88,15 +89,50 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
   const [isOfflineDataFallback, setIsOfflineDataFallback] = useState(false);
 
   const mapaRef = useRef<MapaRef | null>(null);
+  const upgradeIntervalRef = useRef<number | null>(null);
+
+  const stopApiUpgradePolling = useCallback(() => {
+    if (upgradeIntervalRef.current !== null) {
+      window.clearInterval(upgradeIntervalRef.current);
+      upgradeIntervalRef.current = null;
+    }
+  }, []);
+
+  const attemptApiUpgrade = useCallback(async () => {
+    const upgraded = await tryUpgradeRotasServiceToApi();
+    if (!upgraded || upgraded.source !== 'api') {
+      return;
+    }
+
+    setRotasService(upgraded.service);
+    setDataSource('api');
+    setIsOfflineDataFallback(false);
+    setDataError(null);
+    stopApiUpgradePolling();
+  }, [stopApiUpgradePolling]);
+
+  const ensureApiUpgradePolling = useCallback(() => {
+    if (!import.meta.env.DEV && !import.meta.env.VITEST) {
+      return;
+    }
+
+    if (upgradeIntervalRef.current !== null) {
+      return;
+    }
+
+    upgradeIntervalRef.current = window.setInterval(() => {
+      void attemptApiUpgrade();
+    }, 5000);
+  }, [attemptApiUpgrade]);
 
   useEffect(() => {
     let isMounted = true;
 
     const bootstrap = async () => {
-        setIsLoadingData(true);
-        setDataError(null);
-        setDataSource(null);
-        setIsOfflineDataFallback(false);
+      setIsLoadingData(true);
+      setDataError(null);
+      setDataSource(null);
+      setIsOfflineDataFallback(false);
 
       try {
         const loadedResult = await loadRotasServiceWithSource();
@@ -104,9 +140,16 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
         setRotasService(loadedResult.service);
         setDataSource(loadedResult.source);
         setIsOfflineDataFallback(loadedResult.source !== 'api');
+
+        if (loadedResult.source !== 'api') {
+          ensureApiUpgradePolling();
+        } else {
+          stopApiUpgradePolling();
+        }
       } catch {
         if (!isMounted) return;
         setDataError('Não foi possível carregar os dados de linhas e paradas.');
+        ensureApiUpgradePolling();
       } finally {
         if (isMounted) {
           setIsLoadingData(false);
@@ -116,10 +159,18 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
 
     bootstrap();
 
+    const handleOnline = () => {
+      void attemptApiUpgrade();
+    };
+
+    window.addEventListener('online', handleOnline);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('online', handleOnline);
+      stopApiUpgradePolling();
     };
-  }, []);
+  }, [attemptApiUpgrade, ensureApiUpgradePolling, stopApiUpgradePolling]);
 
   const linhasData = useMemo(() => rotasService.getTodasLinhas(), [rotasService]);
   const todasParadas = useMemo(() => rotasService.getTodasParadas(), [rotasService]);
@@ -208,8 +259,15 @@ export function useRotas(): RotasContextData {
  * Use quando o componente só precisa dos dados e não das ações.
  */
 export function useRotasData() {
-  const { linhasData, todasParadas, rotasService, isLoadingData, dataError, dataSource, isOfflineDataFallback } =
-    useRotas();
+  const {
+    linhasData,
+    todasParadas,
+    rotasService,
+    isLoadingData,
+    dataError,
+    dataSource,
+    isOfflineDataFallback,
+  } = useRotas();
 
   return {
     linhasData,

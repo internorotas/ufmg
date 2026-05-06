@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAuthStore } from '@/stores/authStore';
+import type { LegalModalType } from '@/types/legal.types';
 
 const SLIDES = [
   {
@@ -25,7 +26,11 @@ const SLIDES = [
   },
 ] as const;
 
-export function OnboardingModal() {
+interface OnboardingModalProps {
+  onOpenLegalModal: (modalType: LegalModalType) => void;
+}
+
+export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isOpen, setIsOpen] = useState(true);
   const { hasSeenOnboarding, setHasSeenOnboarding } = useAuthStore();
@@ -93,9 +98,13 @@ export function OnboardingModal() {
               {currentSlide === 2 ? (
                 <>
                   Leia nossa{' '}
-                  <a href="/privacidade" className="font-semibold underline">
+                  <button
+                    type="button"
+                    onClick={() => onOpenLegalModal('privacidade')}
+                    className="font-semibold underline"
+                  >
                     Política de Privacidade
-                  </a>
+                  </button>
                   .
                 </>
               ) : null}

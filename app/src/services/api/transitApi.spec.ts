@@ -68,4 +68,16 @@ describe('transitApi', () => {
 
     await expect(fetchLinhas()).rejects.toThrow('Erro HTTP 503 em /v1/linhas');
   });
+
+  it('erro 502 inclui orientação de backend indisponível', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 502,
+      }),
+    );
+
+    await expect(fetchLinhas()).rejects.toThrow('Proxy do Vite não alcançou o backend');
+  });
 });

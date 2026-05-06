@@ -10,6 +10,7 @@ import { tv, type VariantProps } from 'tailwind-variants';
 
 import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
+import type { LegalModalType } from '../types/legal.types';
 
 // Obtém a versão do app do ambiente
 const appVersion = import.meta.env.VITE_APP_VERSION;
@@ -65,8 +66,10 @@ export const creditLinkVariants = tv({
 });
 
 export interface MenuFooterProps
-  extends ComponentProps<'div'>,
-    VariantProps<typeof footerContainerVariants> {}
+  extends Omit<ComponentProps<'div'>, 'onClick'>,
+    VariantProps<typeof footerContainerVariants> {
+  onOpenLegalModal: (modalType: LegalModalType) => void;
+}
 
 /**
  * Menu de rodapé com links para contato, projeto e créditos.
@@ -76,7 +79,7 @@ export interface MenuFooterProps
  * <MenuFooter />
  * ```
  */
-export function MenuFooter({ className, ...props }: MenuFooterProps) {
+export function MenuFooter({ className, onOpenLegalModal, ...props }: MenuFooterProps) {
   const analytics = useAnalytics();
 
   const handleLinkClick = (platform: string) => {
@@ -85,6 +88,11 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
       action: 'click_outbound_link',
       label: platform,
     });
+  };
+
+  const handleLegalClick = (modalType: LegalModalType, label: string) => {
+    handleLinkClick(label);
+    onOpenLegalModal(modalType);
   };
 
   return (
@@ -103,32 +111,32 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
         </a>
 
         {/* Botão Sobre o Projeto */}
-        <a
-          href="/sobre"
-          onClick={() => handleLinkClick('Sobre')}
-          aria-label="Sobre o projeto"
+        <button
+          type="button"
+          onClick={() => handleLegalClick('sobre', 'Sobre')}
+          aria-label="Abrir modal Sobre o projeto"
           className={footerButtonVariants({ intent: 'primary' })}
         >
           Sobre
-        </a>
+        </button>
 
-        <a
-          href="/privacidade"
-          onClick={() => handleLinkClick('Privacidade')}
-          aria-label="Política de privacidade"
+        <button
+          type="button"
+          onClick={() => handleLegalClick('privacidade', 'Privacidade')}
+          aria-label="Abrir modal Política de privacidade"
           className={footerButtonVariants({ intent: 'ghost' })}
         >
           Privacidade
-        </a>
+        </button>
 
-        <a
-          href="/termos"
-          onClick={() => handleLinkClick('Termos')}
-          aria-label="Termos de uso"
+        <button
+          type="button"
+          onClick={() => handleLegalClick('termos', 'Termos')}
+          aria-label="Abrir modal Termos de uso"
           className={footerButtonVariants({ intent: 'ghost' })}
         >
           Termos
-        </a>
+        </button>
 
         {/* Botão Versão Antiga */}
         {/* <a

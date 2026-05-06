@@ -206,6 +206,13 @@ let loadingServicePromise: Promise<IRotasService> | null = null;
 
 let cachedLoadResult: RotasServiceLoadResult | null = null;
 let loadingResultPromise: Promise<RotasServiceLoadResult> | null = null;
+let loadingApiUpgradePromise: Promise<RotasServiceLoadResult | null> | null = null;
+
+function cacheLoadResult(service: IRotasService, source: RotasDataSource): RotasServiceLoadResult {
+  cachedService = service;
+  cachedLoadResult = { service, source };
+  return cachedLoadResult;
+}
 
 export async function loadRotasServiceWithSource(): Promise<RotasServiceLoadResult> {
   if (cachedLoadResult) {
@@ -220,23 +227,17 @@ export async function loadRotasServiceWithSource(): Promise<RotasServiceLoadResu
     try {
       const { linhas, paradas } = await loadFromApi();
       const service = RotasServiceImpl.fromData(linhas, paradas);
-      cachedService = service;
-      cachedLoadResult = { service, source: 'api' };
-      return cachedLoadResult;
+      return cacheLoadResult(service, 'api');
     } catch {
       try {
         const { linhas, paradas } = await loadFromPublic();
         const service = RotasServiceImpl.fromData(linhas, paradas);
-        cachedService = service;
-        cachedLoadResult = { service, source: 'public-cache' };
-        return cachedLoadResult;
+        return cacheLoadResult(service, 'public-cache');
       } catch {
         if (import.meta.env.DEV || import.meta.env.MODE === 'test' || import.meta.env.VITEST) {
           const { linhas, paradas } = await loadFromSourceFallback();
           const service = RotasServiceImpl.fromData(linhas, paradas);
-          cachedService = service;
-          cachedLoadResult = { service, source: 'source-fallback' };
-          return cachedLoadResult;
+          return cacheLoadResult(service, 'source-fallback');
         }
 
         throw new RotasServiceLoadError(
@@ -272,6 +273,32 @@ export async function loadRotasService(): Promise<IRotasService> {
     return await loadingServicePromise;
   } finally {
     loadingServicePromise = null;
+  }
+}
+
+export async function tryUpgradeRotasServiceToApi(): Promise<RotasServiceLoadResult | null> {
+  if (cachedLoadResult?.source === 'api') {
+    return cachedLoadResult;
+  }
+
+  if (loadingApiUpgradePromise) {
+    return loadingApiUpgradePromise;
+  }
+
+  loadingApiUpgradePromise = (async () => {
+    try {
+      const { linhas, paradas } = await loadFromApi();
+      const service = RotasServiceImpl.fromData(linhas, paradas);
+      return cacheLoadResult(service, 'api');
+    } catch {
+      return null;
+    }
+  })();
+
+  try {
+    return await loadingApiUpgradePromise;
+  } finally {
+    loadingApiUpgradePromise = null;
   }
 }
 

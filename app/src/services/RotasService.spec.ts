@@ -57,10 +57,7 @@ describe('RotasService fallback chain', () => {
 
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce({ ok: false })
-        .mockResolvedValueOnce({ ok: false }),
+      vi.fn().mockResolvedValueOnce({ ok: false }).mockResolvedValueOnce({ ok: false }),
     );
 
     const { loadRotasServiceWithSource } = await import('./RotasService');
@@ -68,5 +65,39 @@ describe('RotasService fallback chain', () => {
 
     expect(result.source).toBe('source-fallback');
     expect(result.service.getTodasParadas()).toBeDefined();
+  });
+
+  it('tryUpgradeRotasServiceToApi promove fallback para fonte da API quando backend volta', async () => {
+    const fetchLinhas = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('api off'))
+      .mockResolvedValue({ categoriasDias: [] });
+    const fetchParadas = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('api off'))
+      .mockResolvedValue({ paradas: [] });
+
+    vi.doMock('@/services/api/transitApi', () => ({
+      fetchLinhas,
+      fetchParadas,
+    }));
+
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ categoriasDias: [] }) })
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ paradas: [] }) }),
+    );
+
+    const { loadRotasServiceWithSource, tryUpgradeRotasServiceToApi } = await import(
+      './RotasService'
+    );
+
+    const initial = await loadRotasServiceWithSource();
+    expect(initial.source).toBe('public-cache');
+
+    const upgraded = await tryUpgradeRotasServiceToApi();
+    expect(upgraded?.source).toBe('api');
   });
 });

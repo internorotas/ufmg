@@ -1,10 +1,11 @@
-import { lazy, Suspense, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { DataStatusScreen } from './components/app/DataStatusScreen';
 import { ModalManager } from './components/app/ModalManager';
 import { OfflineToast } from './components/app/OfflineToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { LegalModal } from './components/legal/LegalModal';
 import { MenuLateral } from './components/MenuLateral';
 import { OfflineBanner } from './components/OfflineBanner';
 import { OnboardingModal } from './components/OnboardingModal';
@@ -16,11 +17,52 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
-import { PrivacidadePage } from './routes/legal/PrivacidadePage';
-import { SobrePage } from './routes/legal/SobrePage';
-import { TermosPage } from './routes/legal/TermosPage';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
+import type { LegalModalType } from './types/legal.types';
+
+const APP_BASE_URL = import.meta.env.BASE_URL || '/';
+
+function stripAppBasePath(pathname: string): string {
+  const normalizedBase = APP_BASE_URL.startsWith('/') ? APP_BASE_URL : `/${APP_BASE_URL}`;
+  const trimmedBase =
+    normalizedBase.endsWith('/') && normalizedBase !== '/'
+      ? normalizedBase.slice(0, normalizedBase.length - 1)
+      : normalizedBase;
+
+  let cleanPathname = pathname;
+  if (trimmedBase !== '/' && cleanPathname.startsWith(trimmedBase)) {
+    cleanPathname = cleanPathname.slice(trimmedBase.length) || '/';
+  }
+
+  if (!cleanPathname.startsWith('/')) {
+    cleanPathname = `/${cleanPathname}`;
+  }
+
+  if (cleanPathname.length > 1 && cleanPathname.endsWith('/')) {
+    cleanPathname = cleanPathname.slice(0, cleanPathname.length - 1);
+  }
+
+  return cleanPathname;
+}
+
+function resolveLegalModalFromPath(pathname: string): LegalModalType | null {
+  const currentPath = stripAppBasePath(pathname);
+
+  if (currentPath === '/sobre') {
+    return 'sobre';
+  }
+
+  if (currentPath === '/privacidade') {
+    return 'privacidade';
+  }
+
+  if (currentPath === '/termos') {
+    return 'termos';
+  }
+
+  return null;
+}
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
 const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default: module.Mapa })));
@@ -81,6 +123,10 @@ function AppContent() {
     iniciarRastreamento,
     solicitarPermissaoNavegador,
   } = useLocalizacaoUsuario();
+
+  const [legalModal, setLegalModal] = useState<LegalModalType | null>(() =>
+    resolveLegalModalFromPath(window.location.pathname),
+  );
   const { solicitarAutoCenter, consumirAutoCenter } = useMapAutoCenter({
     mapaRef,
     localizacao,
@@ -120,6 +166,14 @@ function AppContent() {
     },
     [selecionarParada, mapaRef, trackEvent],
   );
+
+  const handleOpenLegalModal = useCallback((modalType: LegalModalType) => {
+    setLegalModal(modalType);
+  }, []);
+
+  const handleCloseLegalModal = useCallback(() => {
+    setLegalModal(null);
+  }, []);
 
   // Handler para voltar ao campus UFMG
   const handlePedirLocalizacao = useCallback(() => {
@@ -193,7 +247,7 @@ function AppContent() {
 
   return (
     <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
-      <OnboardingModal />
+      <OnboardingModal onOpenLegalModal={handleOpenLegalModal} />
       <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
       <a
         href="#main-content"
@@ -206,6 +260,7 @@ function AppContent() {
         todasParadas={todasParadas}
         onLinhaSelect={handleLinhaSelect}
         onParadaClick={handleParadaClick}
+        onOpenLegalModal={handleOpenLegalModal}
         linhaSelecionada={linhaSelecionada}
         isOffline={isOffline || isOfflineDataFallback}
       />
@@ -270,6 +325,8 @@ function AppContent() {
         onContinuarAqui={handleContinuarAqui}
       />
 
+      <LegalModal modalType={legalModal} onClose={handleCloseLegalModal} />
+
       <OfflineToast show={showOfflineToast} />
     </div>
   );
@@ -282,30 +339,6 @@ function AppContent() {
  * @returns {JSX.Element} O componente principal da aplicação renderizado.
  */
 export function App() {
-  if (window.location.pathname === '/privacidade') {
-    return (
-      <ThemeProvider>
-        <PrivacidadePage />
-      </ThemeProvider>
-    );
-  }
-
-  if (window.location.pathname === '/termos') {
-    return (
-      <ThemeProvider>
-        <TermosPage />
-      </ThemeProvider>
-    );
-  }
-
-  if (window.location.pathname === '/sobre') {
-    return (
-      <ThemeProvider>
-        <SobrePage />
-      </ThemeProvider>
-    );
-  }
-
   if (import.meta.env.DEV && window.location.search.includes('admin=true')) {
     return (
       <ThemeProvider>
