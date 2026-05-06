@@ -15,7 +15,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import { type IRotasService, loadRotasService, RotasService } from '../services/RotasService';
+import {
+  type IRotasService,
+  loadRotasServiceWithSource,
+  type RotasDataSource,
+  RotasService,
+  tryUpgradeRotasServiceToApi,
+} from '../services/RotasService';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 
 /**
@@ -34,6 +40,8 @@ interface RotasContextData {
   todasParadas: Parada[];
   isLoadingData: boolean;
   dataError: string | null;
+  dataSource: RotasDataSource | null;
+  isOfflineDataFallback: boolean;
 
   linhaSelecionada: Linha | null;
   paradaSelecionada: Parada | null;
@@ -77,8 +85,45 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
   const [rotasService, setRotasService] = useState<IRotasService>(RotasService);
+  const [dataSource, setDataSource] = useState<RotasDataSource | null>(null);
+  const [isOfflineDataFallback, setIsOfflineDataFallback] = useState(false);
 
   const mapaRef = useRef<MapaRef | null>(null);
+  const upgradeIntervalRef = useRef<number | null>(null);
+
+  const stopApiUpgradePolling = useCallback(() => {
+    if (upgradeIntervalRef.current !== null) {
+      window.clearInterval(upgradeIntervalRef.current);
+      upgradeIntervalRef.current = null;
+    }
+  }, []);
+
+  const attemptApiUpgrade = useCallback(async () => {
+    const upgraded = await tryUpgradeRotasServiceToApi();
+    if (!upgraded || upgraded.source !== 'api') {
+      return;
+    }
+
+    setRotasService(upgraded.service);
+    setDataSource('api');
+    setIsOfflineDataFallback(false);
+    setDataError(null);
+    stopApiUpgradePolling();
+  }, [stopApiUpgradePolling]);
+
+  const ensureApiUpgradePolling = useCallback(() => {
+    if (!import.meta.env.DEV && !import.meta.env.VITEST) {
+      return;
+    }
+
+    if (upgradeIntervalRef.current !== null) {
+      return;
+    }
+
+    upgradeIntervalRef.current = window.setInterval(() => {
+      void attemptApiUpgrade();
+    }, 5000);
+  }, [attemptApiUpgrade]);
 
   useEffect(() => {
     let isMounted = true;
@@ -86,14 +131,25 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
     const bootstrap = async () => {
       setIsLoadingData(true);
       setDataError(null);
+      setDataSource(null);
+      setIsOfflineDataFallback(false);
 
       try {
-        const loadedService = await loadRotasService();
+        const loadedResult = await loadRotasServiceWithSource();
         if (!isMounted) return;
-        setRotasService(loadedService);
+        setRotasService(loadedResult.service);
+        setDataSource(loadedResult.source);
+        setIsOfflineDataFallback(loadedResult.source !== 'api');
+
+        if (loadedResult.source !== 'api') {
+          ensureApiUpgradePolling();
+        } else {
+          stopApiUpgradePolling();
+        }
       } catch {
         if (!isMounted) return;
         setDataError('Não foi possível carregar os dados de linhas e paradas.');
+        ensureApiUpgradePolling();
       } finally {
         if (isMounted) {
           setIsLoadingData(false);
@@ -103,10 +159,18 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
 
     bootstrap();
 
+    const handleOnline = () => {
+      void attemptApiUpgrade();
+    };
+
+    window.addEventListener('online', handleOnline);
+
     return () => {
       isMounted = false;
+      window.removeEventListener('online', handleOnline);
+      stopApiUpgradePolling();
     };
-  }, []);
+  }, [attemptApiUpgrade, ensureApiUpgradePolling, stopApiUpgradePolling]);
 
   const linhasData = useMemo(() => rotasService.getTodasLinhas(), [rotasService]);
   const todasParadas = useMemo(() => rotasService.getTodasParadas(), [rotasService]);
@@ -138,6 +202,8 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
       todasParadas,
       isLoadingData,
       dataError,
+      dataSource,
+      isOfflineDataFallback,
       linhaSelecionada,
       paradaSelecionada,
       selecionarLinha,
@@ -151,6 +217,8 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
       todasParadas,
       isLoadingData,
       dataError,
+      dataSource,
+      isOfflineDataFallback,
       linhaSelecionada,
       paradaSelecionada,
       selecionarLinha,
@@ -191,8 +259,25 @@ export function useRotas(): RotasContextData {
  * Use quando o componente só precisa dos dados e não das ações.
  */
 export function useRotasData() {
-  const { linhasData, todasParadas, rotasService, isLoadingData, dataError } = useRotas();
-  return { linhasData, todasParadas, rotasService, isLoadingData, dataError };
+  const {
+    linhasData,
+    todasParadas,
+    rotasService,
+    isLoadingData,
+    dataError,
+    dataSource,
+    isOfflineDataFallback,
+  } = useRotas();
+
+  return {
+    linhasData,
+    todasParadas,
+    rotasService,
+    isLoadingData,
+    dataError,
+    dataSource,
+    isOfflineDataFallback,
+  };
 }
 
 /**

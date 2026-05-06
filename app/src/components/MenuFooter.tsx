@@ -10,6 +10,7 @@ import { tv, type VariantProps } from 'tailwind-variants';
 
 import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
+import type { LegalModalType } from '../types/legal.types';
 
 // Obtém a versão do app do ambiente
 const appVersion = import.meta.env.VITE_APP_VERSION;
@@ -30,7 +31,8 @@ export const footerContainerVariants = tv({
  */
 export const footerButtonVariants = tv({
   base: [
-    'flex min-h-11 w-full items-center justify-center rounded-md border px-2.5 py-2',
+    'flex w-full items-center justify-center rounded-md border px-2.5 py-1.5',
+    'flex w-full items-center justify-center rounded-md border px-2.5 py-1.5',
     'text-center text-[0.8rem] leading-tight sm:text-sm',
     'text-sm font-semibold transition-colors cursor-pointer',
     'truncate',
@@ -68,8 +70,10 @@ export const creditLinkVariants = tv({
 });
 
 export interface MenuFooterProps
-  extends ComponentProps<'div'>,
-    VariantProps<typeof footerContainerVariants> {}
+  extends Omit<ComponentProps<'div'>, 'onClick'>,
+    VariantProps<typeof footerContainerVariants> {
+  onOpenLegalModal: (modalType: LegalModalType) => void;
+}
 
 /**
  * Menu de rodapé com links para contato, projeto e créditos.
@@ -79,7 +83,7 @@ export interface MenuFooterProps
  * <MenuFooter />
  * ```
  */
-export function MenuFooter({ className, ...props }: MenuFooterProps) {
+export function MenuFooter({ className, onOpenLegalModal, ...props }: MenuFooterProps) {
   const analytics = useAnalytics();
 
   const handleLinkClick = (platform: string) => {
@@ -88,6 +92,11 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
       action: 'click_outbound_link',
       label: platform,
     });
+  };
+
+  const handleLegalClick = (modalType: LegalModalType, label: string) => {
+    handleLinkClick(label);
+    onOpenLegalModal(modalType);
   };
 
   return (
@@ -106,16 +115,32 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
         </a>
 
         {/* Botão Sobre o Projeto */}
-        <a
-          href="https://github.com/internorotas/ufmg"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => handleLinkClick('Sobre o Projeto')}
-          aria-label="Sobre o projeto no GitHub (abre em nova aba)"
+        <button
+          type="button"
+          onClick={() => handleLegalClick('sobre', 'Sobre')}
+          aria-label="Abrir modal Sobre o projeto"
           className={footerButtonVariants({ intent: 'primary' })}
         >
           Sobre
-        </a>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleLegalClick('privacidade', 'Privacidade')}
+          aria-label="Abrir modal Política de privacidade"
+          className={footerButtonVariants({ intent: 'ghost' })}
+        >
+          Privacidade
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleLegalClick('termos', 'Termos')}
+          aria-label="Abrir modal Termos de uso"
+          className={footerButtonVariants({ intent: 'ghost' })}
+        >
+          Termos
+        </button>
 
         {/* Botão Versão Antiga */}
         {/* <a
