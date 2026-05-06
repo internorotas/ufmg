@@ -472,6 +472,36 @@ body {
   animation: pulse-soft 2s ease-in-out infinite;
 }
 
+@keyframes line-favorite-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes line-favorite-down {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-line-favorite-up {
+  animation: line-favorite-up 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-line-favorite-down {
+  animation: line-favorite-down 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

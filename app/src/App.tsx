@@ -1,11 +1,14 @@
-import { lazy, Suspense, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { DataStatusScreen } from './components/app/DataStatusScreen';
 import { ModalManager } from './components/app/ModalManager';
 import { OfflineToast } from './components/app/OfflineToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { LegalModal } from './components/legal/LegalModal';
 import { MenuLateral } from './components/MenuLateral';
+import { OfflineBanner } from './components/OfflineBanner';
+import { OnboardingModal } from './components/OnboardingModal';
 import { GA_MEASUREMENT_ID } from './config/analytics';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
@@ -16,6 +19,50 @@ import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoU
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
+import type { LegalModalType } from './types/legal.types';
+
+const APP_BASE_URL = import.meta.env.BASE_URL || '/';
+
+function stripAppBasePath(pathname: string): string {
+  const normalizedBase = APP_BASE_URL.startsWith('/') ? APP_BASE_URL : `/${APP_BASE_URL}`;
+  const trimmedBase =
+    normalizedBase.endsWith('/') && normalizedBase !== '/'
+      ? normalizedBase.slice(0, normalizedBase.length - 1)
+      : normalizedBase;
+
+  let cleanPathname = pathname;
+  if (trimmedBase !== '/' && cleanPathname.startsWith(trimmedBase)) {
+    cleanPathname = cleanPathname.slice(trimmedBase.length) || '/';
+  }
+
+  if (!cleanPathname.startsWith('/')) {
+    cleanPathname = `/${cleanPathname}`;
+  }
+
+  if (cleanPathname.length > 1 && cleanPathname.endsWith('/')) {
+    cleanPathname = cleanPathname.slice(0, cleanPathname.length - 1);
+  }
+
+  return cleanPathname;
+}
+
+function resolveLegalModalFromPath(pathname: string): LegalModalType | null {
+  const currentPath = stripAppBasePath(pathname);
+
+  if (currentPath === '/sobre') {
+    return 'sobre';
+  }
+
+  if (currentPath === '/privacidade') {
+    return 'privacidade';
+  }
+
+  if (currentPath === '/termos') {
+    return 'termos';
+  }
+
+  return null;
+}
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
 const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default: module.Mapa })));
@@ -51,6 +98,7 @@ function AppContent() {
     todasParadas,
     isLoadingData,
     dataError,
+    isOfflineDataFallback,
     linhaSelecionada,
     paradaSelecionada,
     selecionarLinha,
@@ -75,6 +123,10 @@ function AppContent() {
     iniciarRastreamento,
     solicitarPermissaoNavegador,
   } = useLocalizacaoUsuario();
+
+  const [legalModal, setLegalModal] = useState<LegalModalType | null>(() =>
+    resolveLegalModalFromPath(window.location.pathname),
+  );
   const { solicitarAutoCenter, consumirAutoCenter } = useMapAutoCenter({
     mapaRef,
     localizacao,
@@ -115,6 +167,14 @@ function AppContent() {
     [selecionarParada, mapaRef, trackEvent],
   );
 
+  const handleOpenLegalModal = useCallback((modalType: LegalModalType) => {
+    setLegalModal(modalType);
+  }, []);
+
+  const handleCloseLegalModal = useCallback(() => {
+    setLegalModal(null);
+  }, []);
+
   // Handler para voltar ao campus UFMG
   const handlePedirLocalizacao = useCallback(() => {
     solicitarAutoCenter();
@@ -142,7 +202,7 @@ function AppContent() {
     return (
       <DataStatusScreen
         title="Carregando dados..."
-        description="Buscando linhas e paradas em /public/data."
+        description="Buscando linhas e paradas na API e no cache local."
       />
     );
   }
@@ -187,6 +247,8 @@ function AppContent() {
 
   return (
     <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
+      <OnboardingModal onOpenLegalModal={handleOpenLegalModal} />
+      <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
       <a
         href="#main-content"
         className="sr-only absolute left-4 top-4 z-[1400] rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
@@ -198,8 +260,9 @@ function AppContent() {
         todasParadas={todasParadas}
         onLinhaSelect={handleLinhaSelect}
         onParadaClick={handleParadaClick}
+        onOpenLegalModal={handleOpenLegalModal}
         linhaSelecionada={linhaSelecionada}
-        isOffline={isOffline}
+        isOffline={isOffline || isOfflineDataFallback}
       />
       <main
         id="main-content"
@@ -261,6 +324,8 @@ function AppContent() {
         onVoltarUFMG={handleVoltarParaUFMG}
         onContinuarAqui={handleContinuarAqui}
       />
+
+      <LegalModal modalType={legalModal} onClose={handleCloseLegalModal} />
 
       <OfflineToast show={showOfflineToast} />
     </div>
