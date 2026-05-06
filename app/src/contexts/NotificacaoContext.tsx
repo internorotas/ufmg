@@ -11,6 +11,7 @@ import { IosInstallModal } from '../components/IosInstallModal';
 import { NotificacaoPermissionModal } from '../components/NotificacaoPermissionModal';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useNotificacao } from '../hooks/useNotificacao';
+import { syncPushSubscription } from '@/services/push/pushSubscriptionService';
 import type { Linha, Parada } from '../types/data.types';
 
 interface NotificacaoContextValue {
@@ -86,6 +87,10 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         return;
       }
       agendarNotificacao(linha, parada, minutosFaltantes, horarioChegada);
+      void syncPushSubscription({
+        linhaId: linha.idRota,
+        paradaId: parada.idParada,
+      });
       trackEvent({
         event: 'alarm_set',
         category: 'engagement',
@@ -112,6 +117,10 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
       const { linha, parada, minutos, horarioChegada } = pendingRef.current;
       pendingRef.current = null;
       agendarNotificacao(linha, parada, minutos, horarioChegada);
+      void syncPushSubscription({
+        linhaId: linha.idRota,
+        paradaId: parada.idParada,
+      });
       trackEvent({
         event: 'alarm_set',
         category: 'engagement',
