@@ -52,3 +52,8 @@ export default tseslint.config({
   },
 });
 ```
+## Ajustes mobile (2026-05-06)
+
+- Footer lateral em mobile ajustado para grid `2x2`, evitando vazamento horizontal.
+- Tabs de categoria com labels longas agora quebram linha de forma controlada (sem corte).
+- Sidebar com `overflow` horizontal bloqueado para evitar conteúdo fora do container.
