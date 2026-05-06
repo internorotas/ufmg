@@ -17,36 +17,16 @@ export default defineConfig({
       // o novo SW toma controle sem interação do usuário.
       registerType: 'autoUpdate',
 
-      // O registro é manual em src/main.tsx via virtual:pwa-register.
-      // Em vite-plugin-pwa@1.x, use `false` para impedir a injeção automática
-      // de registerSW.js no HTML gerado.
-      injectRegister: false,
+      // Registro manual permanece em src/main.tsx.
+      injectRegister: null,
 
-      // Workbox gera o sw.js automaticamente com precache manifest baseado nos
-      // hashes do build — zero manutenção manual de versão.
-      strategies: 'generateSW',
-
-      workbox: {
-        // Precacheia todos os assets estáticos gerados pelo build
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2}'],
-
-        // SPA fallback: todas as navegações servem o index.html
-        navigateFallback: '/ufmg/index.html',
-
-        // Não intercepta requests para os dados JSON nem para o manifesto PWA.
-        // O manifesto é fetchado pelo browser como navigate request em alguns browsers
-        // (Chrome); sem esta exclusão o SW retornaria index.html no lugar do JSON,
-        // causando "Manifest: Line 1, column 1, Syntax error".
-        navigateFallbackDenylist: [/^\/ufmg\/data\//, /\/site\.webmanifest$/],
-
-        // Ativa imediatamente ao instalar (sem esperar fechar todas as abas)
-        skipWaiting: true,
-
-        // Toma controle de todas as abas abertas assim que ativa
-        clientsClaim: true,
-
-        // Remove caches antigos do Workbox quando a estratégia mudar entre builds.
-        cleanupOutdatedCaches: true,
+      // Fase 3: SW customizado para suportar handlers de push.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectManifest: {
+        // Inclui JSON para manter dados de linhas/paradas disponíveis offline.
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2,json}'],
       },
 
       // Não sobrescreve o site.webmanifest existente em public/
