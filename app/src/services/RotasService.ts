@@ -250,6 +250,20 @@ export async function loadRotasData(): Promise<RotasLoadResult> {
   }
 }
 
+export async function loadRotasFallbackData(): Promise<RotasLoadResult> {
+  try {
+    const { linhas, paradas } = await loadFromPublic();
+    return createLoadResult('public-data', linhas, paradas);
+  } catch {
+    if (import.meta.env.DEV) {
+      const { linhas, paradas } = await loadFromSourceFallback();
+      return createLoadResult('source-fallback', linhas, paradas);
+    }
+
+    throw new Error('Falha ao carregar fallback de rotas em /public/data.');
+  }
+}
+
 export async function loadRotasService(): Promise<IRotasService> {
   const result = await loadRotasData();
   return result.service;

@@ -15,11 +15,14 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useLinhasQuery } from '@/features/transit-data/queries/useLinhasQuery';
+import { useParadasQuery } from '@/features/transit-data/queries/useParadasQuery';
 import {
   type IRotasService,
-  loadRotasData,
+  loadRotasFallbackData,
   type RotasDataSource,
   RotasService,
+  RotasServiceImpl,
 } from '../services/RotasService';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 
@@ -91,16 +94,52 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
   const [dataUpdatedAt, setDataUpdatedAt] = useState('');
 
   const mapaRef = useRef<MapaRef | null>(null);
+  const fallbackAttemptedRef = useRef(false);
+
+  const linhasQuery = useLinhasQuery(true);
+  const paradasQuery = useParadasQuery(true);
+
+  const hasApiData = Boolean(linhasQuery.data && paradasQuery.data);
+  const hasApiError = linhasQuery.isError || paradasQuery.isError;
+  const isApiLoading = linhasQuery.isLoading || paradasQuery.isLoading;
 
   useEffect(() => {
-    let isMounted = true;
+    if (!linhasQuery.data || !paradasQuery.data) {
+      return;
+    }
 
-    const bootstrap = async () => {
+    setRotasService(RotasServiceImpl.fromData(linhasQuery.data, paradasQuery.data));
+    setDataSource('api');
+    setDataVersion('v1');
+    setDataUpdatedAt(new Date().toISOString());
+    setDataError(null);
+    setIsLoadingData(false);
+    fallbackAttemptedRef.current = false;
+  }, [linhasQuery.data, paradasQuery.data]);
+
+  useEffect(() => {
+    if (hasApiData) {
+      return;
+    }
+
+    if (isApiLoading) {
+      setIsLoadingData(true);
+      return;
+    }
+
+    if (!hasApiError || fallbackAttemptedRef.current) {
+      return;
+    }
+
+    let isMounted = true;
+    fallbackAttemptedRef.current = true;
+
+    const loadFallback = async () => {
       setIsLoadingData(true);
       setDataError(null);
 
       try {
-        const loadedData = await loadRotasData();
+        const loadedData = await loadRotasFallbackData();
         if (!isMounted) return;
         setRotasService(loadedData.service);
         setDataSource(loadedData.source);
@@ -116,12 +155,12 @@ export function RotasProvider({ children, onLinhaSelect, onParadaSelect }: Rotas
       }
     };
 
-    bootstrap();
+    void loadFallback();
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [hasApiData, hasApiError, isApiLoading]);
 
   const linhasData = useMemo(() => rotasService.getTodasLinhas(), [rotasService]);
   const todasParadas = useMemo(() => rotasService.getTodasParadas(), [rotasService]);
