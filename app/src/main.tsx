@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import './globals.css';
 
 import { App } from './App';
+import { AppQueryProvider } from './providers/AppQueryProvider';
 
 const SW_RELOAD_GUARD_KEY = 'ufmg:sw-reload-build-id';
 const UPDATE_STATUS_REGION_ID = 'app-update-status';
@@ -145,7 +146,9 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <AppQueryProvider>
+      <App />
+    </AppQueryProvider>
   </StrictMode>,
 );
 
