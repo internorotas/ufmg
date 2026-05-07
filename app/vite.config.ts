@@ -48,6 +48,13 @@ export default defineConfig({
       // e retornam 403 no ambiente local.
       allow: ['..', '../..'],
     },
+    proxy: {
+      // Backend local NestJS para rotas /v1/* durante desenvolvimento.
+      '/v1': {
+        target: 'http://localhost:43111',
+        changeOrigin: true,
+      },
+    },
   },
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version),
