@@ -5,6 +5,7 @@
 
 import { Info } from 'lucide-react';
 import type { ComponentProps } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getCurrentSpecialPeriod, isWeekday } from '../config/specialPeriods';
 import { SystemBanner } from './SystemBanner';
 
@@ -20,6 +21,7 @@ export interface VacationBannerProps extends ComponentProps<'div'> {}
  * ```
  */
 export function VacationBanner({ className, ...props }: VacationBannerProps) {
+  const { t } = useTranslation('system-banner');
   const specialPeriod = getCurrentSpecialPeriod();
 
   // Não mostrar se não houver período especial ativo
@@ -38,18 +40,12 @@ export function VacationBanner({ className, ...props }: VacationBannerProps) {
       description={
         <>
           <p>
-            De {specialPeriod.startDate.toLocaleDateString('pt-BR')} a{' '}
-            {specialPeriod.endDate.toLocaleDateString('pt-BR')}, operam apenas os horários de Férias
-            e Recessos. Não há circulação aos fins de semana e feriados.
+            {t('vacation.description', {
+              start: specialPeriod.startDate.toLocaleDateString('pt-BR'),
+              end: specialPeriod.endDate.toLocaleDateString('pt-BR'),
+            })}
           </p>
-          {!isWeekdayToday && (
-            <p className="mt-2 font-semibold">
-              <span role="img" aria-label="Atenção">
-                ⚠️
-              </span>{' '}
-              Hoje não há circulação de ônibus (apenas em dias úteis).
-            </p>
-          )}
+          {!isWeekdayToday && <p className="mt-2 font-semibold">{t('vacation.weekendWarning')}</p>}
         </>
       }
       {...props}

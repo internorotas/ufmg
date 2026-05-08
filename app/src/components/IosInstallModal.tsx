@@ -6,6 +6,7 @@
  */
 
 import { Bell, Plus, Share } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Modal } from './Modal';
 import { Button } from './ui/Button';
 
@@ -18,42 +19,33 @@ const PASSOS = [
   {
     id: 'compartilhar',
     icone: Share,
-    descricao: (
-      <>
-        Toque no ícone de <span className="font-semibold">Compartilhar</span> (quadrado com seta
-        para cima) na barra inferior do Safari.
-      </>
-    ),
+    i18nKey: 'iosInstall.steps.share',
   },
   {
     id: 'adicionar',
     icone: Plus,
-    descricao: (
-      <>
-        Toque em <span className="font-semibold">"Adicionar à Tela de Início"</span>.
-      </>
-    ),
+    i18nKey: 'iosInstall.steps.add',
   },
   {
     id: 'abrir',
     icone: Bell,
-    descricao: <>Abra o aplicativo por lá e ative seu alarme!</>,
+    i18nKey: 'iosInstall.steps.open',
   },
 ];
 
 export function IosInstallModal({ isOpen, onClose }: IosInstallModalProps) {
+  const { t } = useTranslation('modals');
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Adicionar à tela inicial"
-      description="No iOS, notificações web exigem o app instalado como atalho na tela inicial."
+      title={t('iosInstall.title')}
+      description={t('iosInstall.description')}
       size="sm"
     >
       <div className="space-y-4">
-        <p className="text-sm text-text-secondary">
-          Para receber notificações no iPhone, instale o app na Tela de Início e abra por lá.
-        </p>
+        <p className="text-sm text-text-secondary">{t('iosInstall.body')}</p>
 
         <ol className="space-y-2">
           {PASSOS.map((passo, idx) => {
@@ -68,7 +60,13 @@ export function IosInstallModal({ isOpen, onClose }: IosInstallModalProps) {
                 </div>
                 <div className="flex items-start gap-2">
                   <Icone size={16} className="mt-0.5 shrink-0 text-brand-accent" />
-                  <p className="text-sm text-text-primary">{passo.descricao}</p>
+                  <p className="text-sm text-text-primary">
+                    <Trans
+                      i18nKey={passo.i18nKey}
+                      ns="modals"
+                      components={{ strong: <strong /> }}
+                    />
+                  </p>
                 </div>
               </li>
             );
@@ -84,10 +82,16 @@ export function IosInstallModal({ isOpen, onClose }: IosInstallModalProps) {
             data-autofocus="true"
             onClick={onClose}
           >
-            Entendi
+            {t('iosInstall.actions.understood')}
           </Button>
-          <Button type="button" variant="ghost" size="md" className="min-h-11 flex-1" onClick={onClose}>
-            Agora não
+          <Button
+            type="button"
+            variant="ghost"
+            size="md"
+            className="min-h-11 flex-1"
+            onClick={onClose}
+          >
+            {t('iosInstall.actions.later')}
           </Button>
         </div>
       </div>

@@ -14,9 +14,9 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
+import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
-import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
 const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default: module.Mapa })));
