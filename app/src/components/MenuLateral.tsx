@@ -3,25 +3,24 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { ArrowLeft, Menu } from 'lucide-react';
+import { ArrowLeft, Info, Menu } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
+import { getCurrentSpecialPeriod, isWeekday } from '@/config/specialPeriods';
 import logo from '../assets/logo-horizontal-transparente.svg';
 import { useRotasSelection } from '../contexts/RotasContext';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useLinhasFilter } from '../hooks/useLinhasFilter';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 import { DisclaimerBanner } from './DisclaimerBanner';
-import { InfoBanner } from './InfoBanner';
 import { LineCard } from './LineCard';
 import { MenuFooter } from './MenuFooter';
+import { SystemBanner } from './SystemBanner';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from './ui/Button';
 import { SearchEmptyState } from './ui/EmptyState';
 import { SearchInput } from './ui/Input';
 import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
-
-import { VacationBanner } from './VacationBanner';
 
 const LinhaDetalhesModal = React.lazy(() =>
   import('./LinhaDetalhesModal').then((m) => ({ default: m.LinhaDetalhesModal })),
@@ -166,6 +165,9 @@ export const MenuLateral = React.memo(function MenuLateral({
     hasResults,
     handleCategoriaChange,
   } = useLinhasFilter(linhasData);
+
+  const specialPeriod = getCurrentSpecialPeriod();
+  const isWeekdayToday = isWeekday();
 
   useEffect(() => {
     const categoria = categoriaAtual?.displayName || 'desconhecida';
@@ -410,8 +412,41 @@ export const MenuLateral = React.memo(function MenuLateral({
           className="flex-1 overflow-y-auto bg-background p-4"
           aria-label="Lista de Linhas"
         >
-          <VacationBanner />
-          <InfoBanner />
+          {specialPeriod ? (
+            <SystemBanner
+              variant="warning"
+              icon={<Info aria-hidden="true" />}
+              title={specialPeriod.name}
+              description={
+                <>
+                  <p>
+                    De {specialPeriod.startDate.toLocaleDateString('pt-BR')} a{' '}
+                    {specialPeriod.endDate.toLocaleDateString('pt-BR')}, operam apenas os horários
+                    de Férias e Recessos. Não há circulação aos fins de semana e feriados.
+                  </p>
+                  {!isWeekdayToday && (
+                    <p className="mt-2 font-semibold">
+                      <span role="img" aria-label="Atenção">
+                        ⚠️
+                      </span>{' '}
+                      Hoje não há circulação de ônibus (apenas em dias úteis).
+                    </p>
+                  )}
+                </>
+              }
+            />
+          ) : null}
+
+          <SystemBanner
+            variant="info"
+            icon={<Info aria-hidden="true" />}
+            description={
+              <>
+                Todas as rotas iniciam e terminam próximas à <strong>Escola de Música</strong>. Os
+                horários indicam a saída dos ônibus deste ponto.
+              </>
+            }
+          />
 
           {hasResults ? (
             linhasFiltradas.map((linha) => (

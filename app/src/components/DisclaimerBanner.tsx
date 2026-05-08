@@ -5,15 +5,8 @@
 
 import { AlertTriangle, Mail, Phone } from 'lucide-react';
 import type { ComponentProps } from 'react';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '../lib/utils';
-
-/**
- * Variantes do banner de disclaimer
- */
-export const disclaimerBannerVariants = tv({
-  base: ['rounded-lg border p-3', 'mb-3', 'border-warning-border bg-warning-bg text-warning-text'],
-});
+import { tv } from 'tailwind-variants';
+import { SystemBanner } from './SystemBanner';
 
 /**
  * Variantes do botão de contato
@@ -27,9 +20,7 @@ export const contactButtonVariants = tv({
   ],
 });
 
-export interface DisclaimerBannerProps
-  extends ComponentProps<'div'>,
-    VariantProps<typeof disclaimerBannerVariants> {
+export interface DisclaimerBannerProps extends ComponentProps<'div'> {
   isOffline?: boolean;
 }
 
@@ -47,15 +38,12 @@ export function DisclaimerBanner({
   ...props
 }: DisclaimerBannerProps) {
   return (
-    <div
-      data-slot="banner"
-      data-intent="warning"
-      className={cn(disclaimerBannerVariants(), className)}
-      {...props}
-    >
-      <div className="flex items-start gap-2">
-        <AlertTriangle className="mt-0.5 size-4.5 shrink-0" aria-hidden="true" />
-        <div className="flex-1">
+    <SystemBanner
+      variant="warning"
+      className={className}
+      icon={<AlertTriangle className="size-4.5" aria-hidden="true" />}
+      description={
+        <>
           {isOffline && (
             <p className="mb-2 text-xs font-semibold leading-relaxed">
               Conexão perdida. Mapas podem não carregar, mas previsões estáticas continuam
@@ -79,27 +67,29 @@ export function DisclaimerBanner({
             reclamações, dúvidas e sugestões, entre em contato com a{' '}
             <strong>Divisão de Transportes</strong>.
           </p>
-
-          <div className="mt-2 flex flex-col gap-2 border-t border-warning-border pt-2 lg:grid lg:grid-cols-2">
-            <a
-              href="tel:3409-4601"
-              className={contactButtonVariants()}
-              aria-label="Ligar para a Divisão de Transportes: 3409-4601 ou 4606"
-            >
-              <Phone className="size-4 shrink-0" aria-hidden="true" />
-              <span>3409-4601 / 4606</span>
-            </a>
-            <a
-              href="mailto:sfrota@dsg.ufmg.br"
-              className={contactButtonVariants()}
-              aria-label="Enviar e-mail para sfrota@dsg.ufmg.br"
-            >
-              <Mail className="size-4 shrink-0" aria-hidden="true" />
-              <span>sfrota@dsg.ufmg.br</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+      actions={
+        <>
+          <a
+            href="tel:3409-4601"
+            className={contactButtonVariants()}
+            aria-label="Ligar para a Divisão de Transportes: 3409-4601 ou 4606"
+          >
+            <Phone className="size-4 shrink-0" aria-hidden="true" />
+            <span>3409-4601 / 4606</span>
+          </a>
+          <a
+            href="mailto:sfrota@dsg.ufmg.br"
+            className={contactButtonVariants()}
+            aria-label="Enviar e-mail para sfrota@dsg.ufmg.br"
+          >
+            <Mail className="size-4 shrink-0" aria-hidden="true" />
+            <span>sfrota@dsg.ufmg.br</span>
+          </a>
+        </>
+      }
+      {...props}
+    />
   );
 }
