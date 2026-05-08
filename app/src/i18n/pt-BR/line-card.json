@@ -1,0 +1,22 @@
+{
+  "favorite": "Favorita",
+  "status": {
+    "notRunning": "Não Circulando"
+  },
+  "labels": {
+    "nextDeparture": "Próxima saída",
+    "last": "Último",
+    "following": "Seguinte",
+    "details": "Ver Detalhes"
+  },
+  "favoriteAction": {
+    "add": "Adicionar linha {{nome}} aos favoritos",
+    "remove": "Remover linha {{nome}} dos favoritos"
+  },
+  "detailsAction": {
+    "label": "Ver detalhes da linha {{nome}}"
+  },
+  "description": {
+    "sr": "Linha {{nome}}{{sublinha}}. Status: {{status}}. Próximo horário: {{nextSchedule}}."
+  }
+}

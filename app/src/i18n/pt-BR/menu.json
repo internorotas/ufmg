@@ -1,0 +1,17 @@
+{
+  "header": {
+    "closeMenu": "Fechar menu lateral"
+  },
+  "search": {
+    "placeholder": "Pesquisar linha...",
+    "aria": "Pesquisar linha de ônibus"
+  },
+  "list": {
+    "aria": "Lista de Linhas",
+    "backToMap": "Ver no mapa"
+  },
+  "mobile": {
+    "openLines": "Ver Linhas",
+    "closeMenu": "Fechar menu"
+  }
+}
