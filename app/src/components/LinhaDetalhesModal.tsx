@@ -551,7 +551,7 @@ export function LinhaDetalhesModal({
           {isLineRunningToday && passados.length > 0 && (
             <div data-slot="passed-schedules">
               <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
-                <Clock size={20} />
+                <Clock size={20} aria-hidden="true" />
                 Horários Passados ({passados.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
@@ -574,7 +574,7 @@ export function LinhaDetalhesModal({
           {!isLineRunningToday && (
             <div data-slot="all-schedules">
               <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
-                <Clock size={20} />
+                <Clock size={20} aria-hidden="true" />
                 Todos os Horários ({todos.length})
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
