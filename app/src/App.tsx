@@ -1,5 +1,4 @@
 import { lazy, Suspense, useCallback, useEffect } from 'react';
-import { AdminLayout } from './components/admin/AdminLayout';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { DataSourceBanner } from './components/app/DataSourceBanner';
 import { DataStatusScreen } from './components/app/DataStatusScreen';
@@ -278,14 +277,6 @@ function AppContent() {
  * @returns {JSX.Element} O componente principal da aplicação renderizado.
  */
 export function App() {
-  if (import.meta.env.DEV && window.location.search.includes('admin=true')) {
-    return (
-      <ThemeProvider>
-        <AdminLayout />
-      </ThemeProvider>
-    );
-  }
-
   return (
     <ErrorBoundary>
       <ThemeProvider>
