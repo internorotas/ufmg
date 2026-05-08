@@ -48,26 +48,28 @@ export function NotificacaoPermissionModal({
   }, [confirmando, onConfirmar]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Ativar Notificações" size="sm">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Saiba quando seu ônibus está chegando"
+      description="Você pode ativar alertas para receber aviso de aproximação da sua linha."
+      size="sm"
+    >
       <div className="flex flex-col items-center gap-5 py-4 text-center">
         {/* Ícone ilustrativo */}
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary">
-          <Bell size={32} className="text-text-inverse" aria-hidden="true" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/12">
+          <Bell size={32} className="text-brand-primary" aria-hidden="true" />
         </div>
 
         {/* Texto explicativo */}
         <div className="space-y-2 px-2">
-          <h3 className="text-base font-semibold text-text-primary">Avisos de chegada</h3>
+          <h3 className="text-base font-semibold text-text-primary">Ative notificações de chegada</h3>
           <p className="text-sm leading-relaxed text-text-secondary">
-            Queremos te avisar quando o ônibus estiver chegando. Para isso, precisamos que você
-            permita o envio de notificações.
+            Receba uma notificação quando a linha que você escolher estiver próxima. Funciona mesmo
+            com o app fechado.
           </p>
           <p className="text-xs text-text-tertiary">
-            Você receberá alertas a cada 5 minutos e uma confirmação ao ônibus chegar.
-          </p>
-          <p className="text-xs text-text-tertiary">
-            Ao permitir, sincronizamos este alarme com o servidor para também te avisar com o app
-            fechado.
+            Você pode desativar quando quiser nas permissões do navegador.
           </p>
         </div>
 
@@ -91,11 +93,12 @@ export function NotificacaoPermissionModal({
             onClick={handleConfirmar}
             loading={confirmando}
             className="flex-1 min-h-11"
+            data-autofocus="true"
           >
-            Permitir
+            Ativar notificações
           </Button>
           <Button variant="outline" type="button" onClick={onClose} className="flex-1 min-h-11">
-            Agora Não
+            Agora não
           </Button>
         </div>
       </div>
