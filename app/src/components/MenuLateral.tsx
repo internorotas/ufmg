@@ -32,8 +32,8 @@ const LinhaDetalhesModal = React.lazy(() =>
  */
 export const sidebarVariants = tv({
   base: [
-    'fixed inset-y-0 left-0 z-[1003] flex flex-col',
-    'w-[85vw] max-w-md md:relative md:w-1/2',
+    'fixed inset-y-0 left-0 z-[1003] flex h-[100dvh] flex-col',
+    'w-screen max-w-none md:relative md:h-full md:w-1/2 md:max-w-md',
     'border-r border-card-border/50 text-text-primary',
     'bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150',
     'shadow-2xl md:shadow-none',
@@ -430,6 +430,35 @@ export const MenuLateral = React.memo(function MenuLateral({
 
           <DisclaimerBanner isOffline={isOffline} />
         </nav>
+
+        <div className="shrink-0 border-t border-card-border bg-background p-4 md:hidden">
+          <Button
+            data-slot="back-to-map"
+            onClick={() => {
+              analytics.trackEvent({
+                category: 'navigation',
+                action: 'back_to_map',
+                label: paradaSelecionada?.idParada ?? linhaSelecionada?.idRota ?? 'sem-contexto',
+              });
+
+              if (paradaSelecionada) {
+                onParadaClick(paradaSelecionada);
+              } else if (linhaSelecionada) {
+                onLinhaSelect(linhaSelecionada);
+              }
+
+              setMenuVisible(false);
+            }}
+            variant="primary"
+            size="lg"
+            fullWidth
+            className="min-h-11"
+            aria-label="Ver no mapa"
+            title="Ver no mapa"
+          >
+            Ver no mapa
+          </Button>
+        </div>
 
         <MenuFooter />
       </aside>
