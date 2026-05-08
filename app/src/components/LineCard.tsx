@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { Bus, ChevronRight, Clock } from 'lucide-react';
+import { Bus, ChevronRight, Clock, Star } from 'lucide-react';
 import type React from 'react';
 import { memo, useMemo } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
@@ -75,6 +75,10 @@ export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
   idParada?: string;
   /** Classe CSS adicional */
   className?: string;
+  /** Estado de favorito da linha (opcional para compatibilidade incremental) */
+  isFavorita?: boolean;
+  /** Callback de alternância de favorito (opcional para compatibilidade incremental) */
+  onToggleFavorita?: (idRota: string) => void;
 }
 
 /**
@@ -201,6 +205,8 @@ function LineCardComponent({
   isSelected = false,
   idParada,
   className,
+  isFavorita = false,
+  onToggleFavorita,
 }: LineCardProps) {
   const { trackEvent } = useAnalytics();
   const now = useCurrentTime();
@@ -256,11 +262,25 @@ function LineCardComponent({
     onDetailsClick(linha);
   };
 
+  const handleToggleFavorita = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!onToggleFavorita) return;
+
+    trackEvent({
+      category: 'engagement',
+      action: isFavorita ? 'unfavorite_line' : 'favorite_line',
+      label: linha.nome,
+    });
+
+    onToggleFavorita(linha.idRota);
+  };
+
   return (
     <article
       data-slot="card"
       data-state={isSelected ? 'selected' : undefined}
       className={cn(lineCardVariants({ selected: isSelected }), 'mb-3', className)}
+      style={{ '--line-color': linha.corHex } as React.CSSProperties}
     >
       <button
         type="button"
@@ -275,13 +295,26 @@ function LineCardComponent({
             <div className="flex flex-1 items-start gap-3">
               <LineIcon color={linha.corHex} />
               <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-0.5">
-                <h3 className="text-base font-bold leading-tight text-text-primary">
+                <h3 className="text-base font-bold leading-tight text-text-primary md:text-lg">
                   {linha.nome}
                 </h3>
                 {linha.sublinha && (
                   <p className="col-span-2 text-sm text-text-secondary">{linha.sublinha}</p>
                 )}
                 <div className="col-start-2 row-start-1 flex items-center gap-2">
+                  {isFavorita && (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                      style={{
+                        borderColor: hexToRgba(linha.corHex, 0.32),
+                        backgroundColor: hexToRgba(linha.corHex, 0.12),
+                        color: linha.corHex,
+                      }}
+                    >
+                      <Star className="size-3 fill-current" aria-hidden="true" />
+                      Favorita
+                    </span>
+                  )}
                   <LineStatusBadge status={statusType} label={status} size="xs" />
                   <ChevronRight
                     className="size-5 shrink-0 text-text-secondary"
@@ -299,9 +332,17 @@ function LineCardComponent({
               message={shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto}
             />
           ) : (
-            <div className="mb-4 grid grid-cols-2 gap-3">
-              <ScheduleDisplay label="Último Partiu" time={previousSchedule} />
-              <ScheduleDisplay label="Próximo" time={nextSchedule} highlight />
+            <div className="mb-4 rounded-xl border p-3" style={{ borderColor: hexToRgba(linha.corHex, 0.24) }}>
+              <p className="mb-1 text-xs font-semibold tracking-wide text-text-secondary uppercase">
+                Próxima saída
+              </p>
+              <p className="font-bold text-[clamp(1.5rem,5vw,2rem)] leading-none tabular-nums" style={{ color: linha.corHex }}>
+                {nextSchedule}
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <ScheduleDisplay label="Último" time={previousSchedule} />
+                <ScheduleDisplay label="Seguinte" time={nextSchedule} highlight />
+              </div>
             </div>
           )}
 
@@ -317,7 +358,32 @@ function LineCardComponent({
         </div>
       </button>
 
-      <div data-slot="actions" className="px-4 pb-4">
+      <div data-slot="actions" className="grid grid-cols-[auto_1fr] gap-2 px-4 pb-4">
+        <button
+          type="button"
+          aria-label={
+            isFavorita
+              ? `Remover linha ${linha.nome} dos favoritos`
+              : `Adicionar linha ${linha.nome} aos favoritos`
+          }
+          aria-pressed={isFavorita}
+          data-slot="favorite-action"
+          onClick={handleToggleFavorita}
+          disabled={!onToggleFavorita}
+          className={cn(
+            'flex min-h-11 min-w-11 items-center justify-center rounded-lg border transition-all duration-150',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
+            'disabled:cursor-not-allowed disabled:opacity-60',
+          )}
+          style={{
+            borderColor: hexToRgba(linha.corHex, isFavorita ? 0.5 : 0.28),
+            backgroundColor: isFavorita ? hexToRgba(linha.corHex, 0.14) : 'var(--card-background)',
+            color: isFavorita ? linha.corHex : 'var(--text-secondary)',
+          }}
+        >
+          <Star className={cn('size-5', isFavorita && 'fill-current')} aria-hidden="true" />
+        </button>
+
         <button
           type="button"
           aria-label={`Ver detalhes da linha ${linha.nome}`}
@@ -327,6 +393,7 @@ function LineCardComponent({
           style={{
             borderColor: hexToRgba(linha.corHex, 0.35),
             color: linha.corHex,
+            minHeight: '44px',
           }}
         >
           <span className="flex items-center justify-between gap-3">
