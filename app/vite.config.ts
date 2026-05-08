@@ -41,6 +41,8 @@ export default defineConfig({
     },
   },
   server: {
+    // Evita discrepancia localhost vs 127.0.0.1 no ambiente local.
+    host: true,
     fs: {
       // Permite que o servidor de desenvolvimento acesse o workspace e o
       // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
