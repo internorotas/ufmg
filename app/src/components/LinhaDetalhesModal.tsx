@@ -203,7 +203,7 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
         type="button"
         onClick={() => onClick(parada)}
         className={cn(stopButtonVariants(), 'mx-0 flex-1')}
-        aria-label={`Ver localização da parada ${parada.nome} no mapa`}
+        aria-label={t('a11y.viewStopOnMap', { nome: parada.nome })}
         title={t('a11y.viewStopOnMap', { nome: parada.nome })}
       >
         <div
