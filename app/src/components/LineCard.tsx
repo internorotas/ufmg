@@ -6,6 +6,7 @@
 import { Bus, ChevronRight, Clock, Star } from 'lucide-react';
 import type React from 'react';
 import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
@@ -208,6 +209,7 @@ function LineCardComponent({
   isFavorita = false,
   onToggleFavorita,
 }: LineCardProps) {
+  const { t } = useTranslation('line-card');
   const { trackEvent } = useAnalytics();
   const now = useCurrentTime();
 
@@ -227,7 +229,7 @@ function LineCardComponent({
 
   const status =
     shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE'
-      ? 'Não Circulando'
+      ? t('status.notRunning')
       : statusLinha.texto;
 
   const statusType: LineStatusType = (() => {
@@ -312,7 +314,7 @@ function LineCardComponent({
                       }}
                     >
                       <Star className="size-3 fill-current" aria-hidden="true" />
-                      Favorita
+                      {t('favorite')}
                     </span>
                   )}
                   <LineStatusBadge status={statusType} label={status} size="xs" />
@@ -332,16 +334,22 @@ function LineCardComponent({
               message={shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto}
             />
           ) : (
-            <div className="mb-4 rounded-xl border p-3" style={{ borderColor: hexToRgba(linha.corHex, 0.24) }}>
+            <div
+              className="mb-4 rounded-xl border p-3"
+              style={{ borderColor: hexToRgba(linha.corHex, 0.24) }}
+            >
               <p className="mb-1 text-xs font-semibold tracking-wide text-text-secondary uppercase">
-                Próxima saída
+                {t('labels.nextDeparture')}
               </p>
-              <p className="font-bold text-[clamp(1.5rem,5vw,2rem)] leading-none tabular-nums" style={{ color: linha.corHex }}>
+              <p
+                className="font-bold text-[clamp(1.5rem,5vw,2rem)] leading-none tabular-nums"
+                style={{ color: linha.corHex }}
+              >
                 {nextSchedule}
               </p>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <ScheduleDisplay label="Último" time={previousSchedule} />
-                <ScheduleDisplay label="Seguinte" time={nextSchedule} highlight />
+                <ScheduleDisplay label={t('labels.last')} time={previousSchedule} />
+                <ScheduleDisplay label={t('labels.following')} time={nextSchedule} highlight />
               </div>
             </div>
           )}
@@ -353,7 +361,12 @@ function LineCardComponent({
           ) : null}
 
           <p id={getLineDescriptionId(linha.idRota)} className="sr-only">
-            {`Linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ''}. Status: ${status}. Próximo horário: ${nextSchedule}.`}
+            {t('description.sr', {
+              nome: linha.nome,
+              sublinha: linha.sublinha ? ` - ${linha.sublinha}` : '',
+              status,
+              nextSchedule,
+            })}
           </p>
         </div>
       </button>
@@ -363,8 +376,8 @@ function LineCardComponent({
           type="button"
           aria-label={
             isFavorita
-              ? `Remover linha ${linha.nome} dos favoritos`
-              : `Adicionar linha ${linha.nome} aos favoritos`
+              ? t('favoriteAction.remove', { nome: linha.nome })
+              : t('favoriteAction.add', { nome: linha.nome })
           }
           aria-pressed={isFavorita}
           data-slot="favorite-action"
@@ -386,7 +399,7 @@ function LineCardComponent({
 
         <button
           type="button"
-          aria-label={`Ver detalhes da linha ${linha.nome}`}
+          aria-label={t('detailsAction.label', { nome: linha.nome })}
           data-slot="action"
           onClick={handleDetailsClickInternal}
           className={detailsButtonVariants()}
@@ -397,7 +410,7 @@ function LineCardComponent({
           }}
         >
           <span className="flex items-center justify-between gap-3">
-            <span>Ver Detalhes</span>
+            <span>{t('labels.details')}</span>
             <span
               aria-hidden="true"
               className="size-2 shrink-0 rounded-full"

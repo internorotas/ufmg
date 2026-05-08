@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import type { AriaRole, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '@/lib/utils';
 
@@ -59,11 +60,12 @@ export function SystemBanner({
   description,
   icon,
   actions,
-  dismissLabel = 'Fechar aviso',
+  dismissLabel,
   onDismiss,
   role,
   className,
 }: SystemBannerProps) {
+  const { t } = useTranslation('system-banner');
   const slots = systemBannerVariants({ variant });
   const resolvedRole = role ?? (variant === 'warning' ? 'alert' : 'status');
 
@@ -88,8 +90,8 @@ export function SystemBanner({
           <button
             type="button"
             onClick={onDismiss}
-            aria-label={dismissLabel}
-            title={dismissLabel}
+            aria-label={dismissLabel || t('dismiss')}
+            title={dismissLabel || t('dismiss')}
             className={slots.close()}
           >
             <X className="size-4" aria-hidden="true" />

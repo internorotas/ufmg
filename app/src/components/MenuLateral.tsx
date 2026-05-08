@@ -5,6 +5,7 @@
 
 import { ArrowLeft, Info, Menu } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { getCurrentSpecialPeriod, isWeekday } from '@/config/specialPeriods';
 import logo from '../assets/logo-horizontal-transparente.svg';
@@ -135,6 +136,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   linhaSelecionada,
   isOffline,
 }: MenuLateralProps) {
+  const { t } = useTranslation('menu');
   const analytics = useAnalytics();
   const { trackEvent } = analytics;
   const { paradaSelecionada } = useRotasSelection();
@@ -321,11 +323,11 @@ export const MenuLateral = React.memo(function MenuLateral({
           aria-controls="menu-lateral-sidebar"
           aria-expanded={isMenuVisible}
           aria-haspopup="dialog"
-          title="Ver Linhas"
+          title={t('mobile.openLines')}
         >
           <span className="flex items-center gap-2 text-white">
             <Menu size={24} aria-hidden="true" />
-            Ver Linhas
+            {t('mobile.openLines')}
           </span>
         </Button>
       </div>
@@ -342,7 +344,7 @@ export const MenuLateral = React.memo(function MenuLateral({
             });
             setMenuVisible(false);
           }}
-          aria-label="Fechar menu"
+          aria-label={t('mobile.closeMenu')}
           className="fixed inset-0 z-1002 animate-fade-in bg-backdrop backdrop-blur-sm cursor-pointer md:hidden"
         />
       )}
@@ -382,8 +384,8 @@ export const MenuLateral = React.memo(function MenuLateral({
               variant="ghost"
               size="sm"
               className="rounded-lg p-2 text-white hover:bg-white/20 md:hidden"
-              aria-label="Fechar menu lateral"
-              title="Fechar menu lateral"
+              aria-label={t('header.closeMenu')}
+              title={t('header.closeMenu')}
             >
               <ArrowLeft size={24} aria-hidden="true" />
             </Button>
@@ -395,8 +397,8 @@ export const MenuLateral = React.memo(function MenuLateral({
             ref={searchInputRef}
             value={searchTerm}
             onValueChange={setSearchTerm}
-            placeholder="Pesquisar linha..."
-            aria-label="Pesquisar linha de ônibus"
+            placeholder={t('search.placeholder')}
+            aria-label={t('search.aria')}
             shortcut={shortcutLabel}
           />
         </div>
@@ -410,7 +412,7 @@ export const MenuLateral = React.memo(function MenuLateral({
         <nav
           data-slot="list"
           className="flex-1 overflow-y-auto bg-background p-4"
-          aria-label="Lista de Linhas"
+          aria-label={t('list.aria')}
         >
           {specialPeriod ? (
             <SystemBanner
@@ -420,16 +422,18 @@ export const MenuLateral = React.memo(function MenuLateral({
               description={
                 <>
                   <p>
-                    De {specialPeriod.startDate.toLocaleDateString('pt-BR')} a{' '}
-                    {specialPeriod.endDate.toLocaleDateString('pt-BR')}, operam apenas os horários
-                    de Férias e Recessos. Não há circulação aos fins de semana e feriados.
+                    <Trans
+                      i18nKey="vacation.description"
+                      ns="system-banner"
+                      values={{
+                        start: specialPeriod.startDate.toLocaleDateString('pt-BR'),
+                        end: specialPeriod.endDate.toLocaleDateString('pt-BR'),
+                      }}
+                    />
                   </p>
                   {!isWeekdayToday && (
                     <p className="mt-2 font-semibold">
-                      <span role="img" aria-label="Atenção">
-                        ⚠️
-                      </span>{' '}
-                      Hoje não há circulação de ônibus (apenas em dias úteis).
+                      <Trans i18nKey="vacation.weekendWarning" ns="system-banner" />
                     </p>
                   )}
                 </>
@@ -441,10 +445,11 @@ export const MenuLateral = React.memo(function MenuLateral({
             variant="info"
             icon={<Info aria-hidden="true" />}
             description={
-              <>
-                Todas as rotas iniciam e terminam próximas à <strong>Escola de Música</strong>. Os
-                horários indicam a saída dos ônibus deste ponto.
-              </>
+              <Trans
+                i18nKey="info.description"
+                ns="system-banner"
+                components={{ strong: <strong /> }}
+              />
             }
           />
 
@@ -488,10 +493,10 @@ export const MenuLateral = React.memo(function MenuLateral({
             size="lg"
             fullWidth
             className="min-h-11"
-            aria-label="Ver no mapa"
-            title="Ver no mapa"
+            aria-label={t('list.backToMap')}
+            title={t('list.backToMap')}
           >
-            Ver no mapa
+            {t('list.backToMap')}
           </Button>
         </div>
 

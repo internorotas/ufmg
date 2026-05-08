@@ -13,6 +13,7 @@
 
 import { Bell, Info } from 'lucide-react';
 import { useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Modal } from './Modal';
 import { Button } from './ui/Button';
 
@@ -34,6 +35,7 @@ export function NotificacaoPermissionModal({
   onClose,
   onConfirmar,
 }: NotificacaoPermissionModalProps) {
+  const { t } = useTranslation('modals');
   const showIOSNote = isIOS();
   const [confirmando, setConfirmando] = useState(false);
 
@@ -51,8 +53,8 @@ export function NotificacaoPermissionModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Saiba quando seu ônibus está chegando"
-      description="Você pode ativar alertas para receber aviso de aproximação da sua linha."
+      title={t('notificationPermission.title')}
+      description={t('notificationPermission.description')}
       size="sm"
     >
       <div className="flex flex-col items-center gap-5 py-4 text-center">
@@ -63,14 +65,13 @@ export function NotificacaoPermissionModal({
 
         {/* Texto explicativo */}
         <div className="space-y-2 px-2">
-          <h3 className="text-base font-semibold text-text-primary">Ative notificações de chegada</h3>
+          <h3 className="text-base font-semibold text-text-primary">
+            {t('notificationPermission.subtitle')}
+          </h3>
           <p className="text-sm leading-relaxed text-text-secondary">
-            Receba uma notificação quando a linha que você escolher estiver próxima. Funciona mesmo
-            com o app fechado.
+            {t('notificationPermission.body')}
           </p>
-          <p className="text-xs text-text-tertiary">
-            Você pode desativar quando quiser nas permissões do navegador.
-          </p>
+          <p className="text-xs text-text-tertiary">{t('notificationPermission.helper')}</p>
         </div>
 
         {/* Nota para usuários iOS */}
@@ -78,9 +79,11 @@ export function NotificacaoPermissionModal({
           <div className="flex w-full items-start gap-2 rounded-lg border border-warning-border bg-warning-bg p-3 text-left">
             <Info size={16} className="mt-0.5 shrink-0 text-warning-text" aria-hidden="true" />
             <p className="text-xs leading-relaxed text-warning-text">
-              No iPhone, as notificações só funcionam se o app estiver instalado na tela inicial.
-              Toque em <strong>Compartilhar → Adicionar à Tela de Início</strong> no Safari para
-              ativá-las.
+              <Trans
+                i18nKey="notificationPermission.iosNote"
+                ns="modals"
+                components={{ strong: <strong /> }}
+              />
             </p>
           </div>
         )}
@@ -95,10 +98,10 @@ export function NotificacaoPermissionModal({
             className="flex-1 min-h-11"
             data-autofocus="true"
           >
-            Ativar notificações
+            {t('notificationPermission.actions.allow')}
           </Button>
           <Button variant="outline" type="button" onClick={onClose} className="flex-1 min-h-11">
-            Agora não
+            {t('notificationPermission.actions.later')}
           </Button>
         </div>
       </div>

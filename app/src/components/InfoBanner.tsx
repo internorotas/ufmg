@@ -5,6 +5,7 @@
 
 import { Info } from 'lucide-react';
 import type { ComponentProps } from 'react';
+import { Trans } from 'react-i18next';
 import { SystemBanner } from './SystemBanner';
 
 export interface InfoBannerProps extends ComponentProps<'div'> {}
@@ -24,10 +25,7 @@ export function InfoBanner({ className, ...props }: InfoBannerProps) {
       className={className}
       icon={<Info aria-hidden="true" />}
       description={
-        <>
-          Todas as rotas iniciam e terminam próximas à <strong>Escola de Música</strong>. Os
-          horários indicam a saída dos ônibus deste ponto.
-        </>
+        <Trans i18nKey="info.description" ns="system-banner" components={{ strong: <strong /> }} />
       }
       {...props}
     />
