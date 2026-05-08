@@ -34,6 +34,12 @@ interface NotificacaoContextValue {
 
 const NotificacaoContext = createContext<NotificacaoContextValue | null>(null);
 
+const FALLBACK_NOTIFICACAO_CONTEXT: NotificacaoContextValue = {
+  suportado: false,
+  isAlarmado: () => false,
+  toggleNotificacao: () => {},
+};
+
 export function NotificacaoProvider({ children }: { children: ReactNode }) {
   const { trackEvent } = useAnalytics();
   const {
@@ -166,7 +172,11 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
 export function useNotificacaoContext(): NotificacaoContextValue {
   const ctx = useContext(NotificacaoContext);
   if (!ctx) {
-    throw new Error('useNotificacaoContext deve ser usado dentro de <NotificacaoProvider>');
+    if (import.meta.env.DEV) {
+      // biome-ignore lint/suspicious/noConsole: aviso útil para depuração local sem derrubar a árvore React durante HMR
+      console.warn('useNotificacaoContext fora de <NotificacaoProvider>; usando fallback seguro.');
+    }
+    return FALLBACK_NOTIFICACAO_CONTEXT;
   }
   return ctx;
 }
