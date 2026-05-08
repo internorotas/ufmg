@@ -16,6 +16,7 @@ import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoU
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
+import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
 const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default: module.Mapa })));
@@ -277,6 +278,19 @@ function AppContent() {
  * @returns {JSX.Element} O componente principal da aplicação renderizado.
  */
 export function App() {
+  const currentPath = window.location.pathname;
+  const isAdminHoneypotRoute = currentPath === '/admin' || currentPath.endsWith('/admin');
+
+  if (isAdminHoneypotRoute) {
+    return (
+      <ErrorBoundary>
+        <ThemeProvider>
+          <FakeAdminLoginPage />
+        </ThemeProvider>
+      </ErrorBoundary>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <ThemeProvider>
