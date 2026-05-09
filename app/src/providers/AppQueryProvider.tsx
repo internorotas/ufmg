@@ -1,5 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
+import { useAuthStore } from '@/features/auth/store/authStore';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,5 +17,11 @@ interface AppQueryProviderProps {
 }
 
 export function AppQueryProvider({ children }: AppQueryProviderProps) {
+  const accessToken = useAuthStore((state) => state.accessToken);
+
+  useEffect(() => {
+    window.__internoAuthToken = accessToken ?? null;
+  }, [accessToken]);
+
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
