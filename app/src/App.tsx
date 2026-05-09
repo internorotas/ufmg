@@ -10,6 +10,9 @@ import { GA_MEASUREMENT_ID } from './config/analytics';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { getGoogleStartUrl } from './features/auth/api/authClient';
+import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
+import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
@@ -47,6 +50,8 @@ if (GA_MEASUREMENT_ID) {
  * Separado do App principal para que o useRotas funcione dentro do Provider.
  */
 function AppContent() {
+  useAuthBootstrap();
+
   const {
     linhasData,
     todasParadas,
@@ -62,6 +67,7 @@ function AppContent() {
   } = useRotas();
 
   const { trackEvent, trackPageView } = useAnalytics();
+  const { authStatus, isAuthenticated } = useAuthContext();
   const { isOffline, showOfflineToast } = useAppConnectivity();
 
   // Hook de localização do usuário
@@ -203,6 +209,16 @@ function AppContent() {
         onParadaClick={handleParadaClick}
         linhaSelecionada={linhaSelecionada}
         isOffline={isOffline}
+        authStatus={authStatus}
+        isAuthenticated={isAuthenticated}
+        onAuthAction={() => {
+          if (isAuthenticated) {
+            window.location.assign('/perfil');
+            return;
+          }
+
+          window.location.assign(getGoogleStartUrl());
+        }}
       />
       <DataSourceBanner isVisible={isOfflineDataFallback} source={dataSource} />
       <main
@@ -294,13 +310,15 @@ export function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <RotasProvider>
-          <AnalyticsProvider>
-            <NotificacaoProvider>
-              <AppContent />
-            </NotificacaoProvider>
-          </AnalyticsProvider>
-        </RotasProvider>
+        <AuthProvider>
+          <RotasProvider>
+            <AnalyticsProvider>
+              <NotificacaoProvider>
+                <AppContent />
+              </NotificacaoProvider>
+            </AnalyticsProvider>
+          </RotasProvider>
+        </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

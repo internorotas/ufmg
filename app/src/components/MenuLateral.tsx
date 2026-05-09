@@ -74,6 +74,9 @@ export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
   onParadaClick: (parada: Parada) => void;
   linhaSelecionada: Linha | null;
   isOffline: boolean;
+  authStatus: 'booting' | 'authenticated' | 'anonymous';
+  isAuthenticated: boolean;
+  onAuthAction: () => void;
 }
 
 interface CategoryTabsProps {
@@ -135,6 +138,9 @@ export const MenuLateral = React.memo(function MenuLateral({
   onParadaClick,
   linhaSelecionada,
   isOffline,
+  authStatus,
+  isAuthenticated,
+  onAuthAction,
 }: MenuLateralProps) {
   const { t } = useTranslation('menu');
   const analytics = useAnalytics();
@@ -365,6 +371,23 @@ export const MenuLateral = React.memo(function MenuLateral({
           data-slot="header"
           className="flex shrink-0 items-center justify-between bg-brand-primary p-2 shadow-sm"
         >
+          <div className="min-w-[132px]">
+            {authStatus === 'booting' ? (
+              <span className="rounded-full bg-white/15 px-3 py-2 text-xs font-semibold text-white">
+                Sessao...
+              </span>
+            ) : (
+              <Button
+                type="button"
+                onClick={onAuthAction}
+                variant="ghost"
+                size="sm"
+                className="min-h-11 rounded-full bg-white/15 px-3 text-xs font-semibold text-white hover:bg-white/25"
+              >
+                {isAuthenticated ? 'Perfil' : 'Entrar'}
+              </Button>
+            )}
+          </div>
           <div className="flex flex-1 items-center justify-center">
             <img src={logo} alt="Logo Interno Rotas" className="h-6" width="138" height="24" />
           </div>

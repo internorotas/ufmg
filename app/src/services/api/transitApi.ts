@@ -36,7 +36,17 @@ function assertParadasPayload(payload: unknown): asserts payload is ParadasPaylo
 
 async function fetchTransit<T>(pathname: '/v1/linhas' | '/v1/paradas'): Promise<T> {
   const endpoint = resolveTransitEndpoint(pathname);
-  const response = await fetch(endpoint, { cache: 'no-store' });
+  const authToken = window.__internoAuthToken ?? null;
+  const headers = authToken
+    ? {
+        Authorization: `Bearer ${authToken}`,
+      }
+    : undefined;
+
+  const response = await fetch(endpoint, {
+    cache: 'no-store',
+    headers,
+  });
 
   if (!response.ok) {
     throw new Error(`Falha ao buscar ${pathname}: HTTP ${response.status}`);
