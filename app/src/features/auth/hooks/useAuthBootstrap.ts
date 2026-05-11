@@ -32,6 +32,11 @@ export function useAuthBootstrap() {
           return;
         }
 
+        if (!refreshed.accessToken) {
+          setAnonymousSession();
+          return;
+        }
+
         setAuthenticatedSession({
           accessToken: refreshed.accessToken,
           user: refreshed.user ?? null,
