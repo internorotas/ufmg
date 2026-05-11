@@ -6,6 +6,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 import packageJson from '../package.json';
 
 const buildId = new Date().toISOString();
+const devProxyTarget = process.env.VITE_DEV_PROXY_TARGET ?? 'http://127.0.0.1:43111';
+const usePolling = process.env.CHOKIDAR_USEPOLLING === 'true';
 
 export default defineConfig({
   plugins: [
@@ -43,6 +45,12 @@ export default defineConfig({
   server: {
     // Evita discrepancia localhost vs 127.0.0.1 no ambiente local.
     host: true,
+    watch: usePolling
+      ? {
+          usePolling: true,
+          interval: 300,
+        }
+      : undefined,
     fs: {
       // Permite que o servidor de desenvolvimento acesse o workspace e o
       // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
@@ -53,7 +61,7 @@ export default defineConfig({
     proxy: {
       // Backend local NestJS para rotas /v1/* durante desenvolvimento.
       '/v1': {
-        target: 'http://127.0.0.1:43111',
+        target: devProxyTarget,
         changeOrigin: true,
       },
     },

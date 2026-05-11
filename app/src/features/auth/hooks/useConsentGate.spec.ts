@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveConsentStatus, type ConsentGateStatus } from './useConsentGate';
+import { type ConsentGateStatus, resolveConsentStatus } from './useConsentGate';
 
 describe('resolveConsentStatus', () => {
   it('retorna denied para usuário não autenticado', async () => {

@@ -87,7 +87,10 @@ export async function refreshSession(): Promise<RefreshResponse> {
   }
 
   if (!response.ok) {
-    throw new AuthRequestError(`Falha no refresh de sessao: HTTP ${response.status}`, response.status);
+    throw new AuthRequestError(
+      `Falha no refresh de sessao: HTTP ${response.status}`,
+      response.status,
+    );
   }
 
   return response.json() as Promise<RefreshResponse>;

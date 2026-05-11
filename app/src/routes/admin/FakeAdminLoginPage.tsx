@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { type FormEvent, useState } from 'react';
 
 type FormState = {
   username: string;
@@ -82,7 +82,12 @@ export function FakeAdminLoginPage() {
               name="username"
               value={form.username}
               onChange={(event) => setForm((prev) => ({ ...prev, username: event.target.value }))}
-              style={{ minHeight: 44, borderRadius: 8, border: '1px solid var(--color-border)', padding: 10 }}
+              style={{
+                minHeight: 44,
+                borderRadius: 8,
+                border: '1px solid var(--color-border)',
+                padding: 10,
+              }}
             />
           </label>
 
@@ -94,7 +99,12 @@ export function FakeAdminLoginPage() {
               name="password"
               value={form.password}
               onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
-              style={{ minHeight: 44, borderRadius: 8, border: '1px solid var(--color-border)', padding: 10 }}
+              style={{
+                minHeight: 44,
+                borderRadius: 8,
+                border: '1px solid var(--color-border)',
+                padding: 10,
+              }}
             />
           </label>
 

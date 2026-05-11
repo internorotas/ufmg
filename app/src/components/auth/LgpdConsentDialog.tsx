@@ -30,10 +30,20 @@ export function LgpdConsentDialog({ isOpen, onClose, onAccept, onRefuse }: LgpdC
         <p className="text-xs leading-relaxed text-text-tertiary">{t('lgpdConsent.retention')}</p>
 
         <div className="mt-2 grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
-          <Button type="button" variant="primary" onClick={() => void onAccept()} className="min-h-11">
+          <Button
+            type="button"
+            variant="primary"
+            onClick={() => void onAccept()}
+            className="min-h-11"
+          >
             {t('lgpdConsent.actions.accept')}
           </Button>
-          <Button type="button" variant="outline" onClick={() => void onRefuse()} className="min-h-11">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => void onRefuse()}
+            className="min-h-11"
+          >
             {t('lgpdConsent.actions.refuse')}
           </Button>
         </div>
