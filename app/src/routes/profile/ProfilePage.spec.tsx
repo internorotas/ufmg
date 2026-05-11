@@ -153,6 +153,7 @@ describe('ProfilePage', () => {
     expect(container.textContent).toContain('@u1');
     expect(container.textContent).toContain('Ranking geral');
     expect(container.textContent).toContain('Normal');
+    expect(container.textContent).toContain('Viagem encerrada automaticamente');
     expect(container.textContent).toContain('Solicitar exclusão de conta');
   });
 });

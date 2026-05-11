@@ -13,6 +13,7 @@
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
 import type { Linha, Parada } from '../types/data.types';
@@ -45,6 +46,8 @@ interface MapaProps {
   onPedirLocalizacao?: () => void;
   /** Estado de carregamento de geolocalização */
   carregandoLocalizacao?: boolean;
+  rastreioColaborativo?: GpsTrackingState;
+  onAlternarRastreioColaborativo?: () => void;
   /** Ref para expor métodos do mapa (React 19 - ref como prop) */
   ref?: Ref<MapaRef>;
 }
@@ -99,6 +102,8 @@ export function Mapa({
   permissaoLocalizacao = false,
   onPedirLocalizacao,
   carregandoLocalizacao = false,
+  rastreioColaborativo,
+  onAlternarRastreioColaborativo,
   ref,
 }: MapaProps) {
   const { trackTiming } = useAnalytics();
@@ -149,6 +154,8 @@ export function Mapa({
           permissaoConcedida={permissaoLocalizacao}
           onPedirLocalizacao={onPedirLocalizacao}
           carregandoLocalizacao={carregandoLocalizacao}
+          rastreioColaborativo={rastreioColaborativo}
+          onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
         />
       )}
 

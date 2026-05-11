@@ -39,6 +39,14 @@ interface PushPayload {
   url?: string;
 }
 
+function broadcastGpsFlushRequest(): Promise<void> {
+  return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+    for (const client of clients) {
+      client.postMessage({ type: 'gps-flush-queue' });
+    }
+  });
+}
+
 function resolveAssetUrl(path: string): string {
   return new URL(path, self.registration.scope).toString();
 }
@@ -174,4 +182,21 @@ self.addEventListener('pushsubscriptionchange', (event) => {
       });
     })(),
   );
+});
+
+self.addEventListener('sync', (event: Event) => {
+  const syncEvent = event as ExtendableEvent & { tag?: string };
+  if (syncEvent.tag !== 'gps-flush-queue') {
+    return;
+  }
+
+  syncEvent.waitUntil(broadcastGpsFlushRequest());
+});
+
+self.addEventListener('message', (event: ExtendableMessageEvent) => {
+  if (event.data?.type !== 'gps-flush-queue') {
+    return;
+  }
+
+  event.waitUntil(broadcastGpsFlushRequest());
 });

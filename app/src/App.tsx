@@ -17,12 +17,14 @@ import { startGoogleLoginFlow } from './features/auth/api/authClient';
 import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
 import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
 import { useConsentGate } from './features/auth/hooks/useConsentGate';
+import { useGpsTrackingSession } from './features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
 import { ProfilePage } from './routes/profile/ProfilePage';
+import { ResearchDashboardPage } from './routes/research/ResearchDashboardPage';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
 
@@ -73,7 +75,7 @@ function AppContent() {
   } = useRotas();
 
   const { trackEvent, trackPageView } = useAnalytics();
-  const { authStatus, isAuthenticated } = useAuthContext();
+  const { authStatus, isAuthenticated, user } = useAuthContext();
   const { isOffline, showOfflineToast } = useAppConnectivity();
   const {
     dialogOpen,
@@ -105,14 +107,10 @@ function AppContent() {
     };
   }, [location.pathname, location.state, navigate]);
 
-  const canStartTracking = useCallback(async () => {
-    const result = await executeProtectedAction(async () => {});
-    return result.allowed;
-  }, [executeProtectedAction]);
-
   // Hook de localização do usuário
   const {
     localizacao,
+    ultimaLeitura,
     heading,
     permissaoConcedida,
     carregando: carregandoLocalizacao,
@@ -123,7 +121,19 @@ function AppContent() {
     fecharModalLonge,
     iniciarRastreamento,
     solicitarPermissaoNavegador,
-  } = useLocalizacaoUsuario({ canStartTracking });
+  } = useLocalizacaoUsuario();
+
+  const rastreioColaborativo = useGpsTrackingSession({
+    enabled: isAuthenticated,
+    selectedLine: linhaSelecionada,
+    userId: user?.id ?? null,
+  });
+  const {
+    isActive: rastreioAtivo,
+    start: iniciarRastreioColaborativo,
+    stop: encerrarRastreioColaborativo,
+    ingestSnapshot,
+  } = rastreioColaborativo;
   const { solicitarAutoCenter, consumirAutoCenter } = useMapAutoCenter({
     mapaRef,
     localizacao,
@@ -134,6 +144,17 @@ function AppContent() {
   useEffect(() => {
     trackPageView('/home');
   }, [trackPageView]);
+
+  useEffect(() => {
+    if (!ultimaLeitura || !rastreioAtivo) {
+      return;
+    }
+
+    void ingestSnapshot({
+      ...ultimaLeitura,
+      heading: ultimaLeitura.heading ?? heading,
+    });
+  }, [heading, ingestSnapshot, rastreioAtivo, ultimaLeitura]);
 
   // Handlers com tracking de analytics
   const handleLinhaSelect = useCallback(
@@ -169,6 +190,29 @@ function AppContent() {
     solicitarAutoCenter();
     iniciarRastreamento();
   }, [solicitarAutoCenter, iniciarRastreamento]);
+
+  const handleAlternarRastreioColaborativo = useCallback(() => {
+    if (rastreioAtivo) {
+      void encerrarRastreioColaborativo('manual');
+      return;
+    }
+
+    void executeProtectedAction(async () => {
+      if (!permissaoConcedida) {
+        await iniciarRastreamento();
+        return;
+      }
+
+      await iniciarRastreioColaborativo();
+    });
+  }, [
+    encerrarRastreioColaborativo,
+    executeProtectedAction,
+    iniciarRastreamento,
+    iniciarRastreioColaborativo,
+    permissaoConcedida,
+    rastreioAtivo,
+  ]);
 
   // Handler para voltar ao campus UFMG
   const handleVoltarParaUFMG = useCallback(() => {
@@ -299,6 +343,8 @@ function AppContent() {
               permissaoLocalizacao={permissaoConcedida}
               carregandoLocalizacao={carregandoLocalizacao}
               onPedirLocalizacao={handlePedirLocalizacao}
+              rastreioColaborativo={rastreioColaborativo}
+              onAlternarRastreioColaborativo={handleAlternarRastreioColaborativo}
             />
           </Suspense>
         </ErrorBoundary>
@@ -396,6 +442,7 @@ export function App() {
       <ThemeProvider>
         <Routes>
           <Route path="/admin/*" element={<FakeAdminLoginPage />} />
+          <Route path="/pesquisa" element={<ResearchDashboardPage />} />
           <Route path="/*" element={<AppAuthenticatedRoutes />} />
         </Routes>
       </ThemeProvider>

@@ -212,7 +212,12 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                   {/* Coluna direita: badge de previsão + sino */}
                   {linha ? (
                     <div className="flex shrink-0 items-center gap-1">
-                      <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                      <div className="flex min-w-0 flex-col items-end gap-1">
+                        <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                        <span className="max-w-32 text-right text-[10px] text-text-tertiary">
+                          prev: {minutosFaltantes !== null ? `${minutosFaltantes} min` : 'sem dado'}
+                        </span>
+                      </div>
                       {suportado &&
                         minutosFaltantes !== null &&
                         (() => {
