@@ -218,6 +218,13 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 
     const hasValue = Boolean(value);
 
+    // Normalize shortcut string for standard ARIA key identifiers (e.g., '⌘K' -> 'Meta+K')
+    const ariaKeyShortcuts = shortcut
+      ?.replace(/⌘/g, 'Meta+')
+      ?.replace(/Ctrl(?!\+)/g, 'Control+')
+      ?.replace(/Ctrl\+/g, 'Control+')
+      ?.replace(/\+\+/g, '+');
+
     return (
       <div data-slot="search-input" className="relative w-full">
         <Search
@@ -232,6 +239,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           value={value}
           onChange={handleChange}
           aria-label={fallbackAriaLabel}
+          aria-keyshortcuts={ariaKeyShortcuts}
           enterKeyHint="search"
           className={cn(
             inputVariants({
@@ -258,7 +266,11 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           </button>
         ) : shortcut ? (
           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 hidden md:block">
-            <kbd className="inline-flex h-5 items-center rounded border border-card-border bg-background px-1.5 text-[10px] font-medium text-text-tertiary font-mono">
+            {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: visual shortcut hint only */}
+            <kbd
+              aria-hidden="true"
+              className="inline-flex h-5 items-center rounded border border-card-border bg-background px-1.5 text-[10px] font-medium text-text-tertiary font-mono"
+            >
               {shortcut}
             </kbd>
           </div>
