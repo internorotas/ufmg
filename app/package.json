@@ -34,6 +34,7 @@
     "react-ga4": "^3.0.1",
     "react-i18next": "^17.0.7",
     "react-leaflet": "^5.0.0",
+    "react-router-dom": "^6.30.3",
     "tailwind-merge": "^3.5.0",
     "tailwind-variants": "^3.2.2",
     "use-debounce": "^10.1.1",
@@ -63,12 +64,12 @@
     "gh-pages": "^6.3.0",
     "globals": "^17.5.0",
     "husky": "^9.1.7",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^4.2.2",
     "typescript": "~6.0.3",
     "vite": "^8.0.8",
     "vite-plugin-pwa": "^1.2.0",
-    "vitest": "^4.1.4",
-    "jsdom": "^26.1.0"
+    "vitest": "^4.1.4"
   }
 }

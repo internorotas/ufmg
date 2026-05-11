@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import '@/i18n';
 
 import './globals.css';
@@ -148,7 +149,12 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <AppQueryProvider>
-      <App />
+      <BrowserRouter
+        basename={import.meta.env.BASE_URL}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <App />
+      </BrowserRouter>
     </AppQueryProvider>
   </StrictMode>,
 );

@@ -21,6 +21,14 @@ interface AuthContextValue {
     } | null;
   }) => void;
   setAnonymousSession: () => void;
+  updateUser: (
+    user: {
+      id: number;
+      displayName: string;
+      avatarUrl: string | null;
+      nickname: string | null;
+    } | null,
+  ) => void;
   resetSession: () => void;
 }
 
@@ -33,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const user = useAuthStore((state) => state.user);
   const setAuthenticatedSession = useAuthStore((state) => state.setAuthenticatedSession);
   const setAnonymousSession = useAuthStore((state) => state.setAnonymousSession);
+  const updateUser = useAuthStore((state) => state.updateUser);
   const resetSession = useAuthStore((state) => state.resetSession);
 
   return (
@@ -44,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         setAuthenticatedSession,
         setAnonymousSession,
+        updateUser,
         resetSession,
       }}
     >

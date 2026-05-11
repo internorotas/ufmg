@@ -1,17 +1,19 @@
-import { lazy, Suspense, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { DataSourceBanner } from './components/app/DataSourceBanner';
 import { DataStatusScreen } from './components/app/DataStatusScreen';
 import { ModalManager } from './components/app/ModalManager';
 import { OfflineToast } from './components/app/OfflineToast';
+import { LgpdConsentDialog } from './components/auth/LgpdConsentDialog';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MenuLateral } from './components/MenuLateral';
-import { LgpdConsentDialog } from './components/auth/LgpdConsentDialog';
+import { ProfileSheet } from './components/profile/ProfileSheet';
 import { GA_MEASUREMENT_ID } from './config/analytics';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { getGoogleStartUrl } from './features/auth/api/authClient';
+import { startGoogleLoginFlow } from './features/auth/api/authClient';
 import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
 import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
 import { useConsentGate } from './features/auth/hooks/useConsentGate';
@@ -20,6 +22,7 @@ import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
+import { ProfilePage } from './routes/profile/ProfilePage';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
 
@@ -52,7 +55,8 @@ if (GA_MEASUREMENT_ID) {
  * Separado do App principal para que o useRotas funcione dentro do Provider.
  */
 function AppContent() {
-  useAuthBootstrap();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     linhasData,
@@ -79,6 +83,27 @@ function AppContent() {
     refuseConsent,
     closeDialog,
   } = useConsentGate();
+  const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
+  const [authFeedbackMessage, setAuthFeedbackMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const locationState = location.state as { authFeedback?: string } | null;
+    const feedback = locationState?.authFeedback;
+    if (!feedback) {
+      return;
+    }
+
+    setAuthFeedbackMessage(feedback);
+    navigate(location.pathname, { replace: true, state: null });
+
+    const timeoutId = window.setTimeout(() => {
+      setAuthFeedbackMessage(null);
+    }, 5000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [location.pathname, location.state, navigate]);
 
   const canStartTracking = useCallback(async () => {
     const result = await executeProtectedAction(async () => {});
@@ -228,11 +253,13 @@ function AppContent() {
         isAuthenticated={isAuthenticated}
         onAuthAction={() => {
           if (isAuthenticated) {
-            window.location.assign('/perfil');
+            setIsProfileSheetOpen(true);
             return;
           }
 
-          window.location.assign(getGoogleStartUrl());
+          void startGoogleLoginFlow().catch(() => {
+            setAuthFeedbackMessage('Falha ao iniciar login com Google. Tente novamente.');
+          });
         }}
       />
       <DataSourceBanner isVisible={isOfflineDataFallback} source={dataSource} />
@@ -306,6 +333,18 @@ function AppContent() {
         onRefuse={refuseConsent}
       />
 
+      <ProfileSheet isOpen={isProfileSheetOpen} onOpenChange={setIsProfileSheetOpen} />
+
+      {authFeedbackMessage ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="pointer-events-none absolute bottom-32 left-1/2 z-[1400] -translate-x-1/2 rounded-lg border border-success-border bg-success-bg px-3 py-2 text-xs text-success-text shadow-md"
+        >
+          {authFeedbackMessage}
+        </div>
+      ) : null}
+
       {feedbackMessage ? (
         <div
           role="status"
@@ -319,6 +358,32 @@ function AppContent() {
   );
 }
 
+function AuthenticatedAppShell() {
+  useAuthBootstrap();
+
+  return (
+    <RotasProvider>
+      <AnalyticsProvider>
+        <NotificacaoProvider>
+          <Routes>
+            <Route path="/" element={<AppContent />} />
+            <Route path="/perfil" element={<ProfilePage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </NotificacaoProvider>
+      </AnalyticsProvider>
+    </RotasProvider>
+  );
+}
+
+function AppAuthenticatedRoutes() {
+  return (
+    <AuthProvider>
+      <AuthenticatedAppShell />
+    </AuthProvider>
+  );
+}
+
 /**
  * O componente principal da aplicação.
  * Configura os Providers e renderiza o conteúdo.
@@ -326,31 +391,13 @@ function AppContent() {
  * @returns {JSX.Element} O componente principal da aplicação renderizado.
  */
 export function App() {
-  const currentPath = window.location.pathname;
-  const isAdminHoneypotRoute = currentPath === '/admin' || currentPath.endsWith('/admin');
-
-  if (isAdminHoneypotRoute) {
-    return (
-      <ErrorBoundary>
-        <ThemeProvider>
-          <FakeAdminLoginPage />
-        </ThemeProvider>
-      </ErrorBoundary>
-    );
-  }
-
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <RotasProvider>
-            <AnalyticsProvider>
-              <NotificacaoProvider>
-                <AppContent />
-              </NotificacaoProvider>
-            </AnalyticsProvider>
-          </RotasProvider>
-        </AuthProvider>
+        <Routes>
+          <Route path="/admin/*" element={<FakeAdminLoginPage />} />
+          <Route path="/*" element={<AppAuthenticatedRoutes />} />
+        </Routes>
       </ThemeProvider>
     </ErrorBoundary>
   );
