@@ -53,7 +53,7 @@ export default defineConfig({
     proxy: {
       // Backend local NestJS para rotas /v1/* durante desenvolvimento.
       '/v1': {
-        target: 'http://localhost:43111',
+        target: 'http://127.0.0.1:43111',
         changeOrigin: true,
       },
     },

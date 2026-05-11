@@ -30,4 +30,42 @@ describe('authStore', () => {
     expect(state.user).toBeNull();
     expect(state.isAuthenticated).toBe(false);
   });
+
+  it('updateUser altera perfil apenas quando autenticado', () => {
+    useAuthStore.getState().setAuthenticatedSession({
+      accessToken: 'token-b',
+      user: {
+        id: 9,
+        displayName: 'User 9',
+        avatarUrl: null,
+        nickname: null,
+      },
+    });
+
+    useAuthStore.getState().updateUser({
+      id: 9,
+      displayName: 'User 9 Updated',
+      avatarUrl: 'https://example.com/avatar.png',
+      nickname: 'u9',
+    });
+
+    let state = useAuthStore.getState();
+    expect(state.user).toEqual({
+      id: 9,
+      displayName: 'User 9 Updated',
+      avatarUrl: 'https://example.com/avatar.png',
+      nickname: 'u9',
+    });
+
+    useAuthStore.getState().setAnonymousSession();
+    useAuthStore.getState().updateUser({
+      id: 99,
+      displayName: 'Should Not Persist',
+      avatarUrl: null,
+      nickname: null,
+    });
+
+    state = useAuthStore.getState();
+    expect(state.user).toBeNull();
+  });
 });

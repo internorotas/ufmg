@@ -5,11 +5,35 @@ export interface AuthenticatedUser {
   nickname: string | null;
 }
 
+export type RankingDetail = 'geral' | 'por_linha';
+export type NotificationProfile = 'minimo' | 'normal' | 'tudo';
+
+export class AuthRequestError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number | null,
+  ) {
+    super(message);
+    this.name = 'AuthRequestError';
+  }
+}
+
 export interface RefreshResponse {
   accessToken: string;
   expiresIn: number;
   tokenType: 'Bearer';
   user?: AuthenticatedUser;
+}
+
+interface GoogleStartResponse {
+  provider: 'google';
+  authUrl: string;
+  state: string;
+  codeChallengeMethod: 'S256';
+}
+
+function resolveLoginContinueUrl(): string {
+  return new URL(window.location.href).toString();
 }
 
 export interface ConsentState {
@@ -19,9 +43,15 @@ export interface ConsentState {
   consentResearchAt: string | null;
 }
 
-function resolveAuthEndpoint(
-  pathname: '/v1/auth/refresh' | '/v1/auth/google/start' | '/v1/auth/consent',
-): string {
+export type AuthEndpointPath =
+  | '/v1/auth/refresh'
+  | '/v1/auth/google/start'
+  | '/v1/auth/consent'
+  | '/v1/auth/profile'
+  | '/v1/auth/logout'
+  | '/v1/auth/delete-account';
+
+export function resolveAuthEndpoint(pathname: AuthEndpointPath): string {
   const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   if (!apiBaseUrl) {
@@ -31,7 +61,7 @@ function resolveAuthEndpoint(
   return new URL(pathname, apiBaseUrl).toString();
 }
 
-function getAuthHeaders(): HeadersInit | undefined {
+export function getAuthHeaders(): HeadersInit | undefined {
   const accessToken = window.__internoAuthToken ?? null;
   if (!accessToken) {
     return undefined;
@@ -43,21 +73,46 @@ function getAuthHeaders(): HeadersInit | undefined {
 }
 
 export async function refreshSession(): Promise<RefreshResponse> {
-  const response = await fetch(resolveAuthEndpoint('/v1/auth/refresh'), {
-    method: 'POST',
-    credentials: 'include',
-    cache: 'no-store',
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(resolveAuthEndpoint('/v1/auth/refresh'), {
+      method: 'POST',
+      credentials: 'include',
+      cache: 'no-store',
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Falha de rede no refresh de sessao';
+    throw new AuthRequestError(message, null);
+  }
 
   if (!response.ok) {
-    throw new Error(`Falha no refresh de sessao: HTTP ${response.status}`);
+    throw new AuthRequestError(`Falha no refresh de sessao: HTTP ${response.status}`, response.status);
   }
 
   return response.json() as Promise<RefreshResponse>;
 }
 
-export function getGoogleStartUrl(): string {
-  return resolveAuthEndpoint('/v1/auth/google/start');
+export async function startGoogleLoginFlow(): Promise<void> {
+  const endpoint = new URL(resolveAuthEndpoint('/v1/auth/google/start'), window.location.origin);
+  endpoint.searchParams.set('continueUrl', resolveLoginContinueUrl());
+
+  const response = await fetch(endpoint.toString(), {
+    method: 'GET',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Falha ao iniciar login Google: HTTP ${response.status}`);
+  }
+
+  const payload = (await response.json()) as Partial<GoogleStartResponse>;
+
+  if (!payload.authUrl || payload.provider !== 'google') {
+    throw new Error('Resposta inválida ao iniciar login Google');
+  }
+
+  window.location.assign(payload.authUrl);
 }
 
 export async function getConsentState(): Promise<ConsentState> {

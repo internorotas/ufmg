@@ -8,5 +8,8 @@
       "accept": "Aceitar e continuar",
       "refuse": "Recusar"
     }
+  },
+  "profile": {
+    "title": "Perfil"
   }
 }
