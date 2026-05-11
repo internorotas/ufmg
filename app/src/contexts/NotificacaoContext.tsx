@@ -32,6 +32,11 @@ interface NotificacaoContextValue {
     minutosFaltantes: number,
     horarioChegada: string,
   ) => void;
+  collaborativeFeedback: string | null;
+  publishCollaborativeEvent: (event: {
+    type: 'trip_auto_finished' | 'post_trip_feedback' | 'service_alert_approved' | 'streak_risk';
+    message: string;
+  }) => void;
 }
 
 const NotificacaoContext = createContext<NotificacaoContextValue | null>(null);
@@ -40,6 +45,8 @@ const FALLBACK_NOTIFICACAO_CONTEXT: NotificacaoContextValue = {
   suportado: false,
   isAlarmado: () => false,
   toggleNotificacao: () => {},
+  collaborativeFeedback: null,
+  publishCollaborativeEvent: () => {},
 };
 
 export function NotificacaoProvider({ children }: { children: ReactNode }) {
@@ -67,8 +74,25 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   } | null>(null);
 
   const [mostrarModalIos, setMostrarModalIos] = useState(false);
+  const [collaborativeFeedback, setCollaborativeFeedback] = useState<string | null>(null);
   const { dialogOpen, executeProtectedAction, acceptAndContinue, refuseConsent, closeDialog } =
     useConsentGate();
+
+  const publishCollaborativeEvent = useCallback(
+    (event: {
+      type: 'trip_auto_finished' | 'post_trip_feedback' | 'service_alert_approved' | 'streak_risk';
+      message: string;
+    }) => {
+      setCollaborativeFeedback(event.message);
+      trackEvent({
+        event: event.type,
+        category: 'engagement',
+        action: event.type,
+        label: event.message,
+      });
+    },
+    [trackEvent],
+  );
 
   const toggleNotificacao = useCallback(
     (linha: Linha, parada: Parada, minutosFaltantes: number, horarioChegada: string) => {
@@ -165,7 +189,15 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   }, [fecharModalPermissao]);
 
   return (
-    <NotificacaoContext.Provider value={{ suportado, isAlarmado, toggleNotificacao }}>
+    <NotificacaoContext.Provider
+      value={{
+        suportado,
+        isAlarmado,
+        toggleNotificacao,
+        collaborativeFeedback,
+        publishCollaborativeEvent,
+      }}
+    >
       {children}
       <NotificacaoPermissionModal
         isOpen={mostrarModalPermissao}
@@ -179,6 +211,15 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         onAccept={acceptAndContinue}
         onRefuse={refuseConsent}
       />
+      {collaborativeFeedback ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="pointer-events-none fixed right-4 bottom-24 z-[1500] max-w-80 rounded-lg border border-info-border bg-card px-3 py-2 text-xs text-text-primary shadow-lg"
+        >
+          {collaborativeFeedback}
+        </div>
+      ) : null}
     </NotificacaoContext.Provider>
   );
 }

@@ -362,7 +362,8 @@ export function ProfilePage() {
                 Notificações e consentimento
               </CardTitle>
               <CardDescription>
-                Estado atual de consentimento LGPD e preferência de notificações.
+                Estado atual de consentimento LGPD e preferência de notificações, incluindo eventos
+                colaborativos da Fase 7.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -391,6 +392,16 @@ export function ProfilePage() {
                 </p>
                 <p className="mt-1 text-sm text-text-secondary">
                   {formatConsent(profile.consentResearchAt)}
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-card-border bg-background px-3 py-2 text-sm text-text-secondary">
+                <p className="font-medium text-text-primary">
+                  Eventos colaborativos ativos neste perfil
+                </p>
+                <p className="mt-1">
+                  Viagem encerrada automaticamente, pedido de avaliação pós-viagem, alerta de
+                  serviço aprovado e risco de streak usam esta preferência.
                 </p>
               </div>
             </CardContent>

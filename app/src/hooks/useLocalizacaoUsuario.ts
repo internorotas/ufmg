@@ -42,6 +42,15 @@ type DeviceOrientationEventWebkit = DeviceOrientationEvent & {
 export interface UseLocalizacaoUsuarioReturn {
   /** Coordenadas atuais do usuário [lat, lng] */
   localizacao: [number, number] | null;
+  /** Última leitura bruta do GPS para integrações colaborativas */
+  ultimaLeitura: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    speedKmh: number;
+    heading: number | null;
+    timestamp: number;
+  } | null;
   /** Direção da bússola em graus (0-360, onde 0 = Norte) */
   heading: number | null;
   /** Se a permissão de GPS foi concedida */
@@ -94,6 +103,8 @@ export function useLocalizacaoUsuario(options?: {
 }): UseLocalizacaoUsuarioReturn {
   // Estados principais
   const [localizacao, setLocalizacao] = useState<[number, number] | null>(null);
+  const [ultimaLeitura, setUltimaLeitura] =
+    useState<UseLocalizacaoUsuarioReturn['ultimaLeitura']>(null);
   const [heading, setHeading] = useState<number | null>(null);
   const [permissaoConcedida, setPermissaoConcedida] = useState(false);
   const [carregando, setCarregando] = useState(false);
@@ -140,10 +151,23 @@ export function useLocalizacaoUsuario(options?: {
   const onPosicaoRecebida = useCallback(
     (position: GeolocationPosition) => {
       const { latitude, longitude, accuracy } = position.coords;
+      const speedKmh = Math.max(0, (position.coords.speed ?? 0) * 3.6);
+      const headingLeitura =
+        typeof position.coords.heading === 'number' && Number.isFinite(position.coords.heading)
+          ? position.coords.heading
+          : null;
 
       setCarregando(false);
       setErro(null);
       setPermissaoConcedida(true);
+      setUltimaLeitura({
+        latitude,
+        longitude,
+        accuracy,
+        speedKmh,
+        heading: headingLeitura,
+        timestamp: position.timestamp,
+      });
 
       // Aceita a primeira leitura (feedback imediato) ou leituras com boa precisão
       const primeiraLeitura = melhorPrecisaoRef.current === Infinity;
@@ -372,6 +396,7 @@ export function useLocalizacaoUsuario(options?: {
 
   return {
     localizacao,
+    ultimaLeitura,
     heading,
     permissaoConcedida,
     carregando,

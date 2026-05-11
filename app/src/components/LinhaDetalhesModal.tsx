@@ -181,6 +181,17 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
       : `~${h}h ${m}min · ${previsao.proximoOnibus.horarioChegada}`;
   }, [previsao, t]);
 
+  const textoHistorico = useMemo(() => {
+    const segundos = previsao?.remoto?.historicalMedianDelaySeconds;
+    if (segundos === null || segundos === undefined) {
+      return null;
+    }
+
+    const minutos = Math.round(segundos / 60);
+    const sinal = minutos > 0 ? '+' : '';
+    return `histórico desta hora: ${sinal}${minutos} min`;
+  }, [previsao?.remoto?.historicalMedianDelaySeconds]);
+
   const badgeStyle = useMemo(() => {
     if (!previsao?.proximoOnibus) return null;
     const minutos = previsao.proximoOnibus.minutosFaltantes;
@@ -260,6 +271,9 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
                   {t('itinerary.lastPassed', { minutes: previsao.onibusAnterior.minutosQuePassou })}
                 </span>
               )}
+              {textoHistorico ? (
+                <span className="text-[10px] text-text-tertiary">{textoHistorico}</span>
+              ) : null}
             </div>
           )}
         </div>

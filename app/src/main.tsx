@@ -110,6 +110,14 @@ function registerAppServiceWorker(): void {
     triggerSingleReloadForUpdatedServiceWorker();
   });
 
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type !== 'gps-flush-queue') {
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent('interno-rotas:gps-flush-queue'));
+  });
+
   navigator.serviceWorker
     .register(SERVICE_WORKER_URL, { scope: SERVICE_WORKER_SCOPE })
     .then((registration) => {
