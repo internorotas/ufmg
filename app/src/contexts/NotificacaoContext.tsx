@@ -9,11 +9,11 @@
 import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from 'react';
 import { LgpdConsentDialog } from '@/components/auth/LgpdConsentDialog';
 import { useConsentGate } from '@/features/auth/hooks/useConsentGate';
+import { syncPushSubscription } from '@/services/push/pushSubscriptionService';
 import { IosInstallModal } from '../components/IosInstallModal';
 import { NotificacaoPermissionModal } from '../components/NotificacaoPermissionModal';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useNotificacao } from '../hooks/useNotificacao';
-import { syncPushSubscription } from '@/services/push/pushSubscriptionService';
 import type { Linha, Parada } from '../types/data.types';
 
 interface NotificacaoContextValue {
@@ -67,13 +67,8 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   } | null>(null);
 
   const [mostrarModalIos, setMostrarModalIos] = useState(false);
-  const {
-    dialogOpen,
-    executeProtectedAction,
-    acceptAndContinue,
-    refuseConsent,
-    closeDialog,
-  } = useConsentGate();
+  const { dialogOpen, executeProtectedAction, acceptAndContinue, refuseConsent, closeDialog } =
+    useConsentGate();
 
   const toggleNotificacao = useCallback(
     (linha: Linha, parada: Parada, minutosFaltantes: number, horarioChegada: string) => {

@@ -89,11 +89,9 @@ export interface UseLocalizacaoUsuarioReturn {
  * <button onClick={solicitarPermissaoNavegador}>Permitir</button>
  * ```
  */
-export function useLocalizacaoUsuario(
-  options?: {
-    canStartTracking?: () => Promise<boolean>;
-  },
-): UseLocalizacaoUsuarioReturn {
+export function useLocalizacaoUsuario(options?: {
+  canStartTracking?: () => Promise<boolean>;
+}): UseLocalizacaoUsuarioReturn {
   // Estados principais
   const [localizacao, setLocalizacao] = useState<[number, number] | null>(null);
   const [heading, setHeading] = useState<number | null>(null);
