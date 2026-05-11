@@ -7,6 +7,8 @@
  */
 
 import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import { LgpdConsentDialog } from '@/components/auth/LgpdConsentDialog';
+import { useConsentGate } from '@/features/auth/hooks/useConsentGate';
 import { IosInstallModal } from '../components/IosInstallModal';
 import { NotificacaoPermissionModal } from '../components/NotificacaoPermissionModal';
 import { useAnalytics } from '../hooks/useAnalytics';
@@ -65,6 +67,13 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   } | null>(null);
 
   const [mostrarModalIos, setMostrarModalIos] = useState(false);
+  const {
+    dialogOpen,
+    executeProtectedAction,
+    acceptAndContinue,
+    refuseConsent,
+    closeDialog,
+  } = useConsentGate();
 
   const toggleNotificacao = useCallback(
     (linha: Linha, parada: Parada, minutosFaltantes: number, horarioChegada: string) => {
@@ -86,23 +95,26 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         });
         return;
       }
-      // Sem permissão: guarda pendência e abre modal educativo
-      if (!podeNotificar) {
-        pendingRef.current = { linha, parada, minutos: minutosFaltantes, horarioChegada };
-        iniciarSolicitacaoPermissao();
-        return;
-      }
-      agendarNotificacao(linha, parada, minutosFaltantes, horarioChegada);
-      void syncPushSubscription({
-        linhaId: linha.idRota,
-        paradaId: parada.idParada,
-      });
-      trackEvent({
-        event: 'alarm_set',
-        category: 'engagement',
-        action: 'alarm_set',
-        label: `${linha.idRota}:${parada.idParada}`,
-        value: minutosFaltantes,
+      void executeProtectedAction(async () => {
+        // Sem permissão: guarda pendência e abre modal educativo
+        if (!podeNotificar) {
+          pendingRef.current = { linha, parada, minutos: minutosFaltantes, horarioChegada };
+          iniciarSolicitacaoPermissao();
+          return;
+        }
+
+        agendarNotificacao(linha, parada, minutosFaltantes, horarioChegada);
+        void syncPushSubscription({
+          linhaId: linha.idRota,
+          paradaId: parada.idParada,
+        });
+        trackEvent({
+          event: 'alarm_set',
+          category: 'engagement',
+          action: 'alarm_set',
+          label: `${linha.idRota}:${parada.idParada}`,
+          value: minutosFaltantes,
+        });
       });
     },
     [
@@ -114,6 +126,7 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
       isPwaInstalled,
       podeNotificar,
       trackEvent,
+      executeProtectedAction,
     ],
   );
 
@@ -165,6 +178,12 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         onConfirmar={handleConfirmar}
       />
       <IosInstallModal isOpen={mostrarModalIos} onClose={() => setMostrarModalIos(false)} />
+      <LgpdConsentDialog
+        isOpen={dialogOpen}
+        onClose={closeDialog}
+        onAccept={acceptAndContinue}
+        onRefuse={refuseConsent}
+      />
     </NotificacaoContext.Provider>
   );
 }
