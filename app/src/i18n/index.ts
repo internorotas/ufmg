@@ -1,5 +1,6 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import commonPtBR from './pt-BR/common.json';
 import lineCardPtBR from './pt-BR/line-card.json';
 import lineDetailsPtBR from './pt-BR/line-details.json';
 import menuPtBR from './pt-BR/menu.json';
@@ -13,7 +14,7 @@ if (!i18next.isInitialized) {
     lng: DEFAULT_LOCALE,
     fallbackLng: DEFAULT_LOCALE,
     supportedLngs: [DEFAULT_LOCALE],
-    ns: ['line-card', 'line-details', 'menu', 'modals', 'system-banner'],
+    ns: ['common', 'line-card', 'line-details', 'menu', 'modals', 'system-banner'],
     defaultNS: 'menu',
     interpolation: {
       escapeValue: false,
@@ -22,6 +23,7 @@ if (!i18next.isInitialized) {
       [DEFAULT_LOCALE]: {
         'line-card': lineCardPtBR,
         'line-details': lineDetailsPtBR,
+        common: commonPtBR,
         menu: menuPtBR,
         modals: modalsPtBR,
         'system-banner': systemBannerPtBR,
