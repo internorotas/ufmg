@@ -89,7 +89,11 @@ export interface UseLocalizacaoUsuarioReturn {
  * <button onClick={solicitarPermissaoNavegador}>Permitir</button>
  * ```
  */
-export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
+export function useLocalizacaoUsuario(
+  options?: {
+    canStartTracking?: () => Promise<boolean>;
+  },
+): UseLocalizacaoUsuarioReturn {
   // Estados principais
   const [localizacao, setLocalizacao] = useState<[number, number] | null>(null);
   const [heading, setHeading] = useState<number | null>(null);
@@ -255,6 +259,13 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
    * "Permitir" do modal após confirmação do usuário.
    */
   const solicitarPermissaoNavegador = useCallback(async () => {
+    if (options?.canStartTracking) {
+      const allowed = await options.canStartTracking();
+      if (!allowed) {
+        return;
+      }
+    }
+
     if (carregando) {
       return;
     }
@@ -290,7 +301,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       }
       bussolaCleanupRef.current = cleanup;
     }
-  }, [carregando, onPosicaoRecebida, onErroGPS, iniciarBussola]);
+  }, [carregando, iniciarBussola, onErroGPS, onPosicaoRecebida, options]);
 
   /**
    * Ponto de entrada principal.
@@ -304,6 +315,13 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
    * comportamento correto e conservador para todos os navegadores.
    */
   const iniciarRastreamento = useCallback(async () => {
+    if (options?.canStartTracking) {
+      const allowed = await options.canStartTracking();
+      if (!allowed) {
+        return;
+      }
+    }
+
     if (carregando) {
       return;
     }
@@ -335,7 +353,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       // Navegador sem Permissions API — exibe modal
       setMostrarModalPermissao(true);
     }
-  }, [carregando, solicitarPermissaoNavegador]);
+  }, [carregando, options, solicitarPermissaoNavegador]);
 
   // Limpeza de recursos ao desmontar o componente
   useEffect(() => {

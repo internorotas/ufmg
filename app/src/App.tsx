@@ -6,6 +6,7 @@ import { ModalManager } from './components/app/ModalManager';
 import { OfflineToast } from './components/app/OfflineToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { MenuLateral } from './components/MenuLateral';
+import { LgpdConsentDialog } from './components/auth/LgpdConsentDialog';
 import { GA_MEASUREMENT_ID } from './config/analytics';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
@@ -13,6 +14,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { getGoogleStartUrl } from './features/auth/api/authClient';
 import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
 import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
+import { useConsentGate } from './features/auth/hooks/useConsentGate';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
@@ -69,6 +71,19 @@ function AppContent() {
   const { trackEvent, trackPageView } = useAnalytics();
   const { authStatus, isAuthenticated } = useAuthContext();
   const { isOffline, showOfflineToast } = useAppConnectivity();
+  const {
+    dialogOpen,
+    feedbackMessage,
+    executeProtectedAction,
+    acceptAndContinue,
+    refuseConsent,
+    closeDialog,
+  } = useConsentGate();
+
+  const canStartTracking = useCallback(async () => {
+    const result = await executeProtectedAction(async () => {});
+    return result.allowed;
+  }, [executeProtectedAction]);
 
   // Hook de localização do usuário
   const {
@@ -83,7 +98,7 @@ function AppContent() {
     fecharModalLonge,
     iniciarRastreamento,
     solicitarPermissaoNavegador,
-  } = useLocalizacaoUsuario();
+  } = useLocalizacaoUsuario({ canStartTracking });
   const { solicitarAutoCenter, consumirAutoCenter } = useMapAutoCenter({
     mapaRef,
     localizacao,
@@ -283,6 +298,23 @@ function AppContent() {
       />
 
       <OfflineToast show={showOfflineToast} />
+
+      <LgpdConsentDialog
+        isOpen={dialogOpen}
+        onClose={closeDialog}
+        onAccept={acceptAndContinue}
+        onRefuse={refuseConsent}
+      />
+
+      {feedbackMessage ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="pointer-events-none absolute bottom-20 left-1/2 z-[1400] -translate-x-1/2 rounded-lg bg-warning-bg px-3 py-2 text-xs text-warning-text shadow-md"
+        >
+          {feedbackMessage}
+        </div>
+      ) : null}
     </div>
   );
 }
