@@ -19,10 +19,10 @@ export class AuthRequestError extends Error {
 }
 
 export interface RefreshResponse {
-  accessToken: string;
-  expiresIn: number;
-  tokenType: 'Bearer';
-  user?: AuthenticatedUser;
+  accessToken: string | null;
+  expiresIn: number | null;
+  tokenType: 'Bearer' | null;
+  user?: AuthenticatedUser | null;
 }
 
 interface GoogleStartResponse {
