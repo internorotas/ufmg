@@ -9,12 +9,26 @@
 import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from 'react';
 import { LgpdConsentDialog } from '@/components/auth/LgpdConsentDialog';
 import { useConsentGate } from '@/features/auth/hooks/useConsentGate';
+import { PointDeltaToast } from '@/features/gamification/components/PointDeltaToast';
+import type { RecentPointEvent } from '@/features/profile/api/profileClient';
 import { syncPushSubscription } from '@/services/push/pushSubscriptionService';
 import { IosInstallModal } from '../components/IosInstallModal';
 import { NotificacaoPermissionModal } from '../components/NotificacaoPermissionModal';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useNotificacao } from '../hooks/useNotificacao';
 import type { Linha, Parada } from '../types/data.types';
+
+type CollaborativeEvent = {
+  type:
+    | 'trip_auto_finished'
+    | 'post_trip_feedback'
+    | 'service_alert_approved'
+    | 'streak_risk'
+    | 'achievement_unlocked'
+    | 'ranking_promoted';
+  message: string;
+  points?: number;
+};
 
 interface NotificacaoContextValue {
   /** Se a Web Notifications API é suportada neste browser */
@@ -33,10 +47,8 @@ interface NotificacaoContextValue {
     horarioChegada: string,
   ) => void;
   collaborativeFeedback: string | null;
-  publishCollaborativeEvent: (event: {
-    type: 'trip_auto_finished' | 'post_trip_feedback' | 'service_alert_approved' | 'streak_risk';
-    message: string;
-  }) => void;
+  publishCollaborativeEvent: (event: CollaborativeEvent) => void;
+  publishPointEvent: (event: RecentPointEvent | null) => void;
 }
 
 const NotificacaoContext = createContext<NotificacaoContextValue | null>(null);
@@ -47,6 +59,7 @@ const FALLBACK_NOTIFICACAO_CONTEXT: NotificacaoContextValue = {
   toggleNotificacao: () => {},
   collaborativeFeedback: null,
   publishCollaborativeEvent: () => {},
+  publishPointEvent: () => {},
 };
 
 export function NotificacaoProvider({ children }: { children: ReactNode }) {
@@ -75,15 +88,14 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
 
   const [mostrarModalIos, setMostrarModalIos] = useState(false);
   const [collaborativeFeedback, setCollaborativeFeedback] = useState<string | null>(null);
+  const [pointEvent, setPointEvent] = useState<RecentPointEvent | null>(null);
   const { dialogOpen, executeProtectedAction, acceptAndContinue, refuseConsent, closeDialog } =
     useConsentGate();
 
   const publishCollaborativeEvent = useCallback(
-    (event: {
-      type: 'trip_auto_finished' | 'post_trip_feedback' | 'service_alert_approved' | 'streak_risk';
-      message: string;
-    }) => {
+    (event: CollaborativeEvent) => {
       setCollaborativeFeedback(event.message);
+      window.setTimeout(() => setCollaborativeFeedback(null), 4200);
       trackEvent({
         event: event.type,
         category: 'engagement',
@@ -93,6 +105,13 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
     },
     [trackEvent],
   );
+
+  const publishPointEvent = useCallback((event: RecentPointEvent | null) => {
+    setPointEvent(event);
+    if (event) {
+      window.setTimeout(() => setPointEvent(null), 4200);
+    }
+  }, []);
 
   const toggleNotificacao = useCallback(
     (linha: Linha, parada: Parada, minutosFaltantes: number, horarioChegada: string) => {
@@ -196,6 +215,7 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         toggleNotificacao,
         collaborativeFeedback,
         publishCollaborativeEvent,
+        publishPointEvent,
       }}
     >
       {children}
@@ -220,6 +240,7 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
           {collaborativeFeedback}
         </div>
       ) : null}
+      <PointDeltaToast event={pointEvent} />
     </NotificacaoContext.Provider>
   );
 }

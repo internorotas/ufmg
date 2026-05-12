@@ -126,6 +126,51 @@ describe('ProfilePage', () => {
             consentGpsAt: null,
             consentResearchAt: null,
             lastSeenAt: '2026-05-11T01:00:00.000Z',
+            gamification: {
+              totalPoints: 180,
+              weeklyRank: 4,
+              weeklyRankScope: 'geral',
+              streakCurrentDays: 6,
+              streakBestDays: 12,
+              achievementsUnlocked: [
+                {
+                  slug: 'pioneer-linha-2004A',
+                  nome: 'Pioneiro da Linha 2004A',
+                  descricao: 'Primeiro colaborador da linha.',
+                  rarity: 'rare',
+                  category: 'line',
+                  isReserved: false,
+                  criteriaText: 'Seja o primeiro colaborador validado da linha 2004A.',
+                  progressPercent: 100,
+                  unlockedAt: '2026-05-11T01:00:00.000Z',
+                },
+              ],
+              achievementsLocked: [
+                {
+                  slug: 'centenario',
+                  nome: 'Centenario',
+                  descricao: 'Complete 100 viagens compartilhadas validadas.',
+                  rarity: 'legendary',
+                  category: 'global',
+                  isReserved: false,
+                  criteriaText: 'Compartilhe 100 viagens válidas.',
+                  progressPercent: 25,
+                  unlockedAt: null,
+                },
+              ],
+              contributionHistory30d: [
+                { date: '2026-05-10', count: 0, points: 0 },
+                { date: '2026-05-11', count: 2, points: 20 },
+              ],
+              recentPointEvents: [
+                {
+                  reason: 'viagem_compartilhada',
+                  points: 10,
+                  earnedAt: '2026-05-11T01:00:00.000Z',
+                  message: 'User One ganhou +10 pts por viagem compartilhada.',
+                },
+              ],
+            },
           }),
           {
             status: 200,
@@ -153,6 +198,10 @@ describe('ProfilePage', () => {
     expect(container.textContent).toContain('@u1');
     expect(container.textContent).toContain('Ranking geral');
     expect(container.textContent).toContain('Normal');
+    expect(container.textContent).toContain('180');
+    expect(container.textContent).toContain('#4 em geral');
+    expect(container.textContent).toContain('Pioneiro da Linha 2004A');
+    expect(container.textContent).toContain('Centenario');
     expect(container.textContent).toContain('Viagem encerrada automaticamente');
     expect(container.textContent).toContain('Solicitar exclusão de conta');
   });

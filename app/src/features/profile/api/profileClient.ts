@@ -19,6 +19,42 @@ export interface UserProfile {
   consentGpsAt: string | null;
   consentResearchAt: string | null;
   lastSeenAt: string;
+  gamification: {
+    totalPoints: number;
+    weeklyRank: number | null;
+    weeklyRankScope: 'geral' | 'campus' | `linha:${string}`;
+    streakCurrentDays: number;
+    streakBestDays: number;
+    achievementsUnlocked: AchievementView[];
+    achievementsLocked: AchievementView[];
+    contributionHistory30d: ContributionHistoryPoint[];
+    recentPointEvents: RecentPointEvent[];
+  };
+}
+
+export interface AchievementView {
+  slug: string;
+  nome: string;
+  descricao: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary' | string;
+  category: 'global' | 'line' | 'supporter' | string;
+  isReserved: boolean;
+  criteriaText: string;
+  progressPercent: number | null;
+  unlockedAt: string | null;
+}
+
+export interface ContributionHistoryPoint {
+  date: string;
+  count: number;
+  points: number;
+}
+
+export interface RecentPointEvent {
+  reason: string;
+  points: number;
+  earnedAt: string;
+  message: string;
 }
 
 export interface ProfileUpdatePayload {
