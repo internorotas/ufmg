@@ -22,6 +22,7 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
+import { AboutPage } from './routes/about/AboutPage';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
 import { ProfilePage } from './routes/profile/ProfilePage';
 import { RankingPage } from './routes/ranking/RankingPage';
@@ -415,6 +416,7 @@ function AuthenticatedAppShell() {
         <NotificacaoProvider>
           <Routes>
             <Route path="/" element={<AppContent />} />
+            <Route path="/sobre" element={<AboutPage />} />
             <Route path="/perfil" element={<ProfilePage />} />
             <Route path="/ranking" element={<RankingPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />

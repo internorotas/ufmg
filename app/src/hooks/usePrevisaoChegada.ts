@@ -33,10 +33,17 @@ export function usePrevisaoChegada(
   idParadaAtual: string | null,
 ): PrevisaoChegadaComposta | null {
   const dataAtual = useCurrentTime();
+  const linhaId = linha?.idRota ?? null;
   const { data: remoto } = useQuery({
-    queryKey: ['live-eta', linha?.idRota ?? null, idParadaAtual],
-    queryFn: async () => fetchLiveEta(linha!.idRota, idParadaAtual!),
-    enabled: Boolean(linha?.idRota && idParadaAtual),
+    queryKey: ['live-eta', linhaId, idParadaAtual],
+    queryFn: async () => {
+      if (!linhaId || !idParadaAtual) {
+        return null;
+      }
+
+      return fetchLiveEta(linhaId, idParadaAtual);
+    },
+    enabled: Boolean(linhaId && idParadaAtual),
     staleTime: 15_000,
     gcTime: 5 * 60 * 1000,
     retry: 1,

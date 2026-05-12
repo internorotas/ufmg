@@ -10,6 +10,7 @@ import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { AchievementsGrid } from '@/features/gamification/components/AchievementsGrid';
 import { ContributionHeatmap } from '@/features/gamification/components/ContributionHeatmap';
+import { SupportActionsCard } from '@/features/monetization/components/SupportActionsCard';
 import {
   deleteAccount,
   getProfile,
@@ -421,6 +422,10 @@ export function ProfilePage() {
               </div>
             </CardContent>
           </Card>
+
+          <div className="lg:col-span-2">
+            <SupportActionsCard monetization={profile.monetization} />
+          </div>
 
           <Card>
             <CardHeader>

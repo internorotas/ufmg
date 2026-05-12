@@ -8,6 +8,10 @@ import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react
 import { Trans, useTranslation } from 'react-i18next';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { getCurrentSpecialPeriod, isWeekday } from '@/config/specialPeriods';
+import {
+  type PartnerSpotlight,
+  PartnerSpotlightCard,
+} from '@/features/monetization/components/PartnerSpotlightCard';
 import logo from '../assets/logo-horizontal-transparente.svg';
 import { useRotasSelection } from '../contexts/RotasContext';
 import { useAnalytics } from '../hooks/useAnalytics';
@@ -119,6 +123,55 @@ function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) 
   );
 }
 
+function resolvePartnerSpotlightEndpoint(): string {
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
+
+  if (!apiBaseUrl) {
+    return '/v1/partners/active';
+  }
+
+  return new URL('/v1/partners/active', apiBaseUrl).toString();
+}
+
+function isPartnerSpotlight(value: unknown): value is PartnerSpotlight {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+
+  return (
+    typeof candidate.slug === 'string' &&
+    typeof candidate.nome === 'string' &&
+    typeof candidate.descricaoCurta === 'string' &&
+    (typeof candidate.logoUrl === 'string' || candidate.logoUrl === null) &&
+    typeof candidate.urlDestino === 'string' &&
+    (typeof candidate.badgeSlug === 'string' || candidate.badgeSlug === null)
+  );
+}
+
+async function fetchActivePartnerSpotlight(): Promise<PartnerSpotlight | null> {
+  const response = await fetch(resolvePartnerSpotlightEndpoint(), {
+    method: 'GET',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Falha ao carregar parceiro ativo: HTTP ${response.status}`);
+  }
+
+  const payload = (await response.json()) as unknown;
+  if (payload === null) {
+    return null;
+  }
+
+  if (!isPartnerSpotlight(payload)) {
+    throw new Error('Resposta de parceiro institucional inválida.');
+  }
+
+  return payload;
+}
+
 /**
  * Menu lateral que exibe lista de linhas de ônibus com busca e categorias.
  *
@@ -154,6 +207,7 @@ export const MenuLateral = React.memo(function MenuLateral({
     typeof window !== 'undefined' ? window.innerWidth < 768 : false,
   );
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
+  const [partnerSpotlight, setPartnerSpotlight] = useState<PartnerSpotlight | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
   const lastListSummaryRef = useRef<string>('');
@@ -212,6 +266,26 @@ export const MenuLateral = React.memo(function MenuLateral({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    void fetchActivePartnerSpotlight()
+      .then((partner) => {
+        if (active) {
+          setPartnerSpotlight(partner);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setPartnerSpotlight(null);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -485,6 +559,19 @@ export const MenuLateral = React.memo(function MenuLateral({
               />
             }
           />
+
+          {partnerSpotlight ? (
+            <PartnerSpotlightCard
+              partner={partnerSpotlight}
+              onClick={() => {
+                trackEvent({
+                  category: 'navigation',
+                  action: 'click_partner_spotlight',
+                  label: partnerSpotlight.slug,
+                });
+              }}
+            />
+          ) : null}
 
           {hasResults ? (
             linhasFiltradas.map((linha) => (

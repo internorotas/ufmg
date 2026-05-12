@@ -30,6 +30,32 @@ export interface UserProfile {
     contributionHistory30d: ContributionHistoryPoint[];
     recentPointEvents: RecentPointEvent[];
   };
+  monetization: UserMonetizationSummary;
+}
+
+export interface UserMonetizationTransaction {
+  kind: 'donation' | 'subscription';
+  status: 'pending' | 'paid' | 'cancelled' | 'refunded' | 'disputed' | 'active' | 'expired';
+  amountCents: number;
+  createdAt: string;
+  paidAt: string | null;
+  receiptUrl: string | null;
+}
+
+export interface UserMonetizationSummary {
+  isPremium: boolean;
+  supporterBadgeUnlocked: boolean;
+  activeSubscription: {
+    status: 'active';
+    frequency: 'MONTHLY';
+    amountCents: number;
+    startedAt: string | null;
+    nextPaymentAt: string | null;
+    cancelledAt: string | null;
+  } | null;
+  lastDonationAt: string | null;
+  nextPaymentAt: string | null;
+  recentTransactions: UserMonetizationTransaction[];
 }
 
 export interface AchievementView {
