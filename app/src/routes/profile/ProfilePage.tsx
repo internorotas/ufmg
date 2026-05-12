@@ -5,8 +5,11 @@ import { DataStatusScreen } from '@/components/app/DataStatusScreen';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
+import { AchievementsGrid } from '@/features/gamification/components/AchievementsGrid';
+import { ContributionHeatmap } from '@/features/gamification/components/ContributionHeatmap';
 import {
   deleteAccount,
   getProfile,
@@ -50,6 +53,7 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const { authStatus, isAuthenticated, updateUser, resetSession } = useAuthContext();
   const { logout, isPending: isLogoutPending } = useLogout();
+  const { publishPointEvent } = useNotificacaoContext();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -78,6 +82,7 @@ export function ProfilePage() {
 
         setProfile(response);
         updateUser(toAuthenticatedUser(response));
+        publishPointEvent(response.gamification.recentPointEvents[0] ?? null);
       } catch (error) {
         if (!isMounted) {
           return;
@@ -97,7 +102,7 @@ export function ProfilePage() {
     return () => {
       isMounted = false;
     };
-  }, [isAuthenticated, updateUser]);
+  }, [isAuthenticated, publishPointEvent, updateUser]);
 
   const handleProfileUpdate = useCallback(
     async (payload: ProfileUpdatePayload) => {
@@ -219,6 +224,16 @@ export function ProfilePage() {
     }
 
     return 'Normal';
+  }, [profile]);
+
+  const weeklyRankLabel = useMemo(() => {
+    if (!profile) {
+      return 'Sem posição semanal ainda';
+    }
+    if (!profile.gamification.weeklyRank) {
+      return 'Sem posição semanal ainda';
+    }
+    return `#${profile.gamification.weeklyRank} em ${profile.gamification.weeklyRankScope}`;
   }, [profile]);
 
   if (authStatus === 'booting') {
@@ -413,12 +428,34 @@ export function ProfilePage() {
                 <Trophy size={18} aria-hidden="true" />
                 Ranking e pontuação
               </CardTitle>
-              <CardDescription>Placeholder planejado para Fases 7 e 8.</CardDescription>
+              <CardDescription>Resumo real da sua contribuição e posição semanal.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm text-text-secondary">
-              <p>Pontuação: em breve</p>
-              <p>Posição semanal: em breve</p>
-              <p>Streak diário/semanal: em breve</p>
+            <CardContent className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border border-card-border bg-background px-3 py-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                  Pontos totais
+                </p>
+                <p className="mt-2 text-2xl font-bold text-text-primary">
+                  {profile.gamification.totalPoints}
+                </p>
+              </div>
+              <div className="rounded-lg border border-card-border bg-background px-3 py-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                  Ranking semanal
+                </p>
+                <p className="mt-2 text-sm font-semibold text-text-primary">{weeklyRankLabel}</p>
+              </div>
+              <div className="rounded-lg border border-card-border bg-background px-3 py-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                  Streak
+                </p>
+                <p className="mt-2 text-sm font-semibold text-text-primary">
+                  {profile.gamification.streakCurrentDays} dias agora
+                </p>
+                <p className="text-xs text-text-secondary">
+                  Melhor sequência: {profile.gamification.streakBestDays} dias
+                </p>
+              </div>
             </CardContent>
           </Card>
 
@@ -428,12 +465,29 @@ export function ProfilePage() {
                 <Medal size={18} aria-hidden="true" />
                 Emblemas e histórico
               </CardTitle>
-              <CardDescription>Placeholder planejado para Fases 7 e 8.</CardDescription>
+              <CardDescription>
+                Emblemas desbloqueados, progresso atual e atividade dos últimos 30 dias.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm text-text-secondary">
-              <p>Emblemas desbloqueados: em breve</p>
-              <p>Emblemas bloqueados com progresso: em breve</p>
-              <p>Histórico de viagens: em breve</p>
+            <CardContent className="space-y-5">
+              <AchievementsGrid
+                unlocked={profile.gamification.achievementsUnlocked}
+                locked={profile.gamification.achievementsLocked}
+              />
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-text-primary">
+                  Ritmo dos últimos 30 dias
+                </h3>
+                <ContributionHeatmap history={profile.gamification.contributionHistory30d} />
+              </div>
+              <div className="space-y-2 rounded-lg border border-card-border bg-background px-3 py-3">
+                <h3 className="text-sm font-semibold text-text-primary">Eventos recentes</h3>
+                <div className="space-y-2 text-sm text-text-secondary">
+                  {profile.gamification.recentPointEvents.map((event) => (
+                    <p key={`${event.reason}-${event.earnedAt}`}>{event.message}</p>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
         </section>

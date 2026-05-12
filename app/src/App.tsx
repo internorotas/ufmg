@@ -24,6 +24,7 @@ import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoU
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
 import { ProfilePage } from './routes/profile/ProfilePage';
+import { RankingPage } from './routes/ranking/RankingPage';
 import { ResearchDashboardPage } from './routes/research/ResearchDashboardPage';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
@@ -295,6 +296,7 @@ function AppContent() {
         isOffline={isOffline}
         authStatus={authStatus}
         isAuthenticated={isAuthenticated}
+        userScore={null}
         onAuthAction={() => {
           if (isAuthenticated) {
             setIsProfileSheetOpen(true);
@@ -414,6 +416,7 @@ function AuthenticatedAppShell() {
           <Routes>
             <Route path="/" element={<AppContent />} />
             <Route path="/perfil" element={<ProfilePage />} />
+            <Route path="/ranking" element={<RankingPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </NotificacaoProvider>

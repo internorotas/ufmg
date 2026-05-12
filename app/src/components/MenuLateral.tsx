@@ -18,6 +18,7 @@ import { LineCard } from './LineCard';
 import { MenuFooter } from './MenuFooter';
 import { SystemBanner } from './SystemBanner';
 import { ThemeToggle } from './ThemeToggle';
+import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { SearchEmptyState } from './ui/EmptyState';
 import { SearchInput } from './ui/Input';
@@ -77,6 +78,7 @@ export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
   authStatus: 'booting' | 'authenticated' | 'anonymous';
   isAuthenticated: boolean;
   onAuthAction: () => void;
+  userScore?: number | null;
 }
 
 interface CategoryTabsProps {
@@ -141,6 +143,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   authStatus,
   isAuthenticated,
   onAuthAction,
+  userScore,
 }: MenuLateralProps) {
   const { t } = useTranslation('menu');
   const analytics = useAnalytics();
@@ -377,15 +380,22 @@ export const MenuLateral = React.memo(function MenuLateral({
                 Sessao...
               </span>
             ) : (
-              <Button
-                type="button"
-                onClick={onAuthAction}
-                variant="ghost"
-                size="sm"
-                className="min-h-11 rounded-full bg-white/15 px-3 text-xs font-semibold text-white hover:bg-white/25"
-              >
-                {isAuthenticated ? 'Perfil' : 'Entrar'}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={onAuthAction}
+                  variant="ghost"
+                  size="sm"
+                  className="min-h-11 rounded-full bg-white/15 px-3 text-xs font-semibold text-white hover:bg-white/25"
+                >
+                  {isAuthenticated ? 'Perfil' : 'Entrar'}
+                </Button>
+                {isAuthenticated && typeof userScore === 'number' ? (
+                  <Badge variant="ouro" size="sm" className="min-h-11 bg-white/95 text-brand-dark">
+                    {userScore} pts
+                  </Badge>
+                ) : null}
+              </div>
             )}
           </div>
           <div className="flex flex-1 items-center justify-center">
