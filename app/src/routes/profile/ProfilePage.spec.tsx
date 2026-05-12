@@ -171,6 +171,38 @@ describe('ProfilePage', () => {
                 },
               ],
             },
+            monetization: {
+              isPremium: true,
+              supporterBadgeUnlocked: true,
+              activeSubscription: {
+                status: 'active',
+                frequency: 'MONTHLY',
+                amountCents: 2990,
+                startedAt: '2026-05-11T01:00:00.000Z',
+                nextPaymentAt: '2026-06-11T01:00:00.000Z',
+                cancelledAt: null,
+              },
+              lastDonationAt: '2026-05-10T01:00:00.000Z',
+              nextPaymentAt: '2026-06-11T01:00:00.000Z',
+              recentTransactions: [
+                {
+                  kind: 'subscription',
+                  status: 'active',
+                  amountCents: 2990,
+                  createdAt: '2026-05-11T01:00:00.000Z',
+                  paidAt: '2026-05-11T01:00:00.000Z',
+                  receiptUrl: 'https://pay.abacate.test/receipt-sub',
+                },
+                {
+                  kind: 'donation',
+                  status: 'paid',
+                  amountCents: 1500,
+                  createdAt: '2026-05-10T01:00:00.000Z',
+                  paidAt: '2026-05-10T01:00:00.000Z',
+                  receiptUrl: 'https://pay.abacate.test/receipt-donation',
+                },
+              ],
+            },
           }),
           {
             status: 200,
@@ -203,6 +235,11 @@ describe('ProfilePage', () => {
     expect(container.textContent).toContain('Pioneiro da Linha 2004A');
     expect(container.textContent).toContain('Centenario');
     expect(container.textContent).toContain('Viagem encerrada automaticamente');
+    expect(container.textContent).toContain('Premium ativo');
+    expect(container.textContent).toContain('Fazer doação via PIX');
+    expect(container.textContent).toContain('Assinar Premium');
+    expect(container.textContent).toContain('Histórico recente');
+    expect(container.textContent).toContain('não desbloqueia funcionalidades core');
     expect(container.textContent).toContain('Solicitar exclusão de conta');
   });
 });

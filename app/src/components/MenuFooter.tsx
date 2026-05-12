@@ -5,6 +5,7 @@
 
 import { Heart } from 'lucide-react';
 import type { ComponentProps } from 'react';
+import { Link } from 'react-router-dom';
 
 import { tv, type VariantProps } from 'tailwind-variants';
 
@@ -79,11 +80,14 @@ export interface MenuFooterProps
 export function MenuFooter({ className, ...props }: MenuFooterProps) {
   const analytics = useAnalytics();
 
-  const handleLinkClick = (platform: string) => {
+  const handleLinkClick = (
+    label: string,
+    action: 'click_outbound_link' | 'click_internal_link',
+  ) => {
     analytics.trackEvent({
       category: 'navigation',
-      action: 'click_outbound_link',
-      label: platform,
+      action,
+      label,
     });
   };
 
@@ -95,7 +99,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           href="https://forms.gle/5e9MHq9pp1p8T5Px5"
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => handleLinkClick('Contato')}
+          onClick={() => handleLinkClick('Contato', 'click_outbound_link')}
           aria-label="Reportar problema ou entrar em contato (abre em nova aba)"
           className={footerButtonVariants({ intent: 'danger' })}
         >
@@ -103,16 +107,14 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
         </a>
 
         {/* Botão Sobre o Projeto */}
-        <a
-          href="https://github.com/internorotas/ufmg"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => handleLinkClick('Sobre o Projeto')}
-          aria-label="Sobre o projeto no GitHub (abre em nova aba)"
+        <Link
+          to="/sobre"
+          onClick={() => handleLinkClick('Sobre', 'click_internal_link')}
+          aria-label="Sobre o projeto no app"
           className={footerButtonVariants({ intent: 'primary' })}
         >
           Sobre
-        </a>
+        </Link>
 
         {/* Botão Versão Antiga */}
         {/* <a
@@ -134,7 +136,7 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           href="https://github.com/igormartins4"
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => handleLinkClick('Dev Profile')}
+          onClick={() => handleLinkClick('Dev Profile', 'click_outbound_link')}
           aria-label="Perfil do desenvolvedor Igor Martins no GitHub (abre em nova aba)"
           className={creditLinkVariants()}
         >
