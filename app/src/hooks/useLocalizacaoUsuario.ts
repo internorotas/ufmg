@@ -16,20 +16,22 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { tenantConfig } from '@/tenants/tenantConfig';
 import { calcularDistanciaKm } from '../lib/utils';
 import { useAnalytics } from './useAnalytics';
 
 /**
- * Coordenadas centrais do Campus UFMG (Pampulha)
+ * Coordenadas centrais do campus principal do tenant atual.
  */
-export const COORDENADAS_UFMG: [number, number] = [-19.87055, -43.96775];
+export const COORDENADAS_CAMPUS: [number, number] = tenantConfig.campusCenter;
+export const CAMPUS_DISPLAY_NAME = tenantConfig.campusDisplayName;
 
 /**
- * Distância máxima em km para considerar o usuário "perto" da UFMG.
+ * Distância máxima em km para considerar o usuário "perto" do campus atual.
  * Exportada para que mensagens de UI possam referenciar o mesmo valor
  * sem duplicar a constante.
  */
-export const DISTANCIA_MAXIMA_KM = 4;
+export const DISTANCIA_MAXIMA_KM = tenantConfig.distanceAlertKm;
 
 /** Extende DeviceOrientationEvent com a propriedade proprietária do WebKit/iOS. */
 type DeviceOrientationEventWebkit = DeviceOrientationEvent & {
@@ -61,7 +63,7 @@ export interface UseLocalizacaoUsuarioReturn {
   erro: string | null;
   /** Controle do modal de permissão */
   mostrarModalPermissao: boolean;
-  /** Controle do modal de "longe da UFMG" */
+  /** Controle do modal de "longe do campus" */
   mostrarModalLonge: boolean;
   /** Abre o modal de permissão */
   abrirModalPermissao: () => void;
@@ -123,14 +125,14 @@ export function useLocalizacaoUsuario(options?: {
   const melhorPrecisaoRef = useRef<number>(Infinity);
 
   /**
-   * Verifica se o usuário está longe da UFMG (apenas 1x por sessão de rastreamento)
+   * Verifica se o usuário está longe do campus atual (apenas 1x por sessão de rastreamento)
    */
   const verificarDistancia = useCallback(
     (lat: number, lng: number) => {
       if (jaVerificouDistanciaRef.current) return;
       jaVerificouDistanciaRef.current = true;
 
-      const distancia = calcularDistanciaKm(lat, lng, COORDENADAS_UFMG[0], COORDENADAS_UFMG[1]);
+      const distancia = calcularDistanciaKm(lat, lng, COORDENADAS_CAMPUS[0], COORDENADAS_CAMPUS[1]);
 
       if (distancia > DISTANCIA_MAXIMA_KM) {
         setMostrarModalLonge(true);

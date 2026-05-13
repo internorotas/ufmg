@@ -1,6 +1,6 @@
 import { MapPin, Navigation } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { DISTANCIA_MAXIMA_KM } from '../../hooks/useLocalizacaoUsuario';
+import { CAMPUS_DISPLAY_NAME, DISTANCIA_MAXIMA_KM } from '../../hooks/useLocalizacaoUsuario';
 import { Modal } from '../Modal';
 import { Button } from '../ui/Button';
 
@@ -12,7 +12,7 @@ interface ModalManagerProps {
   onClosePermissao: () => void;
   onCloseLonge: () => void;
   onPermitirLocalizacao: () => void;
-  onVoltarUFMG: () => void;
+  onVoltarAoCampus: () => void;
   onContinuarAqui: () => void;
 }
 
@@ -24,7 +24,7 @@ export function ModalManager({
   onClosePermissao,
   onCloseLonge,
   onPermitirLocalizacao,
-  onVoltarUFMG,
+  onVoltarAoCampus,
   onContinuarAqui,
 }: ModalManagerProps): ReactNode {
   return (
@@ -80,19 +80,19 @@ export function ModalManager({
         isOpen={mostrarModalLonge}
         onClose={onCloseLonge}
         title="Você está longe do campus"
-        description={`Você está a mais de ${DISTANCIA_MAXIMA_KM} quilômetros da UFMG e pode voltar a centralizar o mapa no campus ou continuar na posição atual.`}
+        description={`Você está a mais de ${DISTANCIA_MAXIMA_KM} quilômetros de ${CAMPUS_DISPLAY_NAME} e pode voltar a centralizar o mapa no campus ou continuar na posição atual.`}
         size="sm"
       >
         <div className="space-y-4 p-4">
           <div className="text-center">
             <p className="text-text-secondary">
-              Parece que você está a mais de {DISTANCIA_MAXIMA_KM}km da UFMG. Deseja voltar a
-              visualizar o campus no mapa?
+              Parece que você está a mais de {DISTANCIA_MAXIMA_KM}km de {CAMPUS_DISPLAY_NAME}.
+              Deseja voltar a visualizar o campus no mapa?
             </p>
           </div>
           <div className="flex flex-col gap-2">
-            <Button variant="primary" fullWidth data-autofocus="true" onClick={onVoltarUFMG}>
-              Voltar para a UFMG
+            <Button variant="primary" fullWidth data-autofocus="true" onClick={onVoltarAoCampus}>
+              Voltar ao campus
             </Button>
             <Button variant="ghost" fullWidth onClick={onContinuarAqui}>
               Continuar aqui

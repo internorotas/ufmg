@@ -9,9 +9,7 @@
   },
   "disclaimer": {
     "offline": "Conexão perdida. Mapas podem não carregar, mas previsões estáticas continuam funcionando.",
-    "source": "Informações extraídas do <a>site da UFMG</a>.",
-    "contact": "Podem haver mudanças de itinerário e horários sem prévio aviso. Para informações, reclamações, dúvidas e sugestões, entre em contato com a <strong>Divisão de Transportes</strong>.",
-    "phone": "3409-4601 / 4606",
-    "email": "sfrota@dsg.ufmg.br"
+    "source": "Informações extraídas do <a>canal oficial de transportes</a>.",
+    "contact": "Podem haver mudanças de itinerário e horários sem prévio aviso. Para informações, reclamações, dúvidas e sugestões, entre em contato com o <strong>canal oficial de transportes</strong>."
   }
 }

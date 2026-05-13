@@ -14,8 +14,8 @@ import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'r
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
+import { COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '../hooks/useAnalytics';
-import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
 import type { Linha, Parada } from '../types/data.types';
 import { ControlesUsuarioMapa } from './ControlesUsuarioMapa';
 import {
@@ -56,7 +56,7 @@ interface MapaProps {
  * Configurações padrão do mapa
  */
 const MAP_CONFIG = {
-  center: COORDENADAS_UFMG,
+  center: COORDENADAS_CAMPUS,
   zoom: 15,
   tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   attribution:

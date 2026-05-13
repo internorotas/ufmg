@@ -16,7 +16,10 @@ export function applyTenantDocumentMetadata(): void {
   }
 
   const appUrl = new URL(import.meta.env.BASE_URL, window.location.origin).toString();
-  const ogImageUrl = new URL(`${import.meta.env.BASE_URL}og-image.png`, window.location.origin).toString();
+  const ogImageUrl = new URL(
+    `${import.meta.env.BASE_URL}og-image.png`,
+    window.location.origin,
+  ).toString();
 
   document.title = tenantConfig.appName;
   updateMeta('meta[name="theme-color"]', tenantConfig.brandColor);

@@ -1,3 +1,5 @@
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+
 export interface AuthenticatedUser {
   id: number;
   displayName: string;
@@ -52,13 +54,7 @@ export type AuthEndpointPath =
   | '/v1/auth/delete-account';
 
 export function resolveAuthEndpoint(pathname: AuthEndpointPath): string {
-  const apiBaseUrl = import.meta.env.VITE_API_URL;
-
-  if (!apiBaseUrl) {
-    return pathname;
-  }
-
-  return new URL(pathname, apiBaseUrl).toString();
+  return resolveApiEndpoint(pathname);
 }
 
 export function getAuthHeaders(): HeadersInit | undefined {
@@ -80,6 +76,7 @@ export async function refreshSession(): Promise<RefreshResponse> {
       method: 'POST',
       credentials: 'include',
       cache: 'no-store',
+      headers: withTenantHeaders(),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Falha de rede no refresh de sessao';
@@ -103,6 +100,7 @@ export async function startGoogleLoginFlow(): Promise<void> {
   const response = await fetch(endpoint.toString(), {
     method: 'GET',
     cache: 'no-store',
+    headers: withTenantHeaders(),
   });
 
   if (!response.ok) {
@@ -122,7 +120,7 @@ export async function getConsentState(): Promise<ConsentState> {
   const response = await fetch(resolveAuthEndpoint('/v1/auth/consent'), {
     method: 'GET',
     cache: 'no-store',
-    headers: getAuthHeaders(),
+    headers: withTenantHeaders(getAuthHeaders()),
   });
 
   if (!response.ok) {
@@ -137,8 +135,8 @@ export async function updateConsentState(payload: {
   consentResearch: boolean;
 }): Promise<ConsentState> {
   const headers: HeadersInit = {
+    ...Object.fromEntries(withTenantHeaders(getAuthHeaders()).entries()),
     'Content-Type': 'application/json',
-    ...(getAuthHeaders() ?? {}),
   };
 
   const response = await fetch(resolveAuthEndpoint('/v1/auth/consent'), {

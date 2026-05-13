@@ -1,3 +1,4 @@
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import type { CategoriaLinhas, Parada } from '@/types/data.types';
 
 interface ParadasPayload {
@@ -5,13 +6,7 @@ interface ParadasPayload {
 }
 
 function resolveTransitEndpoint(pathname: '/v1/linhas' | '/v1/paradas'): string {
-  const apiBaseUrl = import.meta.env.VITE_API_URL;
-
-  if (!apiBaseUrl) {
-    return pathname;
-  }
-
-  return new URL(pathname, apiBaseUrl).toString();
+  return resolveApiEndpoint(pathname);
 }
 
 function assertLinhasPayload(payload: unknown): asserts payload is CategoriaLinhas {
@@ -37,11 +32,13 @@ function assertParadasPayload(payload: unknown): asserts payload is ParadasPaylo
 async function fetchTransit<T>(pathname: '/v1/linhas' | '/v1/paradas'): Promise<T> {
   const endpoint = resolveTransitEndpoint(pathname);
   const authToken = window.__internoAuthToken ?? null;
-  const headers = authToken
-    ? {
-        Authorization: `Bearer ${authToken}`,
-      }
-    : undefined;
+  const headers = withTenantHeaders(
+    authToken
+      ? {
+          Authorization: `Bearer ${authToken}`,
+        }
+      : undefined,
+  );
 
   const response = await fetch(endpoint, {
     cache: 'no-store',

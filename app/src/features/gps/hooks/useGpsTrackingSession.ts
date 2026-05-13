@@ -7,6 +7,7 @@ import {
 } from '@/features/gps/api/gpsClient';
 import { hashUserId } from '@/features/gps/lib/hashUserId';
 import { calcularDistanciaKm } from '@/lib/utils';
+import { getTenantStorageKey } from '@/pwa/tenantNamespace';
 import type { Linha } from '@/types/data.types';
 
 export const TRACKING_TOGGLE_LABEL = 'Estou no ônibus agora';
@@ -17,7 +18,7 @@ const IDLE_AUTO_FINISH_MS = 5 * 60 * 1000;
 const MAX_SESSION_DURATION_MS = 60 * 60 * 1000;
 const MAX_ROUTE_DISTANCE_KM = 0.3;
 const TERMINAL_DISTANCE_KM = 0.08;
-const OFFLINE_SESSION_STORAGE_KEY = 'interno-rotas:gps-offline-session';
+const OFFLINE_SESSION_STORAGE_KEY = getTenantStorageKey('gps-offline-session');
 
 type TrackingStopReason = 'manual' | 'parado' | 'saiu_rota' | 'terminal' | 'timeout';
 

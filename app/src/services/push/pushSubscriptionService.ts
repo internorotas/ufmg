@@ -1,3 +1,6 @@
+import { getAuthHeaders } from '@/features/auth/api/authClient';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+
 export interface PushSubscriptionContext {
   linhaId: string;
   paradaId: string;
@@ -26,13 +29,7 @@ function decodeVapidPublicKey(base64Value: string): ArrayBuffer {
 }
 
 function resolvePushSubscriptionEndpoint(): string {
-  const apiBaseUrl = import.meta.env.VITE_API_URL;
-
-  if (!apiBaseUrl) {
-    return '/v1/push/subscriptions';
-  }
-
-  return new URL('/v1/push/subscriptions', apiBaseUrl).toString();
+  return resolveApiEndpoint('/v1/push/subscriptions');
 }
 
 function extractSubscriptionKeys(subscription: PushSubscription): {
@@ -89,9 +86,10 @@ export async function syncPushSubscription(context: PushSubscriptionContext): Pr
 
     const response = await fetch(resolvePushSubscriptionEndpoint(), {
       method: 'POST',
-      headers: {
+      headers: withTenantHeaders({
         'Content-Type': 'application/json',
-      },
+        ...(getAuthHeaders() ?? {}),
+      }),
       body: JSON.stringify(payload),
       keepalive: true,
     });

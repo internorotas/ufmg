@@ -1,4 +1,5 @@
 import { getAuthHeaders } from '@/features/auth/api/authClient';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 
 export interface GpsPointPayload {
   lat: number;
@@ -23,22 +24,17 @@ export interface GpsSessionPayload {
 }
 
 function resolveGpsEndpoint(pathname: string): string {
-  const apiBaseUrl = import.meta.env.VITE_API_URL;
-  if (!apiBaseUrl) {
-    return pathname;
-  }
-
-  return new URL(pathname, apiBaseUrl).toString();
+  return resolveApiEndpoint(pathname);
 }
 
 async function fetchGps(pathname: string, init?: RequestInit): Promise<Response> {
   const response = await fetch(resolveGpsEndpoint(pathname), {
     ...init,
-    headers: {
+    headers: withTenantHeaders({
       'Content-Type': 'application/json',
       ...(getAuthHeaders() ?? {}),
       ...(init?.headers ?? {}),
-    },
+    }),
   });
 
   if (!response.ok) {

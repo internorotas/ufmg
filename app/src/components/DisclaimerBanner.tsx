@@ -7,6 +7,7 @@ import { AlertTriangle, Mail, Phone } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { Trans } from 'react-i18next';
 import { tv } from 'tailwind-variants';
+import { tenantConfig } from '@/tenants/tenantConfig';
 import { SystemBanner } from './SystemBanner';
 
 /**
@@ -38,6 +39,29 @@ export function DisclaimerBanner({
   isOffline = false,
   ...props
 }: DisclaimerBannerProps) {
+  const contactActions =
+    tenantConfig.transportContactPhone && tenantConfig.transportContactPhoneHref ? (
+      <a
+        href={tenantConfig.transportContactPhoneHref}
+        className={contactButtonVariants()}
+        aria-label={`Ligar para o contato de transportes: ${tenantConfig.transportContactPhone}`}
+      >
+        <Phone className="size-4 shrink-0" aria-hidden="true" />
+        <span>{tenantConfig.transportContactPhone}</span>
+      </a>
+    ) : null;
+
+  const emailAction = tenantConfig.transportContactEmail ? (
+    <a
+      href={`mailto:${tenantConfig.transportContactEmail}`}
+      className={contactButtonVariants()}
+      aria-label={`Enviar e-mail para ${tenantConfig.transportContactEmail}`}
+    >
+      <Mail className="size-4 shrink-0" aria-hidden="true" />
+      <span>{tenantConfig.transportContactEmail}</span>
+    </a>
+  ) : null;
+
   return (
     <SystemBanner
       variant="warning"
@@ -55,15 +79,17 @@ export function DisclaimerBanner({
               i18nKey="disclaimer.source"
               ns="system-banner"
               components={{
-                a: (
+                a: tenantConfig.transportSiteUrl ? (
                   <a
-                    href="https://www.ufmg.br/transporte/"
+                    href={tenantConfig.transportSiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-semibold underline hover:no-underline"
                   >
-                    site da UFMG
+                    site oficial de transportes
                   </a>
+                ) : (
+                  <span className="font-semibold">canal oficial de transportes</span>
                 ),
               }}
             />
@@ -79,26 +105,8 @@ export function DisclaimerBanner({
       }
       actions={
         <>
-          <a
-            href="tel:3409-4601"
-            className={contactButtonVariants()}
-            aria-label="Ligar para a Divisão de Transportes: 3409-4601 ou 4606"
-          >
-            <Phone className="size-4 shrink-0" aria-hidden="true" />
-            <span>
-              <Trans i18nKey="disclaimer.phone" ns="system-banner" />
-            </span>
-          </a>
-          <a
-            href="mailto:sfrota@dsg.ufmg.br"
-            className={contactButtonVariants()}
-            aria-label="Enviar e-mail para sfrota@dsg.ufmg.br"
-          >
-            <Mail className="size-4 shrink-0" aria-hidden="true" />
-            <span>
-              <Trans i18nKey="disclaimer.email" ns="system-banner" />
-            </span>
-          </a>
+          {contactActions}
+          {emailAction}
         </>
       }
       {...props}

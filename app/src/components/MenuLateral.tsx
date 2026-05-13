@@ -12,6 +12,7 @@ import {
   type PartnerSpotlight,
   PartnerSpotlightCard,
 } from '@/features/monetization/components/PartnerSpotlightCard';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import logo from '../assets/logo-horizontal-transparente.svg';
 import { useRotasSelection } from '../contexts/RotasContext';
 import { useAnalytics } from '../hooks/useAnalytics';
@@ -124,13 +125,7 @@ function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) 
 }
 
 function resolvePartnerSpotlightEndpoint(): string {
-  const apiBaseUrl = import.meta.env.VITE_API_URL;
-
-  if (!apiBaseUrl) {
-    return '/v1/partners/active';
-  }
-
-  return new URL('/v1/partners/active', apiBaseUrl).toString();
+  return resolveApiEndpoint('/v1/partners/active');
 }
 
 function isPartnerSpotlight(value: unknown): value is PartnerSpotlight {
@@ -154,6 +149,7 @@ async function fetchActivePartnerSpotlight(): Promise<PartnerSpotlight | null> {
   const response = await fetch(resolvePartnerSpotlightEndpoint(), {
     method: 'GET',
     cache: 'no-store',
+    headers: withTenantHeaders(),
   });
 
   if (!response.ok) {
