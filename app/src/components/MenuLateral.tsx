@@ -12,6 +12,7 @@ import { useAnalytics } from '../hooks/useAnalytics';
 import { useFavoritos } from '../hooks/useFavoritos';
 import { useLinhasFilter } from '../hooks/useLinhasFilter';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
+import type { LegalModalType } from '../types/legal.types';
 import { DisclaimerBanner } from './DisclaimerBanner';
 import { InfoBanner } from './InfoBanner';
 import { LineCard } from './LineCard';
@@ -38,6 +39,7 @@ export const sidebarVariants = tv({
     'border-r border-card-border/50 text-text-primary',
     'bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150',
     'shadow-2xl md:shadow-none',
+    'overflow-hidden',
     'transform transition-transform duration-300',
   ],
   variants: {
@@ -56,8 +58,9 @@ export const sidebarVariants = tv({
  */
 export const categoryTabVariants = tv({
   base: [
-    'flex-1 rounded-md px-2.5 py-2 lg:py-2.5',
-    'text-xs lg:text-sm font-medium',
+    'flex-1 min-h-11 rounded-md px-2 py-1.5 lg:py-2.5',
+    'text-[0.75rem] sm:text-xs lg:text-sm font-medium leading-tight text-center',
+    'whitespace-normal break-words overflow-visible text-clip',
     'cursor-pointer transition-all duration-150 ease-out',
     'active:scale-[0.97]',
     'data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm',
@@ -73,6 +76,7 @@ export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
   todasParadas: Parada[];
   onLinhaSelect: (linha: Linha) => void;
   onParadaClick: (parada: Parada) => void;
+  onOpenLegalModal: (modalType: LegalModalType) => void;
   linhaSelecionada: Linha | null;
   isOffline: boolean;
 }
@@ -100,7 +104,7 @@ function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) 
       onValueChange={handleValueChange}
       className="border-b border-card-border bg-background px-4 py-3 md:border-none"
     >
-      <TabsList variant="pills" className="gap-2 bg-transparent p-0">
+      <TabsList variant="pills" className="gap-1.5 bg-transparent p-0">
         {categories.map((categoria) => (
           <TabsTrigger
             key={categoria.id}
@@ -134,6 +138,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   todasParadas,
   onLinhaSelect,
   onParadaClick,
+  onOpenLegalModal,
   linhaSelecionada,
   isOffline,
 }: MenuLateralProps) {
@@ -544,7 +549,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           <DisclaimerBanner isOffline={isOffline} />
         </nav>
 
-        <MenuFooter />
+        <MenuFooter onOpenLegalModal={onOpenLegalModal} />
       </aside>
 
       {linhaDetalhesAberta && (

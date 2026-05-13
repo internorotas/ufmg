@@ -23,6 +23,16 @@ interface AuthState {
   logout: () => void;
 }
 
+const ONBOARDING_STORAGE_KEY = 'onboarding_completed';
+
+function readOnboardingFlagFromStorage(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return window.localStorage.getItem(ONBOARDING_STORAGE_KEY) === 'true';
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -30,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isLoading: true,
-      hasSeenOnboarding: false,
+      hasSeenOnboarding: readOnboardingFlagFromStorage(),
 
       setAccessToken: (token) => set({ accessToken: token, isAuthenticated: !!token }),
 
@@ -38,7 +48,13 @@ export const useAuthStore = create<AuthState>()(
 
       setLoading: (loading) => set({ isLoading: loading }),
 
-      setHasSeenOnboarding: (seen) => set({ hasSeenOnboarding: seen }),
+      setHasSeenOnboarding: (seen) => {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(ONBOARDING_STORAGE_KEY, String(seen));
+        }
+
+        set({ hasSeenOnboarding: seen });
+      },
 
       login: (token, user) =>
         set({

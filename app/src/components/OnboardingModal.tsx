@@ -4,29 +4,33 @@ import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAuthStore } from '@/stores/authStore';
+import type { LegalModalType } from '@/types/legal.types';
 
 const SLIDES = [
   {
     icon: Bus,
     title: 'Bem-vindo ao Interno Rotas',
     description:
-      'Seu guia de transporte universitário UFMG. Veja horários em tempo real e salve suas linhas favoritas.',
+      'Sem cadastro obrigatório: consulte linhas e paradas da UFMG rapidamente e salve favoritas quando quiser.',
   },
   {
     icon: MapPin,
     title: 'GPS Colaborativo',
     description:
-      'Ajude a comunidade! Compartilhe a localização do ônibus para ajudar outros alunos a saberem quando ele chega.',
+      'Ajude a comunidade com GPS colaborativo: quando você compartilha posição, mais pessoas recebem previsões melhores.',
   },
   {
     icon: Shield,
     title: 'Seus dados são seus',
-    description:
-      'Compartilhamos localização apenas para melhorar o serviço. Você pode excluir seus dados a qualquer momento.',
+    description: 'Seguimos a LGPD para tratamento de dados de localização e transparência de uso.',
   },
 ] as const;
 
-export function OnboardingModal() {
+interface OnboardingModalProps {
+  onOpenLegalModal: (modalType: LegalModalType) => void;
+}
+
+export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isOpen, setIsOpen] = useState(true);
   const { hasSeenOnboarding, setHasSeenOnboarding } = useAuthStore();
@@ -90,7 +94,20 @@ export function OnboardingModal() {
             </Dialog.Title>
 
             <Dialog.Description className="text-center">
-              {SLIDES[currentSlide].description}
+              {SLIDES[currentSlide].description}{' '}
+              {currentSlide === 2 ? (
+                <>
+                  Leia nossa{' '}
+                  <button
+                    type="button"
+                    onClick={() => onOpenLegalModal('privacidade')}
+                    className="font-semibold underline"
+                  >
+                    Política de Privacidade
+                  </button>
+                  .
+                </>
+              ) : null}
             </Dialog.Description>
           </div>
 

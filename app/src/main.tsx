@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -7,7 +8,27 @@ import './globals.css';
 import { App } from './App';
 import { queryClient } from './lib/queryClient';
 
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    tracesSampleRate: 0.1,
+    environment: import.meta.env.MODE,
+    beforeSend(event) {
+      if (event.request?.headers?.authorization) {
+        delete event.request.headers.authorization;
+      }
+
+      if (event.user?.email) {
+        delete event.user.email;
+      }
+
+      return event;
+    },
+  });
+}
+
 const SW_RELOAD_GUARD_KEY = 'ufmg:sw-reload-build-id';
+const SW_UPDATE_IN_PROGRESS_KEY = 'ufmg:sw-update-in-progress';
 const UPDATE_STATUS_REGION_ID = 'app-update-status';
 const SERVICE_WORKER_UPDATE_INTERVAL_MS = 60_000;
 const SERVICE_WORKER_SCOPE = import.meta.env.BASE_URL;
@@ -50,16 +71,44 @@ function ensureUpdateStatusRegion(): HTMLElement {
 }
 
 function triggerSingleReloadForUpdatedServiceWorker(): void {
+  if (sessionStorage.getItem(SW_UPDATE_IN_PROGRESS_KEY) === import.meta.env.VITE_BUILD_ID) {
+    return;
+  }
+
   if (sessionStorage.getItem(SW_RELOAD_GUARD_KEY) === import.meta.env.VITE_BUILD_ID) {
     return;
   }
 
+  sessionStorage.setItem(SW_UPDATE_IN_PROGRESS_KEY, import.meta.env.VITE_BUILD_ID);
   sessionStorage.setItem(SW_RELOAD_GUARD_KEY, import.meta.env.VITE_BUILD_ID);
   ensureUpdateStatusRegion().textContent = 'Nova versão disponível. Atualizando o aplicativo.';
 
   window.setTimeout(() => {
     window.location.reload();
   }, 150);
+}
+
+async function forceServiceWorkerUpdate(): Promise<void> {
+  if (!('serviceWorker' in navigator)) {
+    triggerSingleReloadForUpdatedServiceWorker();
+    return;
+  }
+
+  const registration = await navigator.serviceWorker.getRegistration(SERVICE_WORKER_SCOPE);
+  if (registration) {
+    await registration.update();
+  }
+
+  triggerSingleReloadForUpdatedServiceWorker();
+}
+
+function handleApiVersionMismatch(): void {
+  ensureUpdateStatusRegion().textContent =
+    'Detectada versão incompatível da API. Atualizando o aplicativo.';
+
+  void forceServiceWorkerUpdate().catch(() => {
+    triggerSingleReloadForUpdatedServiceWorker();
+  });
 }
 
 function ensureManifestLink(): void {
@@ -152,6 +201,8 @@ createRoot(rootElement).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+window.addEventListener('internorotas:api-version-mismatch', handleApiVersionMismatch);
 
 ensureManifestLink();
 registerAppServiceWorker();
