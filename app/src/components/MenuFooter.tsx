@@ -8,6 +8,7 @@ import type { ComponentProps } from 'react';
 import { Link } from 'react-router-dom';
 
 import { tv, type VariantProps } from 'tailwind-variants';
+import { tenantConfig } from '@/tenants/tenantConfig';
 
 import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
@@ -116,18 +117,18 @@ export function MenuFooter({ className, ...props }: MenuFooterProps) {
           Sobre
         </Link>
 
-        {/* Botão Versão Antiga */}
-        {/* <a
-          href="https://ufmg-pi.vercel.app/"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() =>
-            handleLinkClick("Versão Antiga", "https://ufmg-pi.vercel.app/")
-          }
-          className={footerButtonVariants({ intent: "ghost" })}
-        >
-          Versão Antiga
-        </a> */}
+        {tenantConfig.publicRepositoryUrl ? (
+          <a
+            href={tenantConfig.publicRepositoryUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => handleLinkClick('Repositório', 'click_outbound_link')}
+            aria-label="Abrir repositório público do projeto em nova aba"
+            className={footerButtonVariants({ intent: 'ghost' })}
+          >
+            Código
+          </a>
+        ) : null}
       </div>
 
       {/* Desenvolvido por */}

@@ -4,6 +4,7 @@ import type {
   RankingDetail,
 } from '@/features/auth/api/authClient';
 import { getAuthHeaders, resolveAuthEndpoint } from '@/features/auth/api/authClient';
+import { withTenantHeaders } from '@/services/api/apiClient';
 
 export interface UserProfile {
   id: number;
@@ -107,10 +108,10 @@ function buildAuthenticatedHeaders(extraHeaders?: HeadersInit): HeadersInit {
     throw new Error('Sessão autenticada ausente');
   }
 
-  return {
+  return withTenantHeaders({
     ...(authHeaders as Record<string, string>),
     ...(extraHeaders as Record<string, string> | undefined),
-  };
+  });
 }
 
 export async function getProfile(): Promise<UserProfile> {
@@ -149,7 +150,7 @@ export async function logout(): Promise<void> {
     method: 'POST',
     cache: 'no-store',
     credentials: 'include',
-    headers: getAuthHeaders() ?? undefined,
+    headers: withTenantHeaders(getAuthHeaders()),
   });
 
   if (!response.ok) {

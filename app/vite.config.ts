@@ -4,10 +4,12 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import packageJson from '../package.json';
+import { resolveTenantDefinition } from './src/tenants/tenantDefinitions';
 
 const buildId = new Date().toISOString();
 const devProxyTarget = process.env.VITE_DEV_PROXY_TARGET ?? 'http://127.0.0.1:43111';
 const usePolling = process.env.CHOKIDAR_USEPOLLING === 'true';
+const tenantBasePath = resolveTenantDefinition(process.env.VITE_TENANT_SLUG).basePath;
 
 export default defineConfig({
   plugins: [
@@ -35,7 +37,7 @@ export default defineConfig({
       manifest: false,
     }),
   ],
-  base: '/ufmg/',
+  base: tenantBasePath,
   resolve: {
     alias: {
       // Deve corresponder ao paths em tsconfig.json e tsconfig.app.json

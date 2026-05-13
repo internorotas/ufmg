@@ -1,4 +1,5 @@
 import { getAuthHeaders } from '@/features/auth/api/authClient';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 
 type PaymentsEndpointPath =
   | '/v1/payments/donations/checkout'
@@ -45,13 +46,7 @@ export interface PaymentsOverview {
 }
 
 function resolvePaymentsEndpoint(pathname: PaymentsEndpointPath): string {
-  const apiBaseUrl = import.meta.env.VITE_API_URL;
-
-  if (!apiBaseUrl) {
-    return pathname;
-  }
-
-  return new URL(pathname, apiBaseUrl).toString();
+  return resolveApiEndpoint(pathname);
 }
 
 function buildAuthenticatedHeaders(extraHeaders?: HeadersInit): HeadersInit {
@@ -60,10 +55,10 @@ function buildAuthenticatedHeaders(extraHeaders?: HeadersInit): HeadersInit {
     throw new Error('Sessão autenticada ausente');
   }
 
-  return {
+  return withTenantHeaders({
     ...(authHeaders as Record<string, string>),
     ...(extraHeaders as Record<string, string> | undefined),
-  };
+  });
 }
 
 async function createCheckout(

@@ -8,11 +8,11 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
-  TENANT_CACHE_PREFIX,
-  TENANT_STORAGE_PREFIX,
   getTenantCacheName,
   getTenantPushTag,
   getTenantStorageKey,
+  TENANT_CACHE_PREFIX,
+  TENANT_STORAGE_PREFIX,
 } from './tenantNamespace';
 
 describe('tenantNamespace (tenant padrão: ufmg em testes)', () => {

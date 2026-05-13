@@ -20,7 +20,11 @@ import { useConsentGate } from './features/auth/hooks/useConsentGate';
 import { useGpsTrackingSession } from './features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
-import { COORDENADAS_UFMG, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
+import {
+  CAMPUS_DISPLAY_NAME,
+  COORDENADAS_CAMPUS,
+  useLocalizacaoUsuario,
+} from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { AboutPage } from './routes/about/AboutPage';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
@@ -187,7 +191,7 @@ function AppContent() {
     [selecionarParada, mapaRef, trackEvent],
   );
 
-  // Handler para voltar ao campus UFMG
+  // Handler para recentralizar no campus do tenant atual.
   const handlePedirLocalizacao = useCallback(() => {
     solicitarAutoCenter();
     iniciarRastreamento();
@@ -216,10 +220,10 @@ function AppContent() {
     rastreioAtivo,
   ]);
 
-  // Handler para voltar ao campus UFMG
-  const handleVoltarParaUFMG = useCallback(() => {
+  // Handler para voltar ao campus principal.
+  const handleVoltarAoCampus = useCallback(() => {
     consumirAutoCenter();
-    mapaRef.current?.centralizarCoordenada(COORDENADAS_UFMG, 15);
+    mapaRef.current?.centralizarCoordenada(COORDENADAS_CAMPUS, 15);
     fecharModalLonge();
   }, [consumirAutoCenter, mapaRef, fecharModalLonge]);
 
@@ -369,7 +373,7 @@ function AppContent() {
             action: 'location_permission_granted',
           });
         }}
-        onVoltarUFMG={handleVoltarParaUFMG}
+        onVoltarAoCampus={handleVoltarAoCampus}
         onContinuarAqui={handleContinuarAqui}
       />
 

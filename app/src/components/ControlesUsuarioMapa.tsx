@@ -13,8 +13,8 @@ import L from 'leaflet';
 import { CornerUpLeft, LoaderCircle, LocateFixed, Radio, Square } from 'lucide-react';
 import { Marker, useMap } from 'react-leaflet';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
+import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '../hooks/useAnalytics';
-import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
 import { cn } from '../lib/utils';
 
 interface ControlesUsuarioMapaProps {
@@ -123,10 +123,10 @@ export function ControlesUsuarioMapa({
             : 'Rastreio colaborativo inativo';
 
   /**
-   * Centraliza o mapa no campus da UFMG
+   * Centraliza o mapa no campus principal configurado para o tenant.
    */
-  const handleCentralizarUFMG = () => {
-    map.flyTo(COORDENADAS_UFMG, 15, { duration: 1 });
+  const handleCentralizarCampus = () => {
+    map.flyTo(COORDENADAS_CAMPUS, 15, { duration: 1 });
   };
 
   /**
@@ -190,18 +190,18 @@ export function ControlesUsuarioMapa({
           </button>
         ) : null}
 
-        {/* Botão: centralizar no campus UFMG */}
+        {/* Botão: centralizar no campus */}
         <button
           type="button"
-          onClick={handleCentralizarUFMG}
+          onClick={handleCentralizarCampus}
           className={cn(
             'flex h-12 w-12 cursor-pointer items-center justify-center',
             'rounded-full shadow-lg transition-all duration-200',
             'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
           )}
-          aria-label="Centralizar mapa no campus UFMG"
-          title="Centralizar mapa no campus UFMG"
+          aria-label={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
+          title={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
         >
           <CornerUpLeft className="h-6 w-6 text-white" aria-hidden="true" />
         </button>

@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 
 type FormState = {
   username: string;
@@ -31,9 +32,9 @@ export function FakeAdminLoginPage() {
     };
 
     try {
-      await fetch('/v1/honeypot/report', {
+      await fetch(resolveApiEndpoint('/v1/honeypot/report'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: withTenantHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       });
     } catch {

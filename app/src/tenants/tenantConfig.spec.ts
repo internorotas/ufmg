@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_TENANT_SLUG,
-  TENANT_DEFINITIONS,
   normalizeTenantSlug,
   resolveTenantDefinition,
+  TENANT_DEFINITIONS,
 } from './tenantDefinitions';
 
 describe('normalizeTenantSlug', () => {

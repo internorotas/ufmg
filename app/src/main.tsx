@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { getTenantStorageKey } from '@/pwa/tenantNamespace';
+import { applyTenantDocumentMetadata } from '@/tenants/tenantConfig';
 import '@/i18n';
 
 import './globals.css';
@@ -8,7 +10,7 @@ import './globals.css';
 import { App } from './App';
 import { AppQueryProvider } from './providers/AppQueryProvider';
 
-const SW_RELOAD_GUARD_KEY = 'ufmg:sw-reload-build-id';
+const SW_RELOAD_GUARD_KEY = getTenantStorageKey('sw-reload-build-id');
 const UPDATE_STATUS_REGION_ID = 'app-update-status';
 const SERVICE_WORKER_UPDATE_INTERVAL_MS = 60_000;
 const SERVICE_WORKER_SCOPE = import.meta.env.BASE_URL;
@@ -20,6 +22,8 @@ const MANIFEST_URL = new URL(
   `${import.meta.env.BASE_URL}site.webmanifest`,
   window.location.origin,
 ).toString();
+
+applyTenantDocumentMetadata();
 
 function ensureUpdateStatusRegion(): HTMLElement {
   const existingRegion = document.getElementById(UPDATE_STATUS_REGION_ID);

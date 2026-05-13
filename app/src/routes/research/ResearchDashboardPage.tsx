@@ -5,6 +5,7 @@ import {
   fetchResearchExportPreview,
   requestResearchExport,
 } from '@/services/research/researchClient';
+import { tenantConfig } from '@/tenants/tenantConfig';
 
 interface ExportFeedback {
   type: 'success' | 'error';
@@ -168,7 +169,7 @@ export function ResearchDashboardPage() {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   className="min-h-11 w-full rounded-lg border border-card-border bg-background px-3 py-2"
-                  placeholder="pesquisa@ufmg.br"
+                  placeholder={tenantConfig.researchEmailExample}
                 />
               </label>
 

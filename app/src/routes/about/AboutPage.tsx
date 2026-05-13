@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { tenantConfig } from '@/tenants/tenantConfig';
 
 function AboutLink({
   href,
@@ -60,8 +61,9 @@ export function AboutPage() {
 
           <h1 className="mt-4 text-2xl font-bold sm:text-3xl">Transparência do Interno Rotas</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-text-secondary">
-            O Interno Rotas existe para facilitar a consulta das linhas universitárias da UFMG com
-            foco em utilidade pública, GPS colaborativo e clareza sobre como o projeto se sustenta.
+            O Interno Rotas existe para facilitar a consulta das linhas universitárias de{' '}
+            {tenantConfig.institutionName} com foco em utilidade pública, GPS colaborativo e clareza
+            sobre como o projeto se sustenta.
           </p>
 
           <div className="mt-4 flex flex-wrap gap-2">
@@ -185,12 +187,14 @@ export function AboutPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <AboutLink
-                href="https://github.com/internorotas/ufmg"
-                label="Repositório público"
-                description="Código do frontend, histórico e documentação pública do app."
-                onClick={() => handleExternalClick('Repositorio publico')}
-              />
+              {tenantConfig.publicRepositoryUrl ? (
+                <AboutLink
+                  href={tenantConfig.publicRepositoryUrl}
+                  label="Repositório público"
+                  description="Código do frontend, histórico e documentação pública do app."
+                  onClick={() => handleExternalClick('Repositorio publico')}
+                />
+              ) : null}
               <AboutLink
                 href="https://forms.gle/5e9MHq9pp1p8T5Px5"
                 label="Contato e feedback"

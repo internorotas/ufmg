@@ -1,3 +1,5 @@
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+
 export interface ResearchExportFilters {
   linhaId?: string;
   dateFrom?: string;
@@ -11,12 +13,7 @@ export interface ResearchExportRequest extends ResearchExportFilters {
 }
 
 function resolveResearchEndpoint(pathname: '/v1/research/exports'): string {
-  const apiBaseUrl = import.meta.env.VITE_API_URL;
-  if (!apiBaseUrl) {
-    return pathname;
-  }
-
-  return new URL(pathname, apiBaseUrl).toString();
+  return resolveApiEndpoint(pathname);
 }
 
 export async function fetchResearchExportPreview(filters: ResearchExportFilters) {
@@ -27,7 +24,10 @@ export async function fetchResearchExportPreview(filters: ResearchExportFilters)
     }
   }
 
-  const response = await fetch(endpoint.toString(), { cache: 'no-store' });
+  const response = await fetch(endpoint.toString(), {
+    cache: 'no-store',
+    headers: withTenantHeaders(),
+  });
   if (!response.ok) {
     throw new Error(`Falha ao carregar preview de pesquisa: HTTP ${response.status}`);
   }
@@ -45,6 +45,7 @@ export async function requestResearchExport(payload: ResearchExportRequest) {
     cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
+      ...Object.fromEntries(withTenantHeaders().entries()),
     },
     body: JSON.stringify(payload),
   });
