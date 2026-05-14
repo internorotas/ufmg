@@ -21,6 +21,8 @@ import { AuthProvider, useAuthContext } from './features/auth/context/AuthContex
 import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
 import { useConsentGate } from './features/auth/hooks/useConsentGate';
 import { useGpsTrackingSession } from './features/gps/hooks/useGpsTrackingSession';
+import { PlannerSummarySheet } from './features/planner/components/PlannerSummarySheet';
+import { usePlannerStore } from './features/planner/store/plannerStore';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_CAMPUS, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
@@ -131,6 +133,7 @@ function AppContent() {
     closeDialog,
   } = useConsentGate();
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
+  const [isSummarySheetOpen, setIsSummarySheetOpen] = useState(false);
   const [authFeedbackMessage, setAuthFeedbackMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -256,6 +259,14 @@ function AppContent() {
     iniciarRastreamento();
   }, [solicitarAutoCenter, iniciarRastreamento]);
 
+  const handlePlannerRouteSelected = useCallback(() => {
+    setIsSummarySheetOpen(true);
+  }, []);
+
+  const handleRegisterMenuOpen = useCallback((fn: () => void) => {
+    usePlannerStore.getState().registerOpenMenu(fn);
+  }, []);
+
   const handleAlternarRastreioColaborativo = useCallback(() => {
     if (rastreioAtivo) {
       void encerrarRastreioColaborativo('manual');
@@ -364,6 +375,8 @@ function AppContent() {
         authStatus={authStatus}
         isAuthenticated={isAuthenticated}
         userScore={null}
+        onPlannerRouteSelected={handlePlannerRouteSelected}
+        onRegisterMenuOpen={handleRegisterMenuOpen}
         onAuthAction={() => {
           if (isAuthenticated) {
             setIsProfileSheetOpen(true);
@@ -451,6 +464,15 @@ function AppContent() {
       />
 
       <ProfileSheet isOpen={isProfileSheetOpen} onOpenChange={setIsProfileSheetOpen} />
+
+      <PlannerSummarySheet
+        isOpen={isSummarySheetOpen}
+        onClose={() => setIsSummarySheetOpen(false)}
+        onBackToResults={() => {
+          setIsSummarySheetOpen(false);
+          usePlannerStore.getState().openMenuFn?.();
+        }}
+      />
 
       {authFeedbackMessage ? (
         <div

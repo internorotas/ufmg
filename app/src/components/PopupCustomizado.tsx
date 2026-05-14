@@ -3,12 +3,13 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { Bell, BellRing, Bus, MapPin } from 'lucide-react';
+import { Bell, BellRing, Bus, MapPin, Navigation } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { useMemo } from 'react';
 import { Popup } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { calcularPrevisaoChegada } from '@/features/eta/domain/calculateEta';
+import { usePlannerStore } from '@/features/planner/store/plannerStore';
 import { isLineAvailableToday } from '../config/specialPeriods';
 import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import { useRotasData } from '../contexts/RotasContext';
@@ -275,7 +276,53 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
             <p className="text-xs italic text-text-secondary">{parada.descricao}</p>
           </div>
         )}
+
+        {/* Ações do planejador */}
+        <PlannerStopActions parada={parada} />
       </div>
     </Popup>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// PlannerStopActions — ações de origem/destino para o planejador de rotas
+// ---------------------------------------------------------------------------
+
+function PlannerStopActions({ parada }: { parada: Parada }) {
+  const { setOrigin, setDestination } = usePlannerStore();
+
+  const handleUseAsOrigin = () => {
+    setOrigin({ kind: 'stop', idParada: parada.idParada, nome: parada.nome });
+  };
+
+  const handleUseAsDestination = () => {
+    setDestination({ kind: 'stop', idParada: parada.idParada, nome: parada.nome });
+  };
+
+  return (
+    <fieldset
+      data-slot="planner-actions"
+      className="mt-2 flex gap-2 border-t border-card-border pt-2"
+    >
+      <legend className="sr-only">Usar esta parada no planejador</legend>
+      <button
+        type="button"
+        onClick={handleUseAsOrigin}
+        className="flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-lg border border-card-border px-2 py-1.5 text-xs font-semibold text-text-primary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        aria-label={`Usar ${parada.nome} como origem`}
+      >
+        <Navigation size={12} aria-hidden="true" />
+        Usar como origem
+      </button>
+      <button
+        type="button"
+        onClick={handleUseAsDestination}
+        className="flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-lg border border-card-border px-2 py-1.5 text-xs font-semibold text-text-primary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        aria-label={`Usar ${parada.nome} como destino`}
+      >
+        <MapPin size={12} aria-hidden="true" />
+        Usar como destino
+      </button>
+    </fieldset>
   );
 }
