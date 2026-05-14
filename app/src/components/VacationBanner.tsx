@@ -5,24 +5,11 @@
 
 import { Info } from 'lucide-react';
 import type { ComponentProps } from 'react';
-import { tv, type VariantProps } from 'tailwind-variants';
+import { useTranslation } from 'react-i18next';
 import { getCurrentSpecialPeriod, isWeekday } from '../config/specialPeriods';
-import { cn } from '../lib/utils';
+import { SystemBanner } from './SystemBanner';
 
-/**
- * Variantes do banner de férias
- */
-export const vacationBannerVariants = tv({
-  base: [
-    'flex items-start gap-2 rounded-lg border p-3',
-    'mb-3',
-    'border-warning-border bg-warning-bg text-warning-text',
-  ],
-});
-
-export interface VacationBannerProps
-  extends ComponentProps<'div'>,
-    VariantProps<typeof vacationBannerVariants> {}
+export interface VacationBannerProps extends ComponentProps<'div'> {}
 
 /**
  * Banner informativo durante períodos de férias e recessos.
@@ -34,6 +21,7 @@ export interface VacationBannerProps
  * ```
  */
 export function VacationBanner({ className, ...props }: VacationBannerProps) {
+  const { t } = useTranslation('system-banner');
   const specialPeriod = getCurrentSpecialPeriod();
 
   // Não mostrar se não houver período especial ativo
@@ -44,29 +32,23 @@ export function VacationBanner({ className, ...props }: VacationBannerProps) {
   const isWeekdayToday = isWeekday();
 
   return (
-    <div
-      data-slot="banner"
-      data-intent="warning"
-      className={cn(vacationBannerVariants(), className)}
-      {...props}
-    >
-      <Info className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
-      <div className="text-xs leading-relaxed lg:text-sm">
-        <p className="mb-1 font-bold">{specialPeriod.name}</p>
-        <p>
-          De {specialPeriod.startDate.toLocaleDateString('pt-BR')} a{' '}
-          {specialPeriod.endDate.toLocaleDateString('pt-BR')}, operam apenas os horários de Férias e
-          Recessos. Não há circulação aos fins de semana e feriados.
-        </p>
-        {!isWeekdayToday && (
-          <p className="mt-2 font-semibold">
-            <span role="img" aria-label="Atenção">
-              ⚠️
-            </span>{' '}
-            Hoje não há circulação de ônibus (apenas em dias úteis).
+    <SystemBanner
+      variant="warning"
+      className={className}
+      icon={<Info aria-hidden="true" />}
+      title={specialPeriod.name}
+      description={
+        <>
+          <p>
+            {t('vacation.description', {
+              start: specialPeriod.startDate.toLocaleDateString('pt-BR'),
+              end: specialPeriod.endDate.toLocaleDateString('pt-BR'),
+            })}
           </p>
-        )}
-      </div>
-    </div>
+          {!isWeekdayToday && <p className="mt-2 font-semibold">{t('vacation.weekendWarning')}</p>}
+        </>
+      }
+      {...props}
+    />
   );
 }

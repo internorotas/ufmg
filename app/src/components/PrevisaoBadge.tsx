@@ -25,6 +25,16 @@ function formatarDuracao(minutos: number): string {
   return `${horas}h ${minutosRestantes}min`;
 }
 
+function formatarAtrasoHistorico(segundos: number | null | undefined): string | null {
+  if (segundos === null || segundos === undefined) {
+    return null;
+  }
+
+  const minutos = Math.round(segundos / 60);
+  const sinal = minutos > 0 ? '+' : '';
+  return `${sinal}${minutos} min`;
+}
+
 export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBadgeProps) {
   const { trackEvent } = useAnalytics();
   const linhaVigente = isLineAvailableToday(linha.categoriaDia);
@@ -66,6 +76,7 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
   }
 
   const { proximoOnibus, onibusAnterior } = previsao;
+  const atrasoHistorico = formatarAtrasoHistorico(previsao.remoto?.historicalMedianDelaySeconds);
 
   if (proximoOnibus.minutosFaltantes < 1) {
     return (
@@ -125,6 +136,11 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
       {onibusAnterior ? (
         <span className="text-[10px] text-text-tertiary">
           Último passou há {onibusAnterior.minutosQuePassou} min
+        </span>
+      ) : null}
+      {atrasoHistorico ? (
+        <span className="text-[10px] text-text-tertiary">
+          Histórico desta hora: {atrasoHistorico}
         </span>
       ) : null}
     </div>
