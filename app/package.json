@@ -24,7 +24,7 @@
     "@fontsource/poppins": "^5.2.7",
     "@sentry/browser": "^10.51.0",
     "@sentry/react": "^10.51.0",
-    "@tanstack/react-query": "^5.100.7",
+    "@tanstack/react-query": "^5.100.9",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "leaflet": "^1.9.4",
@@ -37,6 +37,11 @@
     "tailwind-merge": "^3.5.0",
     "tailwind-variants": "^3.2.2",
     "use-debounce": "^10.1.1",
+    "workbox-cacheable-response": "^7.4.1",
+    "workbox-expiration": "^7.4.1",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1",
+    "workbox-strategies": "^7.4.1",
     "zustand": "^5.0.12"
   },
   "engines": {

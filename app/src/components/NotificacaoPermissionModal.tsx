@@ -65,6 +65,10 @@ export function NotificacaoPermissionModal({
           <p className="text-xs text-text-tertiary">
             Você receberá alertas a cada 5 minutos e uma confirmação ao ônibus chegar.
           </p>
+          <p className="text-xs text-text-tertiary">
+            Ao permitir, sincronizamos este alarme com o servidor para também te avisar com o app
+            fechado.
+          </p>
         </div>
 
         {/* Nota para usuários iOS */}

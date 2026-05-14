@@ -25,7 +25,10 @@ test('LineCard mantém ações acessíveis', async ({ page }) => {
   const mobileMenuTrigger = page.locator('[data-slot="mobile-trigger"]');
   const sidebar = page.locator('[data-slot="sidebar"]');
 
-  if ((await mobileMenuTrigger.isVisible()) && (await sidebar.getAttribute('data-state')) !== 'open') {
+  if (
+    (await mobileMenuTrigger.isVisible()) &&
+    (await sidebar.getAttribute('data-state')) !== 'open'
+  ) {
     await mobileMenuTrigger.click();
     await expect(sidebar).toHaveAttribute('data-state', 'open');
   }

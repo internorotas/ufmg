@@ -15,21 +15,14 @@ interface ParadasPayload {
   paradas: Parada[];
 }
 
-export type RotasDataSource = 'api' | 'public-cache' | 'source-fallback';
+export type RotasDataSource = 'api' | 'public-data' | 'source-fallback';
 
-export class RotasServiceLoadError extends Error {
-  constructor(
-    message: string,
-    public readonly source: RotasDataSource,
-  ) {
-    super(message);
-    this.name = 'RotasServiceLoadError';
-  }
-}
-
-export interface RotasServiceLoadResult {
+export interface RotasLoadResult {
   service: IRotasService;
   source: RotasDataSource;
+  dataVersion: string;
+  updatedAt: string;
+  isFallback: boolean;
 }
 
 /**
@@ -181,6 +174,11 @@ async function loadFromPublic(): Promise<{ linhas: CategoriaLinhas; paradas: Par
   return { linhas, paradas };
 }
 
+async function loadFromApi(): Promise<{ linhas: CategoriaLinhas; paradas: ParadasPayload }> {
+  const [linhas, paradas] = await Promise.all([fetchLinhas(), fetchParadas()]);
+  return { linhas, paradas };
+}
+
 async function loadFromSourceFallback(): Promise<{
   linhas: CategoriaLinhas;
   paradas: ParadasPayload;
@@ -196,78 +194,54 @@ async function loadFromSourceFallback(): Promise<{
   };
 }
 
-async function loadFromApi(): Promise<{ linhas: CategoriaLinhas; paradas: ParadasPayload }> {
-  const [linhas, paradas] = await Promise.all([fetchLinhas(), fetchParadas()]);
-  return { linhas, paradas };
+let cachedLoadResult: RotasLoadResult | null = null;
+let loadingServicePromise: Promise<RotasLoadResult> | null = null;
+
+function createLoadResult(
+  source: RotasDataSource,
+  linhas: CategoriaLinhas,
+  paradas: ParadasPayload,
+): RotasLoadResult {
+  return {
+    service: RotasServiceImpl.fromData(linhas, paradas),
+    source,
+    dataVersion: source === 'api' ? 'v1' : DATA_BUILD_ID,
+    updatedAt: new Date().toISOString(),
+    isFallback: source !== 'api',
+  };
 }
 
-let cachedService: IRotasService | null = null;
-let loadingServicePromise: Promise<IRotasService> | null = null;
-
-let cachedLoadResult: RotasServiceLoadResult | null = null;
-let loadingResultPromise: Promise<RotasServiceLoadResult> | null = null;
-let loadingApiUpgradePromise: Promise<RotasServiceLoadResult | null> | null = null;
-
-function cacheLoadResult(service: IRotasService, source: RotasDataSource): RotasServiceLoadResult {
-  cachedService = service;
-  cachedLoadResult = { service, source };
-  return cachedLoadResult;
-}
-
-export async function loadRotasServiceWithSource(): Promise<RotasServiceLoadResult> {
+export async function loadRotasData(): Promise<RotasLoadResult> {
   if (cachedLoadResult) {
     return cachedLoadResult;
-  }
-
-  if (loadingResultPromise) {
-    return loadingResultPromise;
-  }
-
-  loadingResultPromise = (async () => {
-    try {
-      const { linhas, paradas } = await loadFromApi();
-      const service = RotasServiceImpl.fromData(linhas, paradas);
-      return cacheLoadResult(service, 'api');
-    } catch {
-      try {
-        const { linhas, paradas } = await loadFromPublic();
-        const service = RotasServiceImpl.fromData(linhas, paradas);
-        return cacheLoadResult(service, 'public-cache');
-      } catch {
-        if (import.meta.env.DEV || import.meta.env.MODE === 'test' || import.meta.env.VITEST) {
-          const { linhas, paradas } = await loadFromSourceFallback();
-          const service = RotasServiceImpl.fromData(linhas, paradas);
-          return cacheLoadResult(service, 'source-fallback');
-        }
-
-        throw new RotasServiceLoadError(
-          'Falha ao carregar dados de rotas da API e do cache público.',
-          'public-cache',
-        );
-      }
-    }
-  })();
-
-  try {
-    return await loadingResultPromise;
-  } finally {
-    loadingResultPromise = null;
-  }
-}
-
-export async function loadRotasService(): Promise<IRotasService> {
-  if (cachedService) {
-    return cachedService;
   }
 
   if (loadingServicePromise) {
     return loadingServicePromise;
   }
 
-  loadingServicePromise = loadRotasServiceWithSource().then((result) => {
-    cachedService = result.service;
-    return result.service;
-  });
+  loadingServicePromise = (async () => {
+    try {
+      const { linhas, paradas } = await loadFromApi();
+      cachedLoadResult = createLoadResult('api', linhas, paradas);
+      return cachedLoadResult;
+    } catch {
+      try {
+        const { linhas, paradas } = await loadFromPublic();
+        cachedLoadResult = createLoadResult('public-data', linhas, paradas);
+        return cachedLoadResult;
+      } catch {
+        if (import.meta.env.DEV || import.meta.env.MODE === 'test' || import.meta.env.VITEST) {
+          // Fallback para os módulos TypeScript quando /public/data ainda não foi gerado.
+          const { linhas, paradas } = await loadFromSourceFallback();
+          cachedLoadResult = createLoadResult('source-fallback', linhas, paradas);
+          return cachedLoadResult;
+        }
+
+        throw new Error('Falha ao carregar dados de rotas: API e /public/data indisponíveis.');
+      }
+    }
+  })();
 
   try {
     return await loadingServicePromise;
@@ -276,30 +250,23 @@ export async function loadRotasService(): Promise<IRotasService> {
   }
 }
 
-export async function tryUpgradeRotasServiceToApi(): Promise<RotasServiceLoadResult | null> {
-  if (cachedLoadResult?.source === 'api') {
-    return cachedLoadResult;
-  }
-
-  if (loadingApiUpgradePromise) {
-    return loadingApiUpgradePromise;
-  }
-
-  loadingApiUpgradePromise = (async () => {
-    try {
-      const { linhas, paradas } = await loadFromApi();
-      const service = RotasServiceImpl.fromData(linhas, paradas);
-      return cacheLoadResult(service, 'api');
-    } catch {
-      return null;
-    }
-  })();
-
+export async function loadRotasFallbackData(): Promise<RotasLoadResult> {
   try {
-    return await loadingApiUpgradePromise;
-  } finally {
-    loadingApiUpgradePromise = null;
+    const { linhas, paradas } = await loadFromPublic();
+    return createLoadResult('public-data', linhas, paradas);
+  } catch {
+    if (import.meta.env.DEV) {
+      const { linhas, paradas } = await loadFromSourceFallback();
+      return createLoadResult('source-fallback', linhas, paradas);
+    }
+
+    throw new Error('Falha ao carregar fallback de rotas em /public/data.');
   }
+}
+
+export async function loadRotasService(): Promise<IRotasService> {
+  const result = await loadRotasData();
+  return result.service;
 }
 
 // Instância vazia para evitar null checks durante bootstrap.

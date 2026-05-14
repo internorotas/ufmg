@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
+import { DataSourceBanner } from './components/app/DataSourceBanner';
 import { DataStatusScreen } from './components/app/DataStatusScreen';
 import { ModalManager } from './components/app/ModalManager';
 import { OfflineToast } from './components/app/OfflineToast';
@@ -98,6 +99,7 @@ function AppContent() {
     todasParadas,
     isLoadingData,
     dataError,
+    dataSource,
     isOfflineDataFallback,
     linhaSelecionada,
     paradaSelecionada,
@@ -264,6 +266,7 @@ function AppContent() {
         linhaSelecionada={linhaSelecionada}
         isOffline={isOffline || isOfflineDataFallback}
       />
+      <DataSourceBanner isVisible={isOfflineDataFallback} source={dataSource} />
       <main
         id="main-content"
         tabIndex={-1}
