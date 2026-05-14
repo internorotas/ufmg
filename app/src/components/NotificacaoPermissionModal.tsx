@@ -13,6 +13,7 @@
 
 import { Bell, Info } from 'lucide-react';
 import { useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Modal } from './Modal';
 import { Button } from './ui/Button';
 
@@ -34,6 +35,7 @@ export function NotificacaoPermissionModal({
   onClose,
   onConfirmar,
 }: NotificacaoPermissionModalProps) {
+  const { t } = useTranslation('modals');
   const showIOSNote = isIOS();
   const [confirmando, setConfirmando] = useState(false);
 
@@ -48,27 +50,28 @@ export function NotificacaoPermissionModal({
   }, [confirmando, onConfirmar]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Ativar Notificações" size="sm">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('notificationPermission.title')}
+      description={t('notificationPermission.description')}
+      size="sm"
+    >
       <div className="flex flex-col items-center gap-5 py-4 text-center">
         {/* Ícone ilustrativo */}
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary">
-          <Bell size={32} className="text-text-inverse" aria-hidden="true" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/12">
+          <Bell size={32} className="text-brand-primary" aria-hidden="true" />
         </div>
 
         {/* Texto explicativo */}
         <div className="space-y-2 px-2">
-          <h3 className="text-base font-semibold text-text-primary">Avisos de chegada</h3>
+          <h3 className="text-base font-semibold text-text-primary">
+            {t('notificationPermission.subtitle')}
+          </h3>
           <p className="text-sm leading-relaxed text-text-secondary">
-            Queremos te avisar quando o ônibus estiver chegando. Para isso, precisamos que você
-            permita o envio de notificações.
+            {t('notificationPermission.body')}
           </p>
-          <p className="text-xs text-text-tertiary">
-            Você receberá alertas a cada 5 minutos e uma confirmação ao ônibus chegar.
-          </p>
-          <p className="text-xs text-text-tertiary">
-            Ao permitir, sincronizamos este alarme com o servidor para também te avisar com o app
-            fechado.
-          </p>
+          <p className="text-xs text-text-tertiary">{t('notificationPermission.helper')}</p>
         </div>
 
         {/* Nota para usuários iOS */}
@@ -76,9 +79,11 @@ export function NotificacaoPermissionModal({
           <div className="flex w-full items-start gap-2 rounded-lg border border-warning-border bg-warning-bg p-3 text-left">
             <Info size={16} className="mt-0.5 shrink-0 text-warning-text" aria-hidden="true" />
             <p className="text-xs leading-relaxed text-warning-text">
-              No iPhone, as notificações só funcionam se o app estiver instalado na tela inicial.
-              Toque em <strong>Compartilhar → Adicionar à Tela de Início</strong> no Safari para
-              ativá-las.
+              <Trans
+                i18nKey="notificationPermission.iosNote"
+                ns="modals"
+                components={{ strong: <strong /> }}
+              />
             </p>
           </div>
         )}
@@ -91,11 +96,12 @@ export function NotificacaoPermissionModal({
             onClick={handleConfirmar}
             loading={confirmando}
             className="flex-1 min-h-11"
+            data-autofocus="true"
           >
-            Permitir
+            {t('notificationPermission.actions.allow')}
           </Button>
           <Button variant="outline" type="button" onClick={onClose} className="flex-1 min-h-11">
-            Agora Não
+            {t('notificationPermission.actions.later')}
           </Button>
         </div>
       </div>

@@ -4,12 +4,22 @@ import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import packageJson from '../package.json';
+import { resolveTenantDefinition } from './src/tenants/tenantDefinitions';
 
 const buildId = new Date().toISOString();
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiTarget = env.VITE_API_URL?.trim() || 'http://localhost:43111';
+  const devProxyTarget =
+    env.VITE_DEV_PROXY_TARGET?.trim() ||
+    process.env.VITE_DEV_PROXY_TARGET?.trim() ||
+    env.VITE_API_URL?.trim() ||
+    'http://127.0.0.1:43111';
+  const usePolling =
+    env.CHOKIDAR_USEPOLLING === 'true' || process.env.CHOKIDAR_USEPOLLING === 'true';
+  const tenantBasePath = resolveTenantDefinition(
+    env.VITE_TENANT_SLUG || process.env.VITE_TENANT_SLUG,
+  ).basePath;
 
   return {
     plugins: [
@@ -37,7 +47,7 @@ export default defineConfig(({ mode }) => {
         manifest: false,
       }),
     ],
-    base: '/ufmg/',
+    base: tenantBasePath,
     resolve: {
       alias: {
         // Deve corresponder ao paths em tsconfig.json e tsconfig.app.json
@@ -47,6 +57,12 @@ export default defineConfig(({ mode }) => {
     server: {
       // Evita discrepancia localhost vs 127.0.0.1 no ambiente local.
       host: true,
+      watch: usePolling
+        ? {
+            usePolling: true,
+            interval: 300,
+          }
+        : undefined,
       fs: {
         // Permite que o servidor de desenvolvimento acesse o workspace e o
         // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
@@ -56,7 +72,7 @@ export default defineConfig(({ mode }) => {
       },
       proxy: {
         '/v1': {
-          target: apiTarget,
+          target: devProxyTarget,
           changeOrigin: true,
           secure: false,
         },

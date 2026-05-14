@@ -1,0 +1,21 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    working_dir: /workspace/app
+    command: pnpm dev -- --host 0.0.0.0 --port 5173
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      VITE_DEV_PROXY_TARGET: http://host.docker.internal:43111
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${FRONTEND_HOST_PORT:-5173}:5173"
+    volumes:
+      - ./app:/workspace/app
+      - frontend_app_node_modules:/workspace/app/node_modules
+
+volumes:
+  frontend_app_node_modules:

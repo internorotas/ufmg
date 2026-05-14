@@ -5,8 +5,10 @@
 
 import { Heart } from 'lucide-react';
 import type { ComponentProps } from 'react';
+import { Link } from 'react-router-dom';
 
 import { tv, type VariantProps } from 'tailwind-variants';
+import { tenantConfig } from '@/tenants/tenantConfig';
 
 import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
@@ -72,7 +74,7 @@ export const creditLinkVariants = tv({
 export interface MenuFooterProps
   extends Omit<ComponentProps<'div'>, 'onClick'>,
     VariantProps<typeof footerContainerVariants> {
-  onOpenLegalModal: (modalType: LegalModalType) => void;
+  onOpenLegalModal?: (modalType: LegalModalType) => void;
 }
 
 /**
@@ -85,75 +87,88 @@ export interface MenuFooterProps
  */
 export function MenuFooter({ className, onOpenLegalModal, ...props }: MenuFooterProps) {
   const analytics = useAnalytics();
+  const hasLegalModals = typeof onOpenLegalModal === 'function';
 
-  const handleLinkClick = (platform: string) => {
+  const handleLinkClick = (
+    label: string,
+    action: 'click_outbound_link' | 'click_internal_link' = 'click_internal_link',
+  ) => {
     analytics.trackEvent({
       category: 'navigation',
-      action: 'click_outbound_link',
-      label: platform,
+      action,
+      label,
     });
   };
 
   const handleLegalClick = (modalType: LegalModalType, label: string) => {
-    handleLinkClick(label);
-    onOpenLegalModal(modalType);
+    handleLinkClick(label, 'click_internal_link');
+    onOpenLegalModal?.(modalType);
   };
 
   return (
     <div data-slot="footer" className={cn(footerContainerVariants(), className)} {...props}>
-      <div className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
+      <div
+        className={cn(
+          'grid grid-cols-2 gap-1.5',
+          hasLegalModals ? 'md:grid-cols-4' : 'md:grid-cols-2',
+        )}
+      >
         {/* Botão Reportar Problema */}
         <a
           href="https://forms.gle/5e9MHq9pp1p8T5Px5"
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => handleLinkClick('Contato')}
+          onClick={() => handleLinkClick('Contato', 'click_outbound_link')}
           aria-label="Reportar problema ou entrar em contato (abre em nova aba)"
           className={footerButtonVariants({ intent: 'danger' })}
         >
           Contato
         </a>
 
-        {/* Botão Sobre o Projeto */}
-        <button
-          type="button"
-          onClick={() => handleLegalClick('sobre', 'Sobre')}
-          aria-label="Abrir modal Sobre o projeto"
+        {/* Página dedicada de transparência */}
+        <Link
+          to="/sobre"
+          onClick={() => handleLinkClick('Sobre', 'click_internal_link')}
+          aria-label="Sobre o projeto no app"
           className={footerButtonVariants({ intent: 'primary' })}
         >
           Sobre
-        </button>
+        </Link>
 
-        <button
-          type="button"
-          onClick={() => handleLegalClick('privacidade', 'Privacidade')}
-          aria-label="Abrir modal Política de privacidade"
-          className={footerButtonVariants({ intent: 'ghost' })}
-        >
-          Privacidade
-        </button>
+        {hasLegalModals ? (
+          <button
+            type="button"
+            onClick={() => handleLegalClick('privacidade', 'Privacidade')}
+            aria-label="Abrir modal Política de privacidade"
+            className={footerButtonVariants({ intent: 'ghost' })}
+          >
+            Privacidade
+          </button>
+        ) : null}
 
-        <button
-          type="button"
-          onClick={() => handleLegalClick('termos', 'Termos')}
-          aria-label="Abrir modal Termos de uso"
-          className={footerButtonVariants({ intent: 'ghost' })}
-        >
-          Termos
-        </button>
+        {hasLegalModals ? (
+          <button
+            type="button"
+            onClick={() => handleLegalClick('termos', 'Termos')}
+            aria-label="Abrir modal Termos de uso"
+            className={footerButtonVariants({ intent: 'ghost' })}
+          >
+            Termos
+          </button>
+        ) : null}
 
-        {/* Botão Versão Antiga */}
-        {/* <a
-          href="https://ufmg-pi.vercel.app/"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() =>
-            handleLinkClick("Versão Antiga", "https://ufmg-pi.vercel.app/")
-          }
-          className={footerButtonVariants({ intent: "ghost" })}
-        >
-          Versão Antiga
-        </a> */}
+        {tenantConfig.publicRepositoryUrl ? (
+          <a
+            href={tenantConfig.publicRepositoryUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => handleLinkClick('Repositório', 'click_outbound_link')}
+            aria-label="Abrir repositório público do projeto em nova aba"
+            className={footerButtonVariants({ intent: 'ghost' })}
+          >
+            Código
+          </a>
+        ) : null}
       </div>
 
       {/* Desenvolvido por */}
@@ -162,7 +177,7 @@ export function MenuFooter({ className, onOpenLegalModal, ...props }: MenuFooter
           href="https://github.com/igormartins4"
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => handleLinkClick('Dev Profile')}
+          onClick={() => handleLinkClick('Dev Profile', 'click_outbound_link')}
           aria-label="Perfil do desenvolvedor Igor Martins no GitHub (abre em nova aba)"
           className={creditLinkVariants()}
         >

@@ -1,0 +1,183 @@
+import type {
+  AuthenticatedUser,
+  NotificationProfile,
+  RankingDetail,
+} from '@/features/auth/api/authClient';
+import { getAuthHeaders, resolveAuthEndpoint } from '@/features/auth/api/authClient';
+import { withTenantHeaders } from '@/services/api/apiClient';
+
+export interface UserProfile {
+  id: number;
+  displayName: string;
+  avatarUrl: string | null;
+  nickname: string | null;
+  profilePublic: boolean;
+  mapMarkerVisible: boolean;
+  rankingDetail: RankingDetail;
+  notificationProfile: NotificationProfile;
+  consentGps: boolean;
+  consentResearch: boolean;
+  consentGpsAt: string | null;
+  consentResearchAt: string | null;
+  lastSeenAt: string;
+  gamification: {
+    totalPoints: number;
+    weeklyRank: number | null;
+    weeklyRankScope: 'geral' | 'campus' | `linha:${string}`;
+    streakCurrentDays: number;
+    streakBestDays: number;
+    achievementsUnlocked: AchievementView[];
+    achievementsLocked: AchievementView[];
+    contributionHistory30d: ContributionHistoryPoint[];
+    recentPointEvents: RecentPointEvent[];
+  };
+  monetization: UserMonetizationSummary;
+}
+
+export interface UserMonetizationTransaction {
+  kind: 'donation' | 'subscription';
+  status: 'pending' | 'paid' | 'cancelled' | 'refunded' | 'disputed' | 'active' | 'expired';
+  amountCents: number;
+  createdAt: string;
+  paidAt: string | null;
+  receiptUrl: string | null;
+}
+
+export interface UserMonetizationSummary {
+  isPremium: boolean;
+  supporterBadgeUnlocked: boolean;
+  activeSubscription: {
+    status: 'active';
+    frequency: 'MONTHLY';
+    amountCents: number;
+    startedAt: string | null;
+    nextPaymentAt: string | null;
+    cancelledAt: string | null;
+  } | null;
+  lastDonationAt: string | null;
+  nextPaymentAt: string | null;
+  recentTransactions: UserMonetizationTransaction[];
+}
+
+export interface AchievementView {
+  slug: string;
+  nome: string;
+  descricao: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary' | string;
+  category: 'global' | 'line' | 'supporter' | string;
+  isReserved: boolean;
+  criteriaText: string;
+  progressPercent: number | null;
+  unlockedAt: string | null;
+}
+
+export interface ContributionHistoryPoint {
+  date: string;
+  count: number;
+  points: number;
+}
+
+export interface RecentPointEvent {
+  reason: string;
+  points: number;
+  earnedAt: string;
+  message: string;
+}
+
+export interface ProfileUpdatePayload {
+  displayName?: string;
+  nickname?: string | null;
+  profilePublic?: boolean;
+  mapMarkerVisible?: boolean;
+  rankingDetail?: RankingDetail;
+  notificationProfile?: NotificationProfile;
+}
+
+export interface AccountDeletionRequestResult {
+  protocol: string;
+  status: 'pending';
+  requestedAt: string;
+  dueAt: string;
+}
+
+interface ProfileResponse extends UserProfile {}
+
+function buildAuthenticatedHeaders(extraHeaders?: HeadersInit): HeadersInit {
+  const authHeaders = getAuthHeaders();
+  if (!authHeaders) {
+    throw new Error('Sessão autenticada ausente');
+  }
+
+  return withTenantHeaders({
+    ...(authHeaders as Record<string, string>),
+    ...(extraHeaders as Record<string, string> | undefined),
+  });
+}
+
+export async function getProfile(): Promise<UserProfile> {
+  const response = await fetch(resolveAuthEndpoint('/v1/auth/profile'), {
+    method: 'GET',
+    cache: 'no-store',
+    headers: buildAuthenticatedHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Falha ao carregar perfil: HTTP ${response.status}`);
+  }
+
+  return response.json() as Promise<ProfileResponse>;
+}
+
+export async function updateProfile(payload: ProfileUpdatePayload): Promise<UserProfile> {
+  const response = await fetch(resolveAuthEndpoint('/v1/auth/profile'), {
+    method: 'PATCH',
+    cache: 'no-store',
+    headers: buildAuthenticatedHeaders({
+      'Content-Type': 'application/json',
+    }),
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Falha ao atualizar perfil: HTTP ${response.status}`);
+  }
+
+  return response.json() as Promise<ProfileResponse>;
+}
+
+export async function logout(): Promise<void> {
+  const response = await fetch(resolveAuthEndpoint('/v1/auth/logout'), {
+    method: 'POST',
+    cache: 'no-store',
+    credentials: 'include',
+    headers: withTenantHeaders(getAuthHeaders()),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Falha ao encerrar sessão: HTTP ${response.status}`);
+  }
+}
+
+export async function deleteAccount(): Promise<AccountDeletionRequestResult> {
+  const response = await fetch(resolveAuthEndpoint('/v1/auth/delete-account'), {
+    method: 'POST',
+    cache: 'no-store',
+    credentials: 'include',
+    headers: buildAuthenticatedHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Falha ao solicitar exclusão de conta: HTTP ${response.status}`);
+  }
+
+  return response.json() as Promise<AccountDeletionRequestResult>;
+}
+
+export function toAuthenticatedUser(profile: UserProfile): AuthenticatedUser {
+  return {
+    id: profile.id,
+    displayName: profile.displayName,
+    avatarUrl: profile.avatarUrl,
+    nickname: profile.nickname,
+  };
+}

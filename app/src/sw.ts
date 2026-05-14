@@ -2,9 +2,16 @@
 
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { ExpirationPlugin } from 'workbox-expiration';
-import { createHandlerBoundToURL, type PrecacheEntry, precacheAndRoute } from 'workbox-precaching';
+import {
+  cleanupOutdatedCaches,
+  createHandlerBoundToURL,
+  type PrecacheEntry,
+  precacheAndRoute,
+} from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
 import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies';
+import { getTenantCacheName, getTenantPushTag, TENANT_CACHE_PREFIX } from './pwa/tenantNamespace';
+import { tenantConfig } from './tenants/tenantConfig';
 
 declare global {
   interface ServiceWorkerGlobalScope {
@@ -14,14 +21,28 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
-const APP_SHELL_PATH = '/ufmg/index.html';
-const DEFAULT_OPEN_URL = '/ufmg/';
-const NAVIGATION_DENYLIST = [/^\/ufmg\/data\//, /\/site\.webmanifest$/];
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
-const API_CACHE_NAME = 'api-cache-v1';
-const RUNTIME_CACHE_NAME = 'runtime-v1';
+function resolveScopedPath(path: string): string {
+  return new URL(path, self.registration.scope).pathname;
+}
 
-const KNOWN_CACHE_PREFIXES = ['workbox-precache-v2-', 'api-cache-v', 'runtime-v'];
+const APP_SCOPE_PATH = new URL(self.registration.scope).pathname;
+const APP_SHELL_PATH = resolveScopedPath('index.html');
+const DEFAULT_OPEN_URL = APP_SCOPE_PATH;
+const DATA_PATH_PREFIX = resolveScopedPath('data/');
+const MANIFEST_PATH = resolveScopedPath('site.webmanifest');
+const NAVIGATION_DENYLIST = [
+  new RegExp(`^${escapeRegExp(DATA_PATH_PREFIX)}`),
+  new RegExp(`${escapeRegExp(MANIFEST_PATH)}$`),
+];
+
+const API_CACHE_NAME = getTenantCacheName('api-v1');
+const RUNTIME_CACHE_NAME = getTenantCacheName('runtime-v1');
+
+const LEGACY_CACHE_PREFIXES = ['api-cache-v', 'runtime-v'];
 
 const API_NETWORK_TIMEOUT_SECONDS = 5;
 const API_CACHE_MAX_ENTRIES = 120;
@@ -37,6 +58,14 @@ interface PushPayload {
   icon?: string;
   badge?: string;
   url?: string;
+}
+
+function broadcastGpsFlushRequest(): Promise<void> {
+  return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+    for (const client of clients) {
+      client.postMessage({ type: 'gps-flush-queue' });
+    }
+  });
 }
 
 function resolveAssetUrl(path: string): string {
@@ -58,6 +87,7 @@ function parsePushPayload(data: PushMessageData | null): PushPayload {
 self.skipWaiting();
 
 precacheAndRoute(self.__WB_MANIFEST);
+cleanupOutdatedCaches();
 
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL(APP_SHELL_PATH), {
@@ -81,7 +111,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }: { url: URL }) => url.pathname.startsWith('/ufmg/data/'),
+  ({ url }: { url: URL }) => url.pathname.startsWith(DATA_PATH_PREFIX),
   new StaleWhileRevalidate({
     cacheName: RUNTIME_CACHE_NAME,
     plugins: [
@@ -98,9 +128,16 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const cacheNames = await caches.keys();
-      const cachesToDelete = cacheNames.filter(
-        (cacheName) => !KNOWN_CACHE_PREFIXES.some((prefix) => cacheName.startsWith(prefix)),
-      );
+      const cachesToDelete = cacheNames.filter((cacheName) => {
+        if (cacheName === API_CACHE_NAME || cacheName === RUNTIME_CACHE_NAME) {
+          return false;
+        }
+
+        return (
+          cacheName.startsWith(TENANT_CACHE_PREFIX) ||
+          LEGACY_CACHE_PREFIXES.some((prefix) => cacheName.startsWith(prefix))
+        );
+      });
 
       await Promise.all(cachesToDelete.map((cacheName) => caches.delete(cacheName)));
       await self.clients.claim();
@@ -111,7 +148,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('push', (event) => {
   const payload = parsePushPayload(event.data);
 
-  const title = payload.title ?? 'Interno Rotas UFMG';
+  const title = payload.title ?? tenantConfig.appName;
   const body = payload.body ?? 'Nova atualizacao de transporte disponivel.';
   const targetUrl = payload.url ?? DEFAULT_OPEN_URL;
 
@@ -123,7 +160,7 @@ self.addEventListener('push', (event) => {
       body,
       icon,
       badge,
-      tag: payload.tag ?? 'interno-rotas-default',
+      tag: getTenantPushTag(payload.tag ?? 'default'),
       data: {
         url: targetUrl,
       },
@@ -174,4 +211,21 @@ self.addEventListener('pushsubscriptionchange', (event) => {
       });
     })(),
   );
+});
+
+self.addEventListener('sync', (event: Event) => {
+  const syncEvent = event as ExtendableEvent & { tag?: string };
+  if (syncEvent.tag !== 'gps-flush-queue') {
+    return;
+  }
+
+  syncEvent.waitUntil(broadcastGpsFlushRequest());
+});
+
+self.addEventListener('message', (event: ExtendableMessageEvent) => {
+  if (event.data?.type !== 'gps-flush-queue') {
+    return;
+  }
+
+  event.waitUntil(broadcastGpsFlushRequest());
 });

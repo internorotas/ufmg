@@ -1,6 +1,10 @@
 import * as Sentry from '@sentry/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { getTenantStorageKey } from '@/pwa/tenantNamespace';
+import { applyTenantDocumentMetadata } from '@/tenants/tenantConfig';
+import '@/i18n';
 
 import './globals.css';
 
@@ -26,8 +30,8 @@ if (import.meta.env.VITE_SENTRY_DSN) {
   });
 }
 
-const SW_RELOAD_GUARD_KEY = 'ufmg:sw-reload-build-id';
-const SW_UPDATE_IN_PROGRESS_KEY = 'ufmg:sw-update-in-progress';
+const SW_RELOAD_GUARD_KEY = getTenantStorageKey('sw-reload-build-id');
+const SW_UPDATE_IN_PROGRESS_KEY = getTenantStorageKey('sw-update-in-progress');
 const UPDATE_STATUS_REGION_ID = 'app-update-status';
 const SERVICE_WORKER_UPDATE_INTERVAL_MS = 60_000;
 const SERVICE_WORKER_SCOPE = import.meta.env.BASE_URL;
@@ -39,6 +43,8 @@ const MANIFEST_URL = new URL(
   `${import.meta.env.BASE_URL}site.webmanifest`,
   window.location.origin,
 ).toString();
+
+applyTenantDocumentMetadata();
 
 function ensureUpdateStatusRegion(): HTMLElement {
   const existingRegion = document.getElementById(UPDATE_STATUS_REGION_ID);
@@ -157,6 +163,14 @@ function registerAppServiceWorker(): void {
     triggerSingleReloadForUpdatedServiceWorker();
   });
 
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type !== 'gps-flush-queue') {
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent('interno-rotas:gps-flush-queue'));
+  });
+
   navigator.serviceWorker
     .register(SERVICE_WORKER_URL, { scope: SERVICE_WORKER_SCOPE })
     .then((registration) => {
@@ -196,7 +210,12 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <AppQueryProvider>
-      <App />
+      <BrowserRouter
+        basename={import.meta.env.BASE_URL}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <App />
+      </BrowserRouter>
     </AppQueryProvider>
   </StrictMode>,
 );

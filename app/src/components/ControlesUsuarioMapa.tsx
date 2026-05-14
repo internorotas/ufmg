@@ -10,10 +10,11 @@
  */
 
 import L from 'leaflet';
-import { CornerUpLeft, LoaderCircle, LocateFixed } from 'lucide-react';
+import { CornerUpLeft, LoaderCircle, LocateFixed, Radio, Square } from 'lucide-react';
 import { Marker, useMap } from 'react-leaflet';
+import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
+import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '../hooks/useAnalytics';
-import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
 import { cn } from '../lib/utils';
 
 interface ControlesUsuarioMapaProps {
@@ -27,6 +28,8 @@ interface ControlesUsuarioMapaProps {
   onPedirLocalizacao: () => void;
   /** Se está carregando a localização no momento */
   carregandoLocalizacao?: boolean;
+  rastreioColaborativo?: GpsTrackingState;
+  onAlternarRastreioColaborativo?: () => void;
 }
 
 /**
@@ -100,15 +103,30 @@ export function ControlesUsuarioMapa({
   permissaoConcedida,
   onPedirLocalizacao,
   carregandoLocalizacao = false,
+  rastreioColaborativo,
+  onAlternarRastreioColaborativo,
 }: ControlesUsuarioMapaProps) {
   const analytics = useAnalytics();
   const map = useMap();
+  const statusRastreio = rastreioColaborativo?.status ?? 'idle';
+  const rastreioAtivo = Boolean(rastreioColaborativo?.isActive);
+
+  const textoRastreio =
+    statusRastreio === 'active'
+      ? `Rastreio ativo · coleta a cada ${Math.round((rastreioColaborativo?.nextCollectionIntervalMs ?? 0) / 1000)}s`
+      : statusRastreio === 'starting'
+        ? 'Iniciando rastreio colaborativo'
+        : statusRastreio === 'paused'
+          ? `Rastreio pausado · ${rastreioColaborativo?.queueSize ?? 0} ponto(s) na fila offline`
+          : statusRastreio === 'error'
+            ? 'Rastreio indisponível no momento'
+            : 'Rastreio colaborativo inativo';
 
   /**
-   * Centraliza o mapa no campus da UFMG
+   * Centraliza o mapa no campus principal configurado para o tenant.
    */
-  const handleCentralizarUFMG = () => {
-    map.flyTo(COORDENADAS_UFMG, 15, { duration: 1 });
+  const handleCentralizarCampus = () => {
+    map.flyTo(COORDENADAS_CAMPUS, 15, { duration: 1 });
   };
 
   /**
@@ -146,18 +164,44 @@ export function ControlesUsuarioMapa({
 
       {/* FABs - Floating Action Buttons */}
       <div className="fixed bottom-6 right-4 z-1000 flex flex-col gap-2 md:bottom-6">
-        {/* Botão: centralizar no campus UFMG */}
+        {rastreioColaborativo && onAlternarRastreioColaborativo ? (
+          <button
+            type="button"
+            onClick={onAlternarRastreioColaborativo}
+            aria-pressed={rastreioAtivo}
+            className={cn(
+              'flex min-h-11 min-w-11 max-w-64 items-center gap-2 rounded-full px-4 py-3 text-left shadow-lg transition-all duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+              rastreioAtivo
+                ? 'bg-success-bg text-success-text hover:bg-success-bg/90'
+                : 'bg-background text-text-primary hover:bg-card-hover',
+            )}
+            title={rastreioColaborativo.label}
+          >
+            {rastreioAtivo ? (
+              <Square className="h-4 w-4 shrink-0" aria-hidden="true" />
+            ) : (
+              <Radio className="h-4 w-4 shrink-0" aria-hidden="true" />
+            )}
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold">{rastreioColaborativo.label}</span>
+              <span className="block text-[11px] opacity-80">{textoRastreio}</span>
+            </span>
+          </button>
+        ) : null}
+
+        {/* Botão: centralizar no campus */}
         <button
           type="button"
-          onClick={handleCentralizarUFMG}
+          onClick={handleCentralizarCampus}
           className={cn(
             'flex h-12 w-12 cursor-pointer items-center justify-center',
             'rounded-full shadow-lg transition-all duration-200',
             'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
           )}
-          aria-label="Centralizar mapa no campus UFMG"
-          title="Centralizar mapa no campus UFMG"
+          aria-label={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
+          title={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
         >
           <CornerUpLeft className="h-6 w-6 text-white" aria-hidden="true" />
         </button>

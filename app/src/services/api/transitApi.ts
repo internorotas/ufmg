@@ -1,13 +1,27 @@
+import { getTenantStorageKey } from '@/pwa/tenantNamespace';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import type { CategoriaLinhas, Parada } from '@/types/data.types';
 
 export interface ParadasPayload {
   paradas: Parada[];
 }
 
-const API_VERSION_STORAGE_KEY = 'ufmg:api-version';
+const API_VERSION_STORAGE_KEY = getTenantStorageKey('api-version');
 
 function getExpectedApiVersion(): string {
   return import.meta.env.VITE_API_VERSION?.trim() || 'v1';
+}
+
+function resolveTransitEndpoint(pathname: '/v1/linhas' | '/v1/paradas'): string {
+  return resolveApiEndpoint(pathname);
+}
+
+function getInMemoryAuthToken(): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return window.__internoAuthToken ?? null;
 }
 
 function getStoredApiVersion(): string | null {
@@ -85,10 +99,6 @@ function getApiBaseUrl(): string {
   return 'http://localhost:43111';
 }
 
-function normalizeBaseUrl(url: string): string {
-  return url.endsWith('/') ? url.slice(0, -1) : url;
-}
-
 function ensureCategoriaLinhasShape(value: unknown): CategoriaLinhas {
   if (
     !value ||
@@ -115,24 +125,30 @@ function ensureParadasPayloadShape(value: unknown): ParadasPayload {
   return { paradas: paradas as Parada[] };
 }
 
-async function fetchWithContract<T>(endpoint: string, parser: (value: unknown) => T): Promise<T> {
-  const baseUrl = normalizeBaseUrl(getApiBaseUrl());
-  const url = `${baseUrl}${endpoint}`;
+async function fetchTransit<T>(
+  pathname: '/v1/linhas' | '/v1/paradas',
+  parser: (value: unknown) => T,
+): Promise<T> {
+  const endpoint = resolveTransitEndpoint(pathname);
+  const authToken = getInMemoryAuthToken();
+  const headers = withTenantHeaders({
+    Accept: 'application/json',
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+  });
 
   let response: Response;
 
   try {
-    response = await fetch(url, {
+    response = await fetch(endpoint, {
       method: 'GET',
+      cache: 'no-store',
       credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-      },
+      headers,
     });
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `Não foi possível conectar ao backend (${url}). Verifique se a API está ativa em http://localhost:43111. Detalhe: ${detail}`,
+      `Não foi possível conectar ao backend (${endpoint}). Verifique se a API está ativa em ${getApiBaseUrl() || 'proxy /v1'}. Detalhe: ${detail}`,
     );
   }
 
@@ -153,9 +169,9 @@ async function fetchWithContract<T>(endpoint: string, parser: (value: unknown) =
 }
 
 export async function fetchLinhas(): Promise<CategoriaLinhas> {
-  return fetchWithContract('/v1/linhas', ensureCategoriaLinhasShape);
+  return fetchTransit('/v1/linhas', ensureCategoriaLinhasShape);
 }
 
 export async function fetchParadas(): Promise<ParadasPayload> {
-  return fetchWithContract('/v1/paradas', ensureParadasPayloadShape);
+  return fetchTransit('/v1/paradas', ensureParadasPayloadShape);
 }

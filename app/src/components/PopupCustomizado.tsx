@@ -188,32 +188,36 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                   key={nomeLinha}
                   className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-card-border/70 bg-background-secondary/40 px-2 py-1.5"
                 >
-                  <span
-                    className={cn(lineBadgeVariants(), 'border-l-[3px]')}
+                  <button
+                    type="button"
+                    className={cn(
+                      lineBadgeVariants(),
+                      'min-h-11 border-l-[3px] whitespace-normal break-words text-left',
+                    )}
                     title={nomeLinha}
                     style={linha ? { borderLeftColor: linha.corHex } : undefined}
+                    aria-label={`Selecionar linha ${getNomeExibicao(linha, nomeLinha)}`}
+                    onClick={() => {
+                      if (!linha) return;
+                      analytics.trackEvent({
+                        category: 'map_interaction',
+                        action: 'select_line',
+                        label: `${parada.nome} -> ${linha.nome}`,
+                      });
+                    }}
                   >
-                    <button
-                      type="button"
-                      className="w-full whitespace-normal break-words text-left"
-                      aria-label={`Selecionar linha ${getNomeExibicao(linha, nomeLinha)}`}
-                      onClick={() => {
-                        if (!linha) return;
-                        analytics.trackEvent({
-                          category: 'map_interaction',
-                          action: 'select_line',
-                          label: `${parada.nome} -> ${linha.nome}`,
-                        });
-                      }}
-                    >
-                      {getNomeExibicao(linha, nomeLinha)}
-                    </button>
-                  </span>
+                    {getNomeExibicao(linha, nomeLinha)}
+                  </button>
 
                   {/* Coluna direita: badge de previsão + sino */}
                   {linha ? (
                     <div className="flex shrink-0 items-center gap-1">
-                      <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                      <div className="flex min-w-0 flex-col items-end gap-1">
+                        <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                        <span className="max-w-32 text-right text-[10px] text-text-tertiary">
+                          prev: {minutosFaltantes !== null ? `${minutosFaltantes} min` : 'sem dado'}
+                        </span>
+                      </div>
                       {suportado &&
                         minutosFaltantes !== null &&
                         (() => {

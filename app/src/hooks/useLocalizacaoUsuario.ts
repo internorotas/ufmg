@@ -16,20 +16,22 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { tenantConfig } from '@/tenants/tenantConfig';
 import { calcularDistanciaKm } from '../lib/utils';
 import { useAnalytics } from './useAnalytics';
 
 /**
- * Coordenadas centrais do Campus UFMG (Pampulha)
+ * Coordenadas centrais do campus principal do tenant atual.
  */
-export const COORDENADAS_UFMG: [number, number] = [-19.87055, -43.96775];
+export const COORDENADAS_CAMPUS: [number, number] = tenantConfig.campusCenter;
+export const CAMPUS_DISPLAY_NAME = tenantConfig.campusDisplayName;
 
 /**
- * Distância máxima em km para considerar o usuário "perto" da UFMG.
+ * Distância máxima em km para considerar o usuário "perto" do campus atual.
  * Exportada para que mensagens de UI possam referenciar o mesmo valor
  * sem duplicar a constante.
  */
-export const DISTANCIA_MAXIMA_KM = 4;
+export const DISTANCIA_MAXIMA_KM = tenantConfig.distanceAlertKm;
 
 /** Extende DeviceOrientationEvent com a propriedade proprietária do WebKit/iOS. */
 type DeviceOrientationEventWebkit = DeviceOrientationEvent & {
@@ -42,6 +44,15 @@ type DeviceOrientationEventWebkit = DeviceOrientationEvent & {
 export interface UseLocalizacaoUsuarioReturn {
   /** Coordenadas atuais do usuário [lat, lng] */
   localizacao: [number, number] | null;
+  /** Última leitura bruta do GPS para integrações colaborativas */
+  ultimaLeitura: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    speedKmh: number;
+    heading: number | null;
+    timestamp: number;
+  } | null;
   /** Direção da bússola em graus (0-360, onde 0 = Norte) */
   heading: number | null;
   /** Se a permissão de GPS foi concedida */
@@ -52,7 +63,7 @@ export interface UseLocalizacaoUsuarioReturn {
   erro: string | null;
   /** Controle do modal de permissão */
   mostrarModalPermissao: boolean;
-  /** Controle do modal de "longe da UFMG" */
+  /** Controle do modal de "longe do campus" */
   mostrarModalLonge: boolean;
   /** Abre o modal de permissão */
   abrirModalPermissao: () => void;
@@ -89,9 +100,13 @@ export interface UseLocalizacaoUsuarioReturn {
  * <button onClick={solicitarPermissaoNavegador}>Permitir</button>
  * ```
  */
-export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
+export function useLocalizacaoUsuario(options?: {
+  canStartTracking?: () => Promise<boolean>;
+}): UseLocalizacaoUsuarioReturn {
   // Estados principais
   const [localizacao, setLocalizacao] = useState<[number, number] | null>(null);
+  const [ultimaLeitura, setUltimaLeitura] =
+    useState<UseLocalizacaoUsuarioReturn['ultimaLeitura']>(null);
   const [heading, setHeading] = useState<number | null>(null);
   const [permissaoConcedida, setPermissaoConcedida] = useState(false);
   const [carregando, setCarregando] = useState(false);
@@ -110,14 +125,14 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
   const melhorPrecisaoRef = useRef<number>(Infinity);
 
   /**
-   * Verifica se o usuário está longe da UFMG (apenas 1x por sessão de rastreamento)
+   * Verifica se o usuário está longe do campus atual (apenas 1x por sessão de rastreamento)
    */
   const verificarDistancia = useCallback(
     (lat: number, lng: number) => {
       if (jaVerificouDistanciaRef.current) return;
       jaVerificouDistanciaRef.current = true;
 
-      const distancia = calcularDistanciaKm(lat, lng, COORDENADAS_UFMG[0], COORDENADAS_UFMG[1]);
+      const distancia = calcularDistanciaKm(lat, lng, COORDENADAS_CAMPUS[0], COORDENADAS_CAMPUS[1]);
 
       if (distancia > DISTANCIA_MAXIMA_KM) {
         setMostrarModalLonge(true);
@@ -138,10 +153,23 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
   const onPosicaoRecebida = useCallback(
     (position: GeolocationPosition) => {
       const { latitude, longitude, accuracy } = position.coords;
+      const speedKmh = Math.max(0, (position.coords.speed ?? 0) * 3.6);
+      const headingLeitura =
+        typeof position.coords.heading === 'number' && Number.isFinite(position.coords.heading)
+          ? position.coords.heading
+          : null;
 
       setCarregando(false);
       setErro(null);
       setPermissaoConcedida(true);
+      setUltimaLeitura({
+        latitude,
+        longitude,
+        accuracy,
+        speedKmh,
+        heading: headingLeitura,
+        timestamp: position.timestamp,
+      });
 
       // Aceita a primeira leitura (feedback imediato) ou leituras com boa precisão
       const primeiraLeitura = melhorPrecisaoRef.current === Infinity;
@@ -255,6 +283,13 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
    * "Permitir" do modal após confirmação do usuário.
    */
   const solicitarPermissaoNavegador = useCallback(async () => {
+    if (options?.canStartTracking) {
+      const allowed = await options.canStartTracking();
+      if (!allowed) {
+        return;
+      }
+    }
+
     if (carregando) {
       return;
     }
@@ -290,7 +325,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       }
       bussolaCleanupRef.current = cleanup;
     }
-  }, [carregando, onPosicaoRecebida, onErroGPS, iniciarBussola]);
+  }, [carregando, iniciarBussola, onErroGPS, onPosicaoRecebida, options]);
 
   /**
    * Ponto de entrada principal.
@@ -304,6 +339,13 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
    * comportamento correto e conservador para todos os navegadores.
    */
   const iniciarRastreamento = useCallback(async () => {
+    if (options?.canStartTracking) {
+      const allowed = await options.canStartTracking();
+      if (!allowed) {
+        return;
+      }
+    }
+
     if (carregando) {
       return;
     }
@@ -335,7 +377,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
       // Navegador sem Permissions API — exibe modal
       setMostrarModalPermissao(true);
     }
-  }, [carregando, solicitarPermissaoNavegador]);
+  }, [carregando, options, solicitarPermissaoNavegador]);
 
   // Limpeza de recursos ao desmontar o componente
   useEffect(() => {
@@ -356,6 +398,7 @@ export function useLocalizacaoUsuario(): UseLocalizacaoUsuarioReturn {
 
   return {
     localizacao,
+    ultimaLeitura,
     heading,
     permissaoConcedida,
     carregando,

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useSyncExternalStore } from 'react';
-import { useRotasData } from '@/contexts/RotasContext';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import type { CategoriaLinhas, Linha } from '@/types/data.types';
 
@@ -82,7 +81,6 @@ export interface UseFavoritosReturn {
 
 export function useFavoritos(): UseFavoritosReturn {
   const { trackEvent } = useAnalytics();
-  const { rotasService } = useRotasData();
   const favoritosIds = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   useEffect(() => {
@@ -121,7 +119,7 @@ export function useFavoritos(): UseFavoritosReturn {
 
       setFavoritosCache(next);
 
-      const resolvedName = nomeLinha ?? rotasService.getLinhaById(idRota)?.nome ?? idRota;
+      const resolvedName = nomeLinha ?? idRota;
 
       trackEvent(
         {
@@ -136,7 +134,7 @@ export function useFavoritos(): UseFavoritosReturn {
         },
       );
     },
-    [rotasService, trackEvent],
+    [trackEvent],
   );
 
   const getLinhasFavoritas = useCallback(
