@@ -1,12 +1,11 @@
 import * as Sentry from '@sentry/react';
-import { QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import './globals.css';
 
 import { App } from './App';
-import { queryClient } from './lib/queryClient';
+import { AppQueryProvider } from './providers/AppQueryProvider';
 
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
@@ -196,9 +195,9 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
+    <AppQueryProvider>
       <App />
-    </QueryClientProvider>
+    </AppQueryProvider>
   </StrictMode>,
 );
 

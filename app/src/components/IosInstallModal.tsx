@@ -47,7 +47,7 @@ export function IosInstallModal({ isOpen, onClose }: IosInstallModalProps) {
       <div className="space-y-4">
         <p className="text-sm text-text-secondary">
           A Apple exige que você adicione este app à sua Tela de Início para poder receber alertas
-          de quando o ônibus estiver chegando.
+          de quando o ônibus estiver chegando, inclusive com o app fechado.
         </p>
 
         <ol className="space-y-2">
