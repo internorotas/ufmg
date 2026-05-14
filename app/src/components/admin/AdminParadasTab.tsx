@@ -221,8 +221,9 @@ export function AdminParadasTab({
                   setShowDeleteConfirm(false);
                 }}
                 className="text-text-secondary hover:text-text-primary text-lg leading-none"
+                aria-label="Fechar edição"
               >
-                ×
+                <span aria-hidden="true">×</span>
               </button>
             </div>
 

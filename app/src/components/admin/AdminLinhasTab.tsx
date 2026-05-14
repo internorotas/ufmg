@@ -101,6 +101,7 @@ function LinhaSelector({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="w-full h-9 flex items-center gap-2 border border-input-border bg-input text-text-primary px-2.5 rounded text-sm text-left truncate hover:bg-card-hover transition-colors"
+        aria-label="Selecionar linha"
       >
         {selected ? (
           <>
@@ -376,9 +377,10 @@ export function AdminLinhasTab({
               type="button"
               onClick={handleAddLinha}
               title="Nova linha nesta categoria"
+              aria-label="Nova linha nesta categoria"
               className="px-2.5 py-1.5 text-xs rounded border border-success-border text-success-text bg-success-bg hover:opacity-90 transition-opacity"
             >
-              +
+              <span aria-hidden="true">+</span>
             </button>
             <button
               type="button"
