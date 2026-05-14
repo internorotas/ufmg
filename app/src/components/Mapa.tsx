@@ -14,6 +14,7 @@ import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'r
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
+import { PlannerMapOverlay } from '@/features/planner/components/PlannerMapOverlay';
 import { COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '../hooks/useAnalytics';
 import type { Linha, Parada } from '../types/data.types';
@@ -140,6 +141,8 @@ export function Mapa({
       <CenterOnParada parada={paradaSelecionada} />
 
       <MapRoute linha={linhaSelecionada} />
+
+      <PlannerMapOverlay />
 
       <MapMarkers
         paradas={todasParadas}

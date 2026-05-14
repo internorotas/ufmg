@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import '@/i18n';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -21,6 +22,31 @@ const analyticsServiceMock: IAnalyticsService = {
   setUserProperty: vi.fn(),
   trackTiming: vi.fn(),
   trackError: vi.fn(),
+};
+
+const linhasDataMock = {
+  categoriasDias: [
+    {
+      id: 1,
+      categoriaDia: 'diasUteis',
+      displayName: 'Dias úteis',
+      linhas: [
+        {
+          idRota: 'DU10',
+          linha: 10,
+          nome: 'Linha DU10',
+          tipo: 'circular',
+          sublinha: null,
+          categoriaDia: 'diasUteis',
+          corHex: '#2563eb',
+          descricao: 'Linha de teste',
+          horarios: ['08:00', '09:00'],
+          itinerarioParadasIds: [],
+          coordenadasTrajeto: [],
+        },
+      ],
+    },
+  ],
 };
 
 describe('MenuLateral', () => {
@@ -55,6 +81,34 @@ describe('MenuLateral', () => {
     setAnalyticsService(ga4Analytics);
     Reflect.set(globalThis, 'IS_REACT_ACT_ENVIRONMENT', false);
   });
+
+  function renderMenu(qc?: QueryClient) {
+    const client = qc ?? new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    act(() => {
+      root.render(
+        <QueryClientProvider client={client}>
+          <BrowserRouter>
+            <ThemeProvider>
+              <RotasSelectionProvider>
+                <MenuLateral
+                  linhasData={linhasDataMock as Parameters<typeof MenuLateral>[0]['linhasData']}
+                  todasParadas={[]}
+                  onLinhaSelect={vi.fn()}
+                  onParadaClick={vi.fn()}
+                  linhaSelecionada={null}
+                  isOffline={false}
+                  authStatus="anonymous"
+                  isAuthenticated={false}
+                  onAuthAction={vi.fn()}
+                  userScore={null}
+                />
+              </RotasSelectionProvider>
+            </ThemeProvider>
+          </BrowserRouter>
+        </QueryClientProvider>,
+      );
+    });
+  }
 
   it('renderiza o slot Parceiro antes da lista de linhas mesmo sem auth', async () => {
     fetchMock.mockResolvedValueOnce(
@@ -148,5 +202,20 @@ describe('MenuLateral', () => {
         partnerSpotlight.compareDocumentPosition(lineButton) & Node.DOCUMENT_POSITION_FOLLOWING,
       ),
     ).toBe(true);
+  });
+
+  it('exibe o botão "Planejar rota" abaixo da busca', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify(null), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+
+    renderMenu();
+
+    const plannerToggle = container.querySelector('[data-slot="planner-toggle"]');
+    expect(plannerToggle).not.toBeNull();
+    expect(plannerToggle?.textContent).toContain('Planejar rota');
   });
 });

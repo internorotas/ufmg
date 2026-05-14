@@ -24,8 +24,8 @@
 
         var pathSegments = window.location.pathname.split('/').filter(Boolean);
         var tenantSlug = pathSegments[0] || 'ufmg';
-        var appBasePath = isLocalhost ? '/' : '/' + tenantSlug + '/';
-        var recoveryKey = 'interno-rotas:' + tenantSlug + ':cache-recovery:v2';
+        var appBasePath = isLocalhost ? '/' : `/${tenantSlug}/`;
+        var recoveryKey = `interno-rotas:${tenantSlug}:cache-recovery:v2`;
         var alreadyRan = false;
 
         try {

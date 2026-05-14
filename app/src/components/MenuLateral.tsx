@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { ArrowLeft, Info, Menu } from 'lucide-react';
+import { ArrowLeft, Info, Menu, Route, X } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { tv, type VariantProps } from 'tailwind-variants';
@@ -12,6 +12,7 @@ import {
   type PartnerSpotlight,
   PartnerSpotlightCard,
 } from '@/features/monetization/components/PartnerSpotlightCard';
+import { usePlannerStore } from '@/features/planner/store/plannerStore';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import logo from '../assets/logo-horizontal-transparente.svg';
 import { useRotasSelection } from '../contexts/RotasContext';
@@ -33,6 +34,10 @@ import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
 
 const LinhaDetalhesModal = React.lazy(() =>
   import('@/components/LinhaDetalhesModal').then((m) => ({ default: m.LinhaDetalhesModal })),
+);
+
+const PlannerPanel = React.lazy(() =>
+  import('@/features/planner/components/PlannerPanel').then((m) => ({ default: m.PlannerPanel })),
 );
 
 /**
@@ -89,6 +94,8 @@ export interface MenuLateralProps extends VariantProps<typeof sidebarVariants> {
   isAuthenticated: boolean;
   onAuthAction: () => void;
   userScore?: number | null;
+  onPlannerRouteSelected?: () => void;
+  onRegisterMenuOpen?: (fn: () => void) => void;
 }
 
 interface CategoryTabsProps {
@@ -199,6 +206,8 @@ export const MenuLateral = React.memo(function MenuLateral({
   isAuthenticated,
   onAuthAction,
   userScore,
+  onPlannerRouteSelected,
+  onRegisterMenuOpen,
 }: MenuLateralProps) {
   const { t } = useTranslation('menu');
   const analytics = useAnalytics();
@@ -209,7 +218,9 @@ export const MenuLateral = React.memo(function MenuLateral({
     typeof window !== 'undefined' ? window.innerWidth < 768 : false,
   );
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
   const [partnerSpotlight, setPartnerSpotlight] = useState<PartnerSpotlight | null>(null);
+  const selectedRouteId = usePlannerStore((state) => state.selectedRouteId);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
   const lastListSummaryRef = useRef<string>('');
@@ -352,6 +363,19 @@ export const MenuLateral = React.memo(function MenuLateral({
 
     return () => mediaQuery.removeEventListener('change', updateViewport);
   }, []);
+
+  useEffect(() => {
+    onRegisterMenuOpen?.(() => setMenuVisible(true));
+  }, [onRegisterMenuOpen]);
+
+  useEffect(() => {
+    if (!selectedRouteId || !isMobileViewport) {
+      return;
+    }
+
+    setMenuVisible(false);
+    onPlannerRouteSelected?.();
+  }, [selectedRouteId, isMobileViewport, onPlannerRouteSelected]);
 
   useEffect(() => {
     if (!isMobileViewport) {
@@ -577,16 +601,46 @@ export const MenuLateral = React.memo(function MenuLateral({
           />
         </div>
 
-        <CategoryTabs
-          categories={linhasData.categoriasDias}
-          activeIndex={categoriaAtiva}
-          onSelect={handleCategoriaChange}
-        />
+        {/* Ação de planejamento de rota */}
+        <div className="shrink-0 border-b border-card-border bg-background-secondary px-2 pb-2 lg:px-4 lg:pb-3">
+          <button
+            type="button"
+            data-slot="planner-toggle"
+            onClick={() => setIsPlannerOpen((prev) => !prev)}
+            className="flex min-h-11 w-full items-center gap-2 rounded-lg border border-card-border bg-card px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            aria-expanded={isPlannerOpen}
+            aria-controls="planner-panel"
+            aria-label={isPlannerOpen ? 'Fechar planejador de rota' : 'Planejar rota'}
+          >
+            <Route size={16} className="shrink-0 text-brand-primary" aria-hidden="true" />
+            <span className="flex-1 text-left">Planejar rota</span>
+            {isPlannerOpen && (
+              <X size={14} className="shrink-0 text-text-tertiary" aria-hidden="true" />
+            )}
+          </button>
+        </div>
+
+        {isPlannerOpen && (
+          <div id="planner-panel" className="shrink-0">
+            <Suspense fallback={null}>
+              <PlannerPanel />
+            </Suspense>
+          </div>
+        )}
+
+        {!isPlannerOpen && (
+          <CategoryTabs
+            categories={linhasData.categoriasDias}
+            activeIndex={categoriaAtiva}
+            onSelect={handleCategoriaChange}
+          />
+        )}
 
         <nav
           data-slot="list"
-          className="flex-1 overflow-y-auto bg-background p-4"
+          className={`flex-1 overflow-y-auto bg-background p-4 ${isPlannerOpen ? 'hidden' : ''}`}
           aria-label={t('list.aria')}
+          hidden={isPlannerOpen}
         >
           {specialPeriod ? (
             <SystemBanner
