@@ -60,9 +60,10 @@ describe('resolveTenantDefinition', () => {
     expect(def.slug).toBe('usp-mock');
   });
 
-  it('cai no fallback ufmg para slug desconhecido', () => {
-    const def = resolveTenantDefinition('tenant-inexistente');
-    expect(def.slug).toBe(DEFAULT_TENANT_SLUG);
+  it('falha fechado para slug desconhecido explicito', () => {
+    expect(() => resolveTenantDefinition('tenant-inexistente')).toThrow(
+      'Tenant desconhecido para o frontend: tenant-inexistente',
+    );
   });
 
   it('cai no fallback ufmg para undefined', () => {
@@ -89,8 +90,8 @@ describe('resolveTenantDefinition', () => {
     expect(usp.basePath).toBe('/usp-mock/');
   });
 
-  it('retorna sempre um objeto (nunca null ou undefined)', () => {
-    for (const slug of [null, undefined, '', 'nao-existe', 'ufmg', 'usp-mock'] as const) {
+  it('retorna sempre um objeto para slugs validos ou ausencia de slug', () => {
+    for (const slug of [null, undefined, '', 'ufmg', 'usp-mock'] as const) {
       expect(resolveTenantDefinition(slug)).toBeTruthy();
     }
   });

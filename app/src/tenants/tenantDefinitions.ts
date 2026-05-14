@@ -79,6 +79,15 @@ export function normalizeTenantSlug(value?: string | null): string {
 }
 
 export function resolveTenantDefinition(value?: string | null): TenantDefinition {
+  if (!value || value.trim().length === 0) {
+    return TENANT_DEFINITIONS[DEFAULT_TENANT_SLUG];
+  }
+
   const normalized = normalizeTenantSlug(value);
-  return TENANT_DEFINITIONS[normalized as TenantSlug] ?? TENANT_DEFINITIONS[DEFAULT_TENANT_SLUG];
+  const resolved = TENANT_DEFINITIONS[normalized as TenantSlug];
+  if (!resolved) {
+    throw new Error(`Tenant desconhecido para o frontend: ${normalized}`);
+  }
+
+  return resolved;
 }
