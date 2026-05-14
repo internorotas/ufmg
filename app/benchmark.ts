@@ -1,34 +1,44 @@
-import { converterMinutosParaHora as oldConv } from './src/lib/utils';
+import { timeToMinutes } from './src/lib/utils';
+import { getSaoPauloNow } from './src/lib/time';
 
-function newConv(minutosTotais: number): string {
-  if (!Number.isFinite(minutosTotais)) return '--:--';
+const MOCK_HORARIOS = Array.from({ length: 50 }, (_, i) => {
+  const h = Math.floor(i / 2).toString().padStart(2, '0');
+  const m = (i % 2 === 0 ? '00' : '30');
+  return `${h}:${m}`;
+});
 
-  const minutosNoDia = 24 * 60;
-  const valorNormalizado =
-    ((Math.floor(minutosTotais) % minutosNoDia) + minutosNoDia) % minutosNoDia;
-  const horas = Math.floor(valorNormalizado / 60);
-  const minutos = valorNormalizado % 60;
-
-  const hStr = horas < 10 ? `0${horas}` : `${horas}`;
-  const mStr = minutos < 10 ? `0${minutos}` : `${minutos}`;
-
-  return `${hStr}:${mStr}`;
+function oldParse(horarios: string[]): number[] {
+  return horarios
+    .filter((time) => time?.includes(':'))
+    .map(timeToMinutes)
+    .sort((a, b) => a - b);
 }
 
-const N = 1_000_000;
+const cache = new WeakMap<string[], number[]>();
 
-// biome-ignore lint/suspicious/noConsole: benchmark script intencional
+function newParse(horarios: string[]): number[] {
+  let cached = cache.get(horarios);
+  if (cached) return cached;
+
+  cached = horarios
+    .filter((time) => time?.includes(':'))
+    .map(timeToMinutes)
+    .sort((a, b) => a - b);
+
+  cache.set(horarios, cached);
+  return cached;
+}
+
+const N = 100000;
+
 console.time('old');
 for (let i = 0; i < N; i++) {
-  oldConv(i);
+  oldParse(MOCK_HORARIOS);
 }
-// biome-ignore lint/suspicious/noConsole: benchmark script intencional
 console.timeEnd('old');
 
-// biome-ignore lint/suspicious/noConsole: benchmark script intencional
 console.time('new');
 for (let i = 0; i < N; i++) {
-  newConv(i);
+  newParse(MOCK_HORARIOS);
 }
-// biome-ignore lint/suspicious/noConsole: benchmark script intencional
 console.timeEnd('new');

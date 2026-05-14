@@ -81,13 +81,20 @@ export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
  * Analisa e ordena os horários em minutos.
  * Esta operação é cara (O(N log N)) e deve ser memoizada.
  */
+const _parsedSchedulesCache = new WeakMap<string[], number[]>();
+
 function parseSchedules(horarios: string[]): number[] {
   if (!horarios || horarios.length === 0) return [];
 
-  return horarios
-    .filter((time) => time?.includes(':'))
-    .map(timeToMinutes)
-    .sort((a, b) => a - b);
+  let cached = _parsedSchedulesCache.get(horarios);
+  if (!cached) {
+    cached = horarios
+      .filter((time) => time?.includes(':'))
+      .map(timeToMinutes)
+      .sort((a, b) => a - b);
+    _parsedSchedulesCache.set(horarios, cached);
+  }
+  return cached;
 }
 
 function calculateSchedules(schedulesInMinutes: number[], currentMinutes: number): ScheduleResult {
