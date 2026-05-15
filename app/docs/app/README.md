@@ -20,7 +20,6 @@ Para validar conexão frontend -> backend:
 ```bash
 powershell -ExecutionPolicy Bypass -File .\scripts\dev-check.ps1
 ```
-
 O checker detecta automaticamente se o frontend/backend estão respondendo em `localhost` ou `127.0.0.1`.
 
 ## Variáveis de ambiente
