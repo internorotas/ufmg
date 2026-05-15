@@ -146,3 +146,9 @@ node_modules/
 test-results/
 *.png
 package-lock.json
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example

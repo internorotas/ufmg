@@ -7,7 +7,9 @@
     "format": "biome format --write .",
     "lint": "biome lint .",
     "check": "biome check --write --unsafe .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,7 @@
     "@semantic-release/npm": "^13.1.5",
     "commitlint": "^20.5.0",
     "husky": "^9.1.7",
-    "semantic-release": "^25.0.3"
+    "semantic-release": "^25.0.3",
+    "wrangler": "^4.92.0"
   }
 }
