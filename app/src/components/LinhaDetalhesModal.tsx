@@ -383,7 +383,12 @@ export function LinhaDetalhesModal({
               borderColor: hexToRgba(linha.corHex, 0.24),
             }}
           >
-            <Bus size={24} className="drop-shadow-sm" style={{ color: linha.corHex }} />
+            <Bus
+              aria-hidden="true"
+              size={24}
+              className="drop-shadow-sm"
+              style={{ color: linha.corHex }}
+            />
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="truncate text-lg font-bold leading-tight text-text-primary">

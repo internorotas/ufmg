@@ -180,7 +180,7 @@ export function LinesEmptyState({ category, size = 'md' }: LinesEmptyStateProps)
   return (
     <EmptyState
       size={size}
-      icon={<Bus size={iconSizes[size]} />}
+      icon={<Bus aria-hidden="true" size={iconSizes[size]} />}
       title="Nenhuma linha disponível"
       description={
         category

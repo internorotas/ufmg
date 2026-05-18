@@ -170,7 +170,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
           <div data-slot="lines-section" className={popupLinesSectionVariants()}>
             <div className="mb-1.5 flex items-center gap-2">
               <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-internoRotas-azul-eletrico/50">
-                <Bus className="text-internoRotas-bege-areia/40" size={13} />
+                <Bus aria-hidden="true" className="text-internoRotas-bege-areia/40" size={13} />
               </div>
               <p className="text-xs font-semibold text-text-primary">
                 {parada.linhasAtendidas.length} linha
