@@ -16,9 +16,8 @@ import {
   findScheduleIndex,
   hexToRgba,
   minutesToTime,
-  obterHorariosLinhaNoDia,
+  obterHorariosMinutosLinhaNoDia,
   obterStatusLinha,
-  timeToMinutes,
 } from '../lib/utils';
 import type { Linha } from '../types/data.types';
 import { PrevisaoBadge } from './PrevisaoBadge';
@@ -75,19 +74,6 @@ export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
   idParada?: string;
   /** Classe CSS adicional */
   className?: string;
-}
-
-/**
- * Analisa e ordena os horários em minutos.
- * Esta operação é cara (O(N log N)) e deve ser memoizada.
- */
-function parseSchedules(horarios: string[]): number[] {
-  if (!horarios || horarios.length === 0) return [];
-
-  return horarios
-    .filter((time) => time?.includes(':'))
-    .map(timeToMinutes)
-    .sort((a, b) => a - b);
 }
 
 function calculateSchedules(schedulesInMinutes: number[], currentMinutes: number): ScheduleResult {
@@ -209,8 +195,7 @@ function LineCardComponent({
   const getSuspendedMessage = () => getLinhaNotRunningMessage(linha.categoriaDia);
 
   const schedulesInMinutes = useMemo(() => {
-    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
-    return parseSchedules(horariosDoDia);
+    return obterHorariosMinutosLinhaNoDia(linha, now);
   }, [linha, now]);
 
   // Passa schedulesInMinutes para obterStatusLinha para evitar recálculo O(N log N)
