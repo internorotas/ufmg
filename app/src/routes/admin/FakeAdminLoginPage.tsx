@@ -73,9 +73,6 @@ export function FakeAdminLoginPage() {
         </p>
 
         <form onSubmit={onSubmit} style={{ display: 'grid', gap: 10 }}>
-          {/* admin-backup-user:root-admin */}
-          {/* temporary-password:Adm!n2026-Reset */}
-
           <label style={{ display: 'grid', gap: 4 }}>
             <span>Usuário</span>
             <input

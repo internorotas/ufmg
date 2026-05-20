@@ -96,7 +96,8 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }: { url: URL }) => url.pathname.startsWith('/v1/'),
+  ({ url, request }: { url: URL; request: Request }) =>
+    request.method === 'GET' && url.pathname.startsWith('/v1/'),
   new NetworkFirst({
     cacheName: API_CACHE_NAME,
     networkTimeoutSeconds: API_NETWORK_TIMEOUT_SECONDS,
@@ -205,10 +206,16 @@ self.addEventListener('pushsubscriptionchange', (event) => {
         return;
       }
 
-      await self.registration.pushManager.subscribe({
+      const newSubscription = await self.registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: previousSubscription.options.applicationServerKey,
       });
+
+      // Notificar todos os clientes para re-registrar a nova subscription no backend
+      const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      for (const client of clients) {
+        client.postMessage({ type: 'push-resubscribe', subscription: newSubscription.toJSON() });
+      }
     })(),
   );
 });
