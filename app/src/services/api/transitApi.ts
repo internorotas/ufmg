@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { getTenantStorageKey } from '@/pwa/tenantNamespace';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import type { CategoriaLinhas, Parada } from '@/types/data.types';
@@ -17,11 +18,7 @@ function resolveTransitEndpoint(pathname: '/v1/linhas' | '/v1/paradas'): string 
 }
 
 function getInMemoryAuthToken(): string | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  return window.__internoAuthToken ?? null;
+  return useAuthStore.getState().accessToken;
 }
 
 function getStoredApiVersion(): string | null {

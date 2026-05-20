@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { useAuthStore } from '@/stores/authStore';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import type { LegalModalType } from '@/types/legal.types';
 
 const SLIDES = [
@@ -33,7 +33,7 @@ interface OnboardingModalProps {
 export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isOpen, setIsOpen] = useState(true);
-  const { hasSeenOnboarding, setHasSeenOnboarding } = useAuthStore();
+  const { hasSeenOnboarding, setHasSeenOnboarding } = useOnboardingStore();
   const { trackEvent } = useAnalytics();
 
   if (hasSeenOnboarding) {
