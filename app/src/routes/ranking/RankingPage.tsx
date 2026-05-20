@@ -1,11 +1,10 @@
 import { Medal, Shield, Trophy } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
-import { startGoogleLoginFlow } from '@/features/auth/api/authClient';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import {
   type AuthenticatedRankingResponse,
@@ -22,6 +21,7 @@ const SCOPE_OPTIONS: RankingScope[] = ['geral', 'campus', 'linha:2004A'];
 export function RankingPage() {
   const { isAuthenticated } = useAuthContext();
   const { collaborativeFeedback } = useNotificacaoContext();
+  const navigate = useNavigate();
   const [period, setPeriod] = useState<RankingPeriod>('semanal');
   const [scope, setScope] = useState<RankingScope>('geral');
   const [publicRanking, setPublicRanking] = useState<PublicRankingResponse | null>(null);
@@ -104,11 +104,7 @@ export function RankingPage() {
                 Voltar ao mapa
               </Link>
               {!isAuthenticated ? (
-                <Button
-                  type="button"
-                  className="min-h-11"
-                  onClick={() => void startGoogleLoginFlow()}
-                >
+                <Button type="button" className="min-h-11" onClick={() => navigate('/login')}>
                   Entrar para ver completo
                 </Button>
               ) : null}

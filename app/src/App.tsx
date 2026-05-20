@@ -16,7 +16,7 @@ import { GA_MEASUREMENT_ID } from './config/analytics';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { startGoogleLoginFlow } from './features/auth/api/authClient';
+
 import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
 import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
 import { useConsentGate } from './features/auth/hooks/useConsentGate';
@@ -29,6 +29,7 @@ import { COORDENADAS_CAMPUS, useLocalizacaoUsuario } from './hooks/useLocalizaca
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { AboutPage } from './routes/about/AboutPage';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
+import { LoginPage } from './routes/login/LoginPage';
 import { ProfilePage } from './routes/profile/ProfilePage';
 import { RankingPage } from './routes/ranking/RankingPage';
 import { ResearchDashboardPage } from './routes/research/ResearchDashboardPage';
@@ -135,7 +136,6 @@ function AppContent() {
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
   const [isSummarySheetOpen, setIsSummarySheetOpen] = useState(false);
   const [authFeedbackMessage, setAuthFeedbackMessage] = useState<string | null>(null);
-
   useEffect(() => {
     const locationState = location.state as { authFeedback?: string } | null;
     const feedback = locationState?.authFeedback;
@@ -382,9 +382,7 @@ function AppContent() {
             return;
           }
 
-          void startGoogleLoginFlow().catch(() => {
-            setAuthFeedbackMessage('Falha ao iniciar login com Google. Tente novamente.');
-          });
+          navigate('/login');
         }}
       />
       <DataSourceBanner isVisible={isOfflineDataFallback} source={dataSource} />
@@ -508,6 +506,7 @@ function AuthenticatedAppShell() {
             <Route path="/privacidade" element={<AppContent />} />
             <Route path="/termos" element={<AppContent />} />
             <Route path="/sobre" element={<AboutPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/perfil" element={<ProfilePage />} />
             <Route path="/ranking" element={<RankingPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
