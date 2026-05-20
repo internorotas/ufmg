@@ -105,11 +105,7 @@ function readPersistedSession(): PersistedTrackingSession | null {
 
   try {
     const parsed = JSON.parse(raw) as PersistedTrackingSession;
-    if (
-      !parsed.sessionId ||
-      !parsed.linhaId ||
-      !Array.isArray(parsed.points)
-    ) {
+    if (!parsed.sessionId || !parsed.linhaId || !Array.isArray(parsed.points)) {
       return null;
     }
 
@@ -132,6 +128,10 @@ function writePersistedSession(session: PersistedTrackingSession | null): void {
     return;
   }
 
+  // FIXME(privacy): raw GPS coordinates are stored in localStorage for offline recovery.
+  // Encrypting them requires client-side key management (complex). Acceptable trade-off for now:
+  // points are written during active tracking and cleared on session finish / reset.
+  // The session is auto-finished after MAX_SESSION_DURATION_MS (1h) or IDLE_AUTO_FINISH_MS (5m).
   window.localStorage.setItem(
     OFFLINE_SESSION_STORAGE_KEY,
     JSON.stringify({
@@ -193,11 +193,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
 
   const flushQueue = useCallback(
     async (isBatchSubmission: boolean) => {
-      if (
-        !sessionId ||
-        !options.selectedLine ||
-        queueRef.current.length === 0
-      ) {
+      if (!sessionId || !options.selectedLine || queueRef.current.length === 0) {
         return;
       }
 

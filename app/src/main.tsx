@@ -2,7 +2,9 @@ import * as Sentry from '@sentry/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { getTenantStorageKey } from '@/pwa/tenantNamespace';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import { applyTenantDocumentMetadata } from '@/tenants/tenantConfig';
 import '@/i18n';
 
@@ -164,11 +166,33 @@ function registerAppServiceWorker(): void {
   });
 
   navigator.serviceWorker.addEventListener('message', (event) => {
-    if (event.data?.type !== 'gps-flush-queue') {
+    if (event.data?.type === 'gps-flush-queue') {
+      window.dispatchEvent(new CustomEvent('interno-rotas:gps-flush-queue'));
       return;
     }
 
-    window.dispatchEvent(new CustomEvent('interno-rotas:gps-flush-queue'));
+    if (event.data?.type === 'push-resubscribe') {
+      const sub = event.data.subscription as {
+        endpoint?: string;
+        keys?: { p256dh?: string; auth?: string };
+      } | null;
+      if (sub?.endpoint && sub.keys?.p256dh && sub.keys?.auth) {
+        const accessToken = useAuthStore.getState().accessToken;
+        void fetch(resolveApiEndpoint('/v1/push/subscriptions'), {
+          method: 'POST',
+          headers: withTenantHeaders({
+            'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          }),
+          body: JSON.stringify({
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth },
+            context: null,
+          }),
+          keepalive: true,
+        }).catch(() => undefined);
+      }
+    }
   });
 
   navigator.serviceWorker
