@@ -60,7 +60,25 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  preview: {
+    headers: {
+
+      // 🛡️ Sentinel: Security enhancement
+      // Prevents MIME type sniffing (X-Content-Type-Options) and
+      // Clickjacking attacks (X-Frame-Options)
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
+  },
   server: {
+    headers: {
+
+      // 🛡️ Sentinel: Security enhancement
+      // Prevents MIME type sniffing (X-Content-Type-Options) and
+      // Clickjacking attacks (X-Frame-Options)
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
     fs: {
       // Permite que o servidor de desenvolvimento acesse o workspace e o
       // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
