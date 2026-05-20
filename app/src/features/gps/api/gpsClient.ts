@@ -13,14 +13,12 @@ export interface GpsPointPayload {
 export interface GpsBatchPayload {
   sessionId: string;
   linhaId: string;
-  userIdHash: string;
   isBatchSubmission: boolean;
   points: GpsPointPayload[];
 }
 
 export interface GpsSessionPayload {
   linhaId: string;
-  userIdHash: string;
 }
 
 function resolveGpsEndpoint(pathname: string): string {

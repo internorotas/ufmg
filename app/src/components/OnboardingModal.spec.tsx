@@ -11,8 +11,8 @@ const mockStore = {
   setHasSeenOnboarding: vi.fn(),
 };
 
-vi.mock('@/stores/authStore', () => ({
-  useAuthStore: () => mockStore,
+vi.mock('@/stores/onboardingStore', () => ({
+  useOnboardingStore: () => mockStore,
 }));
 
 vi.mock('@/hooks/useAnalytics', () => ({

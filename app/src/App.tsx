@@ -122,7 +122,7 @@ function AppContent() {
   } = useRotas();
 
   const { trackEvent, trackPageView } = useAnalytics();
-  const { authStatus, isAuthenticated, user } = useAuthContext();
+  const { authStatus, isAuthenticated } = useAuthContext();
   const { isOffline, showOfflineToast } = useAppConnectivity();
   const {
     dialogOpen,
@@ -177,7 +177,6 @@ function AppContent() {
   const rastreioColaborativo = useGpsTrackingSession({
     enabled: isAuthenticated,
     selectedLine: linhaSelecionada,
-    userId: user?.id ?? null,
   });
   const {
     isActive: rastreioAtivo,

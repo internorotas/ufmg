@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/features/auth/store/authStore';
 import type { PlannerClientQuery, PlannerRoutesResponse } from '../types';
 
 function resolvePlannerEndpoint(): string {
@@ -30,7 +31,7 @@ export async function fetchPlannerRoutes(
     url.searchParams.set('categoryDay', query.categoryDay);
   }
 
-  const authToken = window.__internoAuthToken ?? null;
+  const authToken = useAuthStore.getState().accessToken;
   const headers: HeadersInit = {
     ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
   };

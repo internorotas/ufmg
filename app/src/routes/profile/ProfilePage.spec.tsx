@@ -58,7 +58,6 @@ beforeEach(() => {
   Reflect.set(globalThis, 'IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('fetch', fetchMock);
   useAuthStore.getState().resetSession();
-  window.__internoAuthToken = null;
 });
 
 afterEach(() => {
@@ -74,7 +73,6 @@ afterEach(() => {
   Reflect.set(globalThis, 'IS_REACT_ACT_ENVIRONMENT', false);
   document.body.innerHTML = '';
   useAuthStore.getState().resetSession();
-  window.__internoAuthToken = null;
 });
 
 describe('ProfilePage', () => {
@@ -107,7 +105,6 @@ describe('ProfilePage', () => {
         nickname: null,
       },
     });
-    window.__internoAuthToken = 'access-token';
 
     fetchMock.mockImplementation(() =>
       Promise.resolve(

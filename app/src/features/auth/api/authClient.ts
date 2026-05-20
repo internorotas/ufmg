@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 
 export interface AuthenticatedUser {
@@ -58,7 +59,7 @@ export function resolveAuthEndpoint(pathname: AuthEndpointPath): string {
 }
 
 export function getAuthHeaders(): HeadersInit | undefined {
-  const accessToken = window.__internoAuthToken ?? null;
+  const accessToken = useAuthStore.getState().accessToken;
   if (!accessToken) {
     return undefined;
   }

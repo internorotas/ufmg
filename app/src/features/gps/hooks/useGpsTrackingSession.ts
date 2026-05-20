@@ -5,7 +5,6 @@ import {
   startGpsSession,
   submitGpsBatch,
 } from '@/features/gps/api/gpsClient';
-import { hashUserId } from '@/features/gps/lib/hashUserId';
 import { calcularDistanciaKm } from '@/lib/utils';
 import { getTenantStorageKey } from '@/pwa/tenantNamespace';
 import type { Linha } from '@/types/data.types';
@@ -25,7 +24,6 @@ type TrackingStopReason = 'manual' | 'parado' | 'saiu_rota' | 'terminal' | 'time
 interface PersistedTrackingSession {
   sessionId: string;
   linhaId: string;
-  userIdHash: string;
   points: GpsPointPayload[];
 }
 
@@ -61,7 +59,6 @@ export interface GpsTrackingState {
 interface UseGpsTrackingSessionOptions {
   enabled: boolean;
   selectedLine: Linha | null;
-  userId: number | null;
 }
 
 export function trimQueue<T>(items: T[], maxItems: number): T[] {
@@ -111,7 +108,6 @@ function readPersistedSession(): PersistedTrackingSession | null {
     if (
       !parsed.sessionId ||
       !parsed.linhaId ||
-      !parsed.userIdHash ||
       !Array.isArray(parsed.points)
     ) {
       return null;
@@ -181,7 +177,6 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const queueRef = useRef<GpsPointPayload[]>([]);
   const sessionStartedAtRef = useRef<number | null>(null);
   const lastMovementAtRef = useRef<number | null>(null);
-  const userIdHashRef = useRef<string | null>(null);
 
   const resetSession = useCallback(() => {
     setStatus('idle');
@@ -193,7 +188,6 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     queueRef.current = [];
     sessionStartedAtRef.current = null;
     lastMovementAtRef.current = null;
-    userIdHashRef.current = null;
     writePersistedSession(null);
   }, []);
 
@@ -202,7 +196,6 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       if (
         !sessionId ||
         !options.selectedLine ||
-        !userIdHashRef.current ||
         queueRef.current.length === 0
       ) {
         return;
@@ -217,7 +210,6 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         await submitGpsBatch({
           sessionId,
           linhaId: options.selectedLine.idRota,
-          userIdHash: userIdHashRef.current,
           isBatchSubmission,
           points: batch,
         });
@@ -225,7 +217,6 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         writePersistedSession({
           sessionId,
           linhaId: options.selectedLine.idRota,
-          userIdHash: userIdHashRef.current,
           points: [],
         });
       } catch {
@@ -235,7 +226,6 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         writePersistedSession({
           sessionId,
           linhaId: options.selectedLine.idRota,
-          userIdHash: userIdHashRef.current,
           points: queueRef.current,
         });
       } finally {
@@ -246,17 +236,15 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   );
 
   const start = useCallback(async () => {
-    if (!options.enabled || !options.selectedLine || !options.userId) {
+    if (!options.enabled || !options.selectedLine) {
       return;
     }
 
     setStatus('starting');
     try {
       setLastStopReason(null);
-      userIdHashRef.current = await hashUserId(options.userId);
       const response = await startGpsSession({
         linhaId: options.selectedLine.idRota,
-        userIdHash: userIdHashRef.current,
       });
 
       sessionStartedAtRef.current = Date.now();
@@ -265,13 +253,12 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       writePersistedSession({
         sessionId: response.sessionId,
         linhaId: options.selectedLine.idRota,
-        userIdHash: userIdHashRef.current,
         points: [],
       });
     } catch {
       setStatus('error');
     }
-  }, [options.enabled, options.selectedLine, options.userId]);
+  }, [options.enabled, options.selectedLine]);
 
   const stop = useCallback(
     async (reason: TrackingStopReason = 'manual') => {
@@ -312,11 +299,10 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       queueRef.current = trimQueue([...queueRef.current, point], MAX_QUEUE_POINTS);
       setQueueSize(queueRef.current.length);
       setNextCollectionIntervalMs(resolveCollectionIntervalMs(snapshot.speedKmh));
-      if (userIdHashRef.current && options.selectedLine) {
+      if (options.selectedLine) {
         writePersistedSession({
           sessionId,
           linhaId: options.selectedLine.idRota,
-          userIdHash: userIdHashRef.current,
           points: queueRef.current,
         });
       }
@@ -365,7 +351,6 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     }
 
     queueRef.current = persistedSession.points;
-    userIdHashRef.current = persistedSession.userIdHash;
     setSessionId(persistedSession.sessionId);
     setQueueSize(persistedSession.points.length);
     if (persistedSession.points.length > 0) {
