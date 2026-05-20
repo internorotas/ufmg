@@ -30,6 +30,7 @@ import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { SearchEmptyState } from './ui/EmptyState';
 import { SearchInput } from './ui/Input';
+import { Skeleton } from './ui/Skeleton';
 import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
 
 const LinhaDetalhesModal = React.lazy(() =>
@@ -541,9 +542,11 @@ export const MenuLateral = React.memo(function MenuLateral({
         >
           <div className="min-w-[132px]">
             {authStatus === 'booting' ? (
-              <span className="rounded-full bg-white/15 px-3 py-2 text-xs font-semibold text-white">
-                Sessao...
-              </span>
+              <Skeleton
+                className="h-8 w-20 bg-white/15"
+                rounded="full"
+                aria-label="Carregando sessão"
+              />
             ) : (
               <div className="flex items-center gap-2">
                 <Button

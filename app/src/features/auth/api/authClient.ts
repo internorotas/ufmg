@@ -98,20 +98,29 @@ export async function startGoogleLoginFlow(): Promise<void> {
   const endpoint = new URL(resolveAuthEndpoint('/v1/auth/google/start'), window.location.origin);
   endpoint.searchParams.set('continueUrl', resolveLoginContinueUrl());
 
-  const response = await fetch(endpoint.toString(), {
-    method: 'GET',
-    cache: 'no-store',
-    headers: withTenantHeaders(),
-  });
+  let response: Response;
+  try {
+    response = await fetch(endpoint.toString(), {
+      method: 'GET',
+      cache: 'no-store',
+      headers: withTenantHeaders(),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Falha de rede ao iniciar login';
+    throw new AuthRequestError(message, null);
+  }
 
   if (!response.ok) {
-    throw new Error(`Falha ao iniciar login Google: HTTP ${response.status}`);
+    throw new AuthRequestError(
+      `Falha ao iniciar login Google: HTTP ${response.status}`,
+      response.status,
+    );
   }
 
   const payload = (await response.json()) as Partial<GoogleStartResponse>;
 
   if (!payload.authUrl || payload.provider !== 'google') {
-    throw new Error('Resposta inválida ao iniciar login Google');
+    throw new AuthRequestError('Resposta inválida ao iniciar login Google', null);
   }
 
   window.location.assign(payload.authUrl);
