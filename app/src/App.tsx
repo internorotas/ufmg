@@ -30,6 +30,7 @@ import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { AboutPage } from './routes/about/AboutPage';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
 import { LoginPage } from './routes/login/LoginPage';
+import { MorePage } from './routes/more/MorePage';
 import { ProfilePage } from './routes/profile/ProfilePage';
 import { RankingPage } from './routes/ranking/RankingPage';
 import { ResearchDashboardPage } from './routes/research/ResearchDashboardPage';
@@ -509,6 +510,7 @@ function AuthenticatedAppShell() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/perfil" element={<ProfilePage />} />
             <Route path="/ranking" element={<RankingPage />} />
+            <Route path="/mais" element={<MorePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </NotificacaoProvider>
