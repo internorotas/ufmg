@@ -11,7 +11,20 @@ const saoPauloFormatter = new Intl.DateTimeFormat('en-CA', {
   hour12: false,
 });
 
+// LRU Cache for toSaoPauloDate to avoid expensive Intl.DateTimeFormat calls
+// Max size is kept relatively small as we primarily need it for the current
+// time which changes every millisecond but frequently requests the same time.
+const saoPauloDateCache = new Map<number, Date>();
+const MAX_CACHE_SIZE = 1000;
+
 export function toSaoPauloDate(date: Date): Date {
+  const time = date.getTime();
+  const cached = saoPauloDateCache.get(time);
+  if (cached) {
+    // Return a cloned instance to prevent caller mutations
+    return new Date(cached.getTime());
+  }
+
   const parts = saoPauloFormatter.formatToParts(date);
 
   // Single pass over parts is faster than multiple find() calls
@@ -33,7 +46,16 @@ export function toSaoPauloDate(date: Date): Date {
     else if (part.type === 'second') second = Number(part.value);
   }
 
-  return new Date(year, month - 1, day, hour, minute, second);
+  const result = new Date(year, month - 1, day, hour, minute, second);
+
+  if (saoPauloDateCache.size >= MAX_CACHE_SIZE) {
+    // Basic LRU: delete oldest entry (first item returned by keys iterator)
+    const firstKey = saoPauloDateCache.keys().next().value;
+    if (firstKey !== undefined) saoPauloDateCache.delete(firstKey);
+  }
+
+  saoPauloDateCache.set(time, result);
+  return new Date(result.getTime());
 }
 
 export function getSaoPauloNow(): Date {
