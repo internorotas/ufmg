@@ -34,7 +34,7 @@ export function AppShell({
   contentClassName,
 }: AppShellProps) {
   return (
-    <div className="flex min-h-dvh bg-background-secondary text-text-primary">
+    <div className="flex h-dvh overflow-hidden bg-background-secondary text-text-primary">
       <a
         href="#shell-main"
         className="sr-only absolute left-4 top-4 z-[1400] rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
