@@ -6,6 +6,7 @@ import { DataSourceBanner } from './components/app/DataSourceBanner';
 import { DataStatusScreen } from './components/app/DataStatusScreen';
 import { MobileTopBar } from './components/app/MobileTopBar';
 import { ModalManager } from './components/app/ModalManager';
+import { NavRail } from './components/app/NavRail';
 import { OfflineToast } from './components/app/OfflineToast';
 import { LgpdConsentDialog } from './components/auth/LgpdConsentDialog';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -365,152 +366,153 @@ function AppContent() {
   };
 
   return (
-    <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
+    <div className="relative flex h-screen min-h-dvh w-full overflow-hidden bg-background font-['Poppins',sans-serif] pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
       <OnboardingModal onOpenLegalModal={handleOpenLegalModal} />
-      <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
       <a
         href="#main-content"
         className="sr-only absolute left-4 top-4 z-[1400] rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
       >
         Pular para o mapa
       </a>
-      <MobileTopBar
-        authStatus={authStatus}
-        isAuthenticated={isAuthenticated}
-        onAuthAction={handleAuthAction}
-      />
-      <div className="flex min-h-0 flex-1 overflow-hidden md:flex-row">
-        <MenuLateral
-          linhasData={linhasData}
-          todasParadas={todasParadas}
-          onLinhaSelect={handleLinhaSelect}
-          onParadaClick={handleParadaClick}
-          onOpenLegalModal={handleOpenLegalModal}
-          linhaSelecionada={linhaSelecionada}
-          isOffline={isOffline || isOfflineDataFallback}
+      <NavRail />
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
+        <MobileTopBar
           authStatus={authStatus}
           isAuthenticated={isAuthenticated}
-          userScore={null}
-          onPlannerRouteSelected={handlePlannerRouteSelected}
-          onRegisterMenuOpen={handleRegisterMenuOpen}
           onAuthAction={handleAuthAction}
         />
-        <DataSourceBanner isVisible={isOfflineDataFallback} source={dataSource} />
-        <main
-          id="main-content"
-          tabIndex={-1}
-          aria-label="Mapa das rotas"
-          className="relative h-full w-full grow"
-        >
-          <ErrorBoundary
-            fallback={
-              <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-background-secondary p-8 text-center">
-                <p className="text-lg font-semibold text-text-primary">
-                  Não foi possível carregar o mapa
-                </p>
-                <p className="text-sm text-text-secondary">
-                  Recarregue a página para tentar novamente.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => window.location.reload()}
-                  className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-text-inverse"
-                >
-                  Recarregar
-                </button>
-              </div>
-            }
+        <div className="flex min-h-0 flex-1 overflow-hidden md:flex-row">
+          <MenuLateral
+            linhasData={linhasData}
+            todasParadas={todasParadas}
+            onLinhaSelect={handleLinhaSelect}
+            onParadaClick={handleParadaClick}
+            onOpenLegalModal={handleOpenLegalModal}
+            linhaSelecionada={linhaSelecionada}
+            isOffline={isOffline || isOfflineDataFallback}
+            authStatus={authStatus}
+            isAuthenticated={isAuthenticated}
+            userScore={null}
+            onPlannerRouteSelected={handlePlannerRouteSelected}
+            onRegisterMenuOpen={handleRegisterMenuOpen}
+            onAuthAction={handleAuthAction}
+          />
+          <DataSourceBanner isVisible={isOfflineDataFallback} source={dataSource} />
+          <main
+            id="main-content"
+            tabIndex={-1}
+            aria-label="Mapa das rotas"
+            className="relative h-full w-full grow"
           >
-            <Suspense fallback={<LoadingMap />}>
-              <Mapa
-                ref={mapaRef}
-                todasParadas={todasParadas}
-                linhaSelecionada={linhaSelecionada}
-                paradaSelecionada={paradaSelecionada}
-                localizacaoUsuario={localizacao}
-                headingUsuario={heading}
-                permissaoLocalizacao={permissaoConcedida}
-                carregandoLocalizacao={carregandoLocalizacao}
-                onPedirLocalizacao={handlePedirLocalizacao}
-                rastreioColaborativo={rastreioColaborativo}
-                onAlternarRastreioColaborativo={handleAlternarRastreioColaborativo}
-              />
-            </Suspense>
-          </ErrorBoundary>
-        </main>
-      </div>
-
-      <ModalManager
-        erroLocalizacao={erroLocalizacao}
-        carregandoLocalizacao={carregandoLocalizacao}
-        mostrarModalPermissao={mostrarModalPermissao}
-        mostrarModalLonge={mostrarModalLonge}
-        onClosePermissao={fecharModalPermissao}
-        onCloseLonge={fecharModalLonge}
-        onPermitirLocalizacao={() => {
-          solicitarAutoCenter();
-          solicitarPermissaoNavegador();
-          trackEvent({
-            event: 'location_permission_granted',
-            category: 'preferences',
-            action: 'location_permission_granted',
-          });
-        }}
-        onVoltarAoCampus={handleVoltarAoCampus}
-        onContinuarAqui={handleContinuarAqui}
-      />
-
-      <LegalModal modalType={legalModal} onClose={handleCloseLegalModal} />
-
-      <OfflineToast show={showOfflineToast} />
-
-      <LgpdConsentDialog
-        isOpen={dialogOpen}
-        onClose={closeDialog}
-        onAccept={acceptAndContinue}
-        onRefuse={refuseConsent}
-      />
-
-      <ProfileSheet isOpen={isProfileSheetOpen} onOpenChange={setIsProfileSheetOpen} />
-
-      <PlannerSummarySheet
-        isOpen={isSummarySheetOpen}
-        onClose={() => setIsSummarySheetOpen(false)}
-        onBackToResults={() => {
-          setIsSummarySheetOpen(false);
-          usePlannerStore.getState().openMenuFn?.();
-        }}
-      />
-
-      {authFeedbackMessage ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className="pointer-events-none absolute bottom-32 left-1/2 z-[1400] -translate-x-1/2 rounded-lg border border-success-border bg-success-bg px-3 py-2 text-xs text-success-text shadow-md"
-        >
-          {authFeedbackMessage}
+            <ErrorBoundary
+              fallback={
+                <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-background-secondary p-8 text-center">
+                  <p className="text-lg font-semibold text-text-primary">
+                    Não foi possível carregar o mapa
+                  </p>
+                  <p className="text-sm text-text-secondary">
+                    Recarregue a página para tentar novamente.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => window.location.reload()}
+                    className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-text-inverse"
+                  >
+                    Recarregar
+                  </button>
+                </div>
+              }
+            >
+              <Suspense fallback={<LoadingMap />}>
+                <Mapa
+                  ref={mapaRef}
+                  todasParadas={todasParadas}
+                  linhaSelecionada={linhaSelecionada}
+                  paradaSelecionada={paradaSelecionada}
+                  localizacaoUsuario={localizacao}
+                  headingUsuario={heading}
+                  permissaoLocalizacao={permissaoConcedida}
+                  carregandoLocalizacao={carregandoLocalizacao}
+                  onPedirLocalizacao={handlePedirLocalizacao}
+                  rastreioColaborativo={rastreioColaborativo}
+                  onAlternarRastreioColaborativo={handleAlternarRastreioColaborativo}
+                />
+              </Suspense>
+            </ErrorBoundary>
+          </main>
         </div>
-      ) : null}
 
-      {feedbackMessage ? (
-        <div
-          role="alertdialog"
-          aria-live="polite"
-          aria-label="Aviso de login necessário"
-          className="pointer-events-auto fixed inset-x-4 bottom-24 z-[1400] mx-auto flex max-w-md items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg md:bottom-20"
-        >
-          <span className="flex-1">{feedbackMessage}</span>
-          <button
-            type="button"
-            onClick={() => navigate('/login')}
-            className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-md bg-warning-text px-3 text-xs font-semibold text-warning-bg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning-text focus-visible:ring-offset-2 focus-visible:ring-offset-warning-bg"
+        <ModalManager
+          erroLocalizacao={erroLocalizacao}
+          carregandoLocalizacao={carregandoLocalizacao}
+          mostrarModalPermissao={mostrarModalPermissao}
+          mostrarModalLonge={mostrarModalLonge}
+          onClosePermissao={fecharModalPermissao}
+          onCloseLonge={fecharModalLonge}
+          onPermitirLocalizacao={() => {
+            solicitarAutoCenter();
+            solicitarPermissaoNavegador();
+            trackEvent({
+              event: 'location_permission_granted',
+              category: 'preferences',
+              action: 'location_permission_granted',
+            });
+          }}
+          onVoltarAoCampus={handleVoltarAoCampus}
+          onContinuarAqui={handleContinuarAqui}
+        />
+
+        <LegalModal modalType={legalModal} onClose={handleCloseLegalModal} />
+
+        <OfflineToast show={showOfflineToast} />
+
+        <LgpdConsentDialog
+          isOpen={dialogOpen}
+          onClose={closeDialog}
+          onAccept={acceptAndContinue}
+          onRefuse={refuseConsent}
+        />
+
+        <ProfileSheet isOpen={isProfileSheetOpen} onOpenChange={setIsProfileSheetOpen} />
+
+        <PlannerSummarySheet
+          isOpen={isSummarySheetOpen}
+          onClose={() => setIsSummarySheetOpen(false)}
+          onBackToResults={() => {
+            setIsSummarySheetOpen(false);
+            usePlannerStore.getState().openMenuFn?.();
+          }}
+        />
+
+        {authFeedbackMessage ? (
+          <div
+            role="status"
+            aria-live="polite"
+            className="pointer-events-none absolute bottom-32 left-1/2 z-[1400] -translate-x-1/2 rounded-lg border border-success-border bg-success-bg px-3 py-2 text-xs text-success-text shadow-md"
           >
-            Entrar
-          </button>
-        </div>
-      ) : null}
+            {authFeedbackMessage}
+          </div>
+        ) : null}
 
-      <div className="md:hidden">
+        {feedbackMessage ? (
+          <div
+            role="alertdialog"
+            aria-live="polite"
+            aria-label="Aviso de login necessário"
+            className="pointer-events-auto fixed inset-x-4 bottom-24 z-[1400] mx-auto flex max-w-md items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg md:bottom-20"
+          >
+            <span className="flex-1">{feedbackMessage}</span>
+            <button
+              type="button"
+              onClick={() => navigate('/login')}
+              className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-md bg-warning-text px-3 text-xs font-semibold text-warning-bg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning-text focus-visible:ring-offset-2 focus-visible:ring-offset-warning-bg"
+            >
+              Entrar
+            </button>
+          </div>
+        ) : null}
+
         <BottomNav />
       </div>
     </div>
