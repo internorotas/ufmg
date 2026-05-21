@@ -9,6 +9,7 @@
 import { Bus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BottomNav } from '@/components/app/BottomNav';
 import { Button } from '@/components/ui/Button';
 import { AuthRequestError, startGoogleLoginFlow } from '@/features/auth/api/authClient';
 import { tenantConfig } from '@/tenants/tenantConfig';
@@ -72,7 +73,8 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-background-secondary px-4 py-12">
+    <>
+    <main className="flex min-h-dvh flex-col items-center justify-center bg-background-secondary px-4 pt-12 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12">
       <div className="w-full max-w-sm">
         {/* Card */}
         <div className="rounded-2xl border border-card-border bg-card px-8 py-8 shadow-sm">
@@ -140,5 +142,7 @@ export function LoginPage() {
         </p>
       </div>
     </main>
+    <BottomNav />
+    </>
   );
 }

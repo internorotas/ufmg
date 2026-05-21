@@ -69,7 +69,7 @@ export function AppShell({
           id="shell-main"
           tabIndex={-1}
           className={cn(
-            'min-h-0 flex-1 overflow-y-auto px-4 py-5 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 md:pb-5',
+            'min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-5 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 md:pb-5',
             contentClassName,
           )}
         >
