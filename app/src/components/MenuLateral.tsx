@@ -517,7 +517,8 @@ export const MenuLateral = React.memo(function MenuLateral({
           data-slot="header"
           className="flex shrink-0 items-center justify-between gap-2 bg-brand-primary px-3 py-2 shadow-sm"
         >
-          <div className="flex min-w-0 items-center gap-2">
+          {/* Desktop: identidade + autenticacao. Mobile usa o MobileTopBar global. */}
+          <div className="hidden min-w-0 items-center gap-2 md:flex">
             {authStatus === 'booting' ? (
               <Skeleton
                 className="h-9 w-20 bg-white/15"
@@ -547,12 +548,17 @@ export const MenuLateral = React.memo(function MenuLateral({
               </>
             )}
           </div>
-          <div className="flex flex-1 items-center justify-center">
+          <div className="hidden flex-1 items-center justify-center md:flex">
             <img src={logo} alt="Logo Interno Rotas" className="h-6" width="138" height="24" />
           </div>
 
+          {/* Mobile: titulo da gaveta */}
+          <p className="flex-1 text-sm font-semibold text-white md:hidden">Linhas e paradas</p>
+
           <div className="flex shrink-0 items-center gap-1">
-            <ThemeToggle />
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
             <Button
               data-slot="close"
               onClick={() => {

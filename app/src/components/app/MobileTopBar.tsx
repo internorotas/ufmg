@@ -18,16 +18,16 @@ export function MobileTopBar({ authStatus, isAuthenticated, onAuthAction }: Mobi
   return (
     <header
       data-slot="mobile-top-bar"
-      className="pointer-events-none fixed inset-x-0 top-0 z-1001 flex justify-center pt-[env(safe-area-inset-top)] md:hidden"
+      className="shrink-0 bg-brand-primary pt-[env(safe-area-inset-top)] shadow-sm md:hidden"
     >
-      <div className="pointer-events-auto mx-3 mt-3 flex w-full max-w-sm items-center gap-2 rounded-2xl bg-brand-primary px-3 py-2 shadow-lg backdrop-blur">
-        <div className="flex-1">
+      <div className="flex w-full items-center gap-2 px-3 py-2">
+        <div className="flex flex-1 items-center">
           <img
             src={logo}
             alt="Interno Rotas"
-            className="h-5 w-auto"
-            width="115"
-            height="20"
+            className="h-6 w-auto"
+            width="138"
+            height="24"
             loading="eager"
           />
         </div>
