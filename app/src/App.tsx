@@ -356,8 +356,16 @@ function AppContent() {
     );
   }
 
+  const handleAuthAction = () => {
+    if (isAuthenticated) {
+      setIsProfileSheetOpen(true);
+      return;
+    }
+    navigate('/login');
+  };
+
   return (
-    <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] md:flex-row">
+    <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif]">
       <OnboardingModal onOpenLegalModal={handleOpenLegalModal} />
       <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
       <a
@@ -369,79 +377,68 @@ function AppContent() {
       <MobileTopBar
         authStatus={authStatus}
         isAuthenticated={isAuthenticated}
-        onAuthAction={() => {
-          if (isAuthenticated) {
-            setIsProfileSheetOpen(true);
-            return;
-          }
-          navigate('/login');
-        }}
+        onAuthAction={handleAuthAction}
       />
-      <MenuLateral
-        linhasData={linhasData}
-        todasParadas={todasParadas}
-        onLinhaSelect={handleLinhaSelect}
-        onParadaClick={handleParadaClick}
-        onOpenLegalModal={handleOpenLegalModal}
-        linhaSelecionada={linhaSelecionada}
-        isOffline={isOffline || isOfflineDataFallback}
-        authStatus={authStatus}
-        isAuthenticated={isAuthenticated}
-        userScore={null}
-        onPlannerRouteSelected={handlePlannerRouteSelected}
-        onRegisterMenuOpen={handleRegisterMenuOpen}
-        onAuthAction={() => {
-          if (isAuthenticated) {
-            setIsProfileSheetOpen(true);
-            return;
-          }
-
-          navigate('/login');
-        }}
-      />
-      <DataSourceBanner isVisible={isOfflineDataFallback} source={dataSource} />
-      <main
-        id="main-content"
-        tabIndex={-1}
-        aria-label="Mapa das rotas"
-        className="h-full w-full grow"
-      >
-        <ErrorBoundary
-          fallback={
-            <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-background-secondary p-8 text-center">
-              <p className="text-lg font-semibold text-text-primary">
-                Não foi possível carregar o mapa
-              </p>
-              <p className="text-sm text-text-secondary">
-                Recarregue a página para tentar novamente.
-              </p>
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-text-inverse"
-              >
-                Recarregar
-              </button>
-            </div>
-          }
+      <div className="flex min-h-0 flex-1 overflow-hidden md:flex-row">
+        <MenuLateral
+          linhasData={linhasData}
+          todasParadas={todasParadas}
+          onLinhaSelect={handleLinhaSelect}
+          onParadaClick={handleParadaClick}
+          onOpenLegalModal={handleOpenLegalModal}
+          linhaSelecionada={linhaSelecionada}
+          isOffline={isOffline || isOfflineDataFallback}
+          authStatus={authStatus}
+          isAuthenticated={isAuthenticated}
+          userScore={null}
+          onPlannerRouteSelected={handlePlannerRouteSelected}
+          onRegisterMenuOpen={handleRegisterMenuOpen}
+          onAuthAction={handleAuthAction}
+        />
+        <DataSourceBanner isVisible={isOfflineDataFallback} source={dataSource} />
+        <main
+          id="main-content"
+          tabIndex={-1}
+          aria-label="Mapa das rotas"
+          className="relative h-full w-full grow"
         >
-          <Suspense fallback={<LoadingMap />}>
-            <Mapa
-              ref={mapaRef}
-              todasParadas={todasParadas}
-              linhaSelecionada={linhaSelecionada}
-              paradaSelecionada={paradaSelecionada}
-              localizacaoUsuario={localizacao}
-              headingUsuario={heading}
-              permissaoLocalizacao={permissaoConcedida}
-              carregandoLocalizacao={carregandoLocalizacao}
-              onPedirLocalizacao={handlePedirLocalizacao}
-              rastreioColaborativo={rastreioColaborativo}
-              onAlternarRastreioColaborativo={handleAlternarRastreioColaborativo}
-            />
-          </Suspense>
-        </ErrorBoundary>
-      </main>
+          <ErrorBoundary
+            fallback={
+              <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-background-secondary p-8 text-center">
+                <p className="text-lg font-semibold text-text-primary">
+                  Não foi possível carregar o mapa
+                </p>
+                <p className="text-sm text-text-secondary">
+                  Recarregue a página para tentar novamente.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="rounded-lg bg-brand-primary px-4 py-2 text-sm font-semibold text-text-inverse"
+                >
+                  Recarregar
+                </button>
+              </div>
+            }
+          >
+            <Suspense fallback={<LoadingMap />}>
+              <Mapa
+                ref={mapaRef}
+                todasParadas={todasParadas}
+                linhaSelecionada={linhaSelecionada}
+                paradaSelecionada={paradaSelecionada}
+                localizacaoUsuario={localizacao}
+                headingUsuario={heading}
+                permissaoLocalizacao={permissaoConcedida}
+                carregandoLocalizacao={carregandoLocalizacao}
+                onPedirLocalizacao={handlePedirLocalizacao}
+                rastreioColaborativo={rastreioColaborativo}
+                onAlternarRastreioColaborativo={handleAlternarRastreioColaborativo}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        </main>
+      </div>
 
       <ModalManager
         erroLocalizacao={erroLocalizacao}
