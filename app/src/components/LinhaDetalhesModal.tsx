@@ -267,12 +267,12 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
                 {textoChegada}
               </span>
               {previsao?.onibusAnterior && (
-                <span className="text-[10px] text-text-tertiary">
+                <span className="text-[11px] text-text-secondary">
                   {t('itinerary.lastPassed', { minutes: previsao.onibusAnterior.minutosQuePassou })}
                 </span>
               )}
               {textoHistorico ? (
-                <span className="text-[10px] text-text-tertiary">{textoHistorico}</span>
+                <span className="text-[11px] text-text-secondary">{textoHistorico}</span>
               ) : null}
             </div>
           )}
