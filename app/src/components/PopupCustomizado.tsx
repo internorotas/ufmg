@@ -21,7 +21,7 @@ import { DisclaimerEstimativa } from './DisclaimerEstimativa';
 import { PrevisaoBadge } from './PrevisaoBadge';
 
 export const popupContainerVariants = tv({
-  base: 'flex w-[min(20rem,84vw)] flex-col gap-3 text-text-primary',
+  base: 'flex w-[min(17rem,76vw)] flex-col gap-3 text-text-primary',
 });
 
 export const popupHeaderVariants = tv({
@@ -124,7 +124,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
   const linhasLabelId = `popup-parada-${parada.idParada}-linhas`;
 
   return (
-    <Popup className={cn('popup-customizado', className)} minWidth={240} {...props}>
+    <Popup className={cn('popup-customizado', className)} minWidth={200} {...props}>
       <section
         data-slot="container"
         aria-labelledby={headingId}
@@ -170,7 +170,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
               </p>
             </div>
 
-            <ul className="space-y-1.5" aria-label="Linhas com previsão de chegada">
+            <ul className="max-h-44 space-y-1.5 overflow-y-auto" aria-label="Linhas com previsão de chegada">
               {linhasResolvidas.map(
                 ({ nomeLinha, linha, minutosFaltantes, horarioChegada, minutosUltimoPassou }) => {
                   const nomeExibicao = getNomeExibicao(linha, nomeLinha);
