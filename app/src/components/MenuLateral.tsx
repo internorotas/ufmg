@@ -480,7 +480,7 @@ export const MenuLateral = React.memo(function MenuLateral({
         </div>
       </div>
 
-      <div className="fixed bottom-6 left-1/2 z-1001 -translate-x-1/2 md:hidden">
+      <div className="fixed bottom-6 left-1/2 z-1001 -translate-x-1/2 md:hidden [margin-bottom:env(safe-area-inset-bottom)]">
         <Button
           ref={mobileTriggerRef}
           data-slot="mobile-trigger"
