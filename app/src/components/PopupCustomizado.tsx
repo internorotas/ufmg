@@ -170,7 +170,10 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
               </p>
             </div>
 
-            <ul className="max-h-44 space-y-1.5 overflow-y-auto" aria-label="Linhas com previsão de chegada">
+            <ul
+              className="max-h-44 space-y-1.5 overflow-y-auto"
+              aria-label="Linhas com previsão de chegada"
+            >
               {linhasResolvidas.map(
                 ({ nomeLinha, linha, minutosFaltantes, horarioChegada, minutosUltimoPassou }) => {
                   const nomeExibicao = getNomeExibicao(linha, nomeLinha);
