@@ -8,7 +8,6 @@ import type { ComponentProps } from 'react';
 import { Link } from 'react-router-dom';
 
 import { tv, type VariantProps } from 'tailwind-variants';
-import { tenantConfig } from '@/tenants/tenantConfig';
 
 import { useAnalytics } from '../hooks/useAnalytics';
 import { cn } from '../lib/utils';
@@ -106,13 +105,16 @@ export function MenuFooter({ className, onOpenLegalModal, ...props }: MenuFooter
 
   return (
     <div data-slot="footer" className={cn(footerContainerVariants(), className)} {...props}>
-      <div
-        className={cn(
-          'grid grid-cols-2 gap-1.5',
-          hasLegalModals ? 'md:grid-cols-4' : 'md:grid-cols-2',
-        )}
-      >
-        {/* Botão Reportar Problema */}
+      <div className="grid grid-cols-2 gap-1.5">
+        <Link
+          to="/mais"
+          onClick={() => handleLinkClick('Mais opcoes', 'click_internal_link')}
+          aria-label="Abrir hub de navegação com perfil, ranking, sobre e configurações"
+          className={footerButtonVariants({ intent: 'primary' })}
+        >
+          Mais opções
+        </Link>
+
         <a
           href="https://forms.gle/5e9MHq9pp1p8T5Px5"
           target="_blank"
@@ -123,16 +125,6 @@ export function MenuFooter({ className, onOpenLegalModal, ...props }: MenuFooter
         >
           Contato
         </a>
-
-        {/* Página dedicada de transparência */}
-        <Link
-          to="/sobre"
-          onClick={() => handleLinkClick('Sobre', 'click_internal_link')}
-          aria-label="Sobre o projeto no app"
-          className={footerButtonVariants({ intent: 'primary' })}
-        >
-          Sobre
-        </Link>
 
         {hasLegalModals ? (
           <button
@@ -154,19 +146,6 @@ export function MenuFooter({ className, onOpenLegalModal, ...props }: MenuFooter
           >
             Termos
           </button>
-        ) : null}
-
-        {tenantConfig.publicRepositoryUrl ? (
-          <a
-            href={tenantConfig.publicRepositoryUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => handleLinkClick('Repositório', 'click_outbound_link')}
-            aria-label="Abrir repositório público do projeto em nova aba"
-            className={footerButtonVariants({ intent: 'ghost' })}
-          >
-            Código
-          </a>
         ) : null}
       </div>
 
