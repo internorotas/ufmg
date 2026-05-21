@@ -74,75 +74,75 @@ export function LoginPage() {
 
   return (
     <>
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-background-secondary px-4 pt-12 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12">
-      <div className="w-full max-w-sm">
-        {/* Card */}
-        <div className="rounded-2xl border border-card-border bg-card px-8 py-8 shadow-sm">
-          {/* Brand header */}
-          <div className="mb-8 flex flex-col items-center gap-3 text-center">
-            <div
-              className="flex size-14 items-center justify-center rounded-2xl shadow-sm"
-              style={{ backgroundColor: tenantConfig.brandColor }}
+      <main className="flex min-h-dvh flex-col items-center justify-center bg-background-secondary px-4 pt-12 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12">
+        <div className="w-full max-w-sm">
+          {/* Card */}
+          <div className="rounded-2xl border border-card-border bg-card px-8 py-8 shadow-sm">
+            {/* Brand header */}
+            <div className="mb-8 flex flex-col items-center gap-3 text-center">
+              <div
+                className="flex size-14 items-center justify-center rounded-2xl shadow-sm"
+                style={{ backgroundColor: tenantConfig.brandColor }}
+              >
+                <Bus size={26} className="text-white" aria-hidden="true" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-text-primary">{tenantConfig.shortName}</h1>
+                <p className="mt-1 text-sm text-text-secondary">{tenantConfig.campusDisplayName}</p>
+              </div>
+            </div>
+
+            {/* Mensagem de erro */}
+            {errorMsg ? (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="mb-4 rounded-lg border border-warning-border bg-warning-bg px-3 py-2.5 text-xs leading-relaxed text-warning-text"
+              >
+                {errorMsg}
+              </div>
+            ) : null}
+
+            {/* Botão Google */}
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              fullWidth
+              loading={isLoading}
+              leftIcon={isLoading ? undefined : <GoogleIcon />}
+              onClick={() => void handleGoogleLogin()}
+              aria-label="Entrar com Google"
             >
-              <Bus size={26} className="text-white" aria-hidden="true" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-text-primary">{tenantConfig.shortName}</h1>
-              <p className="mt-1 text-sm text-text-secondary">{tenantConfig.campusDisplayName}</p>
-            </div>
+              {isLoading ? 'Redirecionando…' : 'Entrar com Google'}
+            </Button>
+
+            {/* Pular login */}
+            <p className="mt-4 text-center text-xs text-text-tertiary">
+              <Link
+                to="/"
+                className="underline underline-offset-2 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 rounded-sm"
+              >
+                Continuar sem login
+              </Link>
+            </p>
           </div>
 
-          {/* Mensagem de erro */}
-          {errorMsg ? (
-            <div
-              role="alert"
-              aria-live="assertive"
-              className="mb-4 rounded-lg border border-warning-border bg-warning-bg px-3 py-2.5 text-xs leading-relaxed text-warning-text"
-            >
-              {errorMsg}
-            </div>
-          ) : null}
-
-          {/* Botão Google */}
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            fullWidth
-            loading={isLoading}
-            leftIcon={isLoading ? undefined : <GoogleIcon />}
-            onClick={() => void handleGoogleLogin()}
-            aria-label="Entrar com Google"
-          >
-            {isLoading ? 'Redirecionando…' : 'Entrar com Google'}
-          </Button>
-
-          {/* Pular login */}
-          <p className="mt-4 text-center text-xs text-text-tertiary">
+          {/* Nota de privacidade */}
+          <p className="mt-5 text-center text-[11px] leading-relaxed text-text-tertiary">
+            Ao entrar, você concorda com nossa{' '}
             <Link
-              to="/"
-              className="underline underline-offset-2 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 rounded-sm"
+              to="/privacidade"
+              className="underline underline-offset-2 hover:text-text-secondary"
             >
-              Continuar sem login
+              política de privacidade
             </Link>
+            .<br />
+            Sem publicidade. Sem venda de dados.
           </p>
         </div>
-
-        {/* Nota de privacidade */}
-        <p className="mt-5 text-center text-[11px] leading-relaxed text-text-tertiary">
-          Ao entrar, você concorda com nossa{' '}
-          <Link
-            to="/privacidade"
-            className="underline underline-offset-2 hover:text-text-secondary"
-          >
-            política de privacidade
-          </Link>
-          .<br />
-          Sem publicidade. Sem venda de dados.
-        </p>
-      </div>
-    </main>
-    <BottomNav />
+      </main>
+      <BottomNav />
     </>
   );
 }
