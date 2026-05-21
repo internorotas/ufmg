@@ -31,11 +31,14 @@ const ITEMS: BottomNavItem[] = [
   { to: '/mais', icon: LayoutGrid, label: 'Mais', matchPrefix: '/mais' },
 ];
 
-function isItemActive(currentPath: string, item: BottomNavItem): boolean {
+function isItemActive(currentPath: string, item: BottomNavItem, resolvedTo: string): boolean {
   if (item.matchPrefix) {
-    return currentPath === item.matchPrefix || currentPath.startsWith(`${item.matchPrefix}/`);
+    if (currentPath === item.matchPrefix || currentPath.startsWith(`${item.matchPrefix}/`)) {
+      return true;
+    }
   }
-  return currentPath === item.to;
+  const targets = [item.to, resolvedTo].filter(Boolean);
+  return targets.some((t) => currentPath === t || currentPath.startsWith(`${t}/`));
 }
 
 export function BottomNav() {
@@ -54,8 +57,8 @@ export function BottomNav() {
       <ul className="mx-auto flex w-full max-w-5xl items-stretch justify-around">
         {ITEMS.map((item) => {
           const Icon = item.icon;
-          const active = isItemActive(location.pathname, item);
           const resolvedTo = !isAuthenticated && item.anonymousTo ? item.anonymousTo : item.to;
+          const active = isItemActive(location.pathname, item, resolvedTo);
           return (
             <li key={item.to} className="flex-1">
               <Link
