@@ -44,7 +44,7 @@ export function AppShell({
 
       <NavRail />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <header className="sticky top-0 z-30 border-b border-card-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
           <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-4 py-3 sm:px-6">
             <Link
@@ -69,7 +69,7 @@ export function AppShell({
           id="shell-main"
           tabIndex={-1}
           className={cn(
-            'flex-1 px-4 py-5 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 md:pb-5',
+            'min-h-0 flex-1 overflow-y-auto px-4 py-5 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 md:pb-5',
             contentClassName,
           )}
         >
