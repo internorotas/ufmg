@@ -62,11 +62,18 @@ export function BottomNav() {
                 to={resolvedTo}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex min-h-14 flex-col items-center justify-center gap-1 px-2 py-2 text-xs font-medium',
+                  'relative flex min-h-14 flex-col items-center justify-center gap-1 px-2 py-2 text-xs font-medium',
                   'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
                   active ? 'text-brand-primary' : 'text-text-secondary hover:text-text-primary',
                 )}
               >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'pointer-events-none absolute inset-x-4 top-0 h-0.5 rounded-b-full bg-brand-primary transition-opacity',
+                    active ? 'opacity-100' : 'opacity-0',
+                  )}
+                />
                 <Icon size={22} aria-hidden="true" />
                 <span>{item.label}</span>
               </Link>
