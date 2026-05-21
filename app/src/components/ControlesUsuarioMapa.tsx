@@ -162,8 +162,8 @@ export function ControlesUsuarioMapa({
         />
       )}
 
-      {/* FABs - Floating Action Buttons */}
-      <div className="fixed bottom-6 right-4 z-1000 flex flex-col gap-2 md:bottom-6">
+      {/* FABs - Floating Action Buttons (above mobile BottomNav) */}
+      <div className="fixed bottom-24 right-4 z-1000 flex flex-col gap-2 [margin-bottom:env(safe-area-inset-bottom)] md:bottom-6 md:[margin-bottom:0]">
         {rastreioColaborativo && onAlternarRastreioColaborativo ? (
           <button
             type="button"
