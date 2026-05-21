@@ -55,9 +55,37 @@ export function TermsOfUseContent() {
       <Section id="aceitacao" title="1. Aceitação e capacidade">
         <p>
           Estes Termos constituem contrato eletrônico entre você e o Operador, com força obrigatória
-          a partir do primeiro acesso. Você declara ter capacidade civil plena (maior de 18 anos ou
-          emancipado), nos termos do Código Civil brasileiro.
+          a partir do primeiro acesso. Para utilizar o aplicativo você declara ter pelo menos{' '}
+          <strong>13 (treze) anos completos</strong>, idade mínima compatível com o Estatuto da
+          Criança e do Adolescente (Lei nº 8.069/1990) e com a Lei Geral de Proteção de Dados
+          (LGPD), observadas as condições deste item.
         </p>
+        <ul className="list-inside list-disc space-y-1">
+          <li>
+            <strong>Usuários a partir de 18 anos:</strong> possuem capacidade civil plena e podem
+            aceitar estes Termos de forma autônoma.
+          </li>
+          <li>
+            <strong>Adolescentes entre 13 e 17 anos:</strong> podem utilizar o aplicativo mediante{' '}
+            <strong>
+              autorização e supervisão de pelo menos um dos pais ou responsáveis legais
+            </strong>
+            , que respondem pelos atos do adolescente perante estes Termos e podem solicitar, a
+            qualquer tempo, o encerramento da conta e a exclusão dos dados pelos canais previstos na{' '}
+            <a
+              href="/privacidade"
+              className="font-medium text-brand-primary underline-offset-2 hover:underline"
+            >
+              Política de Privacidade
+            </a>
+            .
+          </li>
+          <li>
+            <strong>Menores de 13 anos:</strong> não podem criar conta ou contribuir com dados (GPS,
+            avaliações, doações). Contas detectadas como pertencentes a crianças serão excluídas e
+            os dados anonimizados conforme art. 14 da LGPD.
+          </li>
+        </ul>
         <p>
           O serviço é fornecido "no estado em que se encontra" e pode ser atualizado, alterado ou
           descontinuado total ou parcialmente, com aviso prévio razoável quando aplicável.
