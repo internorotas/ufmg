@@ -102,10 +102,10 @@ function ItemShell({
   return (
     <div className="flex w-full items-center gap-3">
       <span
-        className={`flex size-10 shrink-0 items-center justify-center rounded-lg border ${
+        className={`flex size-10 shrink-0 items-center justify-center rounded-lg shadow-sm ${
           variant === 'danger'
-            ? 'border-warning-border bg-warning-bg text-warning-text'
-            : 'border-card-border bg-background text-brand-primary'
+            ? 'bg-warning-bg text-warning-text ring-1 ring-warning-border'
+            : 'bg-brand-primary text-white'
         }`}
       >
         <Icon size={18} aria-hidden="true" />
