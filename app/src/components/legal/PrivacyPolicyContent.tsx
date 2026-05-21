@@ -397,10 +397,48 @@ export function PrivacyPolicyContent() {
 
       <Section id="criancas" title="11. Crianças e adolescentes">
         <p>
-          O Interno Rotas é destinado a maiores de 18 anos. Não direcionamos o serviço a crianças ou
-          adolescentes. Quando identificado o tratamento de dados de menor sem o devido
-          consentimento de pelo menos um dos pais ou responsáveis legais, o registro será excluído
-          imediatamente, conforme art. 14 da LGPD.
+          O Interno Rotas adota a idade mínima de <strong>13 (treze) anos completos</strong> para
+          uso do aplicativo, em conformidade com o Estatuto da Criança e do Adolescente (Lei nº
+          8.069/1990) e com o art. 14 da LGPD. O tratamento de dados pessoais de adolescentes (13 a
+          17 anos) ocorre sempre em seu melhor interesse e observa as seguintes regras adicionais:
+        </p>
+        <ul className="list-inside list-disc space-y-1">
+          <li>
+            <strong>Consentimento parental:</strong> o cadastro de adolescente requer autorização de
+            pelo menos um dos pais ou responsáveis legais. O responsável poderá, a qualquer tempo e
+            gratuitamente, solicitar acesso, correção, anonimização ou eliminação dos dados, pelo
+            canal de contato indicado na seção 1.
+          </li>
+          <li>
+            <strong>Minimização reforçada:</strong> aplicamos coleta estritamente necessária. Não
+            tratamos dados sensíveis e não realizamos perfilamento publicitário, comportamental ou
+            psicográfico.
+          </li>
+          <li>
+            <strong>Sem comunicação direcionada a menores:</strong> não enviamos comunicações
+            promocionais ou de monetização (doações, parceiros institucionais) com foco em
+            adolescentes. O slot de Parceiro é institucional e não realiza segmentação por idade.
+          </li>
+          <li>
+            <strong>Crianças (até 12 anos):</strong> o serviço <strong>não</strong> é destinado a
+            esse público. Contas identificadas como pertencentes a crianças sem consentimento
+            específico e em destaque de pelo menos um dos pais ou responsáveis legais (art. 14, §1º
+            da LGPD) serão excluídas e os dados anonimizados em até 5 (cinco) dias úteis após
+            identificação ou denúncia.
+          </li>
+        </ul>
+        <p>
+          Pais e responsáveis podem entrar em contato a qualquer momento pelo{' '}
+          <a
+            href="https://forms.gle/5e9MHq9pp1p8T5Px5"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-brand-primary underline-offset-2 hover:underline"
+          >
+            canal oficial
+          </a>{' '}
+          para esclarecer dúvidas, revogar consentimento ou solicitar exclusão de dados relacionados
+          a menor sob sua responsabilidade.
         </p>
       </Section>
 
