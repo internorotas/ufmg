@@ -19,7 +19,7 @@ vi.mock('@/contexts/NotificacaoContext', () => ({
   }),
 }));
 
-// Mock do RotasContext / useRotasData
+// Mock do RotasContext / useRotasData / useRotasSelection
 vi.mock('@/contexts/RotasContext', () => ({
   useRotasData: () => ({
     rotasService: {
@@ -27,6 +27,13 @@ vi.mock('@/contexts/RotasContext', () => ({
       getTodasParadas: () => [],
     },
     todasParadas: [],
+  }),
+  useRotasSelection: () => ({
+    selecionarLinha: vi.fn(),
+    selecionarParada: vi.fn(),
+    limparSelecao: vi.fn(),
+    linhaSelecionada: null,
+    paradaSelecionada: null,
   }),
 }));
 
