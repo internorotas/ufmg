@@ -1,8 +1,10 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
+import { BottomNav } from './components/app/BottomNav';
 import { DataSourceBanner } from './components/app/DataSourceBanner';
 import { DataStatusScreen } from './components/app/DataStatusScreen';
+import { MobileTopBar } from './components/app/MobileTopBar';
 import { ModalManager } from './components/app/ModalManager';
 import { OfflineToast } from './components/app/OfflineToast';
 import { LgpdConsentDialog } from './components/auth/LgpdConsentDialog';
@@ -364,6 +366,17 @@ function AppContent() {
       >
         Pular para o mapa
       </a>
+      <MobileTopBar
+        authStatus={authStatus}
+        isAuthenticated={isAuthenticated}
+        onAuthAction={() => {
+          if (isAuthenticated) {
+            setIsProfileSheetOpen(true);
+            return;
+          }
+          navigate('/login');
+        }}
+      />
       <MenuLateral
         linhasData={linhasData}
         todasParadas={todasParadas}
@@ -484,13 +497,25 @@ function AppContent() {
 
       {feedbackMessage ? (
         <div
-          role="status"
+          role="alertdialog"
           aria-live="polite"
-          className="pointer-events-none absolute bottom-20 left-1/2 z-[1400] -translate-x-1/2 rounded-lg bg-warning-bg px-3 py-2 text-xs text-warning-text shadow-md"
+          aria-label="Aviso de login necessário"
+          className="pointer-events-auto fixed inset-x-4 bottom-24 z-[1400] mx-auto flex max-w-md items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg md:bottom-20"
         >
-          {feedbackMessage}
+          <span className="flex-1">{feedbackMessage}</span>
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-md bg-warning-text px-3 text-xs font-semibold text-warning-bg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning-text focus-visible:ring-offset-2 focus-visible:ring-offset-warning-bg"
+          >
+            Entrar
+          </button>
         </div>
       ) : null}
+
+      <div className="md:hidden">
+        <BottomNav />
+      </div>
     </div>
   );
 }

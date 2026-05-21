@@ -120,7 +120,7 @@ function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) 
     <Tabs
       value={activeValue}
       onValueChange={handleValueChange}
-      className="border-b border-card-border bg-background px-4 py-3 md:border-none"
+      className="border-b border-card-border bg-background px-3 py-2 md:border-none md:px-4 md:py-3"
     >
       <TabsList variant="pills" className="gap-1.5 bg-transparent p-0">
         {categories.map((categoria) => (
@@ -457,30 +457,7 @@ export const MenuLateral = React.memo(function MenuLateral({
 
   return (
     <>
-      <div
-        className="fixed left-1/2 top-4 z-1001 -translate-x-1/2 md:hidden"
-        aria-hidden={isMenuVisible}
-      >
-        <div
-          className={`transition-all duration-300 ${
-            isMenuVisible
-              ? 'pointer-events-none translate-x-20 opacity-0'
-              : 'translate-x-0 opacity-100'
-          }`}
-        >
-          <div className="rounded-xl bg-brand-primary px-4 py-2 shadow-lg backdrop-blur-sm">
-            <img
-              src={logo}
-              alt="Logo Interno Rotas"
-              className="h-5 w-auto"
-              width="115"
-              height="20"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="fixed bottom-6 left-1/2 z-1001 -translate-x-1/2 md:hidden [margin-bottom:env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-24 left-1/2 z-1001 -translate-x-1/2 md:hidden [margin-bottom:env(safe-area-inset-bottom)]">
         <Button
           ref={mobileTriggerRef}
           data-slot="mobile-trigger"
@@ -538,39 +515,43 @@ export const MenuLateral = React.memo(function MenuLateral({
       >
         <header
           data-slot="header"
-          className="flex shrink-0 items-center justify-between bg-brand-primary p-2 shadow-sm"
+          className="flex shrink-0 items-center justify-between gap-2 bg-brand-primary px-3 py-2 shadow-sm"
         >
-          <div className="min-w-[132px]">
+          <div className="flex min-w-0 items-center gap-2">
             {authStatus === 'booting' ? (
               <Skeleton
-                className="h-8 w-20 bg-white/15"
+                className="h-9 w-20 bg-white/15"
                 rounded="full"
                 aria-label="Carregando sessão"
               />
             ) : (
-              <div className="flex items-center gap-2">
+              <>
                 <Button
                   type="button"
                   onClick={onAuthAction}
                   variant="ghost"
                   size="sm"
-                  className="min-h-11 rounded-full bg-white/15 px-3 text-xs font-semibold text-white hover:bg-white/25"
+                  className="min-h-9 shrink-0 rounded-full bg-white px-3 text-xs font-semibold text-brand-primary shadow-sm hover:bg-white/90"
                 >
                   {isAuthenticated ? 'Perfil' : 'Entrar'}
                 </Button>
                 {isAuthenticated && typeof userScore === 'number' ? (
-                  <Badge variant="ouro" size="sm" className="min-h-11 bg-white/95 text-brand-dark">
+                  <Badge
+                    variant="ouro"
+                    size="sm"
+                    className="shrink-0 bg-white/95 text-brand-primary"
+                  >
                     {userScore} pts
                   </Badge>
                 ) : null}
-              </div>
+              </>
             )}
           </div>
           <div className="flex flex-1 items-center justify-center">
             <img src={logo} alt="Logo Interno Rotas" className="h-6" width="138" height="24" />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1">
             <ThemeToggle />
             <Button
               data-slot="close"
@@ -593,7 +574,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           </div>
         </header>
 
-        <div className="shrink-0 border-b border-card-border bg-background-secondary p-2 lg:p-4">
+        <div className="shrink-0 border-b border-card-border bg-background-secondary p-2 lg:p-3">
           <SearchInput
             ref={searchInputRef}
             value={searchTerm}
@@ -605,7 +586,7 @@ export const MenuLateral = React.memo(function MenuLateral({
         </div>
 
         {/* Ação de planejamento de rota */}
-        <div className="shrink-0 border-b border-card-border bg-background-secondary px-2 pb-2 lg:px-4 lg:pb-3">
+        <div className="shrink-0 border-b border-card-border bg-background-secondary px-2 pb-2 lg:px-3 lg:pb-2.5">
           <button
             type="button"
             data-slot="planner-toggle"
