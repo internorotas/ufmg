@@ -5,9 +5,10 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { usePlannerStore } from '@/features/planner/store/plannerStore';
 
-// Mock mínimo do react-leaflet Popup para evitar dependência do Leaflet em JSDOM
+// Mock mínimo do react-leaflet Popup e useMap para evitar dependência do Leaflet em JSDOM
 vi.mock('react-leaflet', () => ({
   Popup: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  useMap: () => ({ closePopup: vi.fn() }),
 }));
 
 // Mock do NotificacaoContext

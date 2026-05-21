@@ -98,7 +98,7 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
           </span>
         </span>
 
-        {onibusAnterior ? (
+        {onibusAnterior && !compacto ? (
           <span className="text-[11px] text-text-secondary">
             Último passou há {onibusAnterior.minutosQuePassou} min
           </span>
@@ -133,12 +133,12 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
         </span>
       </span>
 
-      {onibusAnterior ? (
+      {onibusAnterior && !compacto ? (
         <span className="text-[11px] text-text-secondary">
           Último passou há {onibusAnterior.minutosQuePassou} min
         </span>
       ) : null}
-      {atrasoHistorico ? (
+      {atrasoHistorico && !compacto ? (
         <span className="text-[11px] text-text-secondary">
           Histórico desta hora: {atrasoHistorico}
         </span>
