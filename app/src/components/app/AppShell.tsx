@@ -64,7 +64,10 @@ export function AppShell({
       <main
         id="shell-main"
         tabIndex={-1}
-        className={cn('flex-1 overflow-y-auto px-4 py-5 sm:px-6', contentClassName)}
+        className={cn(
+          'flex-1 px-4 py-5 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6',
+          contentClassName,
+        )}
       >
         <div className="mx-auto w-full max-w-5xl">{children}</div>
       </main>

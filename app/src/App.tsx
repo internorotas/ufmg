@@ -365,7 +365,7 @@ function AppContent() {
   };
 
   return (
-    <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif]">
+    <div className="relative flex h-screen min-h-dvh w-full flex-col overflow-hidden bg-background font-['Poppins',sans-serif] pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
       <OnboardingModal onOpenLegalModal={handleOpenLegalModal} />
       <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
       <a
