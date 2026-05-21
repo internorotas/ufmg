@@ -1,6 +1,7 @@
 import { ArrowUpRight, Bus, HandCoins, ShieldCheck, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { AppShell } from '@/components/app/AppShell';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -50,8 +51,8 @@ export function AboutPage() {
   };
 
   return (
-    <main className="min-h-dvh bg-background-secondary px-4 py-6 text-text-primary sm:px-6">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+    <AppShell title="Sobre" description="Transparência e funcionamento do projeto">
+      <div className="flex flex-col gap-5">
         <header className="rounded-xl border border-card-border bg-card px-5 py-5 shadow-sm">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="primary">Sobre o projeto</Badge>
@@ -59,7 +60,7 @@ export function AboutPage() {
             <Badge variant="info">sem tracking de terceiros</Badge>
           </div>
 
-          <h1 className="mt-4 text-2xl font-bold sm:text-3xl">Transparência do Interno Rotas</h1>
+          <h2 className="mt-4 text-2xl font-bold sm:text-3xl">Transparência do Interno Rotas</h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-text-secondary">
             O Interno Rotas existe para facilitar a consulta das linhas universitárias de{' '}
             {tenantConfig.institutionName} com foco em utilidade pública, GPS colaborativo e clareza
@@ -67,12 +68,6 @@ export function AboutPage() {
           </p>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            <Link
-              to="/"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-card-border px-4 text-sm font-semibold text-text-primary hover:bg-card-hover"
-            >
-              Voltar ao mapa
-            </Link>
             <Link
               to="/ranking"
               className="inline-flex min-h-11 items-center justify-center rounded-lg border border-card-border px-4 text-sm font-semibold text-text-primary hover:bg-card-hover"
@@ -205,6 +200,6 @@ export function AboutPage() {
           </Card>
         </section>
       </div>
-    </main>
+    </AppShell>
   );
 }

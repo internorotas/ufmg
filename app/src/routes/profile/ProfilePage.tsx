@@ -1,6 +1,7 @@
 import { AlertTriangle, Bell, Eye, EyeOff, MapPin, Medal, Trophy, UserCircle2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { AppShell } from '@/components/app/AppShell';
 import { DataStatusScreen } from '@/components/app/DataStatusScreen';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -270,8 +271,8 @@ export function ProfilePage() {
   }
 
   return (
-    <main className="min-h-dvh bg-background-secondary px-4 py-5 text-text-primary sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+    <AppShell title="Perfil" description={profile.displayName}>
+      <div className="flex flex-col gap-5">
         <header className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-card-border bg-card px-4 py-4 shadow-sm sm:px-5">
           <div className="flex min-w-0 items-center gap-3">
             {profile.avatarUrl ? (
@@ -286,7 +287,7 @@ export function ProfilePage() {
               </div>
             )}
             <div className="min-w-0">
-              <h1 className="truncate text-xl font-bold sm:text-2xl">{profile.displayName}</h1>
+              <h2 className="truncate text-xl font-bold sm:text-2xl">{profile.displayName}</h2>
               <p className="truncate text-sm text-text-secondary">
                 {profile.nickname ? `@${profile.nickname}` : 'Sem nickname configurado'}
               </p>
@@ -295,15 +296,6 @@ export function ProfilePage() {
               </p>
             </div>
           </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="min-h-11"
-            onClick={() => navigate('/')}
-          >
-            Voltar ao mapa
-          </Button>
         </header>
 
         {feedback ? (
@@ -537,6 +529,6 @@ export function ProfilePage() {
         onConfirm={handleDeleteAccount}
         isPending={isDeletingAccount}
       />
-    </main>
+    </AppShell>
   );
 }

@@ -1,6 +1,7 @@
 import { Medal, Shield, Trophy } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { AppShell } from '@/components/app/AppShell';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -82,32 +83,29 @@ export function RankingPage() {
   }, [isAuthenticated, privateRanking, publicRanking]);
 
   return (
-    <main className="min-h-dvh bg-background-secondary px-4 py-6 text-text-primary sm:px-6">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+    <AppShell
+      title="Ranking colaborativo"
+      description="Top 10 público com visão completa para autenticados"
+      actions={
+        !isAuthenticated ? (
+          <Button type="button" className="min-h-11" onClick={() => navigate('/login')}>
+            Entrar para ver completo
+          </Button>
+        ) : undefined
+      }
+    >
+      <div className="flex flex-col gap-5">
         <header className="rounded-xl border border-card-border bg-card px-5 py-5 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Trophy size={20} aria-hidden="true" />
-                <h1 className="text-2xl font-bold">Ranking colaborativo</h1>
+                <h2 className="text-xl font-bold sm:text-2xl">Ranking colaborativo</h2>
               </div>
               <p className="max-w-2xl text-sm text-text-secondary">
                 Top 10 público para leitura livre e visão completa para usuários autenticados.
                 Pontos continuam apenas como incentivo, sem desbloqueio funcional do app.
               </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link
-                to="/"
-                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-card-border px-4 text-sm font-semibold text-text-primary hover:bg-card-hover"
-              >
-                Voltar ao mapa
-              </Link>
-              {!isAuthenticated ? (
-                <Button type="button" className="min-h-11" onClick={() => navigate('/login')}>
-                  Entrar para ver completo
-                </Button>
-              ) : null}
             </div>
           </div>
         </header>
@@ -237,6 +235,6 @@ export function RankingPage() {
           </Card>
         </section>
       </div>
-    </main>
+    </AppShell>
   );
 }
