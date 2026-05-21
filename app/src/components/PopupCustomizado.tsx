@@ -6,7 +6,7 @@
 import { Bell, BellRing, Bus, MapPin, Navigation } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { useMemo } from 'react';
-import { Popup } from 'react-leaflet';
+import { Popup, useMap } from 'react-leaflet';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { calcularPrevisaoChegada } from '@/features/eta/domain/calculateEta';
 import { usePlannerStore } from '@/features/planner/store/plannerStore';
@@ -112,6 +112,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
           linha,
           minutosFaltantes: previsao?.proximoOnibus?.minutosFaltantes ?? null,
           horarioChegada: previsao?.proximoOnibus?.horarioChegada ?? '',
+          minutosUltimoPassou: previsao?.onibusAnterior?.minutosQuePassou ?? null,
         };
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,7 +133,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
         <header data-slot="header" className={popupHeaderVariants()}>
           <span
             aria-hidden="true"
-            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-internoRotas-laranja-ambar/15 text-internoRotas-laranja-ambar"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-accent text-white shadow-sm"
           >
             <MapPin size={20} />
           </span>
@@ -160,7 +161,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
             <div className="mb-2 flex items-center gap-2">
               <span
                 aria-hidden="true"
-                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-primary/15 text-brand-primary"
+                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-primary text-white shadow-sm"
               >
                 <Bus size={14} />
               </span>
@@ -170,92 +171,102 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
             </div>
 
             <ul className="space-y-1.5" aria-label="Linhas com previsão de chegada">
-              {linhasResolvidas.map(({ nomeLinha, linha, minutosFaltantes, horarioChegada }) => {
-                const nomeExibicao = getNomeExibicao(linha, nomeLinha);
-                const isAlarmAtivo =
-                  linha && suportado ? isAlarmado(linha.idRota, parada.idParada) : false;
-                const showBell = Boolean(linha) && suportado && minutosFaltantes !== null;
+              {linhasResolvidas.map(
+                ({ nomeLinha, linha, minutosFaltantes, horarioChegada, minutosUltimoPassou }) => {
+                  const nomeExibicao = getNomeExibicao(linha, nomeLinha);
+                  const isAlarmAtivo =
+                    linha && suportado ? isAlarmado(linha.idRota, parada.idParada) : false;
+                  const showBell = Boolean(linha) && suportado && minutosFaltantes !== null;
 
-                return (
-                  <li
-                    key={nomeLinha}
-                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-card-border/70 bg-background-secondary/60 p-2"
-                  >
-                    <button
-                      type="button"
-                      className={lineButtonVariants()}
-                      title={nomeExibicao}
-                      style={linha ? { borderLeftColor: linha.corHex } : undefined}
-                      disabled={!linha}
-                      aria-label={
-                        linha
-                          ? `Ver linha ${nomeExibicao} no menu`
-                          : `Linha ${nomeExibicao} sem dados detalhados`
-                      }
-                      onClick={() => {
-                        if (!linha) return;
-                        analytics.trackEvent({
-                          category: 'map_interaction',
-                          action: 'select_line_from_popup',
-                          label: `${parada.nome} -> ${linha.nome}`,
-                        });
-                        selecionarLinha(linha);
-                      }}
+                  return (
+                    <li
+                      key={nomeLinha}
+                      className="rounded-lg border border-card-border/70 bg-card p-2"
                     >
-                      <span className="truncate">{nomeExibicao}</span>
-                    </button>
-
-                    <div className="flex shrink-0 items-center gap-1">
-                      {linha ? (
-                        <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
-                      ) : (
-                        <span
-                          className="rounded-full px-2 py-0.5 text-xs font-medium"
-                          style={{
-                            backgroundColor: 'var(--neutral-bg)',
-                            color: 'var(--neutral-text)',
-                          }}
-                        >
-                          Sem previsão
-                        </span>
-                      )}
-
-                      {showBell && linha && minutosFaltantes !== null ? (
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
                         <button
                           type="button"
-                          onClick={() =>
-                            toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)
-                          }
-                          className={cn(
-                            'flex size-11 shrink-0 items-center justify-center rounded-full transition-colors',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95',
-                            isAlarmAtivo
-                              ? 'bg-brand-accent/20 text-brand-accent hover:bg-brand-accent/30'
-                              : 'text-text-secondary hover:bg-card-hover hover:text-text-primary',
-                          )}
+                          className={lineButtonVariants()}
+                          title={nomeExibicao}
+                          style={linha ? { borderLeftColor: linha.corHex } : undefined}
+                          disabled={!linha}
                           aria-label={
-                            isAlarmAtivo
-                              ? `Cancelar alarme de chegada para ${nomeExibicao}`
-                              : `Avisar quando ${nomeExibicao} chegar`
+                            linha
+                              ? `Ver linha ${nomeExibicao} no menu`
+                              : `Linha ${nomeExibicao} sem dados detalhados`
                           }
-                          aria-pressed={isAlarmAtivo}
-                          title={
-                            isAlarmAtivo
-                              ? 'Cancelar alarme de chegada'
-                              : 'Avisar quando o ônibus chegar'
-                          }
+                          onClick={() => {
+                            if (!linha) return;
+                            analytics.trackEvent({
+                              category: 'map_interaction',
+                              action: 'select_line_from_popup',
+                              label: `${parada.nome} -> ${linha.nome}`,
+                            });
+                            selecionarLinha(linha);
+                          }}
                         >
-                          {isAlarmAtivo ? (
-                            <BellRing size={18} aria-hidden="true" />
-                          ) : (
-                            <Bell size={18} aria-hidden="true" />
-                          )}
+                          <span className="truncate">{nomeExibicao}</span>
                         </button>
+
+                        <div className="flex shrink-0 items-center gap-1">
+                          {linha ? (
+                            <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                          ) : (
+                            <span
+                              className="rounded-full px-2 py-0.5 text-xs font-medium"
+                              style={{
+                                backgroundColor: 'var(--neutral-bg)',
+                                color: 'var(--neutral-text)',
+                              }}
+                            >
+                              Sem previsão
+                            </span>
+                          )}
+
+                          {showBell && linha && minutosFaltantes !== null ? (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)
+                              }
+                              className={cn(
+                                'flex size-11 shrink-0 items-center justify-center rounded-full transition-colors',
+                                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95',
+                                isAlarmAtivo
+                                  ? 'bg-brand-accent/20 text-brand-accent hover:bg-brand-accent/30'
+                                  : 'text-text-secondary hover:bg-card-hover hover:text-text-primary',
+                              )}
+                              aria-label={
+                                isAlarmAtivo
+                                  ? `Cancelar alarme de chegada para ${nomeExibicao}`
+                                  : `Avisar quando ${nomeExibicao} chegar`
+                              }
+                              aria-pressed={isAlarmAtivo}
+                              title={
+                                isAlarmAtivo
+                                  ? 'Cancelar alarme de chegada'
+                                  : 'Avisar quando o ônibus chegar'
+                              }
+                            >
+                              {isAlarmAtivo ? (
+                                <BellRing size={18} aria-hidden="true" />
+                              ) : (
+                                <Bell size={18} aria-hidden="true" />
+                              )}
+                            </button>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      {minutosUltimoPassou !== null ? (
+                        <p className="mt-1.5 border-t border-card-border/60 pt-1.5 text-[11px] text-text-secondary">
+                          Último passou há {minutosUltimoPassou} min
+                        </p>
                       ) : null}
-                    </div>
-                  </li>
-                );
-              })}
+                    </li>
+                  );
+                },
+              )}
             </ul>
           </section>
         ) : null}
@@ -274,13 +285,16 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
 
 function PlannerStopActions({ parada }: { parada: Parada }) {
   const { setOrigin, setDestination } = usePlannerStore();
+  const map = useMap();
 
   const handleUseAsOrigin = () => {
     setOrigin({ kind: 'stop', idParada: parada.idParada, nome: parada.nome });
+    map.closePopup();
   };
 
   const handleUseAsDestination = () => {
     setDestination({ kind: 'stop', idParada: parada.idParada, nome: parada.nome });
+    map.closePopup();
   };
 
   return (
