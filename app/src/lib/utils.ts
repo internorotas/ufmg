@@ -276,17 +276,31 @@ export function calcularDistanciaKm(
 export function findScheduleIndex<T>(
   sortedArray: T[],
   target: number,
-  getVal: (item: T) => number = (item) => item as unknown as number,
+  getVal?: (item: T) => number,
 ): number {
   let left = 0;
   let right = sortedArray.length;
 
-  while (left < right) {
-    const mid = Math.floor((left + right) / 2);
-    if (getVal(sortedArray[mid]) > target) {
-      right = mid;
-    } else {
-      left = mid + 1;
+  // Hoist accessor check outside loop to avoid repeated evaluations
+  // and use bitwise right shift (>>> 1) for division as it's faster
+  // and prevents 32-bit array overflows.
+  if (getVal) {
+    while (left < right) {
+      const mid = (left + right) >>> 1;
+      if (getVal(sortedArray[mid]) > target) {
+        right = mid;
+      } else {
+        left = mid + 1;
+      }
+    }
+  } else {
+    while (left < right) {
+      const mid = (left + right) >>> 1;
+      if ((sortedArray[mid] as unknown as number) > target) {
+        right = mid;
+      } else {
+        left = mid + 1;
+      }
     }
   }
 
