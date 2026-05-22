@@ -141,17 +141,51 @@ function writePersistedSession(session: PersistedTrackingSession | null): void {
   );
 }
 
+// Conversao aproximada km->graus para fast-path bounding box:
+// 1 grau lat ~= 111 km; 1 grau lng varia com cos(lat), mas dentro de BH (~-19.9)
+// 1 grau lng ~= 104 km. Usamos 100 km/grau como limite inferior conservador.
+const BOUNDING_BOX_DEG = MAX_ROUTE_DISTANCE_KM / 100;
+
 function isNearLineRoute(snapshot: TrackingSnapshot, selectedLine: Linha | null): boolean {
   const routeCoordinates = selectedLine?.coordenadasTrajeto ?? [];
   if (routeCoordinates.length === 0) {
     return true;
   }
 
-  return routeCoordinates.some(([lat, lng]) => {
-    return (
+  // Pre-filtro O(N) com bounding box rapido antes do haversine completo —
+  // descarta candidatos obviamente distantes sem trig.
+  for (const [lat, lng] of routeCoordinates) {
+    if (
+      Math.abs(snapshot.latitude - lat) <= BOUNDING_BOX_DEG &&
+      Math.abs(snapshot.longitude - lng) <= BOUNDING_BOX_DEG &&
       calcularDistanciaKm(snapshot.latitude, snapshot.longitude, lat, lng) <= MAX_ROUTE_DISTANCE_KM
-    );
-  });
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function isValidSnapshot(snapshot: TrackingSnapshot): boolean {
+  if (!Number.isFinite(snapshot.latitude) || !Number.isFinite(snapshot.longitude)) {
+    return false;
+  }
+  if (!Number.isFinite(snapshot.accuracy) || snapshot.accuracy <= 0) {
+    return false;
+  }
+  if (!Number.isFinite(snapshot.speedKmh) || snapshot.speedKmh < 0) {
+    return false;
+  }
+  if (!Number.isFinite(snapshot.timestamp) || snapshot.timestamp <= 0) {
+    return false;
+  }
+  // Relogio do device fora de [-30s, +30s] vs Date.now: rejeita antes de enfileirar.
+  // Backend tambem checa, mas evitar round-trip 4xx melhora latencia.
+  if (Math.abs(snapshot.timestamp - Date.now()) > 30_000) {
+    return false;
+  }
+  return true;
 }
 
 function isTerminalPoint(snapshot: TrackingSnapshot, selectedLine: Linha | null): boolean {
@@ -280,6 +314,11 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const ingestSnapshot = useCallback(
     async (snapshot: TrackingSnapshot) => {
       if (status !== 'active' || !sessionId) {
+        return;
+      }
+
+      if (!isValidSnapshot(snapshot)) {
+        // Snapshot inutilizavel: descarta antes de enfileirar/network.
         return;
       }
 
