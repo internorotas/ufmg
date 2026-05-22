@@ -8,6 +8,9 @@ export interface GpsPointPayload {
   accuracy: number;
   heading?: number;
   timestampDispositivo: string;
+  // Cliente honesto envia true em simuladores; ataque ativo precisa de atestacao real
+  // (Play Integrity / DeviceCheck — pendente).
+  isMockProvider?: boolean;
 }
 
 export interface GpsBatchPayload {
