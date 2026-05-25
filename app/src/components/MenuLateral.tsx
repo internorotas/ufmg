@@ -19,6 +19,7 @@ import { useRotasSelection } from '../contexts/RotasContext';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useFavoritos } from '../hooks/useFavoritos';
 import { useLinhasFilter } from '../hooks/useLinhasFilter';
+import { useMounted } from '../hooks/useMounted';
 import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 import type { LegalModalType } from '../types/legal.types';
 import { DisclaimerBanner } from './DisclaimerBanner';
@@ -228,6 +229,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   const wasMenuVisibleRef = useRef(false);
   const previousFavoritosRef = useRef<Set<string>>(new Set());
   const [movimentoPorId, setMovimentoPorId] = useState<Record<string, 'up' | 'down'>>({});
+  const isMounted = useMounted();
 
   const [shortcutLabel] = useState(() => {
     if (typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/i.test(navigator.userAgent)) {
@@ -336,24 +338,14 @@ export const MenuLateral = React.memo(function MenuLateral({
   }, []);
 
   useEffect(() => {
-    let active = true;
-
     void fetchActivePartnerSpotlight()
       .then((partner) => {
-        if (active) {
-          setPartnerSpotlight(partner);
-        }
+        if (isMounted()) setPartnerSpotlight(partner);
       })
       .catch(() => {
-        if (active) {
-          setPartnerSpotlight(null);
-        }
+        if (isMounted()) setPartnerSpotlight(null);
       });
-
-    return () => {
-      active = false;
-    };
-  }, []);
+  }, [isMounted]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 767px)');

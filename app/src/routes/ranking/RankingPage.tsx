@@ -16,6 +16,7 @@ import {
   type RankingPeriod,
   type RankingScope,
 } from '@/features/gamification/api/rankingClient';
+import { useMounted } from '@/hooks/useMounted';
 
 const PERIOD_OPTIONS: RankingPeriod[] = ['semanal', 'mensal', 'all_time'];
 const SCOPE_OPTIONS: RankingScope[] = ['geral', 'campus', 'linha:2004A'];
@@ -29,52 +30,40 @@ export function RankingPage() {
   const [publicRanking, setPublicRanking] = useState<PublicRankingResponse | null>(null);
   const [privateRanking, setPrivateRanking] = useState<AuthenticatedRankingResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const isMounted = useMounted();
 
   useEffect(() => {
-    let active = true;
     setError(null);
 
     void getPublicRanking({ period, scope })
       .then((response) => {
-        if (active) {
-          setPublicRanking(response);
-        }
+        if (isMounted()) setPublicRanking(response);
       })
       .catch((currentError) => {
-        if (active) {
+        if (isMounted())
           setError(
             currentError instanceof Error ? currentError.message : 'Falha ao carregar ranking.',
           );
-        }
       });
 
     if (!isAuthenticated) {
       setPrivateRanking(null);
-      return () => {
-        active = false;
-      };
+      return;
     }
 
     void getAuthenticatedRanking({ period, scope })
       .then((response) => {
-        if (active) {
-          setPrivateRanking(response);
-        }
+        if (isMounted()) setPrivateRanking(response);
       })
       .catch((currentError) => {
-        if (active) {
+        if (isMounted())
           setError(
             currentError instanceof Error
               ? currentError.message
               : 'Falha ao carregar ranking autenticado.',
           );
-        }
       });
-
-    return () => {
-      active = false;
-    };
-  }, [isAuthenticated, period, scope]);
+  }, [isAuthenticated, isMounted, period, scope]);
 
   const entries = useMemo(() => {
     if (isAuthenticated && privateRanking) {

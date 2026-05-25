@@ -1,6 +1,8 @@
 import { Database, Download, Mail } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
+import { useMounted } from '@/hooks/useMounted';
 import {
   fetchResearchExportPreview,
   requestResearchExport,
@@ -19,21 +21,16 @@ export function ResearchDashboardPage() {
   const [latestSnapshotWeek, setLatestSnapshotWeek] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [feedback, setFeedback] = useState<ExportFeedback | null>(null);
+  const isMounted = useMounted();
 
   useEffect(() => {
-    let active = true;
-
     void fetchResearchExportPreview({ period })
       .then((preview) => {
-        if (!active) {
-          return;
-        }
+        if (!isMounted()) return;
         setLatestSnapshotWeek(preview.latestSnapshotWeek);
       })
       .catch((error) => {
-        if (!active) {
-          return;
-        }
+        if (!isMounted()) return;
         setFeedback({
           type: 'error',
           message:
@@ -41,15 +38,9 @@ export function ResearchDashboardPage() {
         });
       })
       .finally(() => {
-        if (active) {
-          setIsLoading(false);
-        }
+        if (isMounted()) setIsLoading(false);
       });
-
-    return () => {
-      active = false;
-    };
-  }, [period]);
+  }, [isMounted, period]);
 
   const handleDownload = useCallback(
     async (format: 'GeoJSON' | 'CSV') => {
@@ -97,19 +88,7 @@ export function ResearchDashboardPage() {
           </div>
         </header>
 
-        {feedback ? (
-          <div
-            role="status"
-            aria-live="polite"
-            className={`rounded-xl border px-4 py-3 text-sm ${
-              feedback.type === 'success'
-                ? 'border-success-border bg-success-bg text-success-text'
-                : 'border-warning-border bg-warning-bg text-warning-text'
-            }`}
-          >
-            {feedback.message}
-          </div>
-        ) : null}
+        {feedback ? <FeedbackBanner type={feedback.type} message={feedback.message} /> : null}
 
         <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1.3fr_1fr]">
           <Card>
