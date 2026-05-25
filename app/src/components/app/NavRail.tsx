@@ -9,7 +9,6 @@
 import { LayoutGrid, Map as MapIcon, Trophy, UserCircle2 } from 'lucide-react';
 import type { ComponentType, SVGProps } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import logo from '@/assets/logo-horizontal-transparente.svg';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { cn } from '@/lib/utils';
 
@@ -54,15 +53,7 @@ export function NavRail() {
         'md:backdrop-blur md:supports-[backdrop-filter]:bg-sidebar/80',
       )}
     >
-      <Link
-        to="/"
-        aria-label="Voltar ao mapa"
-        className="mx-3 mt-3 inline-flex items-center justify-center rounded-xl bg-brand-primary px-2 py-2 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
-      >
-        <img src={logo} alt="Interno Rotas" className="h-5 w-auto" width="115" height="20" />
-      </Link>
-
-      <nav aria-label="Páginas principais" className="mt-3 flex flex-1 flex-col gap-1 px-2">
+      <nav aria-label="Páginas principais" className="mt-4 flex flex-1 flex-col gap-1 px-2">
         {ITEMS.map((item) => {
           const Icon = item.icon;
           const active = isItemActive(location.pathname, item);

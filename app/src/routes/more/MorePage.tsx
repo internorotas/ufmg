@@ -139,7 +139,9 @@ function renderItem(item: MoreItem, key: string): ReactNode {
           label={item.label}
           description={item.description}
           badge={item.badge}
-          trailing={<ArrowUpRight size={16} aria-hidden="true" className="shrink-0 text-text-tertiary" />}
+          trailing={
+            <ArrowUpRight size={16} aria-hidden="true" className="shrink-0 text-text-tertiary" />
+          }
         />
       </Link>
     );
@@ -158,7 +160,9 @@ function renderItem(item: MoreItem, key: string): ReactNode {
           icon={item.icon}
           label={item.label}
           description={item.description}
-          trailing={<ExternalLink size={16} aria-hidden="true" className="shrink-0 text-text-tertiary" />}
+          trailing={
+            <ExternalLink size={16} aria-hidden="true" className="shrink-0 text-text-tertiary" />
+          }
         />
       </a>
     );
