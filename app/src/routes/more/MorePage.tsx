@@ -79,7 +79,7 @@ function Section({ title, description, children }: SectionProps) {
         </h2>
         {description ? <p className="mt-1 text-sm text-text-secondary">{description}</p> : null}
       </header>
-      <div className="grid gap-2 overflow-hidden sm:grid-cols-2">{children}</div>
+      <div className="grid grid-cols-1 gap-2 overflow-hidden sm:grid-cols-2">{children}</div>
     </section>
   );
 }
