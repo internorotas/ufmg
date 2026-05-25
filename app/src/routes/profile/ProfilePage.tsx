@@ -24,6 +24,7 @@ import {
   updateProfile,
 } from '@/features/profile/api/profileClient';
 import { DeleteAccountDialog } from '@/features/profile/components/DeleteAccountDialog';
+import { useMounted } from '@/hooks/useMounted';
 import { formatConsent, formatDateTimePtBr } from '@/lib/formatters';
 
 interface ProfileFeedbackState {
@@ -44,13 +45,12 @@ export function ProfilePage() {
   const [profileError, setProfileError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<ProfileFeedbackState | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const isMounted = useMounted();
 
   useEffect(() => {
     if (!isAuthenticated) {
       return;
     }
-
-    let isMounted = true;
 
     const loadProfile = async () => {
       setIsLoadingProfile(true);
@@ -58,33 +58,23 @@ export function ProfilePage() {
 
       try {
         const response = await getProfile();
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted()) return;
 
         setProfile(response);
         updateUser(toAuthenticatedUser(response));
         publishPointEvent(response.gamification.recentPointEvents[0] ?? null);
       } catch (error) {
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted()) return;
 
         const message = error instanceof Error ? error.message : 'Falha ao carregar perfil.';
         setProfileError(message);
       } finally {
-        if (isMounted) {
-          setIsLoadingProfile(false);
-        }
+        if (isMounted()) setIsLoadingProfile(false);
       }
     };
 
     void loadProfile();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isAuthenticated, publishPointEvent, updateUser]);
+  }, [isAuthenticated, isMounted, publishPointEvent, updateUser]);
 
   const handleProfileUpdate = useCallback(
     async (payload: ProfileUpdatePayload) => {

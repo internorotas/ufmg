@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { useLinhasQuery } from '@/features/transit-data/queries/useLinhasQuery';
 import { useParadasQuery } from '@/features/transit-data/queries/useParadasQuery';
+import { useMounted } from '@/hooks/useMounted';
 import {
   type IRotasService,
   loadRotasFallbackData,
@@ -45,6 +46,7 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
   const [dataUpdatedAt, setDataUpdatedAt] = useState('');
 
   const fallbackAttemptedRef = useRef(false);
+  const isMounted = useMounted();
 
   const linhasQuery = useLinhasQuery(true);
   const paradasQuery = useParadasQuery(true);
@@ -81,7 +83,6 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
       return;
     }
 
-    let isMounted = true;
     fallbackAttemptedRef.current = true;
 
     const loadFallback = async () => {
@@ -90,34 +91,23 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
 
       try {
         const loadedData = await loadRotasFallbackData();
-
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted()) return;
 
         setRotasService(loadedData.service);
         setDataSource(loadedData.source);
         setDataVersion(loadedData.dataVersion);
         setDataUpdatedAt(loadedData.updatedAt);
       } catch {
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted()) return;
 
         setDataError('Não foi possível carregar os dados de linhas e paradas.');
       } finally {
-        if (isMounted) {
-          setIsLoadingData(false);
-        }
+        if (isMounted()) setIsLoadingData(false);
       }
     };
 
     void loadFallback();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [hasApiData, hasApiError, isApiLoading]);
+  }, [hasApiData, hasApiError, isApiLoading, isMounted]);
 
   const linhasData = useMemo(() => rotasService.getTodasLinhas(), [rotasService]);
   const todasParadas = useMemo(() => rotasService.getTodasParadas(), [rotasService]);

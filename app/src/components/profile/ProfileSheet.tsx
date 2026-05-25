@@ -14,6 +14,7 @@ import {
   type UserProfile,
   updateProfile,
 } from '@/features/profile/api/profileClient';
+import { useMounted } from '@/hooks/useMounted';
 import { formatConsent } from '@/lib/formatters';
 
 interface ProfileSheetProps {
@@ -30,13 +31,12 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
   const [isTogglingPublic, setIsTogglingPublic] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const headingId = useRef(`profile-sheet-title-${Math.random().toString(16).slice(2)}`).current;
+  const isMounted = useMounted();
 
   useEffect(() => {
     if (!isOpen || !isAuthenticated) {
       return;
     }
-
-    let active = true;
 
     const loadProfile = async () => {
       setIsLoading(true);
@@ -44,32 +44,22 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
 
       try {
         const data = await getProfile();
-        if (!active) {
-          return;
-        }
+        if (!isMounted()) return;
 
         setProfile(data);
         updateUser(toAuthenticatedUser(data));
       } catch (error) {
-        if (!active) {
-          return;
-        }
+        if (!isMounted()) return;
 
         const message = error instanceof Error ? error.message : 'Falha ao carregar perfil rápido.';
         setErrorMessage(message);
       } finally {
-        if (active) {
-          setIsLoading(false);
-        }
+        if (isMounted()) setIsLoading(false);
       }
     };
 
     void loadProfile();
-
-    return () => {
-      active = false;
-    };
-  }, [isAuthenticated, isOpen, updateUser]);
+  }, [isAuthenticated, isMounted, isOpen, updateUser]);
 
   const userDisplay = useMemo(() => {
     if (profile) {
