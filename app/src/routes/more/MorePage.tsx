@@ -230,8 +230,8 @@ export function MorePage() {
         to: '/login',
         icon: LogIn,
         label: 'Entrar',
-        description: 'Acesse com sua conta Google para participar do ranking.',
-        badge: 'Recomendado',
+        description: 'Entre com Google para contribuir com GPS e aparecer no ranking.',
+        badge: 'Grátis',
       },
     ];
   }, [authStatus, isAuthenticated, isLogoutPending, logout, trackEvent]);
@@ -242,8 +242,8 @@ export function MorePage() {
         kind: 'link',
         to: '/ranking',
         icon: Trophy,
-        label: 'Ranking colaborativo',
-        description: 'Top 10 público e detalhamento autenticado por período.',
+        label: 'Ranking',
+        description: 'Veja o top 10 público ou a visão completa com login.',
       },
     ],
     [],
@@ -299,11 +299,12 @@ export function MorePage() {
         description: 'Regras de uso, responsabilidades e limites do serviço.',
       },
       {
-        kind: 'link',
-        to: '/sobre',
+        kind: 'external',
+        href: 'https://forms.gle/5e9MHq9pp1p8T5Px5',
         icon: ScrollText,
-        label: 'Transparência',
-        description: 'Compromissos editoriais e limites da monetização.',
+        label: 'Dúvidas legais',
+        description: 'Entre em contato sobre privacidade, dados ou direitos LGPD.',
+        analyticsLabel: 'Duvidas legais',
       },
     ],
     [],
@@ -315,7 +316,7 @@ export function MorePage() {
         kind: 'action',
         icon: SunMoon,
         label: 'Alternar tema',
-        description: `Tema atual: ${theme === 'dark' ? 'escuro' : 'claro'}.`,
+        description: `Aparência ${theme === 'dark' ? 'escura' : 'clara'} ativa. Toque para alternar.`,
         onClick: () => {
           trackEvent({
             category: 'preferences',
@@ -357,8 +358,8 @@ export function MorePage() {
         </Section>
 
         <Section
-          title="Engajamento"
-          description="Acompanhe sua contribuição e o desempenho da comunidade."
+          title="Comunidade"
+          description="Compare sua posição e veja o desempenho da comunidade."
         >
           {engajamento.map((item, index) => renderItem(item, `engajamento-${index}`))}
         </Section>
@@ -367,7 +368,7 @@ export function MorePage() {
           {sobre.map((item, index) => renderItem(item, `sobre-${index}`))}
         </Section>
 
-        <Section title="Legal" description="Documentos obrigatórios e compromissos do app.">
+        <Section title="Legal" description="Documentos legais e compromissos do projeto.">
           {legal.map((item, index) => renderItem(item, `legal-${index}`))}
         </Section>
 
