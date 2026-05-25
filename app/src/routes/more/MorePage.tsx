@@ -111,10 +111,10 @@ function ItemShell({
         <Icon size={18} aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1 text-left">
-        <p className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-          <span className="truncate">{label}</span>
+        <p className="flex min-w-0 items-center gap-2 text-sm font-semibold text-text-primary">
+          <span className="min-w-0 flex-1 truncate">{label}</span>
           {badge ? (
-            <Badge variant="info" size="sm">
+            <Badge variant="info" size="sm" className="shrink-0">
               {badge}
             </Badge>
           ) : null}
@@ -132,7 +132,7 @@ function renderItem(item: MoreItem, key: string): ReactNode {
       <Link
         key={key}
         to={item.to}
-        className="flex min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        className="flex w-full min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
       >
         <ItemShell
           icon={item.icon}
@@ -152,7 +152,7 @@ function renderItem(item: MoreItem, key: string): ReactNode {
         href={item.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        className="flex w-full min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
       >
         <ItemShell
           icon={item.icon}
@@ -170,7 +170,7 @@ function renderItem(item: MoreItem, key: string): ReactNode {
       type="button"
       onClick={item.onClick}
       disabled={item.disabled}
-      className={`flex min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 text-left transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`flex w-full min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 text-left transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60 ${
         item.variant === 'danger' ? 'hover:bg-warning-bg/40' : ''
       }`}
     >
