@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
+import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import {
@@ -159,13 +160,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
             </div>
 
             {errorMessage ? (
-              <div
-                role="status"
-                aria-live="polite"
-                className="rounded-lg border border-warning-border bg-warning-bg px-3 py-2 text-xs text-warning-text"
-              >
-                {errorMessage}
-              </div>
+              <FeedbackBanner message={errorMessage} className="rounded-lg text-xs" />
             ) : null}
 
             <div className="rounded-xl border border-card-border bg-card p-3">
