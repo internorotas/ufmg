@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
+import { ToggleRow } from '@/components/ui/ToggleRow';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import {
@@ -182,20 +183,21 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
             </div>
 
             <div className="rounded-xl border border-card-border bg-card p-3">
-              <button
-                type="button"
-                className="flex min-h-11 w-full items-center justify-between rounded-lg border border-card-border bg-background px-3 py-2 text-left hover:bg-card-hover"
+              <ToggleRow
+                label={
+                  <span className="flex items-center gap-2 text-text-primary">
+                    <Bell size={16} aria-hidden="true" />
+                    Perfil público
+                  </span>
+                }
+                trailing={
+                  <Badge variant={profile?.profilePublic ? 'success' : 'neutral'}>
+                    {profile?.profilePublic ? 'Ativo' : 'Oculto'}
+                  </Badge>
+                }
                 onClick={() => void handleTogglePublicProfile()}
                 disabled={!profile || isTogglingPublic}
-              >
-                <span className="flex items-center gap-2 text-sm font-medium text-text-primary">
-                  <Bell size={16} aria-hidden="true" />
-                  Perfil público
-                </span>
-                <Badge variant={profile?.profilePublic ? 'success' : 'neutral'}>
-                  {profile?.profilePublic ? 'Ativo' : 'Oculto'}
-                </Badge>
-              </button>
+              />
             </div>
 
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
