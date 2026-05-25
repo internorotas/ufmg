@@ -134,7 +134,10 @@ export async function getConsentState(): Promise<ConsentState> {
   });
 
   if (!response.ok) {
-    throw new Error(`Falha ao carregar consentimento: HTTP ${response.status}`);
+    throw new AuthRequestError(
+      `Falha ao carregar consentimento: HTTP ${response.status}`,
+      response.status,
+    );
   }
 
   return response.json() as Promise<ConsentState>;
@@ -157,7 +160,10 @@ export async function updateConsentState(payload: {
   });
 
   if (!response.ok) {
-    throw new Error(`Falha ao atualizar consentimento: HTTP ${response.status}`);
+    throw new AuthRequestError(
+      `Falha ao atualizar consentimento: HTTP ${response.status}`,
+      response.status,
+    );
   }
 
   return response.json() as Promise<ConsentState>;
