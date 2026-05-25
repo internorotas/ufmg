@@ -98,7 +98,7 @@ function readPersistedSession(): PersistedTrackingSession | null {
     return null;
   }
 
-  const raw = window.localStorage.getItem(OFFLINE_SESSION_STORAGE_KEY);
+  const raw = window.sessionStorage.getItem(OFFLINE_SESSION_STORAGE_KEY);
   if (!raw) {
     return null;
   }
@@ -124,15 +124,12 @@ function writePersistedSession(session: PersistedTrackingSession | null): void {
   }
 
   if (!session) {
-    window.localStorage.removeItem(OFFLINE_SESSION_STORAGE_KEY);
+    window.sessionStorage.removeItem(OFFLINE_SESSION_STORAGE_KEY);
     return;
   }
 
-  // FIXME(privacy): raw GPS coordinates are stored in localStorage for offline recovery.
-  // Encrypting them requires client-side key management (complex). Acceptable trade-off for now:
-  // points are written during active tracking and cleared on session finish / reset.
-  // The session is auto-finished after MAX_SESSION_DURATION_MS (1h) or IDLE_AUTO_FINISH_MS (5m).
-  window.localStorage.setItem(
+  // GPS coordinates stored in sessionStorage (not localStorage) — cleared on tab close, reducing exposure window.
+  window.sessionStorage.setItem(
     OFFLINE_SESSION_STORAGE_KEY,
     JSON.stringify({
       ...session,
