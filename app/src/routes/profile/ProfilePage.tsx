@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
+import { InfoRow } from '@/components/ui/InfoRow';
+import { ToggleRow } from '@/components/ui/ToggleRow';
 import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
@@ -290,42 +292,39 @@ export function ProfilePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <button
-                type="button"
-                className="flex min-h-11 w-full items-center justify-between rounded-lg border border-card-border bg-background px-3 py-2 text-left hover:bg-card-hover"
+              <ToggleRow
+                label="Perfil público"
+                trailing={
+                  <Badge variant={profile.profilePublic ? 'success' : 'neutral'}>
+                    {profile.profilePublic ? 'Ativo' : 'Oculto'}
+                  </Badge>
+                }
                 onClick={handleToggleProfilePublic}
                 disabled={isUpdatingProfile}
-              >
-                <span className="text-sm font-medium">Perfil público</span>
-                <Badge variant={profile.profilePublic ? 'success' : 'neutral'}>
-                  {profile.profilePublic ? 'Ativo' : 'Oculto'}
-                </Badge>
-              </button>
+              />
 
-              <button
-                type="button"
-                className="flex min-h-11 w-full items-center justify-between rounded-lg border border-card-border bg-background px-3 py-2 text-left hover:bg-card-hover"
+              <ToggleRow
+                label={
+                  <span className="flex items-center gap-2">
+                    <MapPin size={16} aria-hidden="true" />
+                    Marcador no mapa
+                  </span>
+                }
+                trailing={
+                  <Badge variant={profile.mapMarkerVisible ? 'success' : 'neutral'}>
+                    {profile.mapMarkerVisible ? 'Visível' : 'Oculto'}
+                  </Badge>
+                }
                 onClick={handleToggleMapMarker}
                 disabled={isUpdatingProfile}
-              >
-                <span className="flex items-center gap-2 text-sm font-medium">
-                  <MapPin size={16} aria-hidden="true" />
-                  Marcador no mapa
-                </span>
-                <Badge variant={profile.mapMarkerVisible ? 'success' : 'neutral'}>
-                  {profile.mapMarkerVisible ? 'Visível' : 'Oculto'}
-                </Badge>
-              </button>
+              />
 
-              <button
-                type="button"
-                className="flex min-h-11 w-full items-center justify-between rounded-lg border border-card-border bg-background px-3 py-2 text-left hover:bg-card-hover"
+              <ToggleRow
+                label="Detalhamento do ranking"
+                trailing={<Badge variant="info">{rankingDetailLabel}</Badge>}
                 onClick={handleCycleRankingDetail}
                 disabled={isUpdatingProfile}
-              >
-                <span className="text-sm font-medium">Detalhamento do ranking</span>
-                <Badge variant="info">{rankingDetailLabel}</Badge>
-              </button>
+              />
             </CardContent>
           </Card>
 
@@ -341,33 +340,18 @@ export function ProfilePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <button
-                type="button"
-                className="flex min-h-11 w-full items-center justify-between rounded-lg border border-card-border bg-background px-3 py-2 text-left hover:bg-card-hover"
+              <ToggleRow
+                label="Perfil de notificação"
+                trailing={<Badge variant="info">{notificationProfileLabel}</Badge>}
                 onClick={handleCycleNotificationProfile}
                 disabled={isUpdatingProfile}
-              >
-                <span className="text-sm font-medium">Perfil de notificação</span>
-                <Badge variant="info">{notificationProfileLabel}</Badge>
-              </button>
+              />
 
-              <div className="rounded-lg border border-card-border bg-background px-3 py-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                  Consentimento GPS
-                </p>
-                <p className="mt-1 text-sm text-text-secondary">
-                  {formatConsent(profile.consentGpsAt)}
-                </p>
-              </div>
-
-              <div className="rounded-lg border border-card-border bg-background px-3 py-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                  Consentimento pesquisa
-                </p>
-                <p className="mt-1 text-sm text-text-secondary">
-                  {formatConsent(profile.consentResearchAt)}
-                </p>
-              </div>
+              <InfoRow label="Consentimento GPS" value={formatConsent(profile.consentGpsAt)} />
+              <InfoRow
+                label="Consentimento pesquisa"
+                value={formatConsent(profile.consentResearchAt)}
+              />
 
               <div className="rounded-lg border border-card-border bg-background px-3 py-2 text-sm text-text-secondary">
                 <p className="font-medium text-text-primary">
