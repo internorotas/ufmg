@@ -1,3 +1,5 @@
+import localLinhas from '@/data/linhas';
+import localParadas from '@/data/paradas';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { getTenantStorageKey } from '@/pwa/tenantNamespace';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
@@ -166,9 +168,17 @@ async function fetchTransit<T>(
 }
 
 export async function fetchLinhas(): Promise<CategoriaLinhas> {
-  return fetchTransit('/v1/linhas', ensureCategoriaLinhasShape);
+  try {
+    return await fetchTransit('/v1/linhas', ensureCategoriaLinhasShape);
+  } catch {
+    return localLinhas;
+  }
 }
 
 export async function fetchParadas(): Promise<ParadasPayload> {
-  return fetchTransit('/v1/paradas', ensureParadasPayloadShape);
+  try {
+    return await fetchTransit('/v1/paradas', ensureParadasPayloadShape);
+  } catch {
+    return localParadas;
+  }
 }
