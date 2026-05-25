@@ -32,6 +32,7 @@ import {
 } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
+import { FeedbackBanner } from './ui/FeedbackBanner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
 
 /**
@@ -102,11 +103,7 @@ function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
   const hasRoute = linha.coordenadasTrajeto && linha.coordenadasTrajeto.length > 1;
 
   if (!hasRoute) {
-    return (
-      <div className="rounded-xl border border-warning-border bg-warning-bg p-3 text-sm text-warning-text">
-        {t('miniMap.unavailable')}
-      </div>
-    );
+    return <FeedbackBanner message={t('miniMap.unavailable')} />;
   }
 
   return (

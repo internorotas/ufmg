@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import {
   createDonationCheckout,
   createSubscriptionCheckout,
@@ -13,6 +14,7 @@ import type {
   UserMonetizationTransaction,
 } from '@/features/profile/api/profileClient';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { formatDatePtBr } from '@/lib/formatters';
 
 interface SupportActionsCardProps {
   monetization: UserMonetizationSummary;
@@ -28,18 +30,6 @@ function formatCurrency(valueInCents: number): string {
     style: 'currency',
     currency: 'BRL',
   }).format(valueInCents / 100);
-}
-
-function formatDate(value: string | null): string {
-  if (!value) {
-    return '—';
-  }
-
-  return new Date(value).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
 }
 
 function formatTransactionKind(kind: UserMonetizationTransaction['kind']): string {
@@ -137,13 +127,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
         </div>
 
         {feedback ? (
-          <div
-            role="status"
-            aria-live="polite"
-            className="rounded-lg border border-warning-border bg-warning-bg px-3 py-2 text-sm text-warning-text"
-          >
-            {feedback.message}
-          </div>
+          <FeedbackBanner message={feedback.message} className="rounded-lg px-3 py-2 text-sm" />
         ) : null}
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -152,7 +136,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
               Última doação
             </p>
             <p className="mt-2 text-sm font-semibold text-text-primary">
-              {formatDate(monetization.lastDonationAt)}
+              {formatDatePtBr(monetization.lastDonationAt)}
             </p>
           </div>
 
@@ -161,7 +145,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
               Próximo pagamento
             </p>
             <p className="mt-2 text-sm font-semibold text-text-primary">
-              {formatDate(monetization.nextPaymentAt)}
+              {formatDatePtBr(monetization.nextPaymentAt)}
             </p>
           </div>
 
@@ -233,7 +217,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
                       </p>
                       <p className="mt-1 text-xs text-text-secondary">
                         {formatTransactionStatus(transaction.status)} em{' '}
-                        {formatDate(transaction.paidAt ?? transaction.createdAt)}
+                        {formatDatePtBr(transaction.paidAt ?? transaction.createdAt)}
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-2">
