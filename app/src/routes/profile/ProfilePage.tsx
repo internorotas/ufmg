@@ -1,5 +1,6 @@
 import { AlertTriangle, Bell, Eye, EyeOff, MapPin, Medal, Trophy, UserCircle2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { formatConsent, formatDateTimePtBr } from '@/lib/formatters';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
 import { DataStatusScreen } from '@/components/app/DataStatusScreen';
@@ -27,29 +28,6 @@ interface ProfileFeedbackState {
   message: string;
 }
 
-function formatConsent(consentAt: string | null): string {
-  if (!consentAt) {
-    return 'Não concedido';
-  }
-
-  return new Date(consentAt).toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function formatLastSeen(value: string): string {
-  return new Date(value).toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -292,7 +270,7 @@ export function ProfilePage() {
                 {profile.nickname ? `@${profile.nickname}` : 'Sem nickname configurado'}
               </p>
               <p className="mt-1 text-xs text-text-tertiary">
-                Última atividade: {formatLastSeen(profile.lastSeenAt)}
+                Última atividade: {formatDateTimePtBr(profile.lastSeenAt)}
               </p>
             </div>
           </div>

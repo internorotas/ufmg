@@ -12,24 +12,11 @@ import {
   type UserProfile,
   updateProfile,
 } from '@/features/profile/api/profileClient';
+import { formatConsent } from '@/lib/formatters';
 
 interface ProfileSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-}
-
-function formatConsent(consentAt: string | null): string {
-  if (!consentAt) {
-    return 'Não concedido';
-  }
-
-  return new Date(consentAt).toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }
 
 export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
