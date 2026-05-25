@@ -1,12 +1,12 @@
 import { AlertTriangle, Bell, Eye, EyeOff, MapPin, Medal, Trophy, UserCircle2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { formatConsent, formatDateTimePtBr } from '@/lib/formatters';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
 import { DataStatusScreen } from '@/components/app/DataStatusScreen';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
@@ -22,12 +22,12 @@ import {
   updateProfile,
 } from '@/features/profile/api/profileClient';
 import { DeleteAccountDialog } from '@/features/profile/components/DeleteAccountDialog';
+import { formatConsent, formatDateTimePtBr } from '@/lib/formatters';
 
 interface ProfileFeedbackState {
   type: 'success' | 'error';
   message: string;
 }
-
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -276,19 +276,7 @@ export function ProfilePage() {
           </div>
         </header>
 
-        {feedback ? (
-          <div
-            role="status"
-            aria-live="polite"
-            className={`rounded-xl border px-4 py-3 text-sm ${
-              feedback.type === 'success'
-                ? 'border-success-border bg-success-bg text-success-text'
-                : 'border-warning-border bg-warning-bg text-warning-text'
-            }`}
-          >
-            {feedback.message}
-          </div>
-        ) : null}
+        {feedback ? <FeedbackBanner type={feedback.type} message={feedback.message} /> : null}
 
         <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Card>

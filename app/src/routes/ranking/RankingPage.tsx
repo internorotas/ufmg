@@ -5,6 +5,7 @@ import { AppShell } from '@/components/app/AppShell';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import {
@@ -110,11 +111,7 @@ export function RankingPage() {
           </div>
         ) : null}
 
-        {error ? (
-          <div className="rounded-xl border border-warning-border bg-warning-bg px-4 py-3 text-sm text-warning-text">
-            {error}
-          </div>
-        ) : null}
+        {error ? <FeedbackBanner message={error} /> : null}
 
         <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
           <Card>

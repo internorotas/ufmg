@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { BottomNav } from '@/components/app/BottomNav';
 import { NavRail } from '@/components/app/NavRail';
 import { Button } from '@/components/ui/Button';
+import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import { AuthRequestError, startGoogleLoginFlow } from '@/features/auth/api/authClient';
 import { tenantConfig } from '@/tenants/tenantConfig';
 
@@ -94,15 +95,12 @@ export function LoginPage() {
               </div>
             </div>
 
-            {/* Mensagem de erro */}
             {errorMsg ? (
-              <div
-                role="alert"
-                aria-live="assertive"
-                className="mb-4 rounded-lg border border-warning-border bg-warning-bg px-3 py-2.5 text-xs leading-relaxed text-warning-text"
-              >
-                {errorMsg}
-              </div>
+              <FeedbackBanner
+                message={errorMsg}
+                live="assertive"
+                className="mb-4 rounded-lg px-3 py-2.5 text-xs leading-relaxed"
+              />
             ) : null}
 
             {/* Botão Google */}
