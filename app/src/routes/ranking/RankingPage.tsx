@@ -95,18 +95,12 @@ export function RankingPage() {
       }
     >
       <div className="flex flex-col gap-5">
-        <header className="rounded-xl border border-card-border bg-card px-5 py-5 shadow-sm">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Trophy size={20} aria-hidden="true" />
-                <h2 className="text-xl font-bold sm:text-2xl">Ranking colaborativo</h2>
-              </div>
-              <p className="max-w-2xl text-sm text-text-secondary">
-                Top 10 público para leitura livre e visão completa para usuários autenticados.
-                Pontos continuam apenas como incentivo, sem desbloqueio funcional do app.
-              </p>
-            </div>
+        <header className="rounded-xl border border-card-border bg-card px-5 py-4 shadow-sm">
+          <div className="flex items-center gap-2 text-text-secondary">
+            <Trophy size={18} aria-hidden="true" className="shrink-0 text-brand-primary" />
+            <p className="text-sm">
+              Top 10 público sem login. Pontos são incentivo — não há paywall funcional.
+            </p>
           </div>
         </header>
 
