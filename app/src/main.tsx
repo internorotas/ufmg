@@ -113,7 +113,8 @@ function handleApiVersionMismatch(): void {
   ensureUpdateStatusRegion().textContent =
     'Detectada versão incompatível da API. Atualizando o aplicativo.';
 
-  void forceServiceWorkerUpdate().catch(() => {
+  void forceServiceWorkerUpdate().catch((err: unknown) => {
+    Sentry.captureException(err, { contexts: { source: { fn: 'handleApiVersionMismatch' } } });
     triggerSingleReloadForUpdatedServiceWorker();
   });
 }
@@ -211,6 +212,7 @@ function registerAppServiceWorker(): void {
     .catch((error: unknown) => {
       // biome-ignore lint/suspicious/noConsole: log intencional de falha no registro do service worker
       console.error('Falha ao registrar o service worker da aplicação.', error);
+      Sentry.captureException(error, { contexts: { source: { fn: 'registerAppServiceWorker' } } });
     });
 }
 
