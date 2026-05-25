@@ -4,34 +4,12 @@
  * entre /perfil, /ranking, /sobre e /mais.
  */
 
-import { LayoutGrid, Map as MapIcon, Trophy, UserCircle2 } from 'lucide-react';
-import type { ComponentType, SVGProps } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { NAV_ITEMS, type NavItem } from '@/components/app/navItems';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { cn } from '@/lib/utils';
 
-interface BottomNavItem {
-  to: string;
-  icon: ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
-  label: string;
-  matchPrefix?: string;
-  anonymousTo?: string;
-}
-
-const ITEMS: BottomNavItem[] = [
-  { to: '/', icon: MapIcon, label: 'Mapa' },
-  { to: '/ranking', icon: Trophy, label: 'Ranking', matchPrefix: '/ranking' },
-  {
-    to: '/perfil',
-    icon: UserCircle2,
-    label: 'Perfil',
-    matchPrefix: '/perfil',
-    anonymousTo: '/login',
-  },
-  { to: '/mais', icon: LayoutGrid, label: 'Mais', matchPrefix: '/mais' },
-];
-
-function isItemActive(currentPath: string, item: BottomNavItem, resolvedTo: string): boolean {
+function isItemActive(currentPath: string, item: NavItem, resolvedTo: string): boolean {
   if (item.matchPrefix) {
     if (currentPath === item.matchPrefix || currentPath.startsWith(`${item.matchPrefix}/`)) {
       return true;
@@ -55,7 +33,7 @@ export function BottomNav() {
       )}
     >
       <ul className="mx-auto flex w-full max-w-5xl items-stretch justify-around">
-        {ITEMS.map((item) => {
+        {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const resolvedTo = !isAuthenticated && item.anonymousTo ? item.anonymousTo : item.to;
           const active = isItemActive(location.pathname, item, resolvedTo);

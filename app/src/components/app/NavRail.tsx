@@ -6,34 +6,12 @@
  * primárias (Mapa, Ranking, Perfil, Mais).
  */
 
-import { LayoutGrid, Map as MapIcon, Trophy, UserCircle2 } from 'lucide-react';
-import type { ComponentType, SVGProps } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { NAV_ITEMS, type NavItem } from '@/components/app/navItems';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { cn } from '@/lib/utils';
 
-interface NavRailItem {
-  to: string;
-  icon: ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
-  label: string;
-  matchPrefix?: string;
-  anonymousTo?: string;
-}
-
-const ITEMS: NavRailItem[] = [
-  { to: '/', icon: MapIcon, label: 'Mapa' },
-  { to: '/ranking', icon: Trophy, label: 'Ranking', matchPrefix: '/ranking' },
-  {
-    to: '/perfil',
-    icon: UserCircle2,
-    label: 'Perfil',
-    matchPrefix: '/perfil',
-    anonymousTo: '/login',
-  },
-  { to: '/mais', icon: LayoutGrid, label: 'Mais', matchPrefix: '/mais' },
-];
-
-function isItemActive(currentPath: string, item: NavRailItem): boolean {
+function isItemActive(currentPath: string, item: NavItem): boolean {
   if (item.matchPrefix) {
     return currentPath === item.matchPrefix || currentPath.startsWith(`${item.matchPrefix}/`);
   }
@@ -54,7 +32,7 @@ export function NavRail() {
       )}
     >
       <nav aria-label="Páginas principais" className="mt-4 flex flex-1 flex-col gap-1 px-2">
-        {ITEMS.map((item) => {
+        {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const active = isItemActive(location.pathname, item);
           const resolvedTo = !isAuthenticated && item.anonymousTo ? item.anonymousTo : item.to;
