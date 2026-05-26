@@ -17,6 +17,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "generate:og": "node scripts/generate-og-image.mjs",
+    "env:pull": "node scripts/load-env.mjs",
+    "env:pull:prod": "node scripts/load-env.mjs --env production",
     "prepare": "husky"
   },
   "dependencies": {
