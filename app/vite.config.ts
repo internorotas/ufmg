@@ -20,6 +20,9 @@ export default defineConfig(({ mode }) => {
   const tenantBasePath = resolveTenantDefinition(
     env.VITE_TENANT_SLUG || process.env.VITE_TENANT_SLUG,
   ).basePath;
+  // VITE_BASE_PATH permite sobrescrever o basePath do tenant em deploys que
+  // nao usam o mesmo subpath do GitHub Pages (ex: Vercel preview com base '/').
+  const basePath = env.VITE_BASE_PATH || process.env.VITE_BASE_PATH || tenantBasePath;
 
   return {
     plugins: [
@@ -47,7 +50,7 @@ export default defineConfig(({ mode }) => {
         manifest: false,
       }),
     ],
-    base: tenantBasePath,
+    base: basePath,
     resolve: {
       alias: {
         // Deve corresponder ao paths em tsconfig.json e tsconfig.app.json
