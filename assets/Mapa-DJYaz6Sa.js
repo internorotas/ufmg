@@ -1,4 +1,4 @@
-import{n as e}from"./rolldown-runtime-DF2fYuay.js";import{a as t,i as n,l as r,n as i,o as a,r as o,s,t as c}from"./vendor-leaflet-Cr7pRb3A.js";import{C as l,D as u,S as d,_ as f,g as p,h as m,p as h,w as g,y as ee}from"./vendor-react-B5X8qM7b.js";import{i as _,l as v,s as y,t as b}from"./PrevisaoBadge-CuJuaUPd.js";import{E as x,a as S,h as C,n as w,r as T,u as E,x as D}from"./NotificacaoContext-DQfwnj-T.js";import{t as O}from"./vendor-misc-fXI2UZ8t.js";var k=e(r(),1),A=e(s(),1),j=u();function M(e){let t=`
+import{n as e}from"./rolldown-runtime-DF2fYuay.js";import{a as t,i as n,l as r,n as i,o as a,r as o,s,t as c}from"./vendor-leaflet-Cr7pRb3A.js";import{C as l,D as u,S as d,_ as f,g as p,h as m,p as h,w as g,y as ee}from"./vendor-react-B5X8qM7b.js";import{i as _,l as v,s as y,t as b}from"./PrevisaoBadge-BRBFmS-q.js";import{E as x,a as S,h as C,n as w,r as T,u as E,x as D}from"./NotificacaoContext-DQfwnj-T.js";import{t as O}from"./vendor-misc-fXI2UZ8t.js";var k=e(r(),1),A=e(s(),1),j=u();function M(e){let t=`
     <div class="user-location-marker" style="position: relative; width: 40px; height: 40px;">
       ${e===null?``:`
         <div 

@@ -39,15 +39,16 @@
         }
 
         Promise.resolve()
-          .then(() => {
+          .then(function () {
             if (!('serviceWorker' in navigator)) {
               return;
             }
 
             return navigator.serviceWorker
               .getRegistrations()
-              .then((registrations) => Promise.all(
-                  registrations.map((registration) => {
+              .then(function (registrations) {
+                return Promise.all(
+                  registrations.map(function (registration) {
                     var scopePathname = new URL(registration.scope).pathname;
                     var shouldResetRegistration =
                       scopePathname === '/' || scopePathname.indexOf('/ufmg/') === 0;
@@ -58,19 +59,26 @@
 
                     return registration.unregister();
                   }),
-                ));
+                );
+              });
           })
-          .then(() => {
+          .then(function () {
             if (!('caches' in window)) {
               return;
             }
 
-            return caches.keys().then((keys) => Promise.all(
-                keys.map((key) => caches.delete(key)),
-              ));
+            return caches.keys().then(function (keys) {
+              return Promise.all(
+                keys.map(function (key) {
+                  return caches.delete(key);
+                }),
+              );
+            });
           })
-          .catch(() => undefined)
-          .finally(() => {
+          .catch(function () {
+            return undefined;
+          })
+          .finally(function () {
             url.searchParams.set('cache-recovery', 'done');
             url.searchParams.set('v', String(Date.now()));
             window.location.replace(url.toString());
@@ -185,13 +193,13 @@
         ]
       }
     </script>
-    <script type="module" crossorigin src="/ufmg/assets/index-BNcQ-aYj.js"></script>
+    <script type="module" crossorigin src="/ufmg/assets/index-BBh_LEUN.js"></script>
     <link rel="modulepreload" crossorigin href="/ufmg/assets/rolldown-runtime-DF2fYuay.js">
     <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-leaflet-Cr7pRb3A.js">
     <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-react-B5X8qM7b.js">
     <link rel="modulepreload" crossorigin href="/ufmg/assets/vendor-misc-fXI2UZ8t.js">
     <link rel="modulepreload" crossorigin href="/ufmg/assets/NotificacaoContext-DQfwnj-T.js">
-    <link rel="modulepreload" crossorigin href="/ufmg/assets/PrevisaoBadge-CuJuaUPd.js">
+    <link rel="modulepreload" crossorigin href="/ufmg/assets/PrevisaoBadge-BRBFmS-q.js">
     <link rel="stylesheet" crossorigin href="/ufmg/assets/vendor-leaflet-vh-t_kPv.css">
     <link rel="stylesheet" crossorigin href="/ufmg/assets/index-B69mdaSb.css">
   </head>
