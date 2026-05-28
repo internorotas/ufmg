@@ -67,7 +67,7 @@ export const tabsListVariants = tv({
  */
 export const tabsTriggerVariants = tv({
   base: [
-    'inline-flex items-center justify-center whitespace-nowrap cursor-pointer',
+    'inline-flex min-w-0 items-center justify-center cursor-pointer',
     'font-medium transition-all duration-150 ease-out',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
     'disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed',
@@ -76,17 +76,17 @@ export const tabsTriggerVariants = tv({
   variants: {
     variant: {
       default: [
-        'rounded-md px-3 py-1.5 text-sm',
+        'rounded-md min-h-11 px-3 py-1.5 text-sm',
         'data-[state=active]:bg-background data-[state=active]:text-text-primary data-[state=active]:shadow-sm',
         'data-[state=inactive]:text-text-secondary data-[state=inactive]:hover:text-text-primary data-[state=inactive]:hover:bg-card-hover/50',
       ],
       underline: [
-        'border-b-2 border-transparent px-4 py-2 text-sm',
+        'min-h-11 border-b-2 border-transparent px-4 py-2 text-sm',
         'data-[state=active]:border-brand-primary data-[state=active]:text-text-primary',
         'data-[state=inactive]:text-text-secondary data-[state=inactive]:hover:text-text-primary data-[state=inactive]:hover:bg-card-hover/30',
       ],
       pills: [
-        'rounded-full px-4 py-2 text-sm',
+        'min-h-11 rounded-full px-4 py-2 text-sm',
         'data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm',
         'data-[state=inactive]:bg-card data-[state=inactive]:text-text-secondary',
         'data-[state=inactive]:hover:bg-card-hover data-[state=inactive]:hover:text-text-primary',

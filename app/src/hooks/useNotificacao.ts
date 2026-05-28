@@ -16,6 +16,7 @@
  *  - iOS < 16.4 / não-PWA             → Web Notifications não suportadas; `suportado = false`
  */
 
+import * as Sentry from '@sentry/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toSaoPauloDate } from '../lib/time';
 import { converterHoraParaMinutos } from '../lib/utils';
@@ -363,6 +364,8 @@ export function useNotificacao(): UseNotificacaoReturn {
               if (import.meta.env.DEV) {
                 // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
                 console.warn('[useNotificacao] erro em processarAlarme:', err);
+              } else {
+                Sentry.captureException(err, { contexts: { alarm: { key } } });
               }
             });
           }, POLL_MS);
@@ -372,6 +375,10 @@ export function useNotificacao(): UseNotificacaoReturn {
           if (import.meta.env.DEV) {
             // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
             console.warn('[useNotificacao] erro ao agendar notificação:', err);
+          } else {
+            Sentry.captureException(err, {
+              contexts: { alarm: { source: 'agendar-notificacao' } },
+            });
           }
         });
     },
@@ -390,6 +397,8 @@ export function useNotificacao(): UseNotificacaoReturn {
           if (import.meta.env.DEV) {
             // biome-ignore lint/suspicious/noConsole: intencional, apenas em DEV
             console.warn('[useNotificacao] erro em visibilitychange processarAlarme:', err);
+          } else {
+            Sentry.captureException(err, { contexts: { alarm: { key } } });
           }
         });
       }

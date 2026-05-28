@@ -1,0 +1,28 @@
+{
+  "notificationPermission": {
+    "title": "Saiba quando seu ônibus está chegando",
+    "description": "Você pode ativar alertas para receber aviso de aproximação da sua linha.",
+    "subtitle": "Ative notificações de chegada",
+    "body": "Receba uma notificação quando a linha que você escolher estiver próxima. Funciona mesmo com o app fechado.",
+    "helper": "Você pode desativar quando quiser nas permissões do navegador.",
+    "iosNote": "No iPhone, as notificações só funcionam se o app estiver instalado na tela inicial. Toque em <strong>Compartilhar → Adicionar à Tela de Início</strong> no Safari para ativá-las.",
+    "actions": {
+      "allow": "Ativar notificações",
+      "later": "Agora não"
+    }
+  },
+  "iosInstall": {
+    "title": "Adicionar à tela inicial",
+    "description": "No iOS, notificações web exigem o app instalado como atalho na tela inicial.",
+    "body": "Para receber notificações no iPhone, instale o app na Tela de Início e abra por lá.",
+    "steps": {
+      "share": "Toque no ícone de <strong>Compartilhar</strong> (quadrado com seta para cima) na barra inferior do Safari.",
+      "add": "Toque em <strong>\"Adicionar à Tela de Início\"</strong>.",
+      "open": "Abra o aplicativo por lá e ative seu alarme!"
+    },
+    "actions": {
+      "understood": "Entendi",
+      "later": "Agora não"
+    }
+  }
+}

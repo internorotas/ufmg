@@ -7,11 +7,28 @@
  */
 
 import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import { LgpdConsentDialog } from '@/components/auth/LgpdConsentDialog';
+import { useConsentGate } from '@/features/auth/hooks/useConsentGate';
+import { PointDeltaToast } from '@/features/gamification/components/PointDeltaToast';
+import type { RecentPointEvent } from '@/features/profile/api/profileClient';
+import { syncPushSubscription } from '@/services/push/pushSubscriptionService';
 import { IosInstallModal } from '../components/IosInstallModal';
 import { NotificacaoPermissionModal } from '../components/NotificacaoPermissionModal';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useNotificacao } from '../hooks/useNotificacao';
 import type { Linha, Parada } from '../types/data.types';
+
+type CollaborativeEvent = {
+  type:
+    | 'trip_auto_finished'
+    | 'post_trip_feedback'
+    | 'service_alert_approved'
+    | 'streak_risk'
+    | 'achievement_unlocked'
+    | 'ranking_promoted';
+  message: string;
+  points?: number;
+};
 
 interface NotificacaoContextValue {
   /** Se a Web Notifications API é suportada neste browser */
@@ -29,9 +46,21 @@ interface NotificacaoContextValue {
     minutosFaltantes: number,
     horarioChegada: string,
   ) => void;
+  collaborativeFeedback: string | null;
+  publishCollaborativeEvent: (event: CollaborativeEvent) => void;
+  publishPointEvent: (event: RecentPointEvent | null) => void;
 }
 
 const NotificacaoContext = createContext<NotificacaoContextValue | null>(null);
+
+const FALLBACK_NOTIFICACAO_CONTEXT: NotificacaoContextValue = {
+  suportado: false,
+  isAlarmado: () => false,
+  toggleNotificacao: () => {},
+  collaborativeFeedback: null,
+  publishCollaborativeEvent: () => {},
+  publishPointEvent: () => {},
+};
 
 export function NotificacaoProvider({ children }: { children: ReactNode }) {
   const { trackEvent } = useAnalytics();
@@ -58,6 +87,31 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   } | null>(null);
 
   const [mostrarModalIos, setMostrarModalIos] = useState(false);
+  const [collaborativeFeedback, setCollaborativeFeedback] = useState<string | null>(null);
+  const [pointEvent, setPointEvent] = useState<RecentPointEvent | null>(null);
+  const { dialogOpen, executeProtectedAction, acceptAndContinue, refuseConsent, closeDialog } =
+    useConsentGate();
+
+  const publishCollaborativeEvent = useCallback(
+    (event: CollaborativeEvent) => {
+      setCollaborativeFeedback(event.message);
+      window.setTimeout(() => setCollaborativeFeedback(null), 4200);
+      trackEvent({
+        event: event.type,
+        category: 'engagement',
+        action: event.type,
+        label: event.message,
+      });
+    },
+    [trackEvent],
+  );
+
+  const publishPointEvent = useCallback((event: RecentPointEvent | null) => {
+    setPointEvent(event);
+    if (event) {
+      window.setTimeout(() => setPointEvent(null), 4200);
+    }
+  }, []);
 
   const toggleNotificacao = useCallback(
     (linha: Linha, parada: Parada, minutosFaltantes: number, horarioChegada: string) => {
@@ -79,19 +133,26 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         });
         return;
       }
-      // Sem permissão: guarda pendência e abre modal educativo
-      if (!podeNotificar) {
-        pendingRef.current = { linha, parada, minutos: minutosFaltantes, horarioChegada };
-        iniciarSolicitacaoPermissao();
-        return;
-      }
-      agendarNotificacao(linha, parada, minutosFaltantes, horarioChegada);
-      trackEvent({
-        event: 'alarm_set',
-        category: 'engagement',
-        action: 'alarm_set',
-        label: `${linha.idRota}:${parada.idParada}`,
-        value: minutosFaltantes,
+      void executeProtectedAction(async () => {
+        // Sem permissão: guarda pendência e abre modal educativo
+        if (!podeNotificar) {
+          pendingRef.current = { linha, parada, minutos: minutosFaltantes, horarioChegada };
+          iniciarSolicitacaoPermissao();
+          return;
+        }
+
+        agendarNotificacao(linha, parada, minutosFaltantes, horarioChegada);
+        void syncPushSubscription({
+          linhaId: linha.idRota,
+          paradaId: parada.idParada,
+        });
+        trackEvent({
+          event: 'alarm_set',
+          category: 'engagement',
+          action: 'alarm_set',
+          label: `${linha.idRota}:${parada.idParada}`,
+          value: minutosFaltantes,
+        });
       });
     },
     [
@@ -103,6 +164,7 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
       isPwaInstalled,
       podeNotificar,
       trackEvent,
+      executeProtectedAction,
     ],
   );
 
@@ -112,6 +174,10 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
       const { linha, parada, minutos, horarioChegada } = pendingRef.current;
       pendingRef.current = null;
       agendarNotificacao(linha, parada, minutos, horarioChegada);
+      void syncPushSubscription({
+        linhaId: linha.idRota,
+        paradaId: parada.idParada,
+      });
       trackEvent({
         event: 'alarm_set',
         category: 'engagement',
@@ -142,7 +208,16 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   }, [fecharModalPermissao]);
 
   return (
-    <NotificacaoContext.Provider value={{ suportado, isAlarmado, toggleNotificacao }}>
+    <NotificacaoContext.Provider
+      value={{
+        suportado,
+        isAlarmado,
+        toggleNotificacao,
+        collaborativeFeedback,
+        publishCollaborativeEvent,
+        publishPointEvent,
+      }}
+    >
       {children}
       <NotificacaoPermissionModal
         isOpen={mostrarModalPermissao}
@@ -150,6 +225,22 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         onConfirmar={handleConfirmar}
       />
       <IosInstallModal isOpen={mostrarModalIos} onClose={() => setMostrarModalIos(false)} />
+      <LgpdConsentDialog
+        isOpen={dialogOpen}
+        onClose={closeDialog}
+        onAccept={acceptAndContinue}
+        onRefuse={refuseConsent}
+      />
+      {collaborativeFeedback ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="pointer-events-none fixed right-4 bottom-24 z-[1500] max-w-80 rounded-lg border border-info-border bg-card px-3 py-2 text-xs text-text-primary shadow-lg"
+        >
+          {collaborativeFeedback}
+        </div>
+      ) : null}
+      <PointDeltaToast event={pointEvent} />
     </NotificacaoContext.Provider>
   );
 }
@@ -157,7 +248,11 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
 export function useNotificacaoContext(): NotificacaoContextValue {
   const ctx = useContext(NotificacaoContext);
   if (!ctx) {
-    throw new Error('useNotificacaoContext deve ser usado dentro de <NotificacaoProvider>');
+    if (import.meta.env.DEV) {
+      // biome-ignore lint/suspicious/noConsole: aviso útil para depuração local sem derrubar a árvore React durante HMR
+      console.warn('useNotificacaoContext fora de <NotificacaoProvider>; usando fallback seguro.');
+    }
+    return FALLBACK_NOTIFICACAO_CONTEXT;
   }
   return ctx;
 }

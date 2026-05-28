@@ -3,9 +3,8 @@ import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from '
 import 'leaflet/dist/leaflet.css';
 import L, { type DragEndEvent } from 'leaflet';
 import icon from '../../assets/marker.svg';
+import { DEFAULT_MAP_CENTER } from '../../config/mapDefaults';
 import type { CategoriaLinhas, Linha, Parada } from '../../types/data.types';
-
-const DEFAULT_CENTER: [number, number] = [-19.87055, -43.96775];
 
 const stationIcon = L.icon({
   iconUrl: icon,
@@ -654,7 +653,7 @@ export function AdminLinhasTab({
 
       {/* Mapa */}
       <div className="flex-1 relative">
-        <MapContainer center={DEFAULT_CENTER} zoom={15} className="h-full w-full">
+        <MapContainer center={DEFAULT_MAP_CENTER} zoom={15} className="h-full w-full">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

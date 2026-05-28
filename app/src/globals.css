@@ -128,6 +128,42 @@ body,
   --neutral-bg: #f3f4f6; /* Gray 100 */
   --neutral-border: #d1d5db; /* Gray 300 */
   --neutral-text: #4b5563; /* Gray 600 */
+
+  --gamification-bronze-bg: #f8ede1;
+  --gamification-bronze-border: #ddb892;
+  --gamification-bronze-text: #8c5a2b;
+  --gamification-prata-bg: #eef2f7;
+  --gamification-prata-border: #b8c4d6;
+  --gamification-prata-text: #4b607a;
+  --gamification-ouro-bg: #fff4cc;
+  --gamification-ouro-border: #f3cf63;
+  --gamification-ouro-text: #7a5a00;
+  --gamification-platina-bg: #e8f2ff;
+  --gamification-platina-border: #89b8ff;
+  --gamification-platina-text: #114a94;
+
+  --gamification-rarity-common-bg: #eef7ef;
+  --gamification-rarity-common-border: #b7d6b7;
+  --gamification-rarity-common-text: #295235;
+  --gamification-rarity-rare-bg: #eef2ff;
+  --gamification-rarity-rare-border: #9fb2ff;
+  --gamification-rarity-rare-text: #233f9a;
+  --gamification-rarity-epic-bg: #f4ebff;
+  --gamification-rarity-epic-border: #c6a0ff;
+  --gamification-rarity-epic-text: #5c2aa5;
+  --gamification-rarity-legendary-bg: #fff0db;
+  --gamification-rarity-legendary-border: #ffb55f;
+  --gamification-rarity-legendary-text: #8a4700;
+
+  --gamification-gps-active-bg: #dcfce7;
+  --gamification-gps-active-border: #86efac;
+  --gamification-gps-active-text: #166534;
+  --gamification-gps-inactive-bg: #f3f4f6;
+  --gamification-gps-inactive-border: #d1d5db;
+  --gamification-gps-inactive-text: #4b5563;
+  --gamification-gps-uncertain-bg: #fff7db;
+  --gamification-gps-uncertain-border: #f7d774;
+  --gamification-gps-uncertain-text: #8a5a00;
 }
 
 .dark {
@@ -172,6 +208,42 @@ body,
   --neutral-bg: #374151; /* Gray 700 */
   --neutral-border: #4b5563; /* Gray 600 */
   --neutral-text: #e5e7eb; /* Gray 200 */
+
+  --gamification-bronze-bg: #4a2f19;
+  --gamification-bronze-border: #9b6b3f;
+  --gamification-bronze-text: #f6dfc9;
+  --gamification-prata-bg: #273241;
+  --gamification-prata-border: #7f92ad;
+  --gamification-prata-text: #e4edf8;
+  --gamification-ouro-bg: #4d3a08;
+  --gamification-ouro-border: #d0a82d;
+  --gamification-ouro-text: #fff1bf;
+  --gamification-platina-bg: #162f4d;
+  --gamification-platina-border: #5f9cf2;
+  --gamification-platina-text: #d9ebff;
+
+  --gamification-rarity-common-bg: #17331f;
+  --gamification-rarity-common-border: #4d8c5e;
+  --gamification-rarity-common-text: #dbf7df;
+  --gamification-rarity-rare-bg: #1d2f63;
+  --gamification-rarity-rare-border: #6d90ff;
+  --gamification-rarity-rare-text: #e0e9ff;
+  --gamification-rarity-epic-bg: #3a1c59;
+  --gamification-rarity-epic-border: #b17cff;
+  --gamification-rarity-epic-text: #f0ddff;
+  --gamification-rarity-legendary-bg: #4a2a08;
+  --gamification-rarity-legendary-border: #f19c34;
+  --gamification-rarity-legendary-text: #ffe3bd;
+
+  --gamification-gps-active-bg: #064e3b;
+  --gamification-gps-active-border: #059669;
+  --gamification-gps-active-text: #d1fae5;
+  --gamification-gps-inactive-bg: #374151;
+  --gamification-gps-inactive-border: #4b5563;
+  --gamification-gps-inactive-text: #e5e7eb;
+  --gamification-gps-uncertain-bg: #422006;
+  --gamification-gps-uncertain-border: #a16207;
+  --gamification-gps-uncertain-text: #fef08a;
 }
 
 /* Global Reset & Typography */
@@ -385,6 +457,25 @@ body {
   }
 }
 
+@keyframes gamification-toast {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
 .animate-fade-in {
   animation: fade-in 0.2s ease-out forwards;
 }
@@ -470,6 +561,40 @@ body {
 
 .animate-pulse-soft {
   animation: pulse-soft 2s ease-in-out infinite;
+}
+
+@keyframes line-favorite-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes line-favorite-down {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-line-favorite-up {
+  animation: line-favorite-up 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-line-favorite-down {
+  animation: line-favorite-down 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-gamification-toast {
+  animation: gamification-toast 4.2s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

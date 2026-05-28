@@ -5,13 +5,24 @@
  * permitindo fácil substituição por APIs externas no futuro.
  */
 
-import { normalizarNomeLinha } from '../lib/utils';
-import type { CategoriaLinhas, DadosLinhas, Linha, Parada } from '../types/data.types';
+import { normalizarNomeLinha } from '@/lib/utils';
+import { fetchLinhas, fetchParadas } from '@/services/api/transitApi';
+import type { CategoriaLinhas, DadosLinhas, Linha, Parada } from '@/types/data.types';
 
 const DATA_BUILD_ID = import.meta.env.VITE_BUILD_ID;
 
 interface ParadasPayload {
   paradas: Parada[];
+}
+
+export type RotasDataSource = 'api' | 'public-data' | 'source-fallback';
+
+export interface RotasLoadResult {
+  service: IRotasService;
+  source: RotasDataSource;
+  dataVersion: string;
+  updatedAt: string;
+  isFallback: boolean;
 }
 
 /**
@@ -163,13 +174,18 @@ async function loadFromPublic(): Promise<{ linhas: CategoriaLinhas; paradas: Par
   return { linhas, paradas };
 }
 
+async function loadFromApi(): Promise<{ linhas: CategoriaLinhas; paradas: ParadasPayload }> {
+  const [linhas, paradas] = await Promise.all([fetchLinhas(), fetchParadas()]);
+  return { linhas, paradas };
+}
+
 async function loadFromSourceFallback(): Promise<{
   linhas: CategoriaLinhas;
   paradas: ParadasPayload;
 }> {
   const [linhasModule, paradasModule] = await Promise.all([
-    import('../data/linhas'),
-    import('../data/paradas'),
+    import('@/data/linhas'),
+    import('@/data/paradas'),
   ]);
 
   return {
@@ -178,12 +194,26 @@ async function loadFromSourceFallback(): Promise<{
   };
 }
 
-let cachedService: IRotasService | null = null;
-let loadingServicePromise: Promise<IRotasService> | null = null;
+let cachedLoadResult: RotasLoadResult | null = null;
+let loadingServicePromise: Promise<RotasLoadResult> | null = null;
 
-export async function loadRotasService(): Promise<IRotasService> {
-  if (cachedService) {
-    return cachedService;
+function createLoadResult(
+  source: RotasDataSource,
+  linhas: CategoriaLinhas,
+  paradas: ParadasPayload,
+): RotasLoadResult {
+  return {
+    service: RotasServiceImpl.fromData(linhas, paradas),
+    source,
+    dataVersion: source === 'api' ? 'v1' : DATA_BUILD_ID,
+    updatedAt: new Date().toISOString(),
+    isFallback: source !== 'api',
+  };
+}
+
+export async function loadRotasData(): Promise<RotasLoadResult> {
+  if (cachedLoadResult) {
+    return cachedLoadResult;
   }
 
   if (loadingServicePromise) {
@@ -192,17 +222,24 @@ export async function loadRotasService(): Promise<IRotasService> {
 
   loadingServicePromise = (async () => {
     try {
-      const { linhas, paradas } = await loadFromPublic();
-      cachedService = RotasServiceImpl.fromData(linhas, paradas);
-      return cachedService;
+      const { linhas, paradas } = await loadFromApi();
+      cachedLoadResult = createLoadResult('api', linhas, paradas);
+      return cachedLoadResult;
     } catch {
-      if (import.meta.env.DEV) {
-        // Fallback para os módulos TypeScript quando /public/data ainda não foi gerado.
-        const { linhas, paradas } = await loadFromSourceFallback();
-        cachedService = RotasServiceImpl.fromData(linhas, paradas);
-        return cachedService;
+      try {
+        const { linhas, paradas } = await loadFromPublic();
+        cachedLoadResult = createLoadResult('public-data', linhas, paradas);
+        return cachedLoadResult;
+      } catch {
+        if (import.meta.env.DEV || import.meta.env.MODE === 'test' || import.meta.env.VITEST) {
+          // Fallback para os módulos TypeScript quando /public/data ainda não foi gerado.
+          const { linhas, paradas } = await loadFromSourceFallback();
+          cachedLoadResult = createLoadResult('source-fallback', linhas, paradas);
+          return cachedLoadResult;
+        }
+
+        throw new Error('Falha ao carregar dados de rotas: API e /public/data indisponíveis.');
       }
-      throw new Error('Falha ao carregar dados de rotas em /public/data');
     }
   })();
 
@@ -211,6 +248,25 @@ export async function loadRotasService(): Promise<IRotasService> {
   } finally {
     loadingServicePromise = null;
   }
+}
+
+export async function loadRotasFallbackData(): Promise<RotasLoadResult> {
+  try {
+    const { linhas, paradas } = await loadFromPublic();
+    return createLoadResult('public-data', linhas, paradas);
+  } catch {
+    if (import.meta.env.DEV) {
+      const { linhas, paradas } = await loadFromSourceFallback();
+      return createLoadResult('source-fallback', linhas, paradas);
+    }
+
+    throw new Error('Falha ao carregar fallback de rotas em /public/data.');
+  }
+}
+
+export async function loadRotasService(): Promise<IRotasService> {
+  const result = await loadRotasData();
+  return result.service;
 }
 
 // Instância vazia para evitar null checks durante bootstrap.

@@ -6,6 +6,7 @@
  */
 
 import { Bell, Plus, Share } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Modal } from './Modal';
 import { Button } from './ui/Button';
 
@@ -18,37 +19,33 @@ const PASSOS = [
   {
     id: 'compartilhar',
     icone: Share,
-    descricao: (
-      <>
-        Toque no ícone de <span className="font-semibold">Compartilhar</span> (quadrado com seta
-        para cima) na barra inferior do Safari.
-      </>
-    ),
+    i18nKey: 'iosInstall.steps.share',
   },
   {
     id: 'adicionar',
     icone: Plus,
-    descricao: (
-      <>
-        Toque em <span className="font-semibold">"Adicionar à Tela de Início"</span>.
-      </>
-    ),
+    i18nKey: 'iosInstall.steps.add',
   },
   {
     id: 'abrir',
     icone: Bell,
-    descricao: <>Abra o aplicativo por lá e ative seu alarme!</>,
+    i18nKey: 'iosInstall.steps.open',
   },
 ];
 
 export function IosInstallModal({ isOpen, onClose }: IosInstallModalProps) {
+  const { t } = useTranslation('modals');
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Alarmes no iPhone" size="sm">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('iosInstall.title')}
+      description={t('iosInstall.description')}
+      size="sm"
+    >
       <div className="space-y-4">
-        <p className="text-sm text-text-secondary">
-          A Apple exige que você adicione este app à sua Tela de Início para poder receber alertas
-          de quando o ônibus estiver chegando.
-        </p>
+        <p className="text-sm text-text-secondary">{t('iosInstall.body')}</p>
 
         <ol className="space-y-2">
           {PASSOS.map((passo, idx) => {
@@ -58,21 +55,45 @@ export function IosInstallModal({ isOpen, onClose }: IosInstallModalProps) {
                 key={passo.id}
                 className="flex items-start gap-3 rounded-lg border border-card-border bg-background-secondary p-3"
               >
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-text-inverse">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-text-inverse">
                   {idx + 1}
                 </div>
                 <div className="flex items-start gap-2">
-                  <Icone size={15} className="mt-0.75 shrink-0 text-brand-accent" />
-                  <p className="text-sm text-text-primary">{passo.descricao}</p>
+                  <Icone size={16} className="mt-0.5 shrink-0 text-brand-accent" />
+                  <p className="text-sm text-text-primary">
+                    <Trans
+                      i18nKey={passo.i18nKey}
+                      ns="modals"
+                      components={{ strong: <strong /> }}
+                    />
+                  </p>
                 </div>
               </li>
             );
           })}
         </ol>
 
-        <Button type="button" variant="secondary" size="md" className="w-full" onClick={onClose}>
-          Entendi
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
+            type="button"
+            variant="secondary"
+            size="md"
+            className="min-h-11 flex-1"
+            data-autofocus="true"
+            onClick={onClose}
+          >
+            {t('iosInstall.actions.understood')}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="md"
+            className="min-h-11 flex-1"
+            onClick={onClose}
+          >
+            {t('iosInstall.actions.later')}
+          </Button>
+        </div>
       </div>
     </Modal>
   );

@@ -5,30 +5,10 @@
 
 import { Info } from 'lucide-react';
 import type { ComponentProps } from 'react';
-import { tv, type VariantProps } from 'tailwind-variants';
-import { cn } from '../lib/utils';
+import { Trans } from 'react-i18next';
+import { SystemBanner } from './SystemBanner';
 
-/**
- * Variantes do banner
- */
-export const bannerVariants = tv({
-  base: ['flex items-start gap-2 rounded-lg border p-3', 'mb-3'],
-  variants: {
-    intent: {
-      info: 'border-info-border bg-info-bg text-info-text',
-      warning: 'border-warning-border bg-warning-bg text-warning-text',
-      success: 'border-success-border bg-success-bg text-success-text',
-      neutral: 'border-neutral-border bg-neutral-bg text-neutral-text',
-    },
-  },
-  defaultVariants: {
-    intent: 'info',
-  },
-});
-
-export interface InfoBannerProps
-  extends ComponentProps<'div'>,
-    VariantProps<typeof bannerVariants> {}
+export interface InfoBannerProps extends ComponentProps<'div'> {}
 
 /**
  * Banner informativo sobre a saída dos ônibus.
@@ -40,17 +20,14 @@ export interface InfoBannerProps
  */
 export function InfoBanner({ className, ...props }: InfoBannerProps) {
   return (
-    <div
-      data-slot="banner"
-      data-intent="info"
-      className={cn(bannerVariants({ intent: 'info' }), className)}
+    <SystemBanner
+      variant="info"
+      className={className}
+      icon={<Info aria-hidden="true" />}
+      description={
+        <Trans i18nKey="info.description" ns="system-banner" components={{ strong: <strong /> }} />
+      }
       {...props}
-    >
-      <Info className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
-      <p className="text-xs leading-relaxed lg:text-sm">
-        Todas as rotas iniciam e terminam próximas à <strong>Escola de Música</strong>. Os horários
-        indicam a saída dos ônibus deste ponto.
-      </p>
-    </div>
+    />
   );
 }

@@ -4,9 +4,8 @@ import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from '
 import 'leaflet/dist/leaflet.css';
 
 import icon from '../../assets/marker.svg';
+import { DEFAULT_MAP_CENTER } from '../../config/mapDefaults';
 import type { CategoriaLinhas, Parada } from '../../types/data.types';
-
-const DEFAULT_CENTER: [number, number] = [-19.87055, -43.96775];
 
 const stationIcon = L.icon({
   iconUrl: icon,
@@ -110,7 +109,7 @@ export function AdminParadasTab({
   );
 
   const handleAdd = useCallback(
-    (lat = DEFAULT_CENTER[0], lng = DEFAULT_CENTER[1]) => {
+    (lat = DEFAULT_MAP_CENTER[0], lng = DEFAULT_MAP_CENTER[1]) => {
       const id = `P_NEW_${Date.now()}`;
       const nova: Parada = {
         idParada: id,
@@ -434,7 +433,7 @@ export function AdminParadasTab({
         )}
 
         <MapContainer
-          center={DEFAULT_CENTER}
+          center={DEFAULT_MAP_CENTER}
           zoom={15}
           className="h-full w-full"
           style={addMode ? { cursor: 'crosshair' } : undefined}

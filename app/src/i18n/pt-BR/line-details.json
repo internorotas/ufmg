@@ -1,0 +1,44 @@
+{
+  "title": {
+    "aria": "Detalhes da linha {{titleLabel}}",
+    "description": "Consulte o itinerário, horários e ações disponíveis para a linha {{titleLabel}}."
+  },
+  "tabs": {
+    "itinerary": "Itinerário",
+    "schedules": "Horários"
+  },
+  "miniMap": {
+    "title": "Mini-mapa do itinerário",
+    "unavailable": "Mapa de itinerário indisponível no momento. Você ainda pode consultar os horários e a lista de paradas abaixo."
+  },
+  "itinerary": {
+    "originDestination": "Ponto de Origem/Destino",
+    "regularStop": "Parada Regular",
+    "departure": "Partida",
+    "arrival": "Chegada",
+    "arrivesNow": "Chega agora",
+    "lastPassed": "Último passou há {{minutes}} min",
+    "tip": "💡 Clique em uma parada para visualizá-la no mapa",
+    "empty": "Nenhuma parada encontrada para este itinerário."
+  },
+  "schedules": {
+    "nextHighlight": "Próximo horário",
+    "nextBadge": "Próxima saída",
+    "nextListTitle": "Horários seguintes",
+    "departure": "Saída",
+    "noFuture": "Não há horários futuros disponíveis para esta linha neste momento.",
+    "pastTitle": "Horários Passados ({{count}})",
+    "allTitle": "Todos os Horários ({{count}})",
+    "summary": "Total de {{count}} horários"
+  },
+  "lineNotRunning": {
+    "warning": "{{text}}"
+  },
+  "a11y": {
+    "viewStopOnMap": "Ver localização da parada {{nome}} no mapa",
+    "disableAlarm": "Cancelar alarme de chegada",
+    "enableAlarm": "Ativar alarme de chegada",
+    "nextTime": "Horário seguinte às {{horario}}",
+    "pastTime": "Horário passado às {{horario}}"
+  }
+}

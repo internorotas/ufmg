@@ -1,0 +1,15 @@
+{
+  "lgpdConsent": {
+    "title": "Consentimento LGPD para contribuição",
+    "description": "Antes de contribuir com dados colaborativos, precisamos do seu consentimento explícito.",
+    "purpose": "Usamos sua localização apenas para melhorar previsões e recursos colaborativos da comunidade acadêmica atendida.",
+    "retention": "Você pode recusar ou revogar depois. Em caso de recusa, o app continua normal para consulta de linhas, paradas e horários.",
+    "actions": {
+      "accept": "Aceitar e continuar",
+      "refuse": "Recusar"
+    }
+  },
+  "profile": {
+    "title": "Perfil"
+  }
+}
