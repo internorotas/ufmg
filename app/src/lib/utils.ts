@@ -141,16 +141,19 @@ function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
  * @param dataAtual Data usada para escolher o conjunto de horários vigente.
  * @returns Lista de horários válidos para o dia, já filtrada por formato.
  */
-export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[] {
-  // Regra de negócio central: somente linhas vigentes no dia entram no motor de horários/ETA.
-  if (!isLineAvailableToday(linha.categoriaDia)) {
-    return [];
-  }
+const _horariosMinutosCache = new WeakMap<object, number[]>();
 
+/**
+ * Retorna os horários válidos da linha em minutos, utilizando WeakMap para cache
+ * com base na referência do array de horários da linha.
+ *
+ * Evita parsing O(N log N) e alocação desnecessária de strings/arrays.
+ */
+function obterArrayHorariosBruto(linha: Linha, dataAtual: Date): string[] {
   const horariosBrutos = linha.horarios as unknown;
 
   if (Array.isArray(horariosBrutos)) {
-    return horariosBrutos.filter((horario) => parseHorarioValido(horario) !== null);
+    return horariosBrutos;
   }
 
   if (!horariosBrutos || typeof horariosBrutos !== 'object') {
@@ -161,11 +164,48 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
   const chaveDia = obterChaveDiaSemana(dataAtual);
   const horariosDia = horariosPorDia[chaveDia];
 
-  if (!Array.isArray(horariosDia) || horariosDia.length === 0) {
+  if (!Array.isArray(horariosDia)) {
     return [];
   }
 
-  return horariosDia.filter((horario) => parseHorarioValido(horario) !== null);
+  return horariosDia;
+}
+
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const arrayBruto = obterArrayHorariosBruto(linha, dataAtual);
+  if (arrayBruto.length === 0) {
+    return [];
+  }
+
+  let horariosValidos = _horariosMinutosCache.get(arrayBruto);
+
+  if (horariosValidos) {
+    return horariosValidos;
+  }
+
+  horariosValidos = arrayBruto
+    .map((horario) => converterHoraParaMinutos(horario))
+    .filter((minutos) => Number.isFinite(minutos))
+    .sort((a, b) => a - b);
+
+  _horariosMinutosCache.set(arrayBruto, horariosValidos);
+
+  return horariosValidos;
+}
+
+export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[] {
+  // Regra de negócio central: somente linhas vigentes no dia entram no motor de horários/ETA.
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const arrayBruto = obterArrayHorariosBruto(linha, dataAtual);
+
+  return arrayBruto.filter((horario) => parseHorarioValido(horario) !== null);
 }
 
 /**
@@ -187,12 +227,7 @@ export function obterStatusLinha(
     return { id: 'NAO_CIRCULA_HOJE', texto: 'Não circula hoje', cor: 'danger' };
   }
 
-  const horariosHoje =
-    horariosPreCalculados ??
-    obterHorariosLinhaNoDia(linha, dataAtual)
-      .map((horario) => converterHoraParaMinutos(horario))
-      .filter((minutos) => Number.isFinite(minutos))
-      .sort((a, b) => a - b);
+  const horariosHoje = horariosPreCalculados ?? obterHorariosMinutosLinhaNoDia(linha, dataAtual);
 
   if (horariosHoje.length === 0) {
     return {
