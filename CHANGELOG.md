@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/internorotas/ufmg/compare/v1.4.0...v1.5.0) (2026-05-28)
+
+
+### Features
+
+* integracao geral - backend, CSP, PWA, env vars ([2be17ff](https://github.com/internorotas/ufmg/commit/2be17ffcc020c5129f2251c55f19f89d0f76dd00))
+
 # [1.4.0](https://github.com/internorotas/ufmg/compare/v1.3.0...v1.4.0) (2026-04-20)
 
 
