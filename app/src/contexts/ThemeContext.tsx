@@ -1,8 +1,10 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import { getTenantStorageKey } from '@/pwa/tenantNamespace';
 import { GA_MEASUREMENT_ID } from '../config/analytics';
 import { ga4Analytics } from '../services/analytics';
 
 type Theme = 'light' | 'dark';
+const THEME_STORAGE_KEY = getTenantStorageKey('theme');
 
 interface ThemeContextType {
   theme: Theme;
@@ -23,7 +25,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     // try/catch necessário: Safari em modo privado lança SecurityError ao acessar localStorage
     try {
-      const savedTheme = localStorage.getItem('theme');
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
       // 🛡️ Sentinel: Validate input from localStorage to prevent unexpected values
       if (savedTheme === 'light' || savedTheme === 'dark') {
         return savedTheme;
@@ -45,7 +47,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     // try/catch necessário: Safari em modo privado lança SecurityError ao gravar
     try {
-      localStorage.setItem('theme', theme);
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
     } catch {
       // Silencioso — tema funciona normalmente na sessão, apenas não persiste
     }

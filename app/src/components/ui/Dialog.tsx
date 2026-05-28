@@ -99,7 +99,7 @@ export const dialogDescriptionVariants = tv({
  */
 export const dialogCloseVariants = tv({
   base: [
-    'inline-flex items-center justify-center rounded-lg p-2',
+    'inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2',
     'text-text-secondary transition-colors cursor-pointer',
     'hover:bg-card hover:text-text-primary',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',

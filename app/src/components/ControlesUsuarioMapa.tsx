@@ -10,10 +10,11 @@
  */
 
 import L from 'leaflet';
-import { CornerUpLeft, LoaderCircle, LocateFixed } from 'lucide-react';
+import { CornerUpLeft, LoaderCircle, LocateFixed, Radio, Square } from 'lucide-react';
 import { Marker, useMap } from 'react-leaflet';
+import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
+import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '../hooks/useAnalytics';
-import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
 import { cn } from '../lib/utils';
 
 interface ControlesUsuarioMapaProps {
@@ -27,6 +28,8 @@ interface ControlesUsuarioMapaProps {
   onPedirLocalizacao: () => void;
   /** Se está carregando a localização no momento */
   carregandoLocalizacao?: boolean;
+  rastreioColaborativo?: GpsTrackingState;
+  onAlternarRastreioColaborativo?: () => void;
 }
 
 /**
@@ -100,15 +103,30 @@ export function ControlesUsuarioMapa({
   permissaoConcedida,
   onPedirLocalizacao,
   carregandoLocalizacao = false,
+  rastreioColaborativo,
+  onAlternarRastreioColaborativo,
 }: ControlesUsuarioMapaProps) {
   const analytics = useAnalytics();
   const map = useMap();
+  const statusRastreio = rastreioColaborativo?.status ?? 'idle';
+  const rastreioAtivo = Boolean(rastreioColaborativo?.isActive);
+
+  const textoRastreio =
+    statusRastreio === 'active'
+      ? `Rastreio ativo · coleta a cada ${Math.round((rastreioColaborativo?.nextCollectionIntervalMs ?? 0) / 1000)}s`
+      : statusRastreio === 'starting'
+        ? 'Iniciando rastreio colaborativo'
+        : statusRastreio === 'paused'
+          ? `Rastreio pausado · ${rastreioColaborativo?.queueSize ?? 0} ponto(s) na fila offline`
+          : statusRastreio === 'error'
+            ? 'Rastreio indisponível no momento'
+            : 'Rastreio colaborativo inativo';
 
   /**
-   * Centraliza o mapa no campus da UFMG
+   * Centraliza o mapa no campus principal configurado para o tenant.
    */
-  const handleCentralizarUFMG = () => {
-    map.flyTo(COORDENADAS_UFMG, 15, { duration: 1 });
+  const handleCentralizarCampus = () => {
+    map.flyTo(COORDENADAS_CAMPUS, 15, { duration: 1 });
   };
 
   /**
@@ -144,37 +162,57 @@ export function ControlesUsuarioMapa({
         />
       )}
 
-      {/* FABs - Floating Action Buttons */}
-      <div className="fixed bottom-6 right-4 z-1000 flex flex-col gap-2 md:bottom-6">
-        {/* Botão: centralizar no campus UFMG */}
+      {/* FABs - coluna vertical alinhada acima da BottomNav mobile */}
+      <div className="pointer-events-none fixed bottom-24 right-4 z-1000 flex flex-col items-end gap-2 [margin-bottom:env(safe-area-inset-bottom)] md:bottom-6 md:[margin-bottom:0]">
+        {rastreioColaborativo && onAlternarRastreioColaborativo ? (
+          <button
+            type="button"
+            onClick={onAlternarRastreioColaborativo}
+            aria-pressed={rastreioAtivo}
+            aria-label={
+              rastreioAtivo
+                ? `Encerrar ${rastreioColaborativo.label}. ${textoRastreio}`
+                : `Iniciar ${rastreioColaborativo.label}. ${textoRastreio}`
+            }
+            title={`${rastreioColaborativo.label} · ${textoRastreio}`}
+            className={cn(
+              'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-200 active:scale-95',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+              rastreioAtivo
+                ? 'bg-success-border text-white hover:bg-success-border/90'
+                : 'bg-card text-text-primary ring-1 ring-card-border hover:bg-card-hover',
+            )}
+          >
+            {rastreioAtivo ? (
+              <Square className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Radio className="h-5 w-5" aria-hidden="true" />
+            )}
+          </button>
+        ) : null}
+
         <button
           type="button"
-          onClick={handleCentralizarUFMG}
+          onClick={handleCentralizarCampus}
           className={cn(
-            'flex h-12 w-12 cursor-pointer items-center justify-center',
-            'rounded-full shadow-lg transition-all duration-200',
-            'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-200 active:scale-95',
+            'bg-card text-text-primary ring-1 ring-card-border hover:bg-card-hover',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
           )}
-          aria-label="Centralizar mapa no campus UFMG"
-          title="Centralizar mapa no campus UFMG"
+          aria-label={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
+          title={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
         >
-          <CornerUpLeft className="h-6 w-6 text-white" aria-hidden="true" />
+          <CornerUpLeft className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        {/* Botão: centralizar na localização do usuário */}
         <button
           type="button"
           onClick={handleCentralizar}
           disabled={carregandoLocalizacao}
           aria-busy={carregandoLocalizacao}
           className={cn(
-            // Tamanho mínimo para touch (48x48px) - Mobile friendly
-            'flex h-12 w-12 cursor-pointer items-center justify-center',
-            // Estilo visual - Azul brand igual ao botão Ver Linhas
-            'rounded-full shadow-lg transition-all duration-200',
-            'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
-            // Focus state para acessibilidade
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-200 active:scale-95',
+            'bg-brand-primary text-white hover:bg-brand-primary/90',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
             'disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100',
           )}
@@ -194,9 +232,9 @@ export function ControlesUsuarioMapa({
           }
         >
           {carregandoLocalizacao ? (
-            <LoaderCircle className="h-6 w-6 animate-spin text-white" aria-hidden="true" />
+            <LoaderCircle className="h-5 w-5 animate-spin" aria-hidden="true" />
           ) : (
-            <LocateFixed className="h-6 w-6 text-white" aria-hidden="true" />
+            <LocateFixed className="h-5 w-5" aria-hidden="true" />
           )}
         </button>
       </div>

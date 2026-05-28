@@ -13,8 +13,10 @@
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
+import { PlannerMapOverlay } from '@/features/planner/components/PlannerMapOverlay';
+import { COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '../hooks/useAnalytics';
-import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
 import type { Linha, Parada } from '../types/data.types';
 import { ControlesUsuarioMapa } from './ControlesUsuarioMapa';
 import {
@@ -45,6 +47,8 @@ interface MapaProps {
   onPedirLocalizacao?: () => void;
   /** Estado de carregamento de geolocalização */
   carregandoLocalizacao?: boolean;
+  rastreioColaborativo?: GpsTrackingState;
+  onAlternarRastreioColaborativo?: () => void;
   /** Ref para expor métodos do mapa (React 19 - ref como prop) */
   ref?: Ref<MapaRef>;
 }
@@ -53,7 +57,7 @@ interface MapaProps {
  * Configurações padrão do mapa
  */
 const MAP_CONFIG = {
-  center: COORDENADAS_UFMG,
+  center: COORDENADAS_CAMPUS,
   zoom: 15,
   tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   attribution:
@@ -99,6 +103,8 @@ export function Mapa({
   permissaoLocalizacao = false,
   onPedirLocalizacao,
   carregandoLocalizacao = false,
+  rastreioColaborativo,
+  onAlternarRastreioColaborativo,
   ref,
 }: MapaProps) {
   const { trackTiming } = useAnalytics();
@@ -136,6 +142,8 @@ export function Mapa({
 
       <MapRoute linha={linhaSelecionada} />
 
+      <PlannerMapOverlay />
+
       <MapMarkers
         paradas={todasParadas}
         paradaDestacadaId={paradaDestacadaId}
@@ -149,6 +157,8 @@ export function Mapa({
           permissaoConcedida={permissaoLocalizacao}
           onPedirLocalizacao={onPedirLocalizacao}
           carregandoLocalizacao={carregandoLocalizacao}
+          rastreioColaborativo={rastreioColaborativo}
+          onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
         />
       )}
 

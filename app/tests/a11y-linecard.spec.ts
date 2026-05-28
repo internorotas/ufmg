@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 test('LineCard mantém ações acessíveis', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem('onboarding_completed', 'true');
+  });
+
   await page.goto('/ufmg/');
 
   await expect(page).toHaveTitle(/Interno Rotas/);
@@ -19,10 +23,14 @@ test('LineCard mantém ações acessíveis', async ({ page }) => {
   await expect(detailsButton).toHaveAttribute('aria-label', /Ver detalhes da linha/);
 
   const mobileMenuTrigger = page.locator('[data-slot="mobile-trigger"]');
+  const sidebar = page.locator('[data-slot="sidebar"]');
 
-  if (await mobileMenuTrigger.isVisible()) {
+  if (
+    (await mobileMenuTrigger.isVisible()) &&
+    (await sidebar.getAttribute('data-state')) !== 'open'
+  ) {
     await mobileMenuTrigger.click();
-    await expect(page.locator('[data-slot="sidebar"]')).toHaveAttribute('data-state', 'open');
+    await expect(sidebar).toHaveAttribute('data-state', 'open');
   }
 
   await expect(page.getByRole('searchbox', { name: 'Pesquisar linha de ônibus' })).toBeVisible();

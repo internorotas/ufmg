@@ -1,0 +1,7 @@
+.git
+.github
+.husky
+app/dist
+app/node_modules
+node_modules
+*.log

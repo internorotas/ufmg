@@ -27,6 +27,39 @@ export const badgeVariants = tv({
       warning: ['bg-warning-bg text-warning-text border-warning-border'],
       danger: ['bg-warning-bg text-warning-text border-warning-border'],
       neutral: ['bg-neutral-bg text-neutral-text border-neutral-border'],
+      bronze: [
+        'bg-[var(--gamification-bronze-bg)] text-[var(--gamification-bronze-text)] border-[var(--gamification-bronze-border)]',
+      ],
+      prata: [
+        'bg-[var(--gamification-prata-bg)] text-[var(--gamification-prata-text)] border-[var(--gamification-prata-border)]',
+      ],
+      ouro: [
+        'bg-[var(--gamification-ouro-bg)] text-[var(--gamification-ouro-text)] border-[var(--gamification-ouro-border)]',
+      ],
+      platina: [
+        'bg-[var(--gamification-platina-bg)] text-[var(--gamification-platina-text)] border-[var(--gamification-platina-border)]',
+      ],
+      comum: [
+        'bg-[var(--gamification-rarity-common-bg)] text-[var(--gamification-rarity-common-text)] border-[var(--gamification-rarity-common-border)]',
+      ],
+      raro: [
+        'bg-[var(--gamification-rarity-rare-bg)] text-[var(--gamification-rarity-rare-text)] border-[var(--gamification-rarity-rare-border)]',
+      ],
+      epico: [
+        'bg-[var(--gamification-rarity-epic-bg)] text-[var(--gamification-rarity-epic-text)] border-[var(--gamification-rarity-epic-border)]',
+      ],
+      lendario: [
+        'bg-[var(--gamification-rarity-legendary-bg)] text-[var(--gamification-rarity-legendary-text)] border-[var(--gamification-rarity-legendary-border)]',
+      ],
+      gps_ativo: [
+        'bg-[var(--gamification-gps-active-bg)] text-[var(--gamification-gps-active-text)] border-[var(--gamification-gps-active-border)]',
+      ],
+      gps_inativo: [
+        'bg-[var(--gamification-gps-inactive-bg)] text-[var(--gamification-gps-inactive-text)] border-[var(--gamification-gps-inactive-border)]',
+      ],
+      gps_incerto: [
+        'bg-[var(--gamification-gps-uncertain-bg)] text-[var(--gamification-gps-uncertain-text)] border-[var(--gamification-gps-uncertain-border)]',
+      ],
 
       // Brand badges
       primary: [

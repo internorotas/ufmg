@@ -1,11 +1,39 @@
+import * as Sentry from '@sentry/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { useAuthStore } from '@/features/auth/store/authStore';
+import { getTenantStorageKey } from '@/pwa/tenantNamespace';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+import { applyTenantDocumentMetadata } from '@/tenants/tenantConfig';
+import '@/i18n';
 
 import './globals.css';
 
 import { App } from './App';
+import { AppQueryProvider } from './providers/AppQueryProvider';
 
-const SW_RELOAD_GUARD_KEY = 'ufmg:sw-reload-build-id';
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    tracesSampleRate: 0.1,
+    environment: import.meta.env.MODE,
+    beforeSend(event) {
+      if (event.request?.headers?.authorization) {
+        delete event.request.headers.authorization;
+      }
+
+      if (event.user?.email) {
+        delete event.user.email;
+      }
+
+      return event;
+    },
+  });
+}
+
+const SW_RELOAD_GUARD_KEY = getTenantStorageKey('sw-reload-build-id');
+const SW_UPDATE_IN_PROGRESS_KEY = getTenantStorageKey('sw-update-in-progress');
 const UPDATE_STATUS_REGION_ID = 'app-update-status';
 const SERVICE_WORKER_UPDATE_INTERVAL_MS = 60_000;
 const SERVICE_WORKER_SCOPE = import.meta.env.BASE_URL;
@@ -17,6 +45,8 @@ const MANIFEST_URL = new URL(
   `${import.meta.env.BASE_URL}site.webmanifest`,
   window.location.origin,
 ).toString();
+
+applyTenantDocumentMetadata();
 
 function ensureUpdateStatusRegion(): HTMLElement {
   const existingRegion = document.getElementById(UPDATE_STATUS_REGION_ID);
@@ -48,16 +78,45 @@ function ensureUpdateStatusRegion(): HTMLElement {
 }
 
 function triggerSingleReloadForUpdatedServiceWorker(): void {
+  if (sessionStorage.getItem(SW_UPDATE_IN_PROGRESS_KEY) === import.meta.env.VITE_BUILD_ID) {
+    return;
+  }
+
   if (sessionStorage.getItem(SW_RELOAD_GUARD_KEY) === import.meta.env.VITE_BUILD_ID) {
     return;
   }
 
+  sessionStorage.setItem(SW_UPDATE_IN_PROGRESS_KEY, import.meta.env.VITE_BUILD_ID);
   sessionStorage.setItem(SW_RELOAD_GUARD_KEY, import.meta.env.VITE_BUILD_ID);
   ensureUpdateStatusRegion().textContent = 'Nova versão disponível. Atualizando o aplicativo.';
 
   window.setTimeout(() => {
     window.location.reload();
   }, 150);
+}
+
+async function forceServiceWorkerUpdate(): Promise<void> {
+  if (!('serviceWorker' in navigator)) {
+    triggerSingleReloadForUpdatedServiceWorker();
+    return;
+  }
+
+  const registration = await navigator.serviceWorker.getRegistration(SERVICE_WORKER_SCOPE);
+  if (registration) {
+    await registration.update();
+  }
+
+  triggerSingleReloadForUpdatedServiceWorker();
+}
+
+function handleApiVersionMismatch(): void {
+  ensureUpdateStatusRegion().textContent =
+    'Detectada versão incompatível da API. Atualizando o aplicativo.';
+
+  void forceServiceWorkerUpdate().catch((err: unknown) => {
+    Sentry.captureException(err, { contexts: { source: { fn: 'handleApiVersionMismatch' } } });
+    triggerSingleReloadForUpdatedServiceWorker();
+  });
 }
 
 function ensureManifestLink(): void {
@@ -107,6 +166,36 @@ function registerAppServiceWorker(): void {
     triggerSingleReloadForUpdatedServiceWorker();
   });
 
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type === 'gps-flush-queue') {
+      window.dispatchEvent(new CustomEvent('interno-rotas:gps-flush-queue'));
+      return;
+    }
+
+    if (event.data?.type === 'push-resubscribe') {
+      const sub = event.data.subscription as {
+        endpoint?: string;
+        keys?: { p256dh?: string; auth?: string };
+      } | null;
+      if (sub?.endpoint && sub.keys?.p256dh && sub.keys?.auth) {
+        const accessToken = useAuthStore.getState().accessToken;
+        void fetch(resolveApiEndpoint('/v1/push/subscriptions'), {
+          method: 'POST',
+          headers: withTenantHeaders({
+            'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          }),
+          body: JSON.stringify({
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth },
+            context: null,
+          }),
+          keepalive: true,
+        }).catch(() => undefined);
+      }
+    }
+  });
+
   navigator.serviceWorker
     .register(SERVICE_WORKER_URL, { scope: SERVICE_WORKER_SCOPE })
     .then((registration) => {
@@ -123,6 +212,7 @@ function registerAppServiceWorker(): void {
     .catch((error: unknown) => {
       // biome-ignore lint/suspicious/noConsole: log intencional de falha no registro do service worker
       console.error('Falha ao registrar o service worker da aplicação.', error);
+      Sentry.captureException(error, { contexts: { source: { fn: 'registerAppServiceWorker' } } });
     });
 }
 
@@ -145,9 +235,18 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <AppQueryProvider>
+      <BrowserRouter
+        basename={import.meta.env.BASE_URL}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <App />
+      </BrowserRouter>
+    </AppQueryProvider>
   </StrictMode>,
 );
+
+window.addEventListener('internorotas:api-version-mismatch', handleApiVersionMismatch);
 
 ensureManifestLink();
 registerAppServiceWorker();
