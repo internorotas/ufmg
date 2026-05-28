@@ -1,1 +1,0 @@
-var e={live:`Ao vivo`,historical:`Histórico`,scheduled:`Programado`};export{e as t};
