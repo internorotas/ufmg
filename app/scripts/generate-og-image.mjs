@@ -17,7 +17,7 @@ const publicDir = path.resolve(__dirname, '../public');
 const outputPath = path.resolve(publicDir, 'og-image.png');
 
 const iconSvg = readFileSync(path.join(publicDir, 'logo_Icone.svg'), 'utf-8');
-const iconBase64 = Buffer.from(iconSvg).toString('base64');
+const iconBase64 = Buffer.from(iconSvg).toString('base64'); 
 const iconDataUrl = `data:image/svg+xml;base64,${iconBase64}`;
 
 const html = `<!DOCTYPE html>
