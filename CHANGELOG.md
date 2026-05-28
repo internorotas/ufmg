@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/internorotas/ufmg/compare/v1.4.0...v1.4.1) (2026-05-28)
+
+
+### Bug Fixes
+
+* corrigir formatação do código ao gerar a imagem OG ([#309](https://github.com/internorotas/ufmg/issues/309)) ([534ef92](https://github.com/internorotas/ufmg/commit/534ef92be422103c7bf1c6e1fce0d3b7ea890227))
+
 # [1.4.0](https://github.com/internorotas/ufmg/compare/v1.3.0...v1.4.0) (2026-04-20)
 
 
