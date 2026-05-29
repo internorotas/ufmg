@@ -11,11 +11,14 @@ import { NAV_ITEMS, type NavItem } from '@/components/app/navItems';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { cn } from '@/lib/utils';
 
-function isItemActive(currentPath: string, item: NavItem): boolean {
+function isItemActive(currentPath: string, item: NavItem, resolvedTo: string): boolean {
   if (item.matchPrefix) {
-    return currentPath === item.matchPrefix || currentPath.startsWith(`${item.matchPrefix}/`);
+    if (currentPath === item.matchPrefix || currentPath.startsWith(`${item.matchPrefix}/`)) {
+      return true;
+    }
   }
-  return currentPath === item.to;
+  const targets = [item.to, resolvedTo].filter(Boolean);
+  return targets.some((t) => currentPath === t || currentPath.startsWith(`${t}/`));
 }
 
 export function NavRail() {
@@ -34,8 +37,8 @@ export function NavRail() {
       <nav aria-label="Páginas principais" className="mt-4 flex flex-1 flex-col gap-1 px-2">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
-          const active = isItemActive(location.pathname, item);
           const resolvedTo = !isAuthenticated && item.anonymousTo ? item.anonymousTo : item.to;
+          const active = isItemActive(location.pathname, item, resolvedTo);
           return (
             <Link
               key={item.to}

@@ -13,8 +13,6 @@
 import { Bus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BottomNav } from '@/components/app/BottomNav';
-import { NavRail } from '@/components/app/NavRail';
 import { Button } from '@/components/ui/Button';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import {
@@ -112,7 +110,7 @@ export function LoginPage() {
   // flash do formulário de login em usuários já autenticados.
   if (authStatus === 'booting') {
     return (
-      <div className="flex h-dvh items-center justify-center bg-background-secondary">
+      <div className="flex flex-1 items-center justify-center bg-background-secondary">
         <div
           className="size-7 animate-spin rounded-full border-2 border-brand-primary border-t-transparent"
           role="status"
@@ -153,8 +151,7 @@ export function LoginPage() {
         : 'Entrar com Google';
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-background-secondary text-text-primary">
-      <NavRail />
+    <div className="flex flex-1 min-h-0 overflow-hidden bg-background-secondary text-text-primary">
       <main className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 pt-12 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12">
         <div className="w-full max-w-sm">
           {/* Card */}
@@ -220,7 +217,6 @@ export function LoginPage() {
           </p>
         </div>
       </main>
-      <BottomNav />
     </div>
   );
 }

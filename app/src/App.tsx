@@ -366,7 +366,7 @@ function AppContent() {
   };
 
   return (
-    <div className="relative flex h-screen min-h-dvh w-full overflow-hidden bg-background font-['Poppins',sans-serif] pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
+    <div className="relative flex flex-1 min-h-0 w-full overflow-hidden bg-background pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
       <OnboardingModal onOpenLegalModal={handleOpenLegalModal} />
       <a
         href="#main-content"
@@ -374,7 +374,6 @@ function AppContent() {
       >
         Pular para o mapa
       </a>
-      <NavRail />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
         <MobileTopBar
@@ -513,7 +512,6 @@ function AppContent() {
           </div>
         ) : null}
 
-        <BottomNav />
       </div>
     </div>
   );
@@ -526,17 +524,23 @@ function AuthenticatedAppShell() {
     <RotasProvider>
       <AnalyticsProvider>
         <NotificacaoProvider>
-          <Routes>
-            <Route path="/" element={<AppContent />} />
-            <Route path="/privacidade" element={<AppContent />} />
-            <Route path="/termos" element={<AppContent />} />
-            <Route path="/sobre" element={<AboutPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/perfil" element={<ProfilePage />} />
-            <Route path="/ranking" element={<RankingPage />} />
-            <Route path="/mais" element={<MorePage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <div className="flex h-dvh overflow-hidden bg-background text-text-primary">
+            <NavRail />
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+              <Routes>
+                <Route path="/" element={<AppContent />} />
+                <Route path="/privacidade" element={<AppContent />} />
+                <Route path="/termos" element={<AppContent />} />
+                <Route path="/sobre" element={<AboutPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/perfil" element={<ProfilePage />} />
+                <Route path="/ranking" element={<RankingPage />} />
+                <Route path="/mais" element={<MorePage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </div>
+            <BottomNav />
+          </div>
         </NotificacaoProvider>
       </AnalyticsProvider>
     </RotasProvider>

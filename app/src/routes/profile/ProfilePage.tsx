@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
-import { InfoRow } from '@/components/ui/InfoRow';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
+import { SwitchRow } from '@/components/ui/SwitchRow';
 import { ToggleRow } from '@/components/ui/ToggleRow';
 import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
+import { updateConsentState } from '@/features/auth/api/authClient';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { AchievementsGrid } from '@/features/gamification/components/AchievementsGrid';
 import { ContributionHeatmap } from '@/features/gamification/components/ContributionHeatmap';
@@ -25,7 +27,7 @@ import {
 } from '@/features/profile/api/profileClient';
 import { DeleteAccountDialog } from '@/features/profile/components/DeleteAccountDialog';
 import { useMounted } from '@/hooks/useMounted';
-import { formatConsent, formatDateTimePtBr } from '@/lib/formatters';
+import { formatDateTimePtBr } from '@/lib/formatters';
 
 interface ProfileFeedbackState {
   type: 'success' | 'error';
@@ -125,17 +127,59 @@ export function ProfilePage() {
     void handleProfileUpdate({ rankingDetail: nextRankingDetail });
   }, [handleProfileUpdate, profile]);
 
-  const handleCycleNotificationProfile = useCallback(() => {
-    if (!profile) {
-      return;
+  const handleToggleConsentGps = useCallback(async () => {
+    if (!profile || isUpdatingProfile) return;
+    setIsUpdatingProfile(true);
+    setFeedback(null);
+    try {
+      const currentGps = !!profile.consentGpsAt;
+      await updateConsentState({
+        consentGps: !currentGps,
+        consentResearch: !!profile.consentResearchAt,
+      });
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              consentGpsAt: currentGps ? null : new Date().toISOString(),
+            }
+          : prev,
+      );
+      setFeedback({ type: 'success', message: 'Consentimento GPS atualizado.' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Falha ao atualizar consentimento.';
+      setFeedback({ type: 'error', message });
+    } finally {
+      setIsUpdatingProfile(false);
     }
+  }, [isUpdatingProfile, profile]);
 
-    const sequence: Array<UserProfile['notificationProfile']> = ['minimo', 'normal', 'tudo'];
-    const currentIndex = sequence.indexOf(profile.notificationProfile);
-    const nextIndex = (currentIndex + 1) % sequence.length;
-    const nextNotificationProfile = sequence[nextIndex] ?? 'normal';
-    void handleProfileUpdate({ notificationProfile: nextNotificationProfile });
-  }, [handleProfileUpdate, profile]);
+  const handleToggleConsentResearch = useCallback(async () => {
+    if (!profile || isUpdatingProfile) return;
+    setIsUpdatingProfile(true);
+    setFeedback(null);
+    try {
+      const currentResearch = !!profile.consentResearchAt;
+      await updateConsentState({
+        consentGps: !!profile.consentGpsAt,
+        consentResearch: !currentResearch,
+      });
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              consentResearchAt: currentResearch ? null : new Date().toISOString(),
+            }
+          : prev,
+      );
+      setFeedback({ type: 'success', message: 'Consentimento de pesquisa atualizado.' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Falha ao atualizar consentimento.';
+      setFeedback({ type: 'error', message });
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  }, [isUpdatingProfile, profile]);
 
   const handleLogout = useCallback(async () => {
     setFeedback(null);
@@ -180,22 +224,6 @@ export function ProfilePage() {
     }
 
     return profile.rankingDetail === 'geral' ? 'Ranking geral' : 'Ranking por linha';
-  }, [profile]);
-
-  const notificationProfileLabel = useMemo(() => {
-    if (!profile) {
-      return 'Normal';
-    }
-
-    if (profile.notificationProfile === 'minimo') {
-      return 'Mínimo';
-    }
-
-    if (profile.notificationProfile === 'tudo') {
-      return 'Tudo';
-    }
-
-    return 'Normal';
   }, [profile]);
 
   const weeklyRankLabel = useMemo(() => {
@@ -282,29 +310,21 @@ export function ProfilePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <ToggleRow
+              <SwitchRow
                 label="Perfil público"
-                trailing={
-                  <Badge variant={profile.profilePublic ? 'success' : 'neutral'}>
-                    {profile.profilePublic ? 'Ativo' : 'Oculto'}
-                  </Badge>
-                }
+                checked={profile.profilePublic}
                 onClick={handleToggleProfilePublic}
                 disabled={isUpdatingProfile}
               />
 
-              <ToggleRow
+              <SwitchRow
                 label={
                   <span className="flex items-center gap-2">
                     <MapPin size={16} aria-hidden="true" />
                     Marcador no mapa
                   </span>
                 }
-                trailing={
-                  <Badge variant={profile.mapMarkerVisible ? 'success' : 'neutral'}>
-                    {profile.mapMarkerVisible ? 'Visível' : 'Oculto'}
-                  </Badge>
-                }
+                checked={profile.mapMarkerVisible}
                 onClick={handleToggleMapMarker}
                 disabled={isUpdatingProfile}
               />
@@ -325,22 +345,44 @@ export function ProfilePage() {
                 Notificações e consentimento
               </CardTitle>
               <CardDescription>
-                Estado atual de consentimento LGPD e preferência de notificações, incluindo eventos
-                colaborativos da Fase 7.
+                Estado de consentimento LGPD e preferência de notificações para eventos
+                colaborativos.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <ToggleRow
-                label="Perfil de notificação"
-                trailing={<Badge variant="info">{notificationProfileLabel}</Badge>}
-                onClick={handleCycleNotificationProfile}
+              <div className="space-y-1.5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                  Perfil de notificação
+                </p>
+                <SegmentedControl
+                  options={[
+                    { value: 'minimo', label: 'Mínimo' },
+                    { value: 'normal', label: 'Normal' },
+                    { value: 'tudo', label: 'Tudo' },
+                  ]}
+                  value={profile.notificationProfile}
+                  onChange={(value) => void handleProfileUpdate({ notificationProfile: value })}
+                  disabled={isUpdatingProfile}
+                />
+              </div>
+
+              <SwitchRow
+                label={
+                  <span className="flex items-center gap-2">
+                    <MapPin size={16} aria-hidden="true" />
+                    Consentimento GPS
+                  </span>
+                }
+                checked={!!profile.consentGpsAt}
+                onClick={() => void handleToggleConsentGps()}
                 disabled={isUpdatingProfile}
               />
 
-              <InfoRow label="Consentimento GPS" value={formatConsent(profile.consentGpsAt)} />
-              <InfoRow
+              <SwitchRow
                 label="Consentimento pesquisa"
-                value={formatConsent(profile.consentResearchAt)}
+                checked={!!profile.consentResearchAt}
+                onClick={() => void handleToggleConsentResearch()}
+                disabled={isUpdatingProfile}
               />
 
               <div className="rounded-lg border border-card-border bg-background px-3 py-2 text-sm text-text-secondary">

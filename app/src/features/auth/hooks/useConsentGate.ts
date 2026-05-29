@@ -27,7 +27,7 @@ export async function resolveConsentStatus(options: {
 }
 
 export function useConsentGate() {
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated, authStatus } = useAuthContext();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [consentStatus, setConsentStatus] = useState<ConsentGateStatus>('unknown');
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
@@ -35,6 +35,11 @@ export function useConsentGate() {
 
   const executeProtectedAction = useCallback(
     async (action: () => void | Promise<void>): Promise<ExecuteResult> => {
+      // During auth bootstrap, silently block without showing any message
+      if (authStatus === 'booting') {
+        return { allowed: false };
+      }
+
       const status = await resolveConsentStatus({
         isAuthenticated,
         cachedStatus: consentStatus,
@@ -63,7 +68,7 @@ export function useConsentGate() {
       setFeedbackMessage(null);
       return { allowed: false };
     },
-    [consentStatus, isAuthenticated],
+    [consentStatus, isAuthenticated, authStatus],
   );
 
   const acceptAndContinue = useCallback(async () => {

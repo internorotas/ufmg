@@ -36,16 +36,16 @@ export const buttonVariants = tv({
         'hover:bg-success-border/90 focus-visible:ring-success-border',
       ],
       danger: [
-        'bg-warning-border text-text-inverse shadow-sm',
-        'hover:bg-warning-border/90 focus-visible:ring-warning-border',
+        'bg-red-600 text-white shadow-sm',
+        'hover:bg-red-500 focus-visible:ring-red-500',
       ],
       ghost: [
         'bg-transparent text-text-primary',
-        'hover:bg-card-hover focus-visible:ring-card-border',
+        'hover:bg-card-hover focus-visible:ring-brand-primary',
       ],
       outline: [
         'border border-card-border bg-transparent text-text-primary',
-        'hover:bg-card-hover focus-visible:ring-card-border',
+        'hover:bg-card-hover hover:border-neutral-border focus-visible:ring-brand-primary',
       ],
       link: [
         'bg-transparent text-internoRotas-azul-eletrico underline-offset-4',
