@@ -7,13 +7,14 @@
  */
 
 import { Bus } from 'lucide-react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { BottomNav } from '@/components/app/BottomNav';
 import { NavRail } from '@/components/app/NavRail';
 import { Button } from '@/components/ui/Button';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import { AuthRequestError, startGoogleLoginFlow } from '@/features/auth/api/authClient';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { tenantConfig } from '@/tenants/tenantConfig';
 
 /** Mensagem amigável por status HTTP (ou null para rede). */
@@ -61,6 +62,19 @@ function GoogleIcon() {
 export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const authStatus = useAuthStore((s) => s.authStatus);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  // Redireciona para o perfil assim que o bootstrap confirmar autenticação.
+  // Cobre o retorno do OAuth: backend redireciona para /login, bootstrap
+  // troca o cookie por accessToken, e este efeito leva o usuário ao perfil.
+  useEffect(() => {
+    if (authStatus !== 'booting' && isAuthenticated) {
+      navigate('/perfil', { replace: true });
+    }
+  }, [authStatus, isAuthenticated, navigate]);
 
   async function handleGoogleLogin() {
     setIsLoading(true);
