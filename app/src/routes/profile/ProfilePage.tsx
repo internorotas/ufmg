@@ -1,5 +1,5 @@
 import { AlertTriangle, Bell, Eye, EyeOff, MapPin, Medal, Trophy, UserCircle2 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
 import { DataStatusScreen } from '@/components/app/DataStatusScreen';
@@ -48,6 +48,12 @@ export function ProfilePage() {
   const [feedback, setFeedback] = useState<ProfileFeedbackState | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const isMounted = useMounted();
+  // Refs estáveis para evitar que funções de contexto com referência instável
+  // disparem re-execuções desnecessárias do efeito de carregamento de perfil.
+  const publishPointEventRef = useRef(publishPointEvent);
+  const updateUserRef = useRef(updateUser);
+  useEffect(() => { publishPointEventRef.current = publishPointEvent; });
+  useEffect(() => { updateUserRef.current = updateUser; });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -63,8 +69,8 @@ export function ProfilePage() {
         if (!isMounted()) return;
 
         setProfile(response);
-        updateUser(toAuthenticatedUser(response));
-        publishPointEvent(response.gamification.recentPointEvents[0] ?? null);
+        updateUserRef.current(toAuthenticatedUser(response));
+        publishPointEventRef.current(response.gamification.recentPointEvents[0] ?? null);
       } catch (error) {
         if (!isMounted()) return;
 
@@ -76,7 +82,11 @@ export function ProfilePage() {
     };
 
     void loadProfile();
-  }, [isAuthenticated, isMounted, publishPointEvent, updateUser]);
+    // Somente re-executa quando a autenticação mudar. publishPointEvent e
+    // updateUser são capturados via ref para evitar loops causados por
+    // referências instáveis vindas dos providers de contexto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, isMounted]);
 
   const handleProfileUpdate = useCallback(
     async (payload: ProfileUpdatePayload) => {
@@ -132,18 +142,14 @@ export function ProfilePage() {
     setIsUpdatingProfile(true);
     setFeedback(null);
     try {
-      const currentGps = !!profile.consentGpsAt;
-      await updateConsentState({
-        consentGps: !currentGps,
+      const result = await updateConsentState({
+        consentGps: !profile.consentGpsAt,
         consentResearch: !!profile.consentResearchAt,
       });
+      // Usa o timestamp retornado pelo servidor (não um timestamp local) para
+      // garantir que o estado local reflita exatamente o que foi persistido.
       setProfile((prev) =>
-        prev
-          ? {
-              ...prev,
-              consentGpsAt: currentGps ? null : new Date().toISOString(),
-            }
-          : prev,
+        prev ? { ...prev, consentGpsAt: result.consentGpsAt } : prev,
       );
       setFeedback({ type: 'success', message: 'Consentimento GPS atualizado.' });
     } catch (error) {
@@ -159,18 +165,12 @@ export function ProfilePage() {
     setIsUpdatingProfile(true);
     setFeedback(null);
     try {
-      const currentResearch = !!profile.consentResearchAt;
-      await updateConsentState({
+      const result = await updateConsentState({
         consentGps: !!profile.consentGpsAt,
-        consentResearch: !currentResearch,
+        consentResearch: !profile.consentResearchAt,
       });
       setProfile((prev) =>
-        prev
-          ? {
-              ...prev,
-              consentResearchAt: currentResearch ? null : new Date().toISOString(),
-            }
-          : prev,
+        prev ? { ...prev, consentResearchAt: result.consentResearchAt } : prev,
       );
       setFeedback({ type: 'success', message: 'Consentimento de pesquisa atualizado.' });
     } catch (error) {
