@@ -8,7 +8,7 @@
 
 import { Bus } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BottomNav } from '@/components/app/BottomNav';
 import { NavRail } from '@/components/app/NavRail';
 import { Button } from '@/components/ui/Button';
@@ -63,24 +63,31 @@ export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const authStatus = useAuthStore((s) => s.authStatus);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  // Redireciona para o perfil assim que o bootstrap confirmar autenticação.
-  // Cobre o retorno do OAuth: backend redireciona para /login, bootstrap
-  // troca o cookie por accessToken, e este efeito leva o usuário ao perfil.
+  // Página de retorno após o login: quem navega para /login deve passar
+  // { state: { from: location.pathname } }. Fallback para '/' (home/mapa).
+  const from = (location.state as { from?: string } | null)?.from ?? '/';
+
+  // Redireciona para a página de origem assim que o bootstrap confirmar
+  // autenticação. Cobre o retorno do OAuth: backend → /login → aqui.
   useEffect(() => {
     if (authStatus !== 'booting' && isAuthenticated) {
-      navigate('/perfil', { replace: true });
+      navigate(from, { replace: true });
     }
-  }, [authStatus, isAuthenticated, navigate]);
+  }, [authStatus, isAuthenticated, navigate, from]);
 
   async function handleGoogleLogin() {
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      await startGoogleLoginFlow();
+      // Passa a URL de retorno para o backend embuti-la no state JWT do OAuth.
+      // Após o consent, o backend redireciona direto para returnUrl (não /login).
+      const returnUrl = new URL(from, window.location.origin).toString();
+      await startGoogleLoginFlow(returnUrl);
       // startGoogleLoginFlow chama window.location.assign — página navega para fora
     } catch (error) {
       setErrorMsg(resolveErrorMessage(error));

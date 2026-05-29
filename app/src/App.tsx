@@ -362,7 +362,7 @@ function AppContent() {
       setIsProfileSheetOpen(true);
       return;
     }
-    navigate('/login');
+    navigate('/login', { state: { from: location.pathname } });
   };
 
   return (
@@ -505,7 +505,7 @@ function AppContent() {
             <span className="flex-1">{feedbackMessage}</span>
             <button
               type="button"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/login', { state: { from: location.pathname } })}
               className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-md bg-warning-text px-3 text-xs font-semibold text-warning-bg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning-text focus-visible:ring-offset-2 focus-visible:ring-offset-warning-bg"
             >
               Entrar

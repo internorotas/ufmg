@@ -94,9 +94,10 @@ export async function refreshSession(): Promise<RefreshResponse> {
   return response.json() as Promise<RefreshResponse>;
 }
 
-export async function startGoogleLoginFlow(): Promise<void> {
+export async function startGoogleLoginFlow(returnUrl?: string): Promise<void> {
+  const continueUrl = returnUrl ?? resolveLoginContinueUrl();
   const endpoint = new URL(resolveAuthEndpoint('/v1/auth/google/start'), window.location.origin);
-  endpoint.searchParams.set('continueUrl', resolveLoginContinueUrl());
+  endpoint.searchParams.set('continueUrl', continueUrl);
 
   let response: Response;
   try {
