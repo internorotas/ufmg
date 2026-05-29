@@ -4,6 +4,10 @@
  * Rota: /login
  * Contexto: Qualquer usuário não autenticado que clicar em "Entrar"
  *           é redirecionado aqui antes de iniciar o fluxo OAuth.
+ *
+ * Parâmetros de URL aceitos:
+ *   ?from=<path>   - destino após login (sobrepõe router state)
+ *   ?error=<code>  - código de erro vindo do callback do backend
  */
 
 import { Bus } from 'lucide-react';
@@ -13,14 +17,27 @@ import { BottomNav } from '@/components/app/BottomNav';
 import { NavRail } from '@/components/app/NavRail';
 import { Button } from '@/components/ui/Button';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
-import { AuthRequestError, startGoogleLoginFlow } from '@/features/auth/api/authClient';
+import {
+  AuthRequestError,
+  startGoogleLoginFlow,
+  warmupBackend,
+} from '@/features/auth/api/authClient';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { tenantConfig } from '@/tenants/tenantConfig';
 
-/** Mensagem amigável por status HTTP (ou null para rede). */
-function resolveErrorMessage(error: unknown): string {
-  if (error instanceof AuthRequestError) {
-    const { status } = error;
+type LoadingState = 'idle' | 'warming' | 'redirecting';
+
+/** Mensagem amigável por código de erro de URL ou status HTTP. */
+function resolveErrorMessage(errorOrCode: unknown): string {
+  // Erros vindos do URL param ?error=<code> (retornados pelo backend)
+  if (typeof errorOrCode === 'string') {
+    if (errorOrCode === 'auth_failed') return 'Falha na autenticação. Tente novamente.';
+    if (errorOrCode === 'missing_params') return 'Erro ao processar autenticação. Tente novamente.';
+    return 'Erro desconhecido. Tente novamente.';
+  }
+  // Erros de rede/HTTP lançados por startGoogleLoginFlow
+  if (errorOrCode instanceof AuthRequestError) {
+    const { status } = errorOrCode;
     if (status === null) return 'Falha de conexão. Verifique sua internet e tente novamente.';
     if (status === 429) return 'Muitas tentativas. Aguarde alguns segundos e tente novamente.';
     if (status >= 500) return 'Serviço temporariamente indisponível. Tente novamente em instantes.';
@@ -60,40 +77,80 @@ function GoogleIcon() {
 }
 
 export function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [loadingState, setLoadingState] = useState<LoadingState>('idle');
   const navigate = useNavigate();
   const location = useLocation();
 
   const authStatus = useAuthStore((s) => s.authStatus);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  // Página de retorno após o login: quem navega para /login deve passar
-  // { state: { from: location.pathname } }. Fallback para '/' (home/mapa).
-  const from = (location.state as { from?: string } | null)?.from ?? '/';
+  const searchParams = new URLSearchParams(location.search);
+
+  // `from` pode vir de:
+  // 1. URL param ?from=<path> — sobrevive ao redirect OAuth
+  // 2. React Router state — para navegações internas
+  // Apenas caminhos relativos são aceitos para evitar open redirect.
+  const rawFrom =
+    searchParams.get('from') ?? (location.state as { from?: string } | null)?.from ?? '/';
+  const from = rawFrom.startsWith('/') ? rawFrom : '/';
+
+  // Erro vindo do callback do backend (?error=auth_failed | ?error=missing_params)
+  const urlErrorCode = searchParams.get('error');
+  const [errorMsg, setErrorMsg] = useState<string | null>(() =>
+    urlErrorCode ? resolveErrorMessage(urlErrorCode) : null,
+  );
 
   // Redireciona para a página de origem assim que o bootstrap confirmar
-  // autenticação. Cobre o retorno do OAuth: backend → /login → aqui.
+  // autenticação. Cobre o retorno do OAuth: backend → /login?from=... → aqui.
   useEffect(() => {
     if (authStatus !== 'booting' && isAuthenticated) {
       navigate(from, { replace: true });
     }
   }, [authStatus, isAuthenticated, navigate, from]);
 
+  // Enquanto o bootstrap verifica a sessão, mostrar spinner para evitar
+  // flash do formulário de login em usuários já autenticados.
+  if (authStatus === 'booting') {
+    return (
+      <div className="flex h-dvh items-center justify-center bg-background-secondary">
+        <div
+          className="size-7 animate-spin rounded-full border-2 border-brand-primary border-t-transparent"
+          role="status"
+          aria-label="Carregando"
+        />
+      </div>
+    );
+  }
+
   async function handleGoogleLogin() {
-    setIsLoading(true);
+    setLoadingState('warming');
     setErrorMsg(null);
     try {
-      // Passa a URL de retorno para o backend embuti-la no state JWT do OAuth.
-      // Após o consent, o backend redireciona direto para returnUrl (não /login).
-      const returnUrl = new URL(from, window.location.origin).toString();
-      await startGoogleLoginFlow(returnUrl);
+      // Acorda o backend (Render free tier pode estar dormindo).
+      await warmupBackend();
+      setLoadingState('redirecting');
+      // O continueUrl é a própria página de login com ?from=... codificado.
+      // Isso garante que erros do backend redirecionem de volta para cá,
+      // e que o destino final sobreviva ao redirect OAuth.
+      const loginPageUrl = new URL(window.location.pathname, window.location.origin);
+      if (from !== '/') {
+        loginPageUrl.searchParams.set('from', from);
+      }
+      await startGoogleLoginFlow(loginPageUrl.toString());
       // startGoogleLoginFlow chama window.location.assign — página navega para fora
     } catch (error) {
       setErrorMsg(resolveErrorMessage(error));
-      setIsLoading(false);
+      setLoadingState('idle');
     }
   }
+
+  const isLoading = loadingState !== 'idle';
+  const buttonLabel =
+    loadingState === 'warming'
+      ? 'Conectando…'
+      : loadingState === 'redirecting'
+        ? 'Redirecionando…'
+        : 'Entrar com Google';
 
   return (
     <div className="flex h-dvh overflow-hidden bg-background-secondary text-text-primary">
@@ -135,7 +192,7 @@ export function LoginPage() {
               onClick={() => void handleGoogleLogin()}
               aria-label="Entrar com Google"
             >
-              {isLoading ? 'Redirecionando…' : 'Entrar com Google'}
+              {buttonLabel}
             </Button>
 
             {/* Pular login */}

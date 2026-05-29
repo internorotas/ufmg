@@ -127,6 +127,28 @@ export async function startGoogleLoginFlow(returnUrl?: string): Promise<void> {
   window.location.assign(payload.authUrl);
 }
 
+/**
+ * Pinga o backend para acordá-lo antes do fluxo OAuth.
+ * O Render free tier dorme após 15min de inatividade; o cold start leva ~15s.
+ * Esta chamada é best-effort: erros e timeouts são silenciados.
+ */
+export async function warmupBackend(): Promise<void> {
+  const endpoint = resolveApiEndpoint('/health');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+  try {
+    await fetch(endpoint, {
+      method: 'GET',
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+  } catch {
+    // silenciar — warmup é best-effort
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function getConsentState(): Promise<ConsentState> {
   const response = await fetch(resolveAuthEndpoint('/v1/auth/consent'), {
     method: 'GET',
