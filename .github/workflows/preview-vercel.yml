@@ -1,0 +1,77 @@
+name: Preview Vercel (feat/integracao-geral)
+
+on:
+  push:
+    branches:
+      - feat/integracao-geral
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      VERCEL_ORG_ID: team_E2GOLXHQgPAkVBA0n4eKkR9n
+      VERCEL_PROJECT_ID: prj_j2ErPKTmAA8fQVsyKqd0wJdO5G29
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: app/pnpm-lock.yaml
+
+      - name: Instalar dependências
+        working-directory: ./app
+        run: pnpm install --frozen-lockfile
+
+      - name: Instalar Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel environment (preview)
+        working-directory: ./app
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build via Vercel CLI
+        working-directory: ./app
+        env:
+          VITE_BASE_PATH: /
+          VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
+          VITE_API_URL: https://interno-rotas-api.onrender.com
+          VITE_API_VERSION: v1
+          VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy para Vercel (prebuilt)
+        id: deploy
+        working-directory: ./app
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          echo "Deploy URL: $DEPLOYMENT_URL"
+
+      - name: Reatribuir alias interno-rotas-preview.vercel.app
+        run: |
+          DEPLOY_URL="${{ steps.deploy.outputs.deployment_url }}"
+          # Extrai o ID do deploy a partir da URL (formato: <nome>-<id>.vercel.app)
+          # Usa a API Vercel para buscar o deploymentId pelo URL e reatribuir o alias
+          curl --fail -X POST \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"alias\": \"interno-rotas-preview.vercel.app\"}" \
+            "https://api.vercel.com/v2/deployments/$(
+              curl -s \
+                -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' \
+                'https://api.vercel.com/v6/deployments?teamId=team_E2GOLXHQgPAkVBA0n4eKkR9n&projectId=prj_j2ErPKTmAA8fQVsyKqd0wJdO5G29&limit=1' \
+              | python3 -c 'import sys,json; print(json.load(sys.stdin)[\"deployments\"][0][\"uid\"])'
+            )/aliases?teamId=team_E2GOLXHQgPAkVBA0n4eKkR9n"
+          echo "Alias reatribuído para $DEPLOY_URL"
