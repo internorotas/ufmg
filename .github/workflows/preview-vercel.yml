@@ -38,11 +38,12 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Pull Vercel environment (preview)
-        working-directory: ./app
+        # Roda da raiz: rootDirectory=app está nas project settings do Vercel,
+        # então `vercel pull` precisa ver o repo inteiro para resolver o path.
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build via Vercel CLI
-        working-directory: ./app
+        # Idem: `vercel build` da raiz; Vercel CLI usa rootDirectory=app das settings.
         env:
           VITE_BASE_PATH: /
           VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
@@ -53,7 +54,6 @@ jobs:
 
       - name: Deploy para Vercel (prebuilt)
         id: deploy
-        working-directory: ./app
         run: |
           DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
