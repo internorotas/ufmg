@@ -26,6 +26,7 @@ import { useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
 import { Badge } from '@/components/ui/Badge';
+import { Switch } from '@/components/ui/Switch';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
@@ -62,7 +63,17 @@ interface ActionItem {
   variant?: 'default' | 'danger';
 }
 
-type MoreItem = InternalItem | ExternalItem | ActionItem;
+interface SwitchItem {
+  kind: 'switch';
+  icon: IconComponent;
+  label: string;
+  description: string;
+  checked: boolean;
+  onToggle: () => void;
+  disabled?: boolean;
+}
+
+type MoreItem = InternalItem | ExternalItem | ActionItem | SwitchItem;
 
 interface SectionProps {
   title: string;
@@ -165,6 +176,27 @@ function renderItem(item: MoreItem, key: string): ReactNode {
           }
         />
       </a>
+    );
+  }
+
+  if (item.kind === 'switch') {
+    return (
+      <button
+        key={key}
+        type="button"
+        role="switch"
+        aria-checked={item.checked}
+        onClick={item.onToggle}
+        disabled={item.disabled}
+        className="flex w-full min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 text-left transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <ItemShell
+          icon={item.icon}
+          label={item.label}
+          description={item.description}
+          trailing={<Switch checked={item.checked} disabled={item.disabled} />}
+        />
+      </button>
     );
   }
 
@@ -317,11 +349,12 @@ export function MorePage() {
   const preferencias: MoreItem[] = useMemo(
     () => [
       {
-        kind: 'action',
+        kind: 'switch',
         icon: SunMoon,
-        label: 'Alternar tema',
-        description: `Aparência ${theme === 'dark' ? 'escura' : 'clara'} ativa. Toque para alternar.`,
-        onClick: () => {
+        label: 'Modo escuro',
+        description: `Aparência ${theme === 'dark' ? 'escura' : 'clara'} ativa.`,
+        checked: theme === 'dark',
+        onToggle: () => {
           trackEvent({
             category: 'preferences',
             action: 'toggle_theme',
