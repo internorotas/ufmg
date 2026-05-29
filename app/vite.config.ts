@@ -56,6 +56,9 @@ export default defineConfig(({ mode }) => {
         // Deve corresponder ao paths em tsconfig.json e tsconfig.app.json
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
+      // Garante uma única instância de React em ambientes monorepo/pnpm
+      // onde pacotes aninhados poderiam resolver versões distintas.
+      dedupe: ['react', 'react-dom'],
     },
     server: {
       // Evita discrepancia localhost vs 127.0.0.1 no ambiente local.
@@ -97,13 +100,15 @@ export default defineConfig(({ mode }) => {
               return 'vendor-leaflet';
             }
 
+            // Ícones — chunk separado da lógica React (deve ser checado ANTES
+            // de 'react' pois lucide-react contém a string 'react' no nome)
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+
             // React core — chunk separado para cache independente
             if (id.includes('react') || id.includes('scheduler')) {
               return 'vendor-react';
-            }
-
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
             }
 
             if (id.includes('date-fns')) {

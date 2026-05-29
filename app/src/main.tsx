@@ -233,20 +233,25 @@ if (!rootElement) {
   throw new Error('Elemento #root não encontrado para inicializar a aplicação.');
 }
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <AppQueryProvider>
-      <BrowserRouter
-        basename={import.meta.env.BASE_URL}
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-      >
-        <App />
-      </BrowserRouter>
-    </AppQueryProvider>
-  </StrictMode>,
-);
+// Se o forceCacheRecovery (inline em index.html) está em andamento, não monta
+// o React. O script vai redirecionar a página após limpar SW + caches antigos.
+// Isso evita o "Invalid hook call" causado por assets de builds misturados.
+if (document.documentElement.getAttribute('data-cache-recovery') !== 'in-progress') {
+  createRoot(rootElement).render(
+    <StrictMode>
+      <AppQueryProvider>
+        <BrowserRouter
+          basename={import.meta.env.BASE_URL}
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
+          <App />
+        </BrowserRouter>
+      </AppQueryProvider>
+    </StrictMode>,
+  );
 
-window.addEventListener('internorotas:api-version-mismatch', handleApiVersionMismatch);
+  window.addEventListener('internorotas:api-version-mismatch', handleApiVersionMismatch);
 
-ensureManifestLink();
-registerAppServiceWorker();
+  ensureManifestLink();
+  registerAppServiceWorker();
+}

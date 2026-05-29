@@ -46,6 +46,13 @@
           return;
         }
 
+        // Marca SINCRONAMENTE antes de qualquer operação async.
+        // O main.tsx verifica este atributo antes de montar o React —
+        // se estiver presente, React não monta durante o redirect de recovery,
+        // evitando o erro "Invalid hook call" causado por assets de builds
+        // misturados servidos pelo Service Worker desatualizado.
+        document.documentElement.setAttribute('data-cache-recovery', 'in-progress');
+
         Promise.resolve()
           .then(() => {
             if (!('serviceWorker' in navigator)) {
