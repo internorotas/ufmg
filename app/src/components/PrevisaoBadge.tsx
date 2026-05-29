@@ -59,7 +59,7 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
     });
   }, [idParada, linha.idRota, previsao?.proximoOnibus, trackEvent]);
 
-  if (!linhaVigente || !previsao?.proximoOnibus) {
+  if (!linhaVigente) {
     return (
       <span
         role="status"
@@ -71,6 +71,25 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
         }}
       >
         Sem previsão
+      </span>
+    );
+  }
+
+  // previsao === null: dados insuficientes (trajeto ausente, parada fora da rota, etc.)
+  // previsao.proximoOnibus === null: linha opera hoje, mas o último ônibus já passou
+  if (!previsao || !previsao.proximoOnibus) {
+    const texto = previsao ? 'Sem mais ônibus hoje' : 'Sem previsão';
+    return (
+      <span
+        role="status"
+        aria-live="polite"
+        className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+        style={{
+          backgroundColor: 'var(--neutral-bg)',
+          color: 'var(--neutral-text)',
+        }}
+      >
+        {texto}
       </span>
     );
   }

@@ -264,6 +264,10 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
 
   const start = useCallback(async () => {
     if (!options.enabled || !options.selectedLine) {
+      console.warn('[GPS] start() ignorado: tracking desabilitado ou linha não selecionada', {
+        enabled: options.enabled,
+        selectedLine: options.selectedLine?.idRota ?? null,
+      });
       return;
     }
 
@@ -282,7 +286,8 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         linhaId: options.selectedLine.idRota,
         points: [],
       });
-    } catch {
+    } catch (err) {
+      console.error('[GPS] Falha ao iniciar sessão de rastreio colaborativo:', err);
       setStatus('error');
     }
   }, [options.enabled, options.selectedLine]);
@@ -297,7 +302,8 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       if (sessionId) {
         try {
           await finishGpsSession(sessionId, reason);
-        } catch {
+        } catch (err) {
+          console.error('[GPS] Falha ao encerrar sessão de rastreio colaborativo:', err);
           setStatus('error');
           return;
         }
