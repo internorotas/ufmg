@@ -524,7 +524,7 @@ function AuthenticatedAppShell() {
     <RotasProvider>
       <AnalyticsProvider>
         <NotificacaoProvider>
-          <div className="flex h-dvh overflow-hidden bg-background text-text-primary">
+          <div className="flex h-dvh bg-background text-text-primary">
             <NavRail />
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
               <Routes>

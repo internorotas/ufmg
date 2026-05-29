@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { AuthRequestError, refreshSession } from '@/features/auth/api/authClient';
+import { AuthRequestError, refreshSession, warmupBackend } from '@/features/auth/api/authClient';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useMounted } from '@/hooks/useMounted';
 
@@ -27,6 +27,15 @@ export function useAuthBootstrap() {
     hasBootstrapped.current = true;
 
     const bootstrap = async (attempt = 0): Promise<void> => {
+      // Na primeira tentativa, dispara o warmup em paralelo (best-effort).
+      // O Render free tier dorme após 15 min de inatividade; o warmup acorda
+      // o backend enquanto a requisição de refresh está em andamento, de modo
+      // que as retentativas já encontrem o servidor ativo sem adicionar latência
+      // extra ao caminho crítico quando o backend já está acordado.
+      if (attempt === 0) {
+        void warmupBackend();
+      }
+
       try {
         const refreshed = await refreshSession();
         if (!isMounted()) return;
