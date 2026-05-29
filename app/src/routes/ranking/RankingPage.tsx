@@ -1,6 +1,6 @@
 import { Medal, Shield, Trophy } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -25,6 +25,7 @@ export function RankingPage() {
   const { isAuthenticated } = useAuthContext();
   const { collaborativeFeedback } = useNotificacaoContext();
   const navigate = useNavigate();
+  const location = useLocation();
   const [period, setPeriod] = useState<RankingPeriod>('semanal');
   const [scope, setScope] = useState<RankingScope>('geral');
   const [publicRanking, setPublicRanking] = useState<PublicRankingResponse | null>(null);
@@ -78,7 +79,7 @@ export function RankingPage() {
       description="Top 10 público com visão completa para autenticados"
       actions={
         !isAuthenticated ? (
-          <Button type="button" className="min-h-11" onClick={() => navigate('/login')}>
+          <Button type="button" className="min-h-11" onClick={() => navigate('/login', { state: { from: location.pathname } })}>
             Entrar para ver completo
           </Button>
         ) : undefined
