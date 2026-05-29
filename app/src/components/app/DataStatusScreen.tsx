@@ -13,7 +13,7 @@ export function DataStatusScreen({ title, description, variant = 'info' }: DataS
 
   return (
     <main
-      className="flex h-screen min-h-dvh w-screen items-center justify-center bg-background-secondary px-4 text-text-primary"
+      className="flex flex-1 min-h-0 w-full items-center justify-center bg-background-secondary px-4 text-text-primary"
       aria-labelledby="data-status-title"
       aria-describedby="data-status-description"
     >
