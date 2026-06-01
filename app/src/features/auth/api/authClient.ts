@@ -133,7 +133,7 @@ export async function startGoogleLoginFlow(returnUrl?: string): Promise<void> {
  * Esta chamada é best-effort: erros e timeouts são silenciados.
  */
 export async function warmupBackend(): Promise<void> {
-  const endpoint = resolveApiEndpoint('/health');
+  const endpoint = resolveApiEndpoint('/v1/health');
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15_000);
   try {
