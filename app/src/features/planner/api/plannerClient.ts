@@ -1,15 +1,6 @@
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import type { PlannerClientQuery, PlannerRoutesResponse } from '../types';
-
-function resolvePlannerEndpoint(): string {
-  const apiBaseUrl = import.meta.env.VITE_API_URL;
-
-  if (!apiBaseUrl) {
-    return '/v1/planner/routes';
-  }
-
-  return new URL('/v1/planner/routes', apiBaseUrl).toString();
-}
 
 export class PlannerRequestError extends Error {
   constructor(
@@ -24,7 +15,7 @@ export class PlannerRequestError extends Error {
 export async function fetchPlannerRoutes(
   query: PlannerClientQuery,
 ): Promise<PlannerRoutesResponse> {
-  const url = new URL(resolvePlannerEndpoint(), window.location.origin);
+  const url = new URL(resolveApiEndpoint('/v1/planner/routes'), window.location.origin);
   url.searchParams.set('originStopId', query.originStopId);
   url.searchParams.set('destinationStopId', query.destinationStopId);
   if (query.categoryDay) {
@@ -32,9 +23,8 @@ export async function fetchPlannerRoutes(
   }
 
   const authToken = useAuthStore.getState().accessToken;
-  const headers: HeadersInit = {
-    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-  };
+  const baseHeaders: HeadersInit = authToken ? { Authorization: `Bearer ${authToken}` } : {};
+  const headers = withTenantHeaders(baseHeaders);
 
   let response: Response;
   try {

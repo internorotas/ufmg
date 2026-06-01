@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CircleMarker, MapContainer, Polyline, TileLayer } from 'react-leaflet';
+import { CircleMarker, MapContainer, Polyline, TileLayer, useMap } from 'react-leaflet';
 import { tv } from 'tailwind-variants';
 import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
@@ -98,6 +98,16 @@ export interface LinhaDetalhesModalProps {
 
 type TabType = 'itinerario' | 'horarios';
 
+function FitBounds({ coords }: { coords: [number, number][] }) {
+  const map = useMap();
+  React.useEffect(() => {
+    if (coords.length > 1) {
+      map.fitBounds(coords as [number, number][], { padding: [20, 20], maxZoom: 16, animate: false });
+    }
+  }, [map, coords]);
+  return null;
+}
+
 function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
   const { t } = useTranslation('line-details');
   const hasRoute = linha.coordenadasTrajeto && linha.coordenadasTrajeto.length > 1;
@@ -121,14 +131,16 @@ function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
         zoomControl={false}
         doubleClickZoom={false}
         keyboard={false}
+        attributionControl={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
+        <FitBounds coords={linha.coordenadasTrajeto} />
         <Polyline
           positions={linha.coordenadasTrajeto}
-          pathOptions={{ color: linha.corHex, weight: 6 }}
+          pathOptions={{ color: linha.corHex, weight: 3, opacity: 0.65 }}
         />
         {paradas.map((parada) => (
           <CircleMarker

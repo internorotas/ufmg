@@ -19,7 +19,7 @@ import {
 import { useMounted } from '@/hooks/useMounted';
 
 const PERIOD_OPTIONS: RankingPeriod[] = ['semanal', 'mensal', 'all_time'];
-const SCOPE_OPTIONS: RankingScope[] = ['geral', 'campus', 'linha:2004A'];
+const SCOPE_OPTIONS: RankingScope[] = ['geral', 'campus'];
 
 export function RankingPage() {
   const { isAuthenticated } = useAuthContext();
