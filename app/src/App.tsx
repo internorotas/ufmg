@@ -23,7 +23,10 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
 import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
 import { useConsentGate } from './features/auth/hooks/useConsentGate';
+import { GpsLinePickerModal } from './features/gps/components/GpsLinePickerModal';
+import { GpsPositionWarningDialog } from './features/gps/components/GpsPositionWarningDialog';
 import { useGpsTrackingSession } from './features/gps/hooks/useGpsTrackingSession';
+import { calcularDistanciaKm } from './lib/utils';
 import { PlannerSummarySheet } from './features/planner/components/PlannerSummarySheet';
 import { usePlannerStore } from './features/planner/store/plannerStore';
 import { useAnalytics } from './hooks/useAnalytics';
@@ -139,6 +142,12 @@ function AppContent() {
   } = useConsentGate();
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
   const [isSummarySheetOpen, setIsSummarySheetOpen] = useState(false);
+  const [isGpsLinePickerOpen, setIsGpsLinePickerOpen] = useState(false);
+  const [gpsWarning, setGpsWarning] = useState<{
+    distanceMeters: number;
+    linha: Linha;
+    pendingAction: () => void;
+  } | null>(null);
   const [authFeedbackMessage, setAuthFeedbackMessage] = useState<string | null>(null);
   useEffect(() => {
     const locationState = location.state as { authFeedback?: string } | null;
@@ -270,28 +279,73 @@ function AppContent() {
     usePlannerStore.getState().registerOpenMenu(fn);
   }, []);
 
+  const startGpsForLinha = useCallback(
+    (linha: Linha) => {
+      const VALIDATION_THRESHOLD_M = 300;
+      const coords = linha.coordenadasTrajeto;
+
+      if (localizacao && coords.length > 0) {
+        const [userLat, userLng] = localizacao;
+        let minKm = Infinity;
+        for (const [lat, lng] of coords) {
+          const d = calcularDistanciaKm(userLat, userLng, lat, lng);
+          if (d < minKm) minKm = d;
+        }
+        const distMeters = minKm * 1000;
+
+        if (distMeters > VALIDATION_THRESHOLD_M) {
+          const action = () =>
+            void executeProtectedAction(async () => {
+              if (!permissaoConcedida) {
+                await iniciarRastreamento();
+                return;
+              }
+              await iniciarRastreioColaborativo();
+            });
+          setGpsWarning({ distanceMeters: Math.round(distMeters), linha, pendingAction: action });
+          return;
+        }
+      }
+
+      void executeProtectedAction(async () => {
+        if (!permissaoConcedida) {
+          await iniciarRastreamento();
+          return;
+        }
+        await iniciarRastreioColaborativo();
+      });
+    },
+    [
+      executeProtectedAction,
+      iniciarRastreamento,
+      iniciarRastreioColaborativo,
+      localizacao,
+      permissaoConcedida,
+    ],
+  );
+
   const handleAlternarRastreioColaborativo = useCallback(() => {
     if (rastreioAtivo) {
       void encerrarRastreioColaborativo('manual');
       return;
     }
 
-    void executeProtectedAction(async () => {
-      if (!permissaoConcedida) {
-        await iniciarRastreamento();
-        return;
-      }
+    if (!linhaSelecionada) {
+      setIsGpsLinePickerOpen(true);
+      return;
+    }
 
-      await iniciarRastreioColaborativo();
-    });
-  }, [
-    encerrarRastreioColaborativo,
-    executeProtectedAction,
-    iniciarRastreamento,
-    iniciarRastreioColaborativo,
-    permissaoConcedida,
-    rastreioAtivo,
-  ]);
+    startGpsForLinha(linhaSelecionada);
+  }, [encerrarRastreioColaborativo, linhaSelecionada, rastreioAtivo, startGpsForLinha]);
+
+  const handleGpsLinePick = useCallback(
+    (linha: Linha) => {
+      selecionarLinha(linha);
+      setIsGpsLinePickerOpen(false);
+      startGpsForLinha(linha);
+    },
+    [selecionarLinha, startGpsForLinha],
+  );
 
   // Handler para voltar ao campus principal.
   const handleVoltarAoCampus = useCallback(() => {
@@ -461,6 +515,27 @@ function AppContent() {
           onVoltarAoCampus={handleVoltarAoCampus}
           onContinuarAqui={handleContinuarAqui}
         />
+
+        <GpsLinePickerModal
+          open={isGpsLinePickerOpen}
+          onClose={() => setIsGpsLinePickerOpen(false)}
+          linhasData={linhasData}
+          onSelect={handleGpsLinePick}
+        />
+
+        {gpsWarning && (
+          <GpsPositionWarningDialog
+            open={true}
+            linha={gpsWarning.linha}
+            distanceMeters={gpsWarning.distanceMeters}
+            onConfirm={() => {
+              const action = gpsWarning.pendingAction;
+              setGpsWarning(null);
+              action();
+            }}
+            onCancel={() => setGpsWarning(null)}
+          />
+        )}
 
         <LegalModal modalType={legalModal} onClose={handleCloseLegalModal} />
 

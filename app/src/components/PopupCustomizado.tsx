@@ -287,7 +287,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
 }
 
 function PlannerStopActions({ parada }: { parada: Parada }) {
-  const { setOrigin, setDestination } = usePlannerStore();
+  const { setOrigin, setDestination, openPlanner, openMenuFn, origin } = usePlannerStore();
   const map = useMap();
 
   const handleUseAsOrigin = () => {
@@ -298,6 +298,10 @@ function PlannerStopActions({ parada }: { parada: Parada }) {
   const handleUseAsDestination = () => {
     setDestination({ kind: 'stop', idParada: parada.idParada, nome: parada.nome });
     map.closePopup();
+    if (origin) {
+      openPlanner();
+      openMenuFn?.();
+    }
   };
 
   return (

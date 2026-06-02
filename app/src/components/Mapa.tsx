@@ -13,6 +13,7 @@
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { GpsRouteOverlay } from '@/features/gps/components/GpsRouteOverlay';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { PlannerMapOverlay } from '@/features/planner/components/PlannerMapOverlay';
 import { COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
@@ -141,6 +142,10 @@ export function Mapa({
       <CenterOnParada parada={paradaSelecionada} />
 
       <MapRoute linha={linhaSelecionada} />
+
+      {rastreioColaborativo?.isActive && linhaSelecionada && (
+        <GpsRouteOverlay linha={linhaSelecionada} />
+      )}
 
       <PlannerMapOverlay />
 

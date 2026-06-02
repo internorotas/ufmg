@@ -220,9 +220,12 @@ export const MenuLateral = React.memo(function MenuLateral({
     typeof window !== 'undefined' ? window.innerWidth < 768 : false,
   );
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
-  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
   const [partnerSpotlight, setPartnerSpotlight] = useState<PartnerSpotlight | null>(null);
   const selectedRouteId = usePlannerStore((state) => state.selectedRouteId);
+  const plannerMode = usePlannerStore((state) => state.mode);
+  const openPlanner = usePlannerStore((state) => state.openPlanner);
+  const closePlanner = usePlannerStore((state) => state.closePlanner);
+  const isPlannerOpen = plannerMode === 'planning';
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
   const lastListSummaryRef = useRef<string>('');
@@ -588,7 +591,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           <button
             type="button"
             data-slot="planner-toggle"
-            onClick={() => setIsPlannerOpen((prev) => !prev)}
+            onClick={() => (isPlannerOpen ? closePlanner() : openPlanner())}
             className="flex min-h-11 w-full items-center gap-2 rounded-lg border border-card-border bg-card px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-expanded={isPlannerOpen}
             aria-controls="planner-panel"
@@ -603,7 +606,7 @@ export const MenuLateral = React.memo(function MenuLateral({
         </div>
 
         {isPlannerOpen && (
-          <div id="planner-panel" className="shrink-0">
+          <div id="planner-panel" className="flex-1 overflow-y-auto">
             <Suspense fallback={null}>
               <PlannerPanel />
             </Suspense>

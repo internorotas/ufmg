@@ -4,6 +4,7 @@
  */
 
 import { Bus, Footprints, Map as MapIcon } from 'lucide-react';
+import { useEffect } from 'react';
 import { tv } from 'tailwind-variants';
 import { usePlannerStore } from '../store/plannerStore';
 import {
@@ -234,6 +235,12 @@ export function PlannerResults({ results }: PlannerResultsProps) {
   const alternatives = results.alternatives.slice(0, 3);
 
   const activeId = selectedRouteId ?? (alternatives.length > 0 ? alternatives[0].routeId : null);
+
+  useEffect(() => {
+    if (!selectedRouteId && alternatives.length > 0 && alternatives[0]) {
+      setSelectedRouteId(alternatives[0].routeId);
+    }
+  }, [alternatives, selectedRouteId, setSelectedRouteId]);
 
   if (alternatives.length === 0) {
     return (
