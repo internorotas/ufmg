@@ -3,8 +3,8 @@ import type {
   NotificationProfile,
   RankingDetail,
 } from '@/features/auth/api/authClient';
-import { getAuthHeaders, resolveAuthEndpoint } from '@/features/auth/api/authClient';
-import { withTenantHeaders } from '@/services/api/apiClient';
+import { resolveAuthEndpoint } from '@/features/auth/api/authClient';
+import { fetchAuthenticatedApi } from '@/features/auth/api/fetchAuthenticatedApi';
 
 export interface UserProfile {
   id: number;
@@ -102,23 +102,10 @@ export interface AccountDeletionRequestResult {
 
 interface ProfileResponse extends UserProfile {}
 
-function buildAuthenticatedHeaders(extraHeaders?: HeadersInit): HeadersInit {
-  const authHeaders = getAuthHeaders();
-  if (!authHeaders) {
-    throw new Error('Sessão autenticada ausente');
-  }
-
-  return withTenantHeaders({
-    ...(authHeaders as Record<string, string>),
-    ...(extraHeaders as Record<string, string> | undefined),
-  });
-}
-
 export async function getProfile(): Promise<UserProfile> {
-  const response = await fetch(resolveAuthEndpoint('/v1/auth/profile'), {
+  const response = await fetchAuthenticatedApi(resolveAuthEndpoint('/v1/auth/profile'), {
     method: 'GET',
     cache: 'no-store',
-    headers: buildAuthenticatedHeaders(),
   });
 
   if (!response.ok) {
@@ -129,12 +116,12 @@ export async function getProfile(): Promise<UserProfile> {
 }
 
 export async function updateProfile(payload: ProfileUpdatePayload): Promise<UserProfile> {
-  const response = await fetch(resolveAuthEndpoint('/v1/auth/profile'), {
+  const response = await fetchAuthenticatedApi(resolveAuthEndpoint('/v1/auth/profile'), {
     method: 'PATCH',
     cache: 'no-store',
-    headers: buildAuthenticatedHeaders({
+    headers: {
       'Content-Type': 'application/json',
-    }),
+    },
     body: JSON.stringify(payload),
   });
 
@@ -146,11 +133,10 @@ export async function updateProfile(payload: ProfileUpdatePayload): Promise<User
 }
 
 export async function logout(): Promise<void> {
-  const response = await fetch(resolveAuthEndpoint('/v1/auth/logout'), {
+  const response = await fetchAuthenticatedApi(resolveAuthEndpoint('/v1/auth/logout'), {
     method: 'POST',
     cache: 'no-store',
     credentials: 'include',
-    headers: withTenantHeaders(getAuthHeaders()),
   });
 
   if (!response.ok) {
@@ -159,11 +145,10 @@ export async function logout(): Promise<void> {
 }
 
 export async function deleteAccount(): Promise<AccountDeletionRequestResult> {
-  const response = await fetch(resolveAuthEndpoint('/v1/auth/delete-account'), {
+  const response = await fetchAuthenticatedApi(resolveAuthEndpoint('/v1/auth/delete-account'), {
     method: 'POST',
     cache: 'no-store',
     credentials: 'include',
-    headers: buildAuthenticatedHeaders(),
   });
 
   if (!response.ok) {

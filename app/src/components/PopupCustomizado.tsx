@@ -65,6 +65,12 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
   const currentTime = useCurrentTime();
 
   const resolverLinhaPorNome = (nomeLinhaParada: string, idParadaAtual: string): Linha | null => {
+    // Banco retorna linhaId (ex: "DU10"); JSON legado retorna nome (ex: "Circular Campi")
+    const porId = rotasService.getLinhaById(nomeLinhaParada);
+    if (porId && isLineAvailableToday(porId.categoriaDia)) {
+      return porId;
+    }
+
     const chave = normalizarNomeLinha(nomeLinhaParada);
     const candidatas = rotasService.getLinhasPorNomeNormalizado(chave);
     if (candidatas.length === 0) return null;

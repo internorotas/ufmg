@@ -1,5 +1,5 @@
-import { getAuthHeaders } from '@/features/auth/api/authClient';
-import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+import { fetchAuthenticatedApi } from '@/features/auth/api/fetchAuthenticatedApi';
+import { resolveApiEndpoint } from '@/services/api/apiClient';
 
 export interface GpsPointPayload {
   lat: number;
@@ -29,13 +29,12 @@ function resolveGpsEndpoint(pathname: string): string {
 }
 
 async function fetchGps(pathname: string, init?: RequestInit): Promise<Response> {
-  const response = await fetch(resolveGpsEndpoint(pathname), {
+  const response = await fetchAuthenticatedApi(resolveGpsEndpoint(pathname), {
     ...init,
-    headers: withTenantHeaders({
+    headers: {
       'Content-Type': 'application/json',
-      ...(getAuthHeaders() ?? {}),
-      ...(init?.headers ?? {}),
-    }),
+      ...(init?.headers as Record<string, string> | undefined),
+    },
   });
 
   if (!response.ok) {

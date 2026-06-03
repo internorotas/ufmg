@@ -1,4 +1,4 @@
-import { getAuthHeaders } from '@/features/auth/api/authClient';
+import { fetchAuthenticatedApi } from '@/features/auth/api/fetchAuthenticatedApi';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 
 export type RankingPeriod = 'semanal' | 'mensal' | 'all_time';
@@ -60,15 +60,9 @@ export async function getAuthenticatedRanking(params: {
   period: RankingPeriod;
   scope: RankingScope;
 }): Promise<AuthenticatedRankingResponse> {
-  const headers = getAuthHeaders();
-  if (!headers) {
-    throw new Error('Sessão autenticada ausente');
-  }
-
-  const response = await fetch(createRankingUrl('/v1/gamification/rankings/me', params), {
+  const response = await fetchAuthenticatedApi(createRankingUrl('/v1/gamification/rankings/me', params), {
     method: 'GET',
     cache: 'no-store',
-    headers: withTenantHeaders(headers),
   });
 
   if (!response.ok) {

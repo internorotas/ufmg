@@ -8,6 +8,7 @@ import { MobileTopBar } from './components/app/MobileTopBar';
 import { ModalManager } from './components/app/ModalManager';
 import { NavRail } from './components/app/NavRail';
 import { OfflineToast } from './components/app/OfflineToast';
+import { InactivityWarningDialog } from './components/auth/InactivityWarningDialog';
 import { LgpdConsentDialog } from './components/auth/LgpdConsentDialog';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { LegalModal } from './components/legal/LegalModal';
@@ -23,8 +24,11 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
 import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
 import { useConsentGate } from './features/auth/hooks/useConsentGate';
+import { SESSION_EXPIRED_EVENT } from './features/auth/api/fetchAuthenticatedApi';
+import { logout } from './features/profile/api/profileClient';
 import { GpsLinePickerModal } from './features/gps/components/GpsLinePickerModal';
 import { GpsPositionWarningDialog } from './features/gps/components/GpsPositionWarningDialog';
+import { GpsTrackingCard } from './features/gps/components/GpsTrackingCard';
 import { useGpsTrackingSession } from './features/gps/hooks/useGpsTrackingSession';
 import { calcularDistanciaKm } from './lib/utils';
 import { PlannerSummarySheet } from './features/planner/components/PlannerSummarySheet';
@@ -32,6 +36,7 @@ import { usePlannerStore } from './features/planner/store/plannerStore';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { COORDENADAS_CAMPUS, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
+import { useInactivityTimer } from './hooks/useInactivityTimer';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { AboutPage } from './routes/about/AboutPage';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
@@ -143,6 +148,7 @@ function AppContent() {
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
   const [isSummarySheetOpen, setIsSummarySheetOpen] = useState(false);
   const [isGpsLinePickerOpen, setIsGpsLinePickerOpen] = useState(false);
+  const [isInactivityWarningOpen, setIsInactivityWarningOpen] = useState(false);
   const [gpsWarning, setGpsWarning] = useState<{
     distanceMeters: number;
     linha: Linha;
@@ -363,6 +369,32 @@ function AppContent() {
     fecharModalLonge();
   }, [localizacao, consumirAutoCenter, mapaRef, fecharModalLonge]);
 
+  const handleInactivityTimeout = useCallback(async () => {
+    setIsInactivityWarningOpen(false);
+    try {
+      await logout();
+    } catch {
+      // ignora erro de rede no logout
+    }
+    navigate('/login', { state: { authFeedback: 'Sessão encerrada por inatividade.' } });
+  }, [navigate]);
+
+  const { resetTimer: resetInactivityTimer } = useInactivityTimer({
+    warningMs: 25 * 60 * 1000,
+    timeoutMs: 30 * 60 * 1000,
+    onWarning: () => setIsInactivityWarningOpen(true),
+    onTimeout: () => { void handleInactivityTimeout(); },
+    enabled: isAuthenticated,
+  });
+
+  useEffect(() => {
+    const handler = () => {
+      void handleInactivityTimeout();
+    };
+    window.addEventListener(SESSION_EXPIRED_EVENT, handler);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handler);
+  }, [handleInactivityTimeout]);
+
   // Validação dos dados
   if (isLoadingData) {
     return (
@@ -492,6 +524,10 @@ function AppContent() {
                   onAlternarRastreioColaborativo={handleAlternarRastreioColaborativo}
                 />
               </Suspense>
+
+              {rastreioColaborativo.isActive && linhaSelecionada && (
+                <GpsTrackingCard rastreio={rastreioColaborativo} linha={linhaSelecionada} />
+              )}
             </ErrorBoundary>
           </main>
         </div>
@@ -536,6 +572,14 @@ function AppContent() {
             onCancel={() => setGpsWarning(null)}
           />
         )}
+
+        <InactivityWarningDialog
+          open={isInactivityWarningOpen}
+          onContinue={() => {
+            setIsInactivityWarningOpen(false);
+            resetInactivityTimer();
+          }}
+        />
 
         <LegalModal modalType={legalModal} onClose={handleCloseLegalModal} />
 

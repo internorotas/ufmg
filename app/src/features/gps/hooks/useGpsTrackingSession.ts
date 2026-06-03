@@ -51,6 +51,9 @@ export interface GpsTrackingState {
   isSyncing: boolean;
   nextCollectionIntervalMs: number;
   lastStopReason: TrackingStopReason | null;
+  distanceKm: number;
+  durationMs: number;
+  snapshotsCount: number;
   start: () => Promise<void>;
   stop: (reason?: TrackingStopReason) => Promise<void>;
   ingestSnapshot: (snapshot: TrackingSnapshot) => Promise<void>;
@@ -205,9 +208,13 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const [isSyncing, setIsSyncing] = useState(false);
   const [nextCollectionIntervalMs, setNextCollectionIntervalMs] = useState(IDLE_INTERVAL_MS);
   const [lastStopReason, setLastStopReason] = useState<TrackingStopReason | null>(null);
+  const [distanceKm, setDistanceKm] = useState(0);
+  const [durationMs, setDurationMs] = useState(0);
+  const [snapshotsCount, setSnapshotsCount] = useState(0);
   const queueRef = useRef<GpsPointPayload[]>([]);
   const sessionStartedAtRef = useRef<number | null>(null);
   const lastMovementAtRef = useRef<number | null>(null);
+  const lastSnapshotCoordRef = useRef<{ lat: number; lng: number } | null>(null);
 
   const resetSession = useCallback(() => {
     setStatus('idle');
@@ -216,9 +223,13 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     setIsSyncing(false);
     setNextCollectionIntervalMs(IDLE_INTERVAL_MS);
     setLastStopReason(null);
+    setDistanceKm(0);
+    setDurationMs(0);
+    setSnapshotsCount(0);
     queueRef.current = [];
     sessionStartedAtRef.current = null;
     lastMovementAtRef.current = null;
+    lastSnapshotCoordRef.current = null;
     writePersistedSession(null);
   }, []);
 
@@ -337,6 +348,14 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       queueRef.current = trimQueue([...queueRef.current, point], MAX_QUEUE_POINTS);
       setQueueSize(queueRef.current.length);
       setNextCollectionIntervalMs(resolveCollectionIntervalMs(snapshot.speedKmh));
+      setSnapshotsCount((c) => c + 1);
+
+      const prev = lastSnapshotCoordRef.current;
+      if (prev) {
+        const seg = calcularDistanciaKm(prev.lat, prev.lng, snapshot.latitude, snapshot.longitude);
+        setDistanceKm((d) => d + seg);
+      }
+      lastSnapshotCoordRef.current = { lat: snapshot.latitude, lng: snapshot.longitude };
       if (options.selectedLine) {
         writePersistedSession({
           sessionId,
@@ -432,6 +451,16 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     };
   }, [flushQueue]);
 
+  useEffect(() => {
+    if (status !== 'active') return;
+    const id = window.setInterval(() => {
+      if (sessionStartedAtRef.current) {
+        setDurationMs(Date.now() - sessionStartedAtRef.current);
+      }
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [status]);
+
   return useMemo(
     () => ({
       label: TRACKING_TOGGLE_LABEL,
@@ -442,17 +471,23 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       isSyncing,
       nextCollectionIntervalMs,
       lastStopReason,
+      distanceKm,
+      durationMs,
+      snapshotsCount,
       start,
       stop,
       ingestSnapshot,
     }),
     [
+      distanceKm,
+      durationMs,
       ingestSnapshot,
       isSyncing,
       lastStopReason,
       nextCollectionIntervalMs,
       queueSize,
       sessionId,
+      snapshotsCount,
       start,
       status,
       stop,
