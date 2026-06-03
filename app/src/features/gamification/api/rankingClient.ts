@@ -60,10 +60,13 @@ export async function getAuthenticatedRanking(params: {
   period: RankingPeriod;
   scope: RankingScope;
 }): Promise<AuthenticatedRankingResponse> {
-  const response = await fetchAuthenticatedApi(createRankingUrl('/v1/gamification/rankings/me', params), {
-    method: 'GET',
-    cache: 'no-store',
-  });
+  const response = await fetchAuthenticatedApi(
+    createRankingUrl('/v1/gamification/rankings/me', params),
+    {
+      method: 'GET',
+      cache: 'no-store',
+    },
+  );
 
   if (!response.ok) {
     throw new Error(`Falha ao carregar ranking autenticado: HTTP ${response.status}`);

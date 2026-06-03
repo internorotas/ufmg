@@ -113,7 +113,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
         <Dialog.Backdrop />
         <Dialog.Popup
           size="sm"
-          className="fixed inset-x-0 bottom-0 top-auto max-h-[88dvh] w-full rounded-b-none rounded-t-2xl"
+          className="fixed inset-x-0 bottom-0 top-auto max-h-[88dvh] w-full max-w-none rounded-b-none rounded-t-2xl"
           aria-labelledby={headingId}
         >
           <div className="flex items-center justify-between border-b border-card-border bg-background-secondary px-4 py-3">

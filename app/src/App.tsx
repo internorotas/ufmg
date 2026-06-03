@@ -20,28 +20,27 @@ import { GA_MEASUREMENT_ID } from './config/analytics';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-
+import { SESSION_EXPIRED_EVENT } from './features/auth/api/fetchAuthenticatedApi';
 import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
 import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
 import { useConsentGate } from './features/auth/hooks/useConsentGate';
-import { SESSION_EXPIRED_EVENT } from './features/auth/api/fetchAuthenticatedApi';
-import { logout } from './features/profile/api/profileClient';
 import { GpsLinePickerModal } from './features/gps/components/GpsLinePickerModal';
 import { GpsPositionWarningDialog } from './features/gps/components/GpsPositionWarningDialog';
 import { GpsTrackingCard } from './features/gps/components/GpsTrackingCard';
 import { useGpsTrackingSession } from './features/gps/hooks/useGpsTrackingSession';
-import { calcularDistanciaKm } from './lib/utils';
 import { PlannerSummarySheet } from './features/planner/components/PlannerSummarySheet';
 import { usePlannerStore } from './features/planner/store/plannerStore';
+import { logout } from './features/profile/api/profileClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
-import { COORDENADAS_CAMPUS, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { useInactivityTimer } from './hooks/useInactivityTimer';
+import { COORDENADAS_CAMPUS, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
+import { calcularDistanciaKm } from './lib/utils';
 import { AboutPage } from './routes/about/AboutPage';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
-import { LoginPage } from './routes/login/LoginPage';
 import { LinhasPage } from './routes/linhas/LinhasPage';
+import { LoginPage } from './routes/login/LoginPage';
 import { MorePage } from './routes/more/MorePage';
 import { ProfilePage } from './routes/profile/ProfilePage';
 import { RankingPage } from './routes/ranking/RankingPage';
@@ -384,7 +383,9 @@ function AppContent() {
     warningMs: 25 * 60 * 1000,
     timeoutMs: 30 * 60 * 1000,
     onWarning: () => setIsInactivityWarningOpen(true),
-    onTimeout: () => { void handleInactivityTimeout(); },
+    onTimeout: () => {
+      void handleInactivityTimeout();
+    },
     enabled: isAuthenticated,
   });
 
@@ -631,7 +632,6 @@ function AppContent() {
             </button>
           </div>
         ) : null}
-
       </div>
     </div>
   );

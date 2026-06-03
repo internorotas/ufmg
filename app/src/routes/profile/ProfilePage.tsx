@@ -11,8 +11,8 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { SwitchRow } from '@/components/ui/SwitchRow';
 import { ToggleRow } from '@/components/ui/ToggleRow';
 import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
-import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { updateConsentState } from '@/features/auth/api/authClient';
+import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { AchievementsGrid } from '@/features/gamification/components/AchievementsGrid';
 import { ContributionHeatmap } from '@/features/gamification/components/ContributionHeatmap';
@@ -52,8 +52,12 @@ export function ProfilePage() {
   // disparem re-execuções desnecessárias do efeito de carregamento de perfil.
   const publishPointEventRef = useRef(publishPointEvent);
   const updateUserRef = useRef(updateUser);
-  useEffect(() => { publishPointEventRef.current = publishPointEvent; });
-  useEffect(() => { updateUserRef.current = updateUser; });
+  useEffect(() => {
+    publishPointEventRef.current = publishPointEvent;
+  });
+  useEffect(() => {
+    updateUserRef.current = updateUser;
+  });
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -148,9 +152,7 @@ export function ProfilePage() {
       });
       // Usa o timestamp retornado pelo servidor (não um timestamp local) para
       // garantir que o estado local reflita exatamente o que foi persistido.
-      setProfile((prev) =>
-        prev ? { ...prev, consentGpsAt: result.consentGpsAt } : prev,
-      );
+      setProfile((prev) => (prev ? { ...prev, consentGpsAt: result.consentGpsAt } : prev));
       setFeedback({ type: 'success', message: 'Consentimento GPS atualizado.' });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Falha ao atualizar consentimento.';

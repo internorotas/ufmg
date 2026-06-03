@@ -424,12 +424,10 @@ export function MorePage() {
           className="inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary hover:text-text-primary transition-colors"
         >
           Desenvolvido com{' '}
-          <Heart size={12} fill="currentColor" className="text-red-500" aria-hidden="true" />{' '}
-          por Igor Martins
+          <Heart size={12} fill="currentColor" className="text-red-500" aria-hidden="true" /> por
+          Igor Martins
         </a>
-        {appVersion && (
-          <p className="mt-0.5 text-xs text-text-tertiary">v{appVersion}</p>
-        )}
+        {appVersion && <p className="mt-0.5 text-xs text-text-tertiary">v{appVersion}</p>}
       </footer>
     </AppShell>
   );

@@ -743,7 +743,6 @@ export const MenuLateral = React.memo(function MenuLateral({
             {t('list.backToMap')}
           </Button>
         </div>
-
       </aside>
 
       {linhaDetalhesAberta && (

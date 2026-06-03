@@ -1,6 +1,6 @@
 import { AlertTriangle, MapPin, Radio } from 'lucide-react';
-import { Dialog } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
+import { Dialog } from '@/components/ui/Dialog';
 import type { Linha } from '@/types/data.types';
 
 interface GpsPositionWarningDialogProps {
@@ -19,15 +19,13 @@ export function GpsPositionWarningDialog({
   onCancel,
 }: GpsPositionWarningDialogProps) {
   const distText =
-    distanceMeters >= 1000
-      ? `${(distanceMeters / 1000).toFixed(1)} km`
-      : `${distanceMeters} m`;
+    distanceMeters >= 1000 ? `${(distanceMeters / 1000).toFixed(1)} km` : `${distanceMeters} m`;
 
   return (
     <Dialog.Root open={open} onOpenChange={(v) => !v && onCancel()}>
       <Dialog.Portal>
         <Dialog.Backdrop />
-        <Dialog.Popup size="sm" className="mx-4 w-full max-w-sm">
+        <Dialog.Popup size="sm">
           <div className="flex flex-col gap-4 p-5">
             {/* Ícone */}
             <div className="flex items-center gap-3">
@@ -89,12 +87,7 @@ export function GpsPositionWarningDialog({
                 <Radio size={15} aria-hidden="true" />
                 Contribuir mesmo assim
               </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                fullWidth
-                onClick={onCancel}
-              >
+              <Button type="button" variant="ghost" fullWidth onClick={onCancel}>
                 Escolher outra linha
               </Button>
             </div>

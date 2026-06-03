@@ -77,7 +77,7 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
 
   // previsao === null: dados insuficientes (trajeto ausente, parada fora da rota, etc.)
   // previsao.proximoOnibus === null: linha opera hoje, mas o último ônibus já passou
-  if (!previsao || !previsao.proximoOnibus) {
+  if (!previsao?.proximoOnibus) {
     const texto = previsao ? 'Sem mais ônibus hoje' : 'Sem previsão';
     return (
       <span

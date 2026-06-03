@@ -275,6 +275,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
 
   const start = useCallback(async () => {
     if (!options.enabled || !options.selectedLine) {
+      // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
       console.warn('[GPS] start() ignorado: tracking desabilitado ou linha não selecionada', {
         enabled: options.enabled,
         selectedLine: options.selectedLine?.idRota ?? null,
@@ -298,6 +299,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         points: [],
       });
     } catch (err) {
+      // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
       console.error('[GPS] Falha ao iniciar sessão de rastreio colaborativo:', err);
       setStatus('error');
     }
@@ -314,6 +316,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         try {
           await finishGpsSession(sessionId, reason);
         } catch (err) {
+          // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
           console.error('[GPS] Falha ao encerrar sessão de rastreio colaborativo:', err);
           setStatus('error');
           return;

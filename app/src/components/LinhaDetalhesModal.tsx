@@ -102,7 +102,11 @@ function FitBounds({ coords }: { coords: [number, number][] }) {
   const map = useMap();
   React.useEffect(() => {
     if (coords.length > 1) {
-      map.fitBounds(coords as [number, number][], { padding: [20, 20], maxZoom: 16, animate: false });
+      map.fitBounds(coords as [number, number][], {
+        padding: [20, 20],
+        maxZoom: 16,
+        animate: false,
+      });
     }
   }, [map, coords]);
   return null;

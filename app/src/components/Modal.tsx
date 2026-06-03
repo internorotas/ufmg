@@ -95,7 +95,7 @@ export function Modal({
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Popup size={size} className={cn(className)} {...props}>
-          <div data-slot="header" className={modalHeaderVariants()}>
+          <div data-slot="header" className={cn(modalHeaderVariants(), 'shrink-0')}>
             {typeof title === 'string' ? (
               <Dialog.Title>{title}</Dialog.Title>
             ) : (

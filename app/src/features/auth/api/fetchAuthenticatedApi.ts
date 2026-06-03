@@ -5,9 +5,7 @@ import { refreshSession } from './authClient';
 export const SESSION_EXPIRED_EVENT = 'auth:session-expired';
 
 function dispatchSessionExpired(message: string) {
-  window.dispatchEvent(
-    new CustomEvent(SESSION_EXPIRED_EVENT, { detail: { message } }),
-  );
+  window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT, { detail: { message } }));
 }
 
 /**

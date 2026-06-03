@@ -69,7 +69,10 @@ function GroupedRow({ group, onSelect }: { group: LinhaGroup; onSelect: (l: Linh
           Linha {group.numero} — {group.linhas.length} variantes
         </p>
       </div>
-      <div className="flex flex-col pl-2 border-l-2 ml-3.5" style={{ borderColor: `${first?.corHex}40` }}>
+      <div
+        className="flex flex-col pl-2 border-l-2 ml-3.5"
+        style={{ borderColor: `${first?.corHex}40` }}
+      >
         {group.linhas.map((linha) => (
           <SublinhaRow key={linha.idRota} linha={linha} onSelect={onSelect} />
         ))}
@@ -133,7 +136,7 @@ export function GpsLinePickerModal({
         <Dialog.Backdrop />
         <Dialog.Popup
           size="sm"
-          className="fixed inset-x-0 bottom-0 top-auto flex max-h-[88dvh] w-full flex-col rounded-b-none rounded-t-2xl sm:static sm:max-h-[85vh] sm:max-w-md sm:rounded-xl"
+          className="fixed inset-x-0 bottom-0 top-auto flex max-h-[88dvh] w-full max-w-none flex-col rounded-b-none rounded-t-2xl sm:static sm:max-h-[85vh] sm:max-w-md sm:rounded-xl"
         >
           {/* Header */}
           <header className="flex shrink-0 items-center justify-between border-b border-card-border bg-background-secondary px-4 py-3">
@@ -166,7 +169,7 @@ export function GpsLinePickerModal({
               <input
                 ref={inputRef}
                 type="search"
-                autoFocus
+                data-autofocus="true"
                 placeholder="Buscar por nome, número ou destino…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

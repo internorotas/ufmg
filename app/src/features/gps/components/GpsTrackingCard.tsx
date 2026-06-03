@@ -31,7 +31,10 @@ export function GpsTrackingCard({ rastreio, linha }: GpsTrackingCardProps) {
       {/* Cabeçalho: dot piscando + linha */}
       <div className="flex items-start gap-2">
         <div className="mt-0.5 flex shrink-0 items-center gap-1.5">
-          <span className="inline-block size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
+          <span
+            className="inline-block size-2 animate-pulse rounded-full bg-red-500"
+            aria-hidden="true"
+          />
           <span className="text-[10px] font-bold uppercase tracking-widest text-red-500">REC</span>
         </div>
 
@@ -66,7 +69,10 @@ export function GpsTrackingCard({ rastreio, linha }: GpsTrackingCardProps) {
           <span className="tabular-nums">{distanceKm.toFixed(1)} km</span>
         </div>
 
-        <div className="flex items-center gap-0.5 text-text-secondary" title="Estimativa sujeita à validação">
+        <div
+          className="flex items-center gap-0.5 text-text-secondary"
+          title="Estimativa sujeita à validação"
+        >
           <span>~{pontosEstimados} pts</span>
           <span className="text-[9px] text-text-tertiary">*</span>
         </div>

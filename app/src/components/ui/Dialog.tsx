@@ -57,7 +57,7 @@ export const dialogBackdropVariants = tv({
  */
 export const dialogPopupVariants = tv({
   base: [
-    'relative flex max-h-[90vh] w-full flex-col',
+    'relative flex max-h-[90dvh] w-full flex-col',
     'rounded-xl border border-card-border bg-modal text-text-primary shadow-2xl',
     'data-[state=open]:animate-modal-in',
     'data-[state=closed]:animate-modal-out',

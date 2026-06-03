@@ -2,9 +2,9 @@ import { ArrowLeft, Info } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
+import { LineCard } from '@/components/LineCard';
 import { CategoryTabs } from '@/components/MenuLateral';
 import { SystemBanner } from '@/components/SystemBanner';
-import { LineCard } from '@/components/LineCard';
 import { SearchEmptyState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/Input';
 import { getCurrentSpecialPeriod, isWeekday } from '@/config/specialPeriods';
@@ -107,7 +107,11 @@ export function LinhasPage() {
 
   const handleFavoritaClick = useCallback(
     (linha: Linha) => {
-      trackEvent({ category: 'preferences', action: 'favorite_section_click', label: linha.idRota });
+      trackEvent({
+        category: 'preferences',
+        action: 'favorite_section_click',
+        label: linha.idRota,
+      });
       handleLinhaClick(linha);
     },
     [handleLinhaClick, trackEvent],
@@ -216,7 +220,9 @@ export function LinhasPage() {
               <div
                 key={linha.idRota}
                 className={
-                  movimentoPorId[linha.idRota] === 'up' ? 'motion-safe:animate-line-favorite-up' : ''
+                  movimentoPorId[linha.idRota] === 'up'
+                    ? 'motion-safe:animate-line-favorite-up'
+                    : ''
                 }
               >
                 <LineCard

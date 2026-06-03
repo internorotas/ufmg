@@ -79,7 +79,11 @@ export function RankingPage() {
       description="Top 10 público com visão completa para autenticados"
       actions={
         !isAuthenticated ? (
-          <Button type="button" className="min-h-11" onClick={() => navigate('/login', { state: { from: location.pathname } })}>
+          <Button
+            type="button"
+            className="min-h-11"
+            onClick={() => navigate('/login', { state: { from: location.pathname } })}
+          >
             Entrar para ver completo
           </Button>
         ) : undefined

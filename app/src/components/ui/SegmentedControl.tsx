@@ -36,6 +36,7 @@ export function SegmentedControl<T extends string = string>({
   className,
 }: SegmentedControlProps<T>) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: role="group" correto para toggle buttons — não é fieldset de formulário
     <div
       role="group"
       className={cn(

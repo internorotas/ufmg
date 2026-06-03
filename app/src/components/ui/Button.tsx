@@ -35,10 +35,7 @@ export const buttonVariants = tv({
         'bg-success-border text-text-inverse shadow-sm',
         'hover:bg-success-border/90 focus-visible:ring-success-border',
       ],
-      danger: [
-        'bg-red-600 text-white shadow-sm',
-        'hover:bg-red-500 focus-visible:ring-red-500',
-      ],
+      danger: ['bg-red-600 text-white shadow-sm', 'hover:bg-red-500 focus-visible:ring-red-500'],
       ghost: [
         'bg-transparent text-text-primary',
         'hover:bg-card-hover focus-visible:ring-brand-primary',
