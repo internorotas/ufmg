@@ -11,7 +11,7 @@ export function InactivityWarningDialog({ open, onContinue }: InactivityWarningD
   return (
     // onOpenChange omitido: dialog não deve fechar com Escape/clique fora
     // — apenas "Continuar sessão" ou o timeout automático fecham
-    <Dialog.Root open={open}>
+    <Dialog.Root open={open} onOpenChange={() => {}}>
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Popup size="sm" className="mx-4 w-full max-w-sm">
