@@ -1,5 +1,5 @@
 import { Bell, ChevronRight, LogOut, ShieldAlert, UserCircle2 } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -30,7 +30,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isTogglingPublic, setIsTogglingPublic] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const headingId = useRef(`profile-sheet-title-${Math.random().toString(16).slice(2)}`).current;
+  const headingId = useId();
   const isMounted = useMounted();
 
   useEffect(() => {

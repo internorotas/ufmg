@@ -1,4 +1,4 @@
-import { MapPin, Timer } from 'lucide-react';
+import { Loader2, MapPin, Square, Timer } from 'lucide-react';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import type { Linha } from '@/types/data.types';
 
@@ -19,23 +19,34 @@ function formatDuration(ms: number): string {
 }
 
 export function GpsTrackingCard({ rastreio, linha }: GpsTrackingCardProps) {
-  const { distanceKm, durationMs, snapshotsCount } = rastreio;
+  const { distanceKm, durationMs, snapshotsCount, status, stop } = rastreio;
+  const isStarting = status === 'starting';
   const pontosEstimados = Math.max(1, Math.floor(snapshotsCount / 2));
 
   return (
     <div
       role="status"
-      aria-label="Rastreio colaborativo ativo"
-      className="pointer-events-none absolute bottom-20 right-3 z-[900] w-56 select-none rounded-xl border border-card-border bg-card p-3 shadow-lg sm:bottom-6 sm:right-4"
+      aria-label="Rastreio colaborativo"
+      className="pointer-events-none absolute bottom-20 left-1/2 z-900 w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 select-none rounded-xl border border-card-border bg-card shadow-lg sm:bottom-6"
     >
-      {/* Cabeçalho: dot piscando + linha */}
-      <div className="flex items-start gap-2">
-        <div className="mt-0.5 flex shrink-0 items-center gap-1.5">
+      {/* Cabeçalho: indicador + linha + botão parar */}
+      <div className="flex items-center gap-2 p-3">
+        <div className="flex shrink-0 items-center gap-1.5">
+          {isStarting ? (
+            <Loader2 size={12} className="animate-spin text-brand-primary" aria-hidden="true" />
+          ) : (
+            <span
+              className="inline-block size-2 animate-pulse rounded-full bg-red-500"
+              aria-hidden="true"
+            />
+          )}
           <span
-            className="inline-block size-2 animate-pulse rounded-full bg-red-500"
-            aria-hidden="true"
-          />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-red-500">REC</span>
+            className={`text-[10px] font-bold uppercase tracking-widest ${
+              isStarting ? 'text-brand-primary' : 'text-red-500'
+            }`}
+          >
+            {isStarting ? 'Iniciando' : 'REC'}
+          </span>
         </div>
 
         <div className="min-w-0 flex-1">
@@ -53,34 +64,43 @@ export function GpsTrackingCard({ rastreio, linha }: GpsTrackingCardProps) {
             <p className="truncate text-[10px] text-text-tertiary">{linha.sublinha}</p>
           ) : null}
         </div>
-      </div>
 
-      <div className="my-2.5 h-px bg-card-border" />
-
-      {/* Métricas */}
-      <div className="flex items-center justify-between gap-2 text-[11px]">
-        <div className="flex items-center gap-1 text-text-secondary">
-          <Timer size={11} aria-hidden="true" />
-          <span className="tabular-nums">{formatDuration(durationMs)}</span>
-        </div>
-
-        <div className="flex items-center gap-1 text-text-secondary">
-          <MapPin size={11} aria-hidden="true" />
-          <span className="tabular-nums">{distanceKm.toFixed(1)} km</span>
-        </div>
-
-        <div
-          className="flex items-center gap-0.5 text-text-secondary"
-          title="Estimativa sujeita à validação"
+        {/* Botão parar — pointer-events-auto para ser clicável dentro do container none */}
+        <button
+          type="button"
+          onClick={() => void stop('manual')}
+          aria-label="Encerrar rastreio colaborativo"
+          className="pointer-events-auto ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-warning-bg text-warning-text transition-colors hover:bg-warning-bg/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90"
         >
-          <span>~{pontosEstimados} pts</span>
-          <span className="text-[9px] text-text-tertiary">*</span>
-        </div>
+          <Square size={13} fill="currentColor" aria-hidden="true" />
+        </button>
       </div>
 
-      <p className="mt-1.5 text-[9px] leading-tight text-text-tertiary">
-        * pontos sujeitos a validação
-      </p>
+      {/* Métricas — visíveis só quando rastreio está ativo */}
+      {!isStarting && (
+        <>
+          <div className="mx-3 h-px bg-card-border" />
+          <div className="flex items-center justify-between gap-2 p-3 pt-2 text-[11px]">
+            <div className="flex items-center gap-1 text-text-secondary">
+              <Timer size={11} aria-hidden="true" />
+              <span className="tabular-nums">{formatDuration(durationMs)}</span>
+            </div>
+
+            <div className="flex items-center gap-1 text-text-secondary">
+              <MapPin size={11} aria-hidden="true" />
+              <span className="tabular-nums">{distanceKm.toFixed(1)} km</span>
+            </div>
+
+            <div
+              className="flex items-center gap-0.5 text-text-secondary"
+              title="Estimativa sujeita à validação"
+            >
+              <span>~{pontosEstimados} pts</span>
+              <span className="text-[9px] text-text-tertiary">*</span>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

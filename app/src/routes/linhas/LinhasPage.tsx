@@ -100,7 +100,7 @@ export function LinhasPage() {
         label: `${linha.nome} | categoria=${categoriaAtual?.displayName ?? 'desconhecida'}`,
       });
       selecionarLinha(linha);
-      navigate('/');
+      navigate('/', { state: { openSidebar: true } });
     },
     [categoriaAtual?.displayName, navigate, selecionarLinha, trackEvent],
   );

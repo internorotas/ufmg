@@ -156,22 +156,31 @@ function AppContent() {
   } | null>(null);
   const [authFeedbackMessage, setAuthFeedbackMessage] = useState<string | null>(null);
   useEffect(() => {
-    const locationState = location.state as { authFeedback?: string } | null;
+    const locationState = location.state as {
+      authFeedback?: string;
+      openSidebar?: boolean;
+    } | null;
     const feedback = locationState?.authFeedback;
-    if (!feedback) {
-      return;
-    }
+    const shouldOpenSidebar = locationState?.openSidebar;
 
-    setAuthFeedbackMessage(feedback);
+    if (!feedback && !shouldOpenSidebar) return;
+
     navigate(location.pathname, { replace: true, state: null });
 
-    const timeoutId = window.setTimeout(() => {
-      setAuthFeedbackMessage(null);
-    }, 5000);
+    if (feedback) {
+      setAuthFeedbackMessage(feedback);
+      const timeoutId = window.setTimeout(() => {
+        setAuthFeedbackMessage(null);
+      }, 5000);
+      return () => window.clearTimeout(timeoutId);
+    }
 
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
+    if (shouldOpenSidebar) {
+      const frameId = window.requestAnimationFrame(() => {
+        usePlannerStore.getState().openMenuFn?.();
+      });
+      return () => window.cancelAnimationFrame(frameId);
+    }
   }, [location.pathname, location.state, navigate]);
 
   // Hook de localização do usuário
