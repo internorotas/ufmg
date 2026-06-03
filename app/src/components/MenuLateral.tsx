@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { ArrowLeft, Info, Menu, Route, X } from 'lucide-react';
+import { ArrowLeft, Info, Route, X } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { tv, type VariantProps } from 'tailwind-variants';
@@ -24,7 +24,6 @@ import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 import type { LegalModalType } from '../types/legal.types';
 import { DisclaimerBanner } from './DisclaimerBanner';
 import { LineCard } from './LineCard';
-import { MenuFooter } from './MenuFooter';
 import { SystemBanner } from './SystemBanner';
 import { ThemeToggle } from './ThemeToggle';
 import { Badge } from './ui/Badge';
@@ -107,7 +106,7 @@ interface CategoryTabsProps {
   onSelect: (index: number) => void;
 }
 
-function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) {
+export function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabsProps) {
   const activeValue = String(categories[activeIndex]?.id ?? '');
 
   const handleValueChange = (value: string) => {
@@ -228,7 +227,6 @@ export const MenuLateral = React.memo(function MenuLateral({
   const closePlanner = usePlannerStore((state) => state.closePlanner);
   const isPlannerOpen = plannerMode === 'planning';
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const mobileTriggerRef = useRef<HTMLButtonElement>(null);
   const lastListSummaryRef = useRef<string>('');
   const wasMenuVisibleRef = useRef(false);
   const previousFavoritosRef = useRef<Set<string>>(new Set());
@@ -383,9 +381,6 @@ export const MenuLateral = React.memo(function MenuLateral({
     }
 
     if (!isMenuVisible) {
-      if (wasMenuVisibleRef.current) {
-        mobileTriggerRef.current?.focus();
-      }
       wasMenuVisibleRef.current = false;
       return;
     }
@@ -453,33 +448,6 @@ export const MenuLateral = React.memo(function MenuLateral({
 
   return (
     <>
-      <div className="fixed bottom-24 left-1/2 z-1001 -translate-x-1/2 md:hidden [margin-bottom:env(safe-area-inset-bottom)]">
-        <Button
-          ref={mobileTriggerRef}
-          data-slot="mobile-trigger"
-          onClick={() => {
-            analytics.trackEvent({
-              category: 'navigation',
-              action: 'open_menu',
-              label: 'mobile_trigger',
-            });
-            setMenuVisible(true);
-          }}
-          variant="primary"
-          size="lg"
-          className="gap-3 rounded-full px-6 shadow-lg"
-          aria-controls="menu-lateral-sidebar"
-          aria-expanded={isMenuVisible}
-          aria-haspopup="dialog"
-          title={t('mobile.openLines')}
-        >
-          <span className="flex items-center gap-2 text-white">
-            <Menu size={24} aria-hidden="true" />
-            {t('mobile.openLines')}
-          </span>
-        </Button>
-      </div>
-
       {isMenuVisible && (
         <button
           type="button"
@@ -776,7 +744,6 @@ export const MenuLateral = React.memo(function MenuLateral({
           </Button>
         </div>
 
-        <MenuFooter />
       </aside>
 
       {linhaDetalhesAberta && (

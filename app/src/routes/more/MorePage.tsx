@@ -220,6 +220,8 @@ function renderItem(item: MoreItem, key: string): ReactNode {
   );
 }
 
+const appVersion = import.meta.env.VITE_APP_VERSION;
+
 export function MorePage() {
   const navigate = useNavigate();
   const { isAuthenticated, authStatus } = useAuthContext();
@@ -413,6 +415,22 @@ export function MorePage() {
           {preferencias.map((item, index) => renderItem(item, `preferencias-${index}`))}
         </Section>
       </div>
+
+      <footer className="pt-4 text-center">
+        <a
+          href="https://github.com/igormartins4"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary hover:text-text-primary transition-colors"
+        >
+          Desenvolvido com{' '}
+          <Heart size={12} fill="currentColor" className="text-red-500" aria-hidden="true" />{' '}
+          por Igor Martins
+        </a>
+        {appVersion && (
+          <p className="mt-0.5 text-xs text-text-tertiary">v{appVersion}</p>
+        )}
+      </footer>
     </AppShell>
   );
 }

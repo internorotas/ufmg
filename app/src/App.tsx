@@ -41,6 +41,7 @@ import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { AboutPage } from './routes/about/AboutPage';
 import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
 import { LoginPage } from './routes/login/LoginPage';
+import { LinhasPage } from './routes/linhas/LinhasPage';
 import { MorePage } from './routes/more/MorePage';
 import { ProfilePage } from './routes/profile/ProfilePage';
 import { RankingPage } from './routes/ranking/RankingPage';
@@ -456,7 +457,7 @@ function AppContent() {
       <OnboardingModal onOpenLegalModal={handleOpenLegalModal} />
       <a
         href="#main-content"
-        className="sr-only absolute left-4 top-4 z-[1400] rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
+        className="sr-only absolute left-4 top-4 z-1400 rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
       >
         Pular para o mapa
       </a>
@@ -607,7 +608,7 @@ function AppContent() {
           <div
             role="status"
             aria-live="polite"
-            className="pointer-events-none absolute bottom-32 left-1/2 z-[1400] -translate-x-1/2 rounded-lg border border-success-border bg-success-bg px-3 py-2 text-xs text-success-text shadow-md"
+            className="pointer-events-none absolute bottom-32 left-1/2 z-1400 -translate-x-1/2 rounded-lg border border-success-border bg-success-bg px-3 py-2 text-xs text-success-text shadow-md"
           >
             {authFeedbackMessage}
           </div>
@@ -618,7 +619,7 @@ function AppContent() {
             role="alertdialog"
             aria-live="polite"
             aria-label="Aviso de login necessário"
-            className="pointer-events-auto fixed inset-x-4 bottom-24 z-[1400] mx-auto flex max-w-md items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg md:bottom-20"
+            className="pointer-events-auto fixed inset-x-4 bottom-24 z-1400 mx-auto flex max-w-md items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg md:bottom-20"
           >
             <span className="flex-1">{feedbackMessage}</span>
             <button
@@ -654,6 +655,7 @@ function AuthenticatedAppShell() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/perfil" element={<ProfilePage />} />
                 <Route path="/ranking" element={<RankingPage />} />
+                <Route path="/linhas" element={<LinhasPage />} />
                 <Route path="/mais" element={<MorePage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
