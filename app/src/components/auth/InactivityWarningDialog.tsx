@@ -9,7 +9,9 @@ interface InactivityWarningDialogProps {
 
 export function InactivityWarningDialog({ open, onContinue }: InactivityWarningDialogProps) {
   return (
-    <Dialog.Root open={open} onOpenChange={(v) => v === false && onContinue()}>
+    // onOpenChange omitido: dialog não deve fechar com Escape/clique fora
+    // — apenas "Continuar sessão" ou o timeout automático fecham
+    <Dialog.Root open={open}>
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Popup size="sm" className="mx-4 w-full max-w-sm">

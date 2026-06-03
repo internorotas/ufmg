@@ -47,8 +47,9 @@ const PlannerPanel = React.lazy(() =>
  */
 export const sidebarVariants = tv({
   base: [
-    'fixed inset-y-0 left-0 z-[1003] flex h-[100dvh] flex-col',
-    'w-screen max-w-none md:relative md:h-full md:w-1/2 md:max-w-md',
+    'fixed inset-y-0 left-0 z-[1003] flex flex-col',
+    'h-[calc(100dvh-3.5rem-env(safe-area-inset-bottom))] md:h-full',
+    'w-screen max-w-none md:relative md:w-1/2 md:max-w-md',
     'border-r border-card-border/50 text-text-primary',
     'bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150',
     'shadow-2xl md:shadow-none',
@@ -201,7 +202,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   todasParadas,
   onLinhaSelect,
   onParadaClick,
-  onOpenLegalModal,
+  onOpenLegalModal: _onOpenLegalModal,
   linhaSelecionada,
   isOffline,
   authStatus,
@@ -775,7 +776,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           </Button>
         </div>
 
-        <MenuFooter onOpenLegalModal={onOpenLegalModal} />
+        <MenuFooter />
       </aside>
 
       {linhaDetalhesAberta && (
