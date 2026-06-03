@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { Bus, ChevronRight, Clock, Star } from 'lucide-react';
+import { Bus, ChevronRight, Star } from 'lucide-react';
 import type React from 'react';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -144,30 +144,6 @@ function getLineDescriptionId(idRota: string): string {
   return `line-card-description-${idRota}`;
 }
 
-interface ScheduleDisplayProps {
-  label: string;
-  time: string;
-  highlight?: boolean;
-}
-
-function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
-  return (
-    <div data-slot="schedule" className="rounded-lg bg-background-secondary/50 p-2 text-center">
-      <p className="mb-1 flex items-center justify-center gap-1 text-xs text-text-secondary">
-        <Clock className="size-3.5" aria-hidden="true" />
-        {label}
-      </p>
-      <p
-        className={cn(
-          'text-base font-bold md:text-lg',
-          highlight ? 'text-success-text' : 'text-text-primary',
-        )}
-      >
-        {time}
-      </p>
-    </div>
-  );
-}
 
 interface SuspendedNoticeProps {
   message: string;
@@ -228,7 +204,7 @@ function LineCardComponent({
   const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);
 
   const currentMinutes = getSaoPauloMinutesOfDay(now);
-  const { nextSchedule, previousSchedule } = calculateSchedules(schedulesInMinutes, currentMinutes);
+  const { nextSchedule } = calculateSchedules(schedulesInMinutes, currentMinutes);
 
   const status =
     shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE'
@@ -335,29 +311,10 @@ function LineCardComponent({
         </div>
 
         <div data-slot="body" className="px-4">
-          {shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE' ? (
+          {(shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE') && (
             <SuspendedNotice
               message={shouldDisableSchedules ? getSuspendedMessage() : statusLinha.texto}
             />
-          ) : (
-            <div
-              className="mb-4 rounded-xl border p-3"
-              style={{ borderColor: hexToRgba(linha.corHex, 0.24) }}
-            >
-              <p className="mb-1 text-xs font-semibold tracking-wide text-text-secondary uppercase">
-                {t('labels.nextDeparture')}
-              </p>
-              <p
-                className="font-bold text-[clamp(1.5rem,5vw,2rem)] leading-none tabular-nums"
-                style={{ color: linha.corHex }}
-              >
-                {nextSchedule}
-              </p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <ScheduleDisplay label={t('labels.last')} time={previousSchedule} />
-                <ScheduleDisplay label={t('labels.following')} time={nextSchedule} highlight />
-              </div>
-            </div>
           )}
 
           {idParada ? (
@@ -377,7 +334,7 @@ function LineCardComponent({
         </div>
       </button>
 
-      <div data-slot="actions" className="grid grid-cols-[auto_1fr] gap-2 px-4 pb-4">
+      <div data-slot="actions" className="grid grid-cols-[auto_1fr] gap-2 px-4 pt-1 pb-4">
         <button
           type="button"
           data-slot="favorite-action"

@@ -92,14 +92,14 @@ body,
   /* Backgrounds */
   --background: #ffffff;
   --background-secondary: #f3f4f6; /* Gray 100 */
-  --sidebar-background: #f9fafb; /* Gray 50 */
+  --sidebar-background: #f3f4f6; /* Gray 100 — mais distinto do card branco */
   --modal-background: #ffffff;
   --backdrop: rgba(0, 0, 0, 0.5);
 
   /* Cards & Inputs */
   --card-background: #ffffff;
   --card-hover: #f9fafb;
-  --card-border: #e5e7eb; /* Gray 200 */
+  --card-border: #d1d5db; /* Gray 300 — mais visível que o antigo Gray 200 */
   --input-background: #f9fafb;
   --input-border: #e5e7eb;
 
