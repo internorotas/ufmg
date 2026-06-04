@@ -27,7 +27,7 @@ export function GpsTrackingCard({ rastreio, linha }: GpsTrackingCardProps) {
     <div
       role="status"
       aria-label="Rastreio colaborativo"
-      className="pointer-events-none absolute bottom-20 left-1/2 z-900 w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 select-none rounded-xl border border-card-border bg-card shadow-lg sm:bottom-6"
+      className="pointer-events-none absolute bottom-20 left-1/2 w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 select-none rounded-xl border border-card-border bg-card shadow-lg sm:bottom-6"
     >
       {/* Cabeçalho: indicador + linha + botão parar */}
       <div className="flex items-center gap-2 p-3">

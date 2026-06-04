@@ -17,6 +17,7 @@ import { OfflineBanner } from './components/OfflineBanner';
 import { OnboardingModal } from './components/OnboardingModal';
 import { ProfileSheet } from './components/profile/ProfileSheet';
 import { GA_MEASUREMENT_ID } from './config/analytics';
+import { LocationProvider, useLocationContext } from './contexts/LocationContext';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -26,15 +27,14 @@ import { useAuthBootstrap } from './features/auth/hooks/useAuthBootstrap';
 import { useConsentGate } from './features/auth/hooks/useConsentGate';
 import { GpsLinePickerModal } from './features/gps/components/GpsLinePickerModal';
 import { GpsPositionWarningDialog } from './features/gps/components/GpsPositionWarningDialog';
-import { GpsTrackingCard } from './features/gps/components/GpsTrackingCard';
-import { useGpsTrackingSession } from './features/gps/hooks/useGpsTrackingSession';
+import { GpsSessionProvider, useGpsSession } from './features/gps/context/GpsSessionContext';
 import { PlannerSummarySheet } from './features/planner/components/PlannerSummarySheet';
 import { usePlannerStore } from './features/planner/store/plannerStore';
 import { logout } from './features/profile/api/profileClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { useInactivityTimer } from './hooks/useInactivityTimer';
-import { COORDENADAS_CAMPUS, useLocalizacaoUsuario } from './hooks/useLocalizacaoUsuario';
+import { COORDENADAS_CAMPUS } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { calcularDistanciaKm } from './lib/utils';
 import { AboutPage } from './routes/about/AboutPage';
@@ -183,10 +183,9 @@ function AppContent() {
     }
   }, [location.pathname, location.state, navigate]);
 
-  // Hook de localização do usuário
+  // Hook de localização do usuário (via LocationContext — persiste em todas as rotas)
   const {
     localizacao,
-    ultimaLeitura,
     heading,
     permissaoConcedida,
     carregando: carregandoLocalizacao,
@@ -197,20 +196,17 @@ function AppContent() {
     fecharModalLonge,
     iniciarRastreamento,
     solicitarPermissaoNavegador,
-  } = useLocalizacaoUsuario();
+  } = useLocationContext();
 
   const [legalModal, setLegalModal] = useState<LegalModalType | null>(() =>
     resolveLegalModalFromPath(window.location.pathname),
   );
-  const rastreioColaborativo = useGpsTrackingSession({
-    enabled: isAuthenticated,
-    selectedLine: linhaSelecionada,
-  });
+  // Sessão GPS via GpsSessionContext — persiste mesmo ao navegar para outras rotas
+  const rastreioColaborativo = useGpsSession();
   const {
     isActive: rastreioAtivo,
     start: iniciarRastreioColaborativo,
     stop: encerrarRastreioColaborativo,
-    ingestSnapshot,
   } = rastreioColaborativo;
   const { solicitarAutoCenter, consumirAutoCenter } = useMapAutoCenter({
     mapaRef,
@@ -227,17 +223,6 @@ function AppContent() {
   useEffect(() => {
     setLegalModal(resolveLegalModalFromPath(location.pathname));
   }, [location.pathname]);
-
-  useEffect(() => {
-    if (!ultimaLeitura || !rastreioAtivo) {
-      return;
-    }
-
-    void ingestSnapshot({
-      ...ultimaLeitura,
-      heading: ultimaLeitura.heading ?? heading,
-    });
-  }, [heading, ingestSnapshot, rastreioAtivo, ultimaLeitura]);
 
   // Handlers com tracking de analytics
   const handleLinhaSelect = useCallback(
@@ -535,10 +520,6 @@ function AppContent() {
                   onAlternarRastreioColaborativo={handleAlternarRastreioColaborativo}
                 />
               </Suspense>
-
-              {rastreioColaborativo.isActive && linhaSelecionada && (
-                <GpsTrackingCard rastreio={rastreioColaborativo} linha={linhaSelecionada} />
-              )}
             </ErrorBoundary>
           </main>
         </div>
@@ -653,24 +634,28 @@ function AuthenticatedAppShell() {
     <RotasProvider>
       <AnalyticsProvider>
         <NotificacaoProvider>
-          <div className="flex h-dvh bg-background text-text-primary">
-            <NavRail />
-            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-              <Routes>
-                <Route path="/" element={<AppContent />} />
-                <Route path="/privacidade" element={<AppContent />} />
-                <Route path="/termos" element={<AppContent />} />
-                <Route path="/sobre" element={<AboutPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/perfil" element={<ProfilePage />} />
-                <Route path="/ranking" element={<RankingPage />} />
-                <Route path="/linhas" element={<LinhasPage />} />
-                <Route path="/mais" element={<MorePage />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </div>
-            <BottomNav />
-          </div>
+          <LocationProvider>
+            <GpsSessionProvider>
+              <div className="flex h-dvh bg-background text-text-primary">
+                <NavRail />
+                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                  <Routes>
+                    <Route path="/" element={<AppContent />} />
+                    <Route path="/privacidade" element={<AppContent />} />
+                    <Route path="/termos" element={<AppContent />} />
+                    <Route path="/sobre" element={<AboutPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/perfil" element={<ProfilePage />} />
+                    <Route path="/ranking" element={<RankingPage />} />
+                    <Route path="/linhas" element={<LinhasPage />} />
+                    <Route path="/mais" element={<MorePage />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </div>
+                <BottomNav />
+              </div>
+            </GpsSessionProvider>
+          </LocationProvider>
         </NotificacaoProvider>
       </AnalyticsProvider>
     </RotasProvider>
