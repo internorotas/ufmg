@@ -1,10 +1,12 @@
-import { Loader2, MapPin, Square, Timer } from 'lucide-react';
+import { Loader2, MapPin, Radio, Square, Timer, Wifi, WifiOff } from 'lucide-react';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import type { Linha } from '@/types/data.types';
 
 interface GpsTrackingCardProps {
   rastreio: GpsTrackingState;
   linha: Linha;
+  speedKmh?: number;
+  accuracyM?: number;
 }
 
 function formatDuration(ms: number): string {
@@ -18,30 +20,39 @@ function formatDuration(ms: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-export function GpsTrackingCard({ rastreio, linha }: GpsTrackingCardProps) {
-  const { distanceKm, durationMs, snapshotsCount, status, stop } = rastreio;
+function signalLabel(accuracyM: number | undefined): { label: string; ok: boolean } {
+  if (accuracyM === undefined) return { label: '—', ok: true };
+  if (accuracyM <= 20) return { label: 'Ótimo', ok: true };
+  if (accuracyM <= 50) return { label: `±${Math.round(accuracyM)}m`, ok: true };
+  return { label: `±${Math.round(accuracyM)}m`, ok: false };
+}
+
+export function GpsTrackingCard({ rastreio, linha, speedKmh, accuracyM }: GpsTrackingCardProps) {
+  const { distanceKm, durationMs, snapshotsCount, queueSize, isSyncing, status, stop } = rastreio;
   const isStarting = status === 'starting';
   const pontosEstimados = Math.max(1, Math.floor(snapshotsCount / 2));
+  const signal = signalLabel(accuracyM);
+  const hasQueue = queueSize > 0;
 
   return (
     <div
       role="status"
-      aria-label="Rastreio colaborativo"
-      className="pointer-events-none absolute bottom-20 left-1/2 w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 select-none rounded-xl border border-card-border bg-card shadow-lg sm:bottom-6"
+      aria-label="Rastreio colaborativo ativo"
+      className="pointer-events-none absolute bottom-24 left-3 w-48 select-none rounded-xl border border-card-border bg-card shadow-lg md:bottom-6 md:left-4"
     >
-      {/* Cabeçalho: indicador + linha + botão parar */}
-      <div className="flex items-center gap-2 p-3">
-        <div className="flex shrink-0 items-center gap-1.5">
+      {/* Cabeçalho */}
+      <div className="flex items-center gap-1.5 p-2.5 pb-2">
+        <div className="flex shrink-0 items-center gap-1">
           {isStarting ? (
-            <Loader2 size={12} className="animate-spin text-brand-primary" aria-hidden="true" />
+            <Loader2 size={11} className="animate-spin text-brand-primary" aria-hidden="true" />
           ) : (
             <span
-              className="inline-block size-2 animate-pulse rounded-full bg-red-500"
+              className="inline-block size-1.5 animate-pulse rounded-full bg-red-500"
               aria-hidden="true"
             />
           )}
           <span
-            className={`text-[10px] font-bold uppercase tracking-widest ${
+            className={`text-[9px] font-bold uppercase tracking-widest ${
               isStarting ? 'text-brand-primary' : 'text-red-500'
             }`}
           >
@@ -50,54 +61,86 @@ export function GpsTrackingCard({ rastreio, linha }: GpsTrackingCardProps) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             <span
-              className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[10px] font-bold tabular-nums"
+              className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-[9px] font-bold tabular-nums"
               style={{ backgroundColor: `${linha.corHex}22`, color: linha.corHex }}
               aria-hidden="true"
             >
               {linha.linha}
             </span>
-            <p className="truncate text-xs font-semibold text-text-primary">{linha.nome}</p>
+            <p className="truncate text-[10px] font-semibold text-text-primary">{linha.nome}</p>
           </div>
-          {linha.sublinha ? (
-            <p className="truncate text-[10px] text-text-tertiary">{linha.sublinha}</p>
-          ) : null}
         </div>
 
-        {/* Botão parar — pointer-events-auto para ser clicável dentro do container none */}
         <button
           type="button"
           onClick={() => void stop('manual')}
-          aria-label="Encerrar rastreio colaborativo"
-          className="pointer-events-auto ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-warning-bg text-warning-text transition-colors hover:bg-warning-bg/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-90"
+          aria-label="Encerrar rastreio"
+          className="pointer-events-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-warning-bg text-warning-text transition-colors hover:bg-warning-bg/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary active:scale-90"
         >
-          <Square size={13} fill="currentColor" aria-hidden="true" />
+          <Square size={10} fill="currentColor" aria-hidden="true" />
         </button>
       </div>
 
-      {/* Métricas — visíveis só quando rastreio está ativo */}
       {!isStarting && (
         <>
-          <div className="mx-3 h-px bg-card-border" />
-          <div className="flex items-center justify-between gap-2 p-3 pt-2 text-[11px]">
-            <div className="flex items-center gap-1 text-text-secondary">
-              <Timer size={11} aria-hidden="true" />
+          <div className="mx-2.5 h-px bg-card-border" />
+
+          {/* Métricas linha 1: tempo + distância */}
+          <div className="flex items-center justify-between gap-1 px-2.5 pt-2 text-[10px]">
+            <div className="flex items-center gap-0.5 text-text-secondary">
+              <Timer size={9} aria-hidden="true" />
               <span className="tabular-nums">{formatDuration(durationMs)}</span>
             </div>
-
-            <div className="flex items-center gap-1 text-text-secondary">
-              <MapPin size={11} aria-hidden="true" />
-              <span className="tabular-nums">{distanceKm.toFixed(1)} km</span>
+            <div className="flex items-center gap-0.5 text-text-secondary">
+              <MapPin size={9} aria-hidden="true" />
+              <span className="tabular-nums">{distanceKm.toFixed(2)} km</span>
             </div>
+          </div>
 
+          {/* Métricas linha 2: pontos + velocidade */}
+          <div className="flex items-center justify-between gap-1 px-2.5 pb-2 pt-1 text-[10px]">
             <div
               className="flex items-center gap-0.5 text-text-secondary"
-              title="Estimativa sujeita à validação"
+              title="Pontos estimados (sujeitos a validação)"
             >
+              <Radio size={9} aria-hidden="true" />
               <span>~{pontosEstimados} pts</span>
-              <span className="text-[9px] text-text-tertiary">*</span>
             </div>
+            {speedKmh !== undefined && speedKmh > 0.5 && (
+              <div className="flex items-center gap-0.5 text-text-secondary">
+                <span className="tabular-nums">{speedKmh.toFixed(0)} km/h</span>
+              </div>
+            )}
+          </div>
+
+          <div className="mx-2.5 h-px bg-card-border" />
+
+          {/* Status: sinal GPS + sincronização */}
+          <div className="flex items-center justify-between gap-1 px-2.5 py-1.5 text-[9px]">
+            <span
+              className={signal.ok ? 'text-success-text' : 'text-warning-text'}
+              title={`Precisão GPS: ${accuracyM !== undefined ? `±${Math.round(accuracyM)}m` : 'desconhecida'}`}
+            >
+              {signal.label}
+            </span>
+
+            {hasQueue || isSyncing ? (
+              <div className="flex items-center gap-0.5 text-text-tertiary">
+                {isSyncing ? (
+                  <Loader2 size={8} className="animate-spin" aria-hidden="true" />
+                ) : (
+                  <WifiOff size={8} aria-hidden="true" />
+                )}
+                <span>{queueSize > 0 ? `${queueSize} fila` : 'enviando'}</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-0.5 text-success-text">
+                <Wifi size={8} aria-hidden="true" />
+                <span>em dia</span>
+              </div>
+            )}
           </div>
         </>
       )}
