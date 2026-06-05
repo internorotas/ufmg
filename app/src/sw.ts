@@ -174,7 +174,12 @@ self.addEventListener('notificationclick', (event) => {
 
   const rawUrl = event.notification.data?.url;
   const targetUrl = typeof rawUrl === 'string' && rawUrl.length > 0 ? rawUrl : DEFAULT_OPEN_URL;
-  const normalizedTargetUrl = new URL(targetUrl, self.location.origin).toString();
+  const resolvedUrl = new URL(targetUrl, self.location.origin);
+  // Reject absolute URLs pointing outside the app origin to prevent open redirect via push payload.
+  const normalizedTargetUrl =
+    resolvedUrl.origin === new URL(self.location.origin).origin
+      ? resolvedUrl.toString()
+      : DEFAULT_OPEN_URL;
 
   event.waitUntil(
     (async () => {
