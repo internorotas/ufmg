@@ -372,13 +372,19 @@ export function ProfilePage() {
                 label={
                   <span className="flex items-center gap-2">
                     <MapPin size={16} aria-hidden="true" />
-                    Consentimento GPS
+                    Compartilhar localização
                   </span>
                 }
                 checked={!!profile.consentGpsAt}
                 onClick={() => void handleToggleConsentGps()}
                 disabled={isUpdatingProfile}
               />
+
+              <div className="rounded-lg border border-card-border bg-background px-3 py-2 text-xs text-text-secondary">
+                Ao usar o app, você contribui com dados de localização por padrão — isso melhora as
+                informações em tempo real para todos os usuários. Você pode desativar a qualquer
+                momento usando o botão acima.
+              </div>
 
               <SwitchRow
                 label="Consentimento pesquisa"

@@ -9,7 +9,6 @@ import { ModalManager } from './components/app/ModalManager';
 import { NavRail } from './components/app/NavRail';
 import { OfflineToast } from './components/app/OfflineToast';
 import { InactivityWarningDialog } from './components/auth/InactivityWarningDialog';
-import { LgpdConsentDialog } from './components/auth/LgpdConsentDialog';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { LegalModal } from './components/legal/LegalModal';
 import { MenuLateral } from './components/MenuLateral';
@@ -137,14 +136,7 @@ function AppContent() {
   const { trackEvent, trackPageView } = useAnalytics();
   const { authStatus, isAuthenticated } = useAuthContext();
   const { isOffline, showOfflineToast } = useAppConnectivity();
-  const {
-    dialogOpen,
-    feedbackMessage,
-    executeProtectedAction,
-    acceptAndContinue,
-    refuseConsent,
-    closeDialog,
-  } = useConsentGate();
+  const { feedbackMessage, executeProtectedAction } = useConsentGate();
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
   const [isSummarySheetOpen, setIsSummarySheetOpen] = useState(false);
   const [isGpsLinePickerOpen, setIsGpsLinePickerOpen] = useState(false);
@@ -581,13 +573,6 @@ function AppContent() {
         <LegalModal modalType={legalModal} onClose={handleCloseLegalModal} />
 
         <OfflineToast show={showOfflineToast} />
-
-        <LgpdConsentDialog
-          isOpen={dialogOpen}
-          onClose={closeDialog}
-          onAccept={acceptAndContinue}
-          onRefuse={refuseConsent}
-        />
 
         <ProfileSheet isOpen={isProfileSheetOpen} onOpenChange={setIsProfileSheetOpen} />
 
