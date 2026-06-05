@@ -275,8 +275,9 @@ function AppContent() {
   // Quando GPS permission chega após seleção de linha, inicia o rastreio automaticamente
   useEffect(() => {
     if (permissaoConcedida && pendingGpsLinhaRef.current && !rastreioAtivo) {
+      const pendingLine = pendingGpsLinhaRef.current;
       pendingGpsLinhaRef.current = null;
-      void iniciarRastreioColaborativo();
+      void iniciarRastreioColaborativo(pendingLine);
     }
   }, [permissaoConcedida, rastreioAtivo, iniciarRastreioColaborativo]);
 
@@ -302,7 +303,7 @@ function AppContent() {
                 await iniciarRastreamento();
                 return;
               }
-              await iniciarRastreioColaborativo();
+              await iniciarRastreioColaborativo(linha);
             });
           setGpsWarning({ distanceMeters: Math.round(distMeters), linha, pendingAction: action });
           return;
@@ -315,7 +316,7 @@ function AppContent() {
           await iniciarRastreamento();
           return;
         }
-        await iniciarRastreioColaborativo();
+        await iniciarRastreioColaborativo(linha);
       });
     },
     [

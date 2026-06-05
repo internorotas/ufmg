@@ -1,4 +1,5 @@
-import { ChevronDown, ChevronUp, Loader2, MapPin, Radio, Square, Timer, Wifi, WifiOff } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2, Map, MapPin, Radio, Square, Timer, Wifi, WifiOff } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import type { Linha } from '@/types/data.types';
 
@@ -45,21 +46,27 @@ export function GpsTrackingCard({
 
   if (isMinimized) {
     return (
-      <button
-        type="button"
-        onClick={onToggleMinimize}
-        aria-label="Expandir painel de rastreio"
-        className="pointer-events-auto absolute bottom-24 left-3 flex h-11 items-center gap-2 rounded-full border border-card-border bg-card px-3 shadow-lg md:bottom-6 md:left-4"
-      >
-        <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
-        <span
-          className="text-[11px] font-bold tabular-nums"
-          style={{ color: linha.corHex }}
+      <div className="pointer-events-auto absolute bottom-24 left-3 flex h-11 items-center gap-1 rounded-full border border-card-border bg-card px-2 shadow-lg md:bottom-6 md:left-4">
+        <button
+          type="button"
+          onClick={onToggleMinimize}
+          aria-label="Expandir painel de rastreio"
+          className="flex h-full items-center gap-2 px-1"
         >
-          {linha.linha}
-        </span>
-        <ChevronUp size={13} className="text-text-secondary" aria-hidden="true" />
-      </button>
+          <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
+          <span className="text-[11px] font-bold tabular-nums" style={{ color: linha.corHex }}>
+            {linha.linha}
+          </span>
+          <ChevronUp size={13} className="text-text-secondary" aria-hidden="true" />
+        </button>
+        <Link
+          to="/"
+          aria-label="Ver rota no mapa"
+          className="flex h-7 w-7 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary"
+        >
+          <Map size={13} aria-hidden="true" />
+        </Link>
+      </div>
     );
   }
 

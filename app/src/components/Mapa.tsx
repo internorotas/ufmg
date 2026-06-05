@@ -13,6 +13,7 @@
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { GpsLiveBusMarker } from '@/features/gps/components/GpsLiveBusMarker';
 import { GpsRouteOverlay } from '@/features/gps/components/GpsRouteOverlay';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { PlannerMapOverlay } from '@/features/planner/components/PlannerMapOverlay';
@@ -146,6 +147,8 @@ export function Mapa({
       {rastreioColaborativo?.isActive && linhaSelecionada && (
         <GpsRouteOverlay linha={linhaSelecionada} />
       )}
+
+      {linhaSelecionada && <GpsLiveBusMarker linha={linhaSelecionada} />}
 
       <PlannerMapOverlay />
 
