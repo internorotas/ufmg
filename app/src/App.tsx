@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { BottomNav } from './components/app/BottomNav';
@@ -137,6 +137,7 @@ function AppContent() {
   const { authStatus, isAuthenticated } = useAuthContext();
   const { isOffline, showOfflineToast } = useAppConnectivity();
   const { feedbackMessage, executeProtectedAction } = useConsentGate();
+  const pendingGpsLinhaRef = useRef<Linha | null>(null);
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
   const [isSummarySheetOpen, setIsSummarySheetOpen] = useState(false);
   const [isGpsLinePickerOpen, setIsGpsLinePickerOpen] = useState(false);
@@ -271,6 +272,14 @@ function AppContent() {
     usePlannerStore.getState().registerOpenMenu(fn);
   }, []);
 
+  // Quando GPS permission chega após seleção de linha, inicia o rastreio automaticamente
+  useEffect(() => {
+    if (permissaoConcedida && pendingGpsLinhaRef.current && !rastreioAtivo) {
+      pendingGpsLinhaRef.current = null;
+      void iniciarRastreioColaborativo();
+    }
+  }, [permissaoConcedida, rastreioAtivo, iniciarRastreioColaborativo]);
+
   const startGpsForLinha = useCallback(
     (linha: Linha) => {
       const VALIDATION_THRESHOLD_M = 300;
@@ -289,6 +298,7 @@ function AppContent() {
           const action = () =>
             void executeProtectedAction(async () => {
               if (!permissaoConcedida) {
+                pendingGpsLinhaRef.current = linha;
                 await iniciarRastreamento();
                 return;
               }
@@ -301,6 +311,7 @@ function AppContent() {
 
       void executeProtectedAction(async () => {
         if (!permissaoConcedida) {
+          pendingGpsLinhaRef.current = linha;
           await iniciarRastreamento();
           return;
         }

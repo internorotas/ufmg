@@ -1,4 +1,4 @@
-import { Loader2, MapPin, Radio, Square, Timer, Wifi, WifiOff } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2, MapPin, Radio, Square, Timer, Wifi, WifiOff } from 'lucide-react';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import type { Linha } from '@/types/data.types';
 
@@ -7,6 +7,8 @@ interface GpsTrackingCardProps {
   linha: Linha;
   speedKmh?: number;
   accuracyM?: number;
+  isMinimized: boolean;
+  onToggleMinimize: () => void;
 }
 
 function formatDuration(ms: number): string {
@@ -27,12 +29,39 @@ function signalLabel(accuracyM: number | undefined): { label: string; ok: boolea
   return { label: `±${Math.round(accuracyM)}m`, ok: false };
 }
 
-export function GpsTrackingCard({ rastreio, linha, speedKmh, accuracyM }: GpsTrackingCardProps) {
+export function GpsTrackingCard({
+  rastreio,
+  linha,
+  speedKmh,
+  accuracyM,
+  isMinimized,
+  onToggleMinimize,
+}: GpsTrackingCardProps) {
   const { distanceKm, durationMs, snapshotsCount, queueSize, isSyncing, status, stop } = rastreio;
   const isStarting = status === 'starting';
   const pontosEstimados = Math.max(1, Math.floor(snapshotsCount / 2));
   const signal = signalLabel(accuracyM);
   const hasQueue = queueSize > 0;
+
+  if (isMinimized) {
+    return (
+      <button
+        type="button"
+        onClick={onToggleMinimize}
+        aria-label="Expandir painel de rastreio"
+        className="pointer-events-auto absolute bottom-24 left-3 flex h-10 items-center gap-2 rounded-full border border-card-border bg-card px-3 shadow-lg md:bottom-6 md:left-4"
+      >
+        <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
+        <span
+          className="text-[11px] font-bold tabular-nums"
+          style={{ color: linha.corHex }}
+        >
+          {linha.linha}
+        </span>
+        <ChevronUp size={13} className="text-text-secondary" aria-hidden="true" />
+      </button>
+    );
+  }
 
   return (
     <div
@@ -72,6 +101,15 @@ export function GpsTrackingCard({ rastreio, linha, speedKmh, accuracyM }: GpsTra
             <p className="truncate text-[10px] font-semibold text-text-primary">{linha.nome}</p>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={onToggleMinimize}
+          aria-label="Minimizar painel"
+          className="pointer-events-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-text-tertiary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary active:scale-90"
+        >
+          <ChevronDown size={10} aria-hidden="true" />
+        </button>
 
         <button
           type="button"

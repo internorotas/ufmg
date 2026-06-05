@@ -232,6 +232,14 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     trackEvent({ event: 'gps_completion_card_dismissed', category: 'engagement', action: 'gps_completion_card_dismissed' });
   }, [trackEvent]);
 
+  const [isCardMinimized, setIsCardMinimized] = useState(false);
+  const handleToggleMinimize = useCallback(() => setIsCardMinimized((v) => !v), []);
+
+  // Restaura ao expandido quando sessão termina
+  useEffect(() => {
+    if (!isActive) setIsCardMinimized(false);
+  }, [isActive]);
+
   return (
     <GpsSessionContext.Provider value={rastreio}>
       {children}
@@ -244,6 +252,8 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
             linha={linhaSelecionada}
             speedKmh={ultimaLeitura?.speedKmh}
             accuracyM={ultimaLeitura?.accuracy}
+            isMinimized={isCardMinimized}
+            onToggleMinimize={handleToggleMinimize}
           />
         </div>
       )}
