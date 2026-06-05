@@ -293,7 +293,7 @@ export function ProfilePage() {
               <p className="truncate text-sm text-text-secondary">
                 {profile.nickname ? `@${profile.nickname}` : 'Sem nickname configurado'}
               </p>
-              <p className="mt-1 text-xs text-text-tertiary">
+              <p className="mt-1 text-xs text-text-secondary">
                 Última atividade: {formatDateTimePtBr(profile.lastSeenAt)}
               </p>
             </div>
@@ -304,14 +304,14 @@ export function ProfilePage() {
               <p className="text-lg font-bold text-text-primary tabular-nums">
                 {profile.gamification.totalPoints}
               </p>
-              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">pts</p>
+              <p className="text-xs uppercase tracking-wide text-text-secondary">pts</p>
             </div>
             <div className="w-px bg-card-border" />
             <div>
               <p className="text-lg font-bold text-text-primary tabular-nums">
                 {profile.gamification.streakCurrentDays}
               </p>
-              <p className="text-[10px] uppercase tracking-wide text-text-tertiary">streak</p>
+              <p className="text-xs uppercase tracking-wide text-text-secondary">streak</p>
             </div>
           </div>
         </header>

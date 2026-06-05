@@ -49,7 +49,7 @@ export function GpsTrackingCard({
         type="button"
         onClick={onToggleMinimize}
         aria-label="Expandir painel de rastreio"
-        className="pointer-events-auto absolute bottom-24 left-3 flex h-10 items-center gap-2 rounded-full border border-card-border bg-card px-3 shadow-lg md:bottom-6 md:left-4"
+        className="pointer-events-auto absolute bottom-24 left-3 flex h-11 items-center gap-2 rounded-full border border-card-border bg-card px-3 shadow-lg md:bottom-6 md:left-4"
       >
         <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
         <span
@@ -156,7 +156,7 @@ export function GpsTrackingCard({
           <div className="mx-2.5 h-px bg-card-border" />
 
           {/* Status: sinal GPS + sincronização */}
-          <div className="flex items-center justify-between gap-1 px-2.5 py-1.5 text-[9px]">
+          <div className="flex items-center justify-between gap-1 px-2.5 py-1.5 text-[10px]">
             <span
               className={signal.ok ? 'text-success-text' : 'text-warning-text'}
               title={`Precisão GPS: ${accuracyM !== undefined ? `±${Math.round(accuracyM)}m` : 'desconhecida'}`}
