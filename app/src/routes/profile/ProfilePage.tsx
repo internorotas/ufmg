@@ -319,7 +319,7 @@ export function ProfilePage() {
         {feedback ? <FeedbackBanner type={feedback.type} message={feedback.message} /> : null}
 
         <Tabs defaultValue="atividade" className="gap-0">
-          <TabsList variant="underline" className="overflow-x-auto px-1">
+          <TabsList variant="underline" fullWidth={false} className="overflow-x-auto px-1">
             <TabsTrigger value="atividade" className="gap-1.5">
               <Trophy size={14} aria-hidden="true" />
               Atividade

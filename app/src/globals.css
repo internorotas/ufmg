@@ -345,7 +345,7 @@ body {
 }
 
 .leaflet-popup-pane {
-  z-index: 700 !important;
+  z-index: 1015 !important;
 }
 
 /* Animations */
