@@ -326,25 +326,29 @@ function AppContent() {
 
   const handleAlternarRastreioColaborativo = useCallback(() => {
     if (rastreioAtivo) {
+      trackEvent({ event: 'gps_stop_button_clicked', category: 'engagement', action: 'gps_stop_button_clicked' });
       void encerrarRastreioColaborativo('manual');
       return;
     }
 
     if (!linhaSelecionada) {
+      trackEvent({ event: 'gps_line_picker_opened', category: 'engagement', action: 'gps_line_picker_opened' });
       setIsGpsLinePickerOpen(true);
       return;
     }
 
+    trackEvent({ event: 'gps_start_button_clicked', category: 'engagement', action: 'gps_start_button_clicked', label: linhaSelecionada.nome });
     startGpsForLinha(linhaSelecionada);
-  }, [encerrarRastreioColaborativo, linhaSelecionada, rastreioAtivo, startGpsForLinha]);
+  }, [encerrarRastreioColaborativo, linhaSelecionada, rastreioAtivo, startGpsForLinha, trackEvent]);
 
   const handleGpsLinePick = useCallback(
     (linha: Linha) => {
+      trackEvent({ event: 'gps_line_picked', category: 'engagement', action: 'gps_line_picked', label: linha.nome, params: { linha_id: linha.idRota } });
       selecionarLinha(linha);
       setIsGpsLinePickerOpen(false);
       startGpsForLinha(linha);
     },
-    [selecionarLinha, startGpsForLinha],
+    [selecionarLinha, startGpsForLinha, trackEvent],
   );
 
   // Handler para voltar ao campus principal.
@@ -385,11 +389,12 @@ function AppContent() {
 
   useEffect(() => {
     const handler = () => {
+      trackEvent({ event: 'session_expired', category: 'engagement', action: 'session_expired' });
       void handleInactivityTimeout();
     };
     window.addEventListener(SESSION_EXPIRED_EVENT, handler);
     return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handler);
-  }, [handleInactivityTimeout]);
+  }, [handleInactivityTimeout, trackEvent]);
 
   // Validação dos dados
   if (isLoadingData) {

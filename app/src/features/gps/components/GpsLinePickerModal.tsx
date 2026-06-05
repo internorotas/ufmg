@@ -1,6 +1,7 @@
 import { ChevronRight, Radio, Search } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog } from '@/components/ui/Dialog';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import type { CategoriaLinhas, Linha } from '@/types/data.types';
 
 interface GpsLinePickerModalProps {
@@ -89,6 +90,14 @@ export function GpsLinePickerModal({
 }: GpsLinePickerModalProps) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const { trackEvent } = useAnalytics();
+
+  // Tracking: modal aberto
+  useEffect(() => {
+    if (open) {
+      trackEvent({ event: 'gps_line_picker_viewed', category: 'engagement', action: 'gps_line_picker_viewed' });
+    }
+  }, [open, trackEvent]);
 
   const todasLinhas = useMemo(
     () => linhasData.categoriasDias.flatMap((cat) => cat.linhas),
@@ -118,6 +127,7 @@ export function GpsLinePickerModal({
   }, [filtradas]);
 
   const handleSelect = (linha: Linha) => {
+    trackEvent({ event: 'gps_line_selected_from_picker', category: 'engagement', action: 'gps_line_selected_from_picker', label: linha.nome, params: { linha_id: linha.idRota } });
     onSelect(linha);
     setQuery('');
     onClose();
@@ -125,6 +135,7 @@ export function GpsLinePickerModal({
 
   const handleOpenChange = (v: boolean) => {
     if (!v) {
+      trackEvent({ event: 'gps_line_picker_cancelled', category: 'engagement', action: 'gps_line_picker_cancelled' });
       setQuery('');
       onClose();
     }
