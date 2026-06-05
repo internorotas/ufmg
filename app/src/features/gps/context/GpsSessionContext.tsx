@@ -14,7 +14,6 @@ import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { GpsTrackingCard } from '@/features/gps/components/GpsTrackingCard';
 import {
   type GpsTrackingState,
-  type TrackingStopReason,
   useGpsTrackingSession,
 } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAudioKeepAlive } from '@/hooks/useAudioKeepAlive';
@@ -216,4 +215,3 @@ export function useGpsSession(): GpsTrackingState {
   return ctx;
 }
 
-export type { TrackingStopReason };
