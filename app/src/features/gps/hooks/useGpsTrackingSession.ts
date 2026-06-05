@@ -19,7 +19,7 @@ const MAX_ROUTE_DISTANCE_KM = 0.3;
 const TERMINAL_DISTANCE_KM = 0.08;
 const OFFLINE_SESSION_STORAGE_KEY = getTenantStorageKey('gps-offline-session');
 
-type TrackingStopReason = 'manual' | 'parado' | 'saiu_rota' | 'terminal' | 'timeout';
+export type TrackingStopReason = 'manual' | 'parado' | 'saiu_rota' | 'terminal' | 'timeout';
 
 interface PersistedTrackingSession {
   sessionId: string;
