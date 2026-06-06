@@ -252,20 +252,20 @@ export function calcularDistanciaKm(
   lat2: number,
   lon2: number,
 ): number {
+  const PI_OVER_180 = 0.017453292519943295; // Math.PI / 180
   const RAIO_TERRA_KM = 6371;
 
-  const toRad = (graus: number) => (graus * Math.PI) / 180;
+  const dLat = (lat2 - lat1) * PI_OVER_180;
+  const dLon = (lon2 - lon1) * PI_OVER_180;
 
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  const sinHalfDLat = Math.sin(dLat * 0.5);
+  const sinHalfDLon = Math.sin(dLon * 0.5);
 
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    sinHalfDLat * sinHalfDLat +
+    Math.cos(lat1 * PI_OVER_180) * Math.cos(lat2 * PI_OVER_180) * sinHalfDLon * sinHalfDLon;
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return RAIO_TERRA_KM * c;
+  return RAIO_TERRA_KM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 /**
@@ -276,17 +276,28 @@ export function calcularDistanciaKm(
 export function findScheduleIndex<T>(
   sortedArray: T[],
   target: number,
-  getVal: (item: T) => number = (item) => item as unknown as number,
+  getVal?: (item: T) => number,
 ): number {
   let left = 0;
   let right = sortedArray.length;
 
-  while (left < right) {
-    const mid = Math.floor((left + right) / 2);
-    if (getVal(sortedArray[mid]) > target) {
-      right = mid;
-    } else {
-      left = mid + 1;
+  if (getVal) {
+    while (left < right) {
+      const mid = (left + right) >>> 1;
+      if (getVal(sortedArray[mid]) > target) {
+        right = mid;
+      } else {
+        left = mid + 1;
+      }
+    }
+  } else {
+    while (left < right) {
+      const mid = (left + right) >>> 1;
+      if ((sortedArray[mid] as unknown as number) > target) {
+        right = mid;
+      } else {
+        left = mid + 1;
+      }
     }
   }
 
