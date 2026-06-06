@@ -1,3 +1,19 @@
+const SP_TIME: Intl.DateTimeFormatOptions = {
+  timeZone: 'America/Sao_Paulo',
+  hour: '2-digit',
+  minute: '2-digit',
+};
+
+export function formatTimeSP(isoString: string): string {
+  try {
+    const d = new Date(isoString);
+    if (Number.isNaN(d.getTime())) return isoString;
+    return d.toLocaleTimeString('pt-BR', SP_TIME);
+  } catch {
+    return isoString;
+  }
+}
+
 const PT_BR_DATE: Intl.DateTimeFormatOptions = {
   day: '2-digit',
   month: '2-digit',

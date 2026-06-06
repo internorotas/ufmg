@@ -6,6 +6,7 @@
 import { Bus, Footprints, Map as MapIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { tv } from 'tailwind-variants';
+import { formatTimeSP } from '@/lib/formatters';
 import { usePlannerStore } from '../store/plannerStore';
 import {
   ETA_SOURCE_LABEL,
@@ -77,7 +78,7 @@ function WalkLegRow({ leg }: { leg: PlannerWalkLeg }) {
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <span className="text-sm font-semibold text-text-primary">
-          Caminhe {leg.minutes} min · {leg.distanceMeters} m
+          Caminhe {leg.minutes} min · {Math.round(leg.distanceMeters)} m
         </span>
         <span className="text-xs text-text-secondary">
           {leg.fromStopName} → {leg.toStopName}
@@ -111,10 +112,10 @@ function BusLegRow({ leg }: { leg: PlannerBusLeg }) {
           <span className={etaBadgeVariants({ source: leg.eta.source })}>{sourceBadgeLabel}</span>
         </div>
         <span className="text-xs text-text-secondary">
-          Embarque em <strong>{leg.fromStopName}</strong> · {leg.boardingTime}
+          Embarque em <strong>{leg.fromStopName}</strong> · {formatTimeSP(leg.boardingTime)}
         </span>
         <span className="text-xs text-text-secondary">
-          Desça em <strong>{leg.toStopName}</strong> · {leg.arrivalTime}
+          Desça em <strong>{leg.toStopName}</strong> · {formatTimeSP(leg.arrivalTime)}
         </span>
       </div>
     </div>
@@ -162,7 +163,7 @@ function AlternativeCard({ alternative, isSelected, onSelect }: AlternativeCardP
             {alternative.totalMinutes} min
           </span>
           <span className="text-xs tabular-nums text-text-secondary">
-            Chegada {alternative.arrivalTime} · {alternative.transferCount} troca
+            Chegada {formatTimeSP(alternative.arrivalTime)} · {alternative.transferCount} troca
             {alternative.transferCount !== 1 ? 's' : ''} · {alternative.walkingMinutes} min a pé
           </span>
         </div>

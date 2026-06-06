@@ -6,6 +6,7 @@ import { ArrowLeft, Bus, Clock, Footprints, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { tv } from 'tailwind-variants';
+import { formatTimeSP } from '@/lib/formatters';
 import { usePlannerStore } from '../store/plannerStore';
 import type { PlannerBusLeg } from '../types';
 import { ETA_SOURCE_LABEL } from '../types';
@@ -177,7 +178,7 @@ export function PlannerSummarySheet({
                 {route.totalMinutes} min
               </span>
               <span className="text-xs tabular-nums text-text-secondary">
-                Chegada {route.arrivalTime} · {route.transferCount} troca
+                Chegada {formatTimeSP(route.arrivalTime)} · {route.transferCount} troca
                 {route.transferCount !== 1 ? 's' : ''} · {route.walkingMinutes} min a pé
               </span>
             </div>
@@ -200,7 +201,7 @@ export function PlannerSummarySheet({
                       </div>
                       <div className="flex flex-col gap-0.5 pt-0.5">
                         <span className="text-sm font-semibold text-text-primary">
-                          Caminhe {leg.minutes} min · {leg.distanceMeters} m
+                          Caminhe {leg.minutes} min · {Math.round(leg.distanceMeters)} m
                         </span>
                         <span className="text-xs text-text-secondary">
                           {leg.fromStopName} → {leg.toStopName}
@@ -227,10 +228,10 @@ export function PlannerSummarySheet({
                           {(leg as PlannerBusLeg).lineName}
                         </span>
                         <span className="text-xs text-text-secondary">
-                          Embarque em <strong>{leg.fromStopName}</strong>
+                          Embarque em <strong>{leg.fromStopName}</strong> · {formatTimeSP((leg as PlannerBusLeg).boardingTime)}
                         </span>
                         <span className="text-xs text-text-secondary">
-                          Desça em <strong>{leg.toStopName}</strong>
+                          Desça em <strong>{leg.toStopName}</strong> · {formatTimeSP((leg as PlannerBusLeg).arrivalTime)}
                         </span>
                       </div>
                     </>
