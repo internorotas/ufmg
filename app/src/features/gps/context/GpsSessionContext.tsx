@@ -14,9 +14,9 @@ import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { GpsTrackingCard } from '@/features/gps/components/GpsTrackingCard';
 import {
   type GpsTrackingState,
-  type TrackingStopReason,
   useGpsTrackingSession,
 } from '@/features/gps/hooks/useGpsTrackingSession';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAudioKeepAlive } from '@/hooks/useAudioKeepAlive';
 import { useWakeLock } from '@/hooks/useWakeLock';
 
@@ -121,6 +121,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuthContext();
   const { linhaSelecionada } = useRotasSelection();
   const { ultimaLeitura, heading } = useLocationContext();
+  const { trackEvent } = useAnalytics();
 
   const rastreio = useGpsTrackingSession({
     enabled: isAuthenticated,
@@ -149,8 +150,17 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     snapshotsCount: number;
   }>({ distanceKm: 0, durationMs: 0, snapshotsCount: 0 });
 
+  // Captura o motivo de parada antes do resetSession() zerá-lo
+  const capturedStopReasonRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (rastreio.lastStopReason !== null) {
+      capturedStopReasonRef.current = rastreio.lastStopReason;
+    }
+  }, [rastreio.lastStopReason]);
+
   const [completedSession, setCompletedSession] = useState<CompletedSession | null>(null);
   const prevIsActiveRef = useRef(false);
+  const prevStatusRef = useRef<string>('idle');
 
   // Salva stats enquanto ativo para poder exibir ao encerrar
   useEffect(() => {
@@ -163,14 +173,47 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     }
   }, [isActive, rastreio.distanceKm, rastreio.durationMs, rastreio.snapshotsCount]);
 
+  // === Tracking: sessão iniciada ===
+  useEffect(() => {
+    if (prevStatusRef.current !== 'active' && status === 'active' && linhaSelecionada) {
+      trackEvent({
+        event: 'gps_session_started',
+        category: 'engagement',
+        action: 'gps_session_started',
+        label: linhaSelecionada.nome,
+        params: { linha_id: linhaSelecionada.idRota, linha_numero: linhaSelecionada.linha },
+      });
+    }
+    prevStatusRef.current = status;
+  }, [status, linhaSelecionada, trackEvent]);
+
   // Detecta fim de sessão
   useEffect(() => {
     const wasActive = prevIsActiveRef.current;
     const nowIdle = status === 'idle';
 
     if (wasActive && nowIdle && lastActiveStatsRef.current.durationMs > 5000 && linhaSelecionada) {
+      const stats = lastActiveStatsRef.current;
+      const stopReason = capturedStopReasonRef.current ?? 'manual';
+
+      // === Tracking: sessão encerrada com stats ===
+      trackEvent({
+        event: 'gps_session_completed',
+        category: 'engagement',
+        action: 'gps_session_completed',
+        label: linhaSelecionada.nome,
+        params: {
+          stop_reason: stopReason,
+          distance_km: Math.round(stats.distanceKm * 100) / 100,
+          duration_s: Math.round(stats.durationMs / 1000),
+          snapshots: stats.snapshotsCount,
+          linha_id: linhaSelecionada.idRota,
+        },
+      });
+      capturedStopReasonRef.current = null;
+
       setCompletedSession({
-        ...lastActiveStatsRef.current,
+        ...stats,
         linhaNome: linhaSelecionada.sublinha
           ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
           : linhaSelecionada.nome,
@@ -182,9 +225,24 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     }
 
     prevIsActiveRef.current = isActive;
-  }, [isActive, status, linhaSelecionada]);
+  }, [isActive, status, linhaSelecionada, trackEvent]);
 
-  const dismissCompleted = useCallback(() => setCompletedSession(null), []);
+  const dismissCompleted = useCallback(() => {
+    setCompletedSession(null);
+    trackEvent({
+      event: 'gps_completion_card_dismissed',
+      category: 'engagement',
+      action: 'gps_completion_card_dismissed',
+    });
+  }, [trackEvent]);
+
+  const [isCardMinimized, setIsCardMinimized] = useState(false);
+  const handleToggleMinimize = useCallback(() => setIsCardMinimized((v) => !v), []);
+
+  // Restaura ao expandido quando sessão termina
+  useEffect(() => {
+    if (!isActive) setIsCardMinimized(false);
+  }, [isActive]);
 
   return (
     <GpsSessionContext.Provider value={rastreio}>
@@ -198,6 +256,8 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
             linha={linhaSelecionada}
             speedKmh={ultimaLeitura?.speedKmh}
             accuracyM={ultimaLeitura?.accuracy}
+            isMinimized={isCardMinimized}
+            onToggleMinimize={handleToggleMinimize}
           />
         </div>
       )}
@@ -215,5 +275,3 @@ export function useGpsSession(): GpsTrackingState {
   if (!ctx) throw new Error('useGpsSession must be inside GpsSessionProvider');
   return ctx;
 }
-
-export type { TrackingStopReason };

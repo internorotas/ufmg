@@ -7,6 +7,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { NAV_ITEMS, type NavItem } from '@/components/app/navItems';
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { cn } from '@/lib/utils';
 
 function isItemActive(currentPath: string, item: NavItem, resolvedTo: string): boolean {
@@ -22,6 +23,7 @@ function isItemActive(currentPath: string, item: NavItem, resolvedTo: string): b
 export function BottomNav() {
   const location = useLocation();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { trackEvent } = useAnalytics();
 
   return (
     <nav
@@ -41,6 +43,15 @@ export function BottomNav() {
               <Link
                 to={resolvedTo}
                 aria-current={active ? 'page' : undefined}
+                onClick={() => {
+                  if (!active)
+                    trackEvent({
+                      event: 'nav_item_clicked',
+                      category: 'navigation',
+                      action: 'nav_item_clicked',
+                      label: item.label,
+                    });
+                }}
                 className={cn(
                   'relative flex min-h-14 flex-col items-center justify-center gap-1 px-2 py-2 text-xs font-medium',
                   'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',

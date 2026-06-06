@@ -54,7 +54,8 @@ export interface GpsTrackingState {
   distanceKm: number;
   durationMs: number;
   snapshotsCount: number;
-  start: () => Promise<void>;
+  lockedLine: Linha | null;
+  start: (lineOverride?: Linha) => Promise<void>;
   stop: (reason?: TrackingStopReason) => Promise<void>;
   ingestSnapshot: (snapshot: TrackingSnapshot) => Promise<void>;
 }
@@ -215,6 +216,8 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const sessionStartedAtRef = useRef<number | null>(null);
   const lastMovementAtRef = useRef<number | null>(null);
   const lastSnapshotCoordRef = useRef<{ lat: number; lng: number } | null>(null);
+  // Linha capturada no início da sessão — não muda se sidebar mudar a seleção
+  const lockedLineRef = useRef<Linha | null>(null);
 
   const resetSession = useCallback(() => {
     setStatus('idle');
@@ -230,12 +233,15 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     sessionStartedAtRef.current = null;
     lastMovementAtRef.current = null;
     lastSnapshotCoordRef.current = null;
+    lockedLineRef.current = null;
     writePersistedSession(null);
   }, []);
 
   const flushQueue = useCallback(
     async (isBatchSubmission: boolean) => {
-      if (!sessionId || !options.selectedLine || queueRef.current.length === 0) {
+      // Usa a linha capturada no início da sessão — nunca a seleção atual da sidebar
+      const line = lockedLineRef.current ?? options.selectedLine;
+      if (!sessionId || !line || queueRef.current.length === 0) {
         return;
       }
 
@@ -247,14 +253,14 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
 
         await submitGpsBatch({
           sessionId,
-          linhaId: options.selectedLine.idRota,
+          linhaId: line.idRota,
           isBatchSubmission,
           points: batch,
         });
 
         writePersistedSession({
           sessionId,
-          linhaId: options.selectedLine.idRota,
+          linhaId: line.idRota,
           points: [],
         });
       } catch {
@@ -263,7 +269,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         setStatus('paused');
         writePersistedSession({
           sessionId,
-          linhaId: options.selectedLine.idRota,
+          linhaId: line.idRota,
           points: queueRef.current,
         });
       } finally {
@@ -273,37 +279,44 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     [options.selectedLine, sessionId],
   );
 
-  const start = useCallback(async () => {
-    if (!options.enabled || !options.selectedLine) {
-      // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
-      console.warn('[GPS] start() ignorado: tracking desabilitado ou linha não selecionada', {
-        enabled: options.enabled,
-        selectedLine: options.selectedLine?.idRota ?? null,
-      });
-      return;
-    }
+  const start = useCallback(
+    async (lineOverride?: Linha) => {
+      // lineOverride permite que o chamador passe a linha diretamente, contornando
+      // o timing de re-render do React quando state e start() são chamados no mesmo ciclo
+      const effectiveLine = lineOverride ?? options.selectedLine;
+      if (!options.enabled || !effectiveLine) {
+        // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
+        console.warn('[GPS] start() ignorado: tracking desabilitado ou linha não selecionada', {
+          enabled: options.enabled,
+          selectedLine: effectiveLine?.idRota ?? null,
+        });
+        return;
+      }
 
-    setStatus('starting');
-    try {
-      setLastStopReason(null);
-      const response = await startGpsSession({
-        linhaId: options.selectedLine.idRota,
-      });
+      setStatus('starting');
+      try {
+        setLastStopReason(null);
+        const response = await startGpsSession({
+          linhaId: effectiveLine.idRota,
+        });
 
-      sessionStartedAtRef.current = Date.now();
-      setSessionId(response.sessionId);
-      setStatus('active');
-      writePersistedSession({
-        sessionId: response.sessionId,
-        linhaId: options.selectedLine.idRota,
-        points: [],
-      });
-    } catch (err) {
-      // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
-      console.error('[GPS] Falha ao iniciar sessão de rastreio colaborativo:', err);
-      setStatus('error');
-    }
-  }, [options.enabled, options.selectedLine]);
+        lockedLineRef.current = effectiveLine;
+        sessionStartedAtRef.current = Date.now();
+        setSessionId(response.sessionId);
+        setStatus('active');
+        writePersistedSession({
+          sessionId: response.sessionId,
+          linhaId: effectiveLine.idRota,
+          points: [],
+        });
+      } catch (err) {
+        // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
+        console.error('[GPS] Falha ao iniciar sessão de rastreio colaborativo:', err);
+        setStatus('error');
+      }
+    },
+    [options.enabled, options.selectedLine],
+  );
 
   const stop = useCallback(
     async (reason: TrackingStopReason = 'manual') => {
@@ -359,10 +372,11 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         setDistanceKm((d) => d + seg);
       }
       lastSnapshotCoordRef.current = { lat: snapshot.latitude, lng: snapshot.longitude };
-      if (options.selectedLine) {
+      const persistLine = lockedLineRef.current ?? options.selectedLine;
+      if (persistLine) {
         writePersistedSession({
           sessionId,
-          linhaId: options.selectedLine.idRota,
+          linhaId: persistLine.idRota,
           points: queueRef.current,
         });
       }
@@ -477,6 +491,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       distanceKm,
       durationMs,
       snapshotsCount,
+      lockedLine: lockedLineRef.current,
       start,
       stop,
       ingestSnapshot,

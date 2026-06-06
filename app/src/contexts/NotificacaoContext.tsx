@@ -7,7 +7,6 @@
  */
 
 import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from 'react';
-import { LgpdConsentDialog } from '@/components/auth/LgpdConsentDialog';
 import { useConsentGate } from '@/features/auth/hooks/useConsentGate';
 import { PointDeltaToast } from '@/features/gamification/components/PointDeltaToast';
 import type { RecentPointEvent } from '@/features/profile/api/profileClient';
@@ -89,8 +88,7 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   const [mostrarModalIos, setMostrarModalIos] = useState(false);
   const [collaborativeFeedback, setCollaborativeFeedback] = useState<string | null>(null);
   const [pointEvent, setPointEvent] = useState<RecentPointEvent | null>(null);
-  const { dialogOpen, executeProtectedAction, acceptAndContinue, refuseConsent, closeDialog } =
-    useConsentGate();
+  const { executeProtectedAction } = useConsentGate();
 
   const publishCollaborativeEvent = useCallback(
     (event: CollaborativeEvent) => {
@@ -225,12 +223,6 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         onConfirmar={handleConfirmar}
       />
       <IosInstallModal isOpen={mostrarModalIos} onClose={() => setMostrarModalIos(false)} />
-      <LgpdConsentDialog
-        isOpen={dialogOpen}
-        onClose={closeDialog}
-        onAccept={acceptAndContinue}
-        onRefuse={refuseConsent}
-      />
       {collaborativeFeedback ? (
         <div
           role="status"

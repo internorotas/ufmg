@@ -21,6 +21,7 @@ import {
   warmupBackend,
 } from '@/features/auth/api/authClient';
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { tenantConfig } from '@/tenants/tenantConfig';
 
 type LoadingState = 'idle' | 'warming' | 'redirecting';
@@ -78,6 +79,7 @@ export function LoginPage() {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle');
   const navigate = useNavigate();
   const location = useLocation();
+  const { trackEvent } = useAnalytics();
 
   const authStatus = useAuthStore((s) => s.authStatus);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -106,6 +108,18 @@ export function LoginPage() {
     }
   }, [authStatus, isAuthenticated, navigate, from]);
 
+  // Tracking: erro vindo do callback OAuth (?error=...)
+  useEffect(() => {
+    if (urlErrorCode) {
+      trackEvent({
+        event: 'login_callback_error',
+        category: 'engagement',
+        action: 'login_callback_error',
+        label: urlErrorCode,
+      });
+    }
+  }, [urlErrorCode, trackEvent]);
+
   // Enquanto o bootstrap verifica a sessão, mostrar spinner para evitar
   // flash do formulário de login em usuários já autenticados.
   if (authStatus === 'booting') {
@@ -121,6 +135,7 @@ export function LoginPage() {
   }
 
   async function handleGoogleLogin() {
+    trackEvent({ event: 'login_initiated', category: 'engagement', action: 'login_initiated' });
     setLoadingState('warming');
     setErrorMsg(null);
     try {
@@ -137,7 +152,14 @@ export function LoginPage() {
       await startGoogleLoginFlow(loginPageUrl.toString());
       // startGoogleLoginFlow chama window.location.assign — página navega para fora
     } catch (error) {
-      setErrorMsg(resolveErrorMessage(error));
+      const msg = resolveErrorMessage(error);
+      trackEvent({
+        event: 'login_error',
+        category: 'engagement',
+        action: 'login_error',
+        label: msg,
+      });
+      setErrorMsg(msg);
       setLoadingState('idle');
     }
   }

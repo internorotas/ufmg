@@ -55,7 +55,8 @@ async function fetchOsrmWalk(
   lon2: number,
 ): Promise<[number, number][]> {
   const base =
-    (typeof import.meta !== 'undefined' && (import.meta as { env?: Record<string, string> }).env?.VITE_OSRM_URL) ??
+    (typeof import.meta !== 'undefined' &&
+      (import.meta as { env?: Record<string, string> }).env?.VITE_OSRM_URL) ??
     'https://router.project-osrm.org';
   const url = `${base}/route/v1/foot/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`;
   const res = await fetch(url);

@@ -1,6 +1,8 @@
 import { ChevronRight, Radio, Search } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog } from '@/components/ui/Dialog';
+import { isLineAvailableToday } from '@/config/specialPeriods';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import type { CategoriaLinhas, Linha } from '@/types/data.types';
 
 interface GpsLinePickerModalProps {
@@ -81,6 +83,40 @@ function GroupedRow({ group, onSelect }: { group: LinhaGroup; onSelect: (l: Linh
   );
 }
 
+const ACTIVE_WINDOW_MINUTES = 40;
+
+function getCurrentSaoPauloMinutes(): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Sao_Paulo',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(new Date());
+  const hour = parseInt(parts.find((p) => p.type === 'hour')?.value ?? '0', 10);
+  const minute = parseInt(parts.find((p) => p.type === 'minute')?.value ?? '0', 10);
+  return hour * 60 + minute;
+}
+
+function isLineActiveNow(linha: Linha): boolean {
+  if (!isLineAvailableToday(linha.categoriaDia)) return false;
+  if (linha.horarios.length === 0) return false;
+
+  const currentMinutes = getCurrentSaoPauloMinutes();
+
+  return linha.horarios.some((horario) => {
+    const parts = horario.split(':');
+    if (parts.length !== 2) return false;
+    const [h, m] = parts.map(Number);
+    if (Number.isNaN(h) || Number.isNaN(m)) return false;
+    const departureMins = h * 60 + m;
+    const windowEnd = departureMins + ACTIVE_WINDOW_MINUTES;
+    if (windowEnd >= 1440) {
+      return currentMinutes >= departureMins || currentMinutes <= windowEnd - 1440;
+    }
+    return currentMinutes >= departureMins && currentMinutes <= windowEnd;
+  });
+}
+
 export function GpsLinePickerModal({
   open,
   onClose,
@@ -89,9 +125,21 @@ export function GpsLinePickerModal({
 }: GpsLinePickerModalProps) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const { trackEvent } = useAnalytics();
+
+  // Tracking: modal aberto
+  useEffect(() => {
+    if (open) {
+      trackEvent({
+        event: 'gps_line_picker_viewed',
+        category: 'engagement',
+        action: 'gps_line_picker_viewed',
+      });
+    }
+  }, [open, trackEvent]);
 
   const todasLinhas = useMemo(
-    () => linhasData.categoriasDias.flatMap((cat) => cat.linhas),
+    () => linhasData.categoriasDias.flatMap((cat) => cat.linhas).filter(isLineActiveNow),
     [linhasData],
   );
 
@@ -118,6 +166,13 @@ export function GpsLinePickerModal({
   }, [filtradas]);
 
   const handleSelect = (linha: Linha) => {
+    trackEvent({
+      event: 'gps_line_selected_from_picker',
+      category: 'engagement',
+      action: 'gps_line_selected_from_picker',
+      label: linha.nome,
+      params: { linha_id: linha.idRota },
+    });
     onSelect(linha);
     setQuery('');
     onClose();
@@ -125,6 +180,11 @@ export function GpsLinePickerModal({
 
   const handleOpenChange = (v: boolean) => {
     if (!v) {
+      trackEvent({
+        event: 'gps_line_picker_cancelled',
+        category: 'engagement',
+        action: 'gps_line_picker_cancelled',
+      });
       setQuery('');
       onClose();
     }
@@ -180,8 +240,8 @@ export function GpsLinePickerModal({
             {filtradas.length > 0 && (
               <p className="mt-1.5 text-[11px] text-text-tertiary">
                 {filtradas.length === 1
-                  ? '1 linha encontrada'
-                  : `${filtradas.length} linhas encontradas`}
+                  ? '1 linha disponível'
+                  : `${filtradas.length} linhas disponíveis`}
                 {' · '}toque para selecionar
               </p>
             )}
@@ -197,7 +257,9 @@ export function GpsLinePickerModal({
               <div className="flex flex-col items-center gap-2 py-12 text-center">
                 <Search size={28} className="text-text-tertiary" aria-hidden="true" />
                 <p className="text-sm font-medium text-text-secondary">Nenhuma linha encontrada</p>
-                <p className="text-xs text-text-tertiary">Tente outro número ou nome</p>
+                <p className="text-xs text-text-tertiary">
+                  {query ? 'Tente outro número ou nome' : 'Nenhuma linha em operação neste horário'}
+                </p>
               </div>
             ) : (
               <div className="flex flex-col gap-1 pt-1">

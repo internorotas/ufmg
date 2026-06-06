@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { getConsentState, updateConsentState } from '@/features/auth/api/authClient';
+import type { getConsentState } from '@/features/auth/api/authClient';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 
 export type ConsentGateStatus = 'unknown' | 'accepted' | 'denied';
@@ -28,92 +28,31 @@ export async function resolveConsentStatus(options: {
 
 export function useConsentGate() {
   const { isAuthenticated, authStatus } = useAuthContext();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [consentStatus, setConsentStatus] = useState<ConsentGateStatus>('unknown');
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-  const [pendingAction, setPendingAction] = useState<(() => void | Promise<void>) | null>(null);
 
   const executeProtectedAction = useCallback(
     async (action: () => void | Promise<void>): Promise<ExecuteResult> => {
-      // During auth bootstrap, silently block without showing any message
       if (authStatus === 'booting') {
         return { allowed: false };
       }
-
-      const status = await resolveConsentStatus({
-        isAuthenticated,
-        cachedStatus: consentStatus,
-        loadConsentState: getConsentState,
-      });
 
       if (!isAuthenticated) {
         setFeedbackMessage('Faça login para usar recursos colaborativos.');
         return { allowed: false, reason: 'unauthenticated' };
       }
 
-      if (status === 'accepted') {
-        setFeedbackMessage(null);
-        await action();
-        return { allowed: true };
-      }
-
-      if (status === 'denied') {
-        setConsentStatus('denied');
-        setFeedbackMessage('Contribuição bloqueada: consentimento LGPD não aceito.');
-        return { allowed: false, reason: 'denied' };
-      }
-
-      setPendingAction(() => action);
-      setDialogOpen(true);
       setFeedbackMessage(null);
-      return { allowed: false };
-    },
-    [consentStatus, isAuthenticated, authStatus],
-  );
-
-  const acceptAndContinue = useCallback(async () => {
-    const updated = await updateConsentState({ consentGps: true, consentResearch: false });
-    setConsentStatus(updated.consentGps ? 'accepted' : 'denied');
-    setDialogOpen(false);
-
-    const action = pendingAction;
-    setPendingAction(null);
-    if (action && updated.consentGps) {
       await action();
-    }
-  }, [pendingAction]);
-
-  const refuseConsent = useCallback(async () => {
-    await updateConsentState({ consentGps: false, consentResearch: false });
-    setConsentStatus('denied');
-    setDialogOpen(false);
-    setPendingAction(null);
-    setFeedbackMessage('Contribuição bloqueada: consentimento LGPD não aceito.');
-  }, []);
-
-  const closeDialog = useCallback(() => {
-    setDialogOpen(false);
-    setPendingAction(null);
-  }, []);
+      return { allowed: true };
+    },
+    [isAuthenticated, authStatus],
+  );
 
   return useMemo(
     () => ({
-      dialogOpen,
-      consentStatus,
       feedbackMessage,
       executeProtectedAction,
-      acceptAndContinue,
-      refuseConsent,
-      closeDialog,
     }),
-    [
-      dialogOpen,
-      consentStatus,
-      feedbackMessage,
-      executeProtectedAction,
-      acceptAndContinue,
-      refuseConsent,
-      closeDialog,
-    ],
+    [feedbackMessage, executeProtectedAction],
   );
 }

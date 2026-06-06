@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { BottomNav } from './components/app/BottomNav';
@@ -9,7 +9,6 @@ import { ModalManager } from './components/app/ModalManager';
 import { NavRail } from './components/app/NavRail';
 import { OfflineToast } from './components/app/OfflineToast';
 import { InactivityWarningDialog } from './components/auth/InactivityWarningDialog';
-import { LgpdConsentDialog } from './components/auth/LgpdConsentDialog';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { LegalModal } from './components/legal/LegalModal';
 import { MenuLateral } from './components/MenuLateral';
@@ -137,14 +136,8 @@ function AppContent() {
   const { trackEvent, trackPageView } = useAnalytics();
   const { authStatus, isAuthenticated } = useAuthContext();
   const { isOffline, showOfflineToast } = useAppConnectivity();
-  const {
-    dialogOpen,
-    feedbackMessage,
-    executeProtectedAction,
-    acceptAndContinue,
-    refuseConsent,
-    closeDialog,
-  } = useConsentGate();
+  const { feedbackMessage, executeProtectedAction } = useConsentGate();
+  const pendingGpsLinhaRef = useRef<Linha | null>(null);
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
   const [isSummarySheetOpen, setIsSummarySheetOpen] = useState(false);
   const [isGpsLinePickerOpen, setIsGpsLinePickerOpen] = useState(false);
@@ -279,6 +272,15 @@ function AppContent() {
     usePlannerStore.getState().registerOpenMenu(fn);
   }, []);
 
+  // Quando GPS permission chega após seleção de linha, inicia o rastreio automaticamente
+  useEffect(() => {
+    if (permissaoConcedida && pendingGpsLinhaRef.current && !rastreioAtivo) {
+      const pendingLine = pendingGpsLinhaRef.current;
+      pendingGpsLinhaRef.current = null;
+      void iniciarRastreioColaborativo(pendingLine);
+    }
+  }, [permissaoConcedida, rastreioAtivo, iniciarRastreioColaborativo]);
+
   const startGpsForLinha = useCallback(
     (linha: Linha) => {
       const VALIDATION_THRESHOLD_M = 300;
@@ -297,10 +299,11 @@ function AppContent() {
           const action = () =>
             void executeProtectedAction(async () => {
               if (!permissaoConcedida) {
+                pendingGpsLinhaRef.current = linha;
                 await iniciarRastreamento();
                 return;
               }
-              await iniciarRastreioColaborativo();
+              await iniciarRastreioColaborativo(linha);
             });
           setGpsWarning({ distanceMeters: Math.round(distMeters), linha, pendingAction: action });
           return;
@@ -309,10 +312,11 @@ function AppContent() {
 
       void executeProtectedAction(async () => {
         if (!permissaoConcedida) {
+          pendingGpsLinhaRef.current = linha;
           await iniciarRastreamento();
           return;
         }
-        await iniciarRastreioColaborativo();
+        await iniciarRastreioColaborativo(linha);
       });
     },
     [
@@ -326,25 +330,48 @@ function AppContent() {
 
   const handleAlternarRastreioColaborativo = useCallback(() => {
     if (rastreioAtivo) {
+      trackEvent({
+        event: 'gps_stop_button_clicked',
+        category: 'engagement',
+        action: 'gps_stop_button_clicked',
+      });
       void encerrarRastreioColaborativo('manual');
       return;
     }
 
     if (!linhaSelecionada) {
+      trackEvent({
+        event: 'gps_line_picker_opened',
+        category: 'engagement',
+        action: 'gps_line_picker_opened',
+      });
       setIsGpsLinePickerOpen(true);
       return;
     }
 
+    trackEvent({
+      event: 'gps_start_button_clicked',
+      category: 'engagement',
+      action: 'gps_start_button_clicked',
+      label: linhaSelecionada.nome,
+    });
     startGpsForLinha(linhaSelecionada);
-  }, [encerrarRastreioColaborativo, linhaSelecionada, rastreioAtivo, startGpsForLinha]);
+  }, [encerrarRastreioColaborativo, linhaSelecionada, rastreioAtivo, startGpsForLinha, trackEvent]);
 
   const handleGpsLinePick = useCallback(
     (linha: Linha) => {
+      trackEvent({
+        event: 'gps_line_picked',
+        category: 'engagement',
+        action: 'gps_line_picked',
+        label: linha.nome,
+        params: { linha_id: linha.idRota },
+      });
       selecionarLinha(linha);
       setIsGpsLinePickerOpen(false);
       startGpsForLinha(linha);
     },
-    [selecionarLinha, startGpsForLinha],
+    [selecionarLinha, startGpsForLinha, trackEvent],
   );
 
   // Handler para voltar ao campus principal.
@@ -385,11 +412,12 @@ function AppContent() {
 
   useEffect(() => {
     const handler = () => {
+      trackEvent({ event: 'session_expired', category: 'engagement', action: 'session_expired' });
       void handleInactivityTimeout();
     };
     window.addEventListener(SESSION_EXPIRED_EVENT, handler);
     return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handler);
-  }, [handleInactivityTimeout]);
+  }, [handleInactivityTimeout, trackEvent]);
 
   // Validação dos dados
   if (isLoadingData) {
@@ -576,13 +604,6 @@ function AppContent() {
         <LegalModal modalType={legalModal} onClose={handleCloseLegalModal} />
 
         <OfflineToast show={showOfflineToast} />
-
-        <LgpdConsentDialog
-          isOpen={dialogOpen}
-          onClose={closeDialog}
-          onAccept={acceptAndContinue}
-          onRefuse={refuseConsent}
-        />
 
         <ProfileSheet isOpen={isProfileSheetOpen} onOpenChange={setIsProfileSheetOpen} />
 

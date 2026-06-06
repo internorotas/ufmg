@@ -125,7 +125,11 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
     [parada.idParada, parada.linhasAtendidas, rotasService, currentTime],
   );
 
-  const totalLinhas = parada.linhasAtendidas?.length ?? 0;
+  const linhasDisponiveis = useMemo(
+    () => linhasResolvidas.filter(({ linha }) => linha !== null),
+    [linhasResolvidas],
+  );
+  const totalLinhas = linhasDisponiveis.length;
   const headingId = `popup-parada-${parada.idParada}`;
   const linhasLabelId = `popup-parada-${parada.idParada}-linhas`;
 
@@ -180,7 +184,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
               className="max-h-44 space-y-1.5 overflow-y-auto"
               aria-label="Linhas com previsão de chegada"
             >
-              {linhasResolvidas.map(
+              {linhasDisponiveis.map(
                 ({ nomeLinha, linha, minutosFaltantes, horarioChegada, minutosUltimoPassou }) => {
                   const nomeExibicao = getNomeExibicao(linha, nomeLinha);
                   const isAlarmAtivo =
@@ -214,7 +218,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                             selecionarLinha(linha);
                           }}
                         >
-                          <span className="truncate">{nomeExibicao}</span>
+                          <span>{nomeExibicao}</span>
                         </button>
 
                         <div className="flex shrink-0 items-center gap-1">
@@ -268,7 +272,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                       </div>
 
                       {minutosUltimoPassou !== null ? (
-                        <p className="mt-1.5 border-t border-card-border/60 pt-1.5 text-[11px] text-text-secondary">
+                        <p className="mt-1.5 border-t border-card-border/60 pt-1.5 text-xs text-text-secondary">
                           Último passou há {minutosUltimoPassou} min
                         </p>
                       ) : null}

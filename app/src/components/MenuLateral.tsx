@@ -229,6 +229,7 @@ export const MenuLateral = React.memo(function MenuLateral({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const lastListSummaryRef = useRef<string>('');
   const wasMenuVisibleRef = useRef(false);
+  const sidebarRef = useRef<HTMLElement>(null);
   const previousFavoritosRef = useRef<Set<string>>(new Set());
   const [movimentoPorId, setMovimentoPorId] = useState<Record<string, 'up' | 'down'>>({});
   const isMounted = useMounted();
@@ -372,6 +373,13 @@ export const MenuLateral = React.memo(function MenuLateral({
     onPlannerRouteSelected?.();
   }, [selectedRouteId, isMobileViewport, onPlannerRouteSelected]);
 
+  // Move o foco para fora do sidebar antes de aria-hidden ser aplicado (evita aviso do browser)
+  useEffect(() => {
+    if (!isMenuVisible && sidebarRef.current?.contains(document.activeElement)) {
+      (document.activeElement as HTMLElement).blur();
+    }
+  }, [isMenuVisible]);
+
   useEffect(() => {
     if (!isMobileViewport) {
       if (isMenuVisible) {
@@ -467,6 +475,7 @@ export const MenuLateral = React.memo(function MenuLateral({
 
       {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-modal é válido quando role="dialog" está ativo (isMobileViewport) */}
       <aside
+        ref={sidebarRef}
         id="menu-lateral-sidebar"
         data-slot="sidebar"
         data-state={isMenuVisible ? 'open' : 'closed'}

@@ -186,7 +186,7 @@ body,
   /* Texto */
   --text-primary: #f9fafb; /* Gray 50 */
   --text-secondary: #d1d5db; /* Gray 300 - Mais claro para contraste no dark */
-  --text-tertiary: #9ca3af; /* Gray 400 */
+  --text-tertiary: #adb5bd; /* Gray ~350 — 4.5:1 on dark card backgrounds */
   --text-inverse: #ffffff;
 
   /* Semantic: Success (Verde) - Dark Mode */
@@ -345,7 +345,7 @@ body {
 }
 
 .leaflet-popup-pane {
-  z-index: 700 !important;
+  z-index: 1015 !important;
 }
 
 /* Animations */

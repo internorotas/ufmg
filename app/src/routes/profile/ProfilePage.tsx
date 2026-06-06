@@ -1,4 +1,14 @@
-import { AlertTriangle, Bell, Eye, EyeOff, MapPin, Medal, Trophy, UserCircle2 } from 'lucide-react';
+import {
+  AlertTriangle,
+  Bell,
+  Eye,
+  EyeOff,
+  MapPin,
+  Medal,
+  Settings,
+  Trophy,
+  UserCircle2,
+} from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
@@ -9,6 +19,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { SwitchRow } from '@/components/ui/SwitchRow';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { ToggleRow } from '@/components/ui/ToggleRow';
 import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
 import { updateConsentState } from '@/features/auth/api/authClient';
@@ -272,9 +283,10 @@ export function ProfilePage() {
 
   return (
     <AppShell title="Perfil" description={profile.displayName}>
-      <div className="flex flex-col gap-5">
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-card-border bg-card px-4 py-4 shadow-sm sm:px-5">
-          <div className="flex min-w-0 items-center gap-3">
+      <div className="flex flex-col gap-4">
+        {/* Cabeçalho com avatar e nome — sempre visível */}
+        <header className="flex flex-wrap items-center gap-3 rounded-xl border border-card-border bg-card px-4 py-4 shadow-sm sm:px-5">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             {profile.avatarUrl ? (
               <img
                 src={profile.avatarUrl}
@@ -291,220 +303,276 @@ export function ProfilePage() {
               <p className="truncate text-sm text-text-secondary">
                 {profile.nickname ? `@${profile.nickname}` : 'Sem nickname configurado'}
               </p>
-              <p className="mt-1 text-xs text-text-tertiary">
+              <p className="mt-1 text-xs text-text-secondary">
                 Última atividade: {formatDateTimePtBr(profile.lastSeenAt)}
               </p>
+            </div>
+          </div>
+          {/* Resumo rápido de pontos e streak */}
+          <div className="flex shrink-0 gap-4 text-center">
+            <div>
+              <p className="text-lg font-bold text-text-primary tabular-nums">
+                {profile.gamification.totalPoints}
+              </p>
+              <p className="text-xs uppercase tracking-wide text-text-secondary">pts</p>
+            </div>
+            <div className="w-px bg-card-border" />
+            <div>
+              <p className="text-lg font-bold text-text-primary tabular-nums">
+                {profile.gamification.streakCurrentDays}
+              </p>
+              <p className="text-xs uppercase tracking-wide text-text-secondary">streak</p>
             </div>
           </div>
         </header>
 
         {feedback ? <FeedbackBanner type={feedback.type} message={feedback.message} /> : null}
 
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Eye size={18} aria-hidden="true" />
-                Privacidade e visibilidade
-              </CardTitle>
-              <CardDescription>
-                Controle separado para perfil público, marcador no mapa e detalhamento de ranking.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <SwitchRow
-                label="Perfil público"
-                checked={profile.profilePublic}
-                onClick={handleToggleProfilePublic}
-                disabled={isUpdatingProfile}
-              />
+        <Tabs defaultValue="atividade" className="gap-0">
+          <TabsList variant="underline" fullWidth={false} className="overflow-x-auto px-1">
+            <TabsTrigger value="atividade" className="gap-1.5">
+              <Trophy size={14} aria-hidden="true" />
+              Atividade
+            </TabsTrigger>
+            <TabsTrigger value="configuracoes" className="gap-1.5">
+              <Settings size={14} aria-hidden="true" />
+              Configurações
+            </TabsTrigger>
+            <TabsTrigger value="apoio" className="gap-1.5">
+              <Medal size={14} aria-hidden="true" />
+              Apoio
+            </TabsTrigger>
+            <TabsTrigger value="conta" className="gap-1.5">
+              <AlertTriangle size={14} aria-hidden="true" />
+              Conta
+            </TabsTrigger>
+          </TabsList>
 
-              <SwitchRow
-                label={
-                  <span className="flex items-center gap-2">
-                    <MapPin size={16} aria-hidden="true" />
-                    Marcador no mapa
-                  </span>
-                }
-                checked={profile.mapMarkerVisible}
-                onClick={handleToggleMapMarker}
-                disabled={isUpdatingProfile}
-              />
+          {/* ─── Atividade ─── */}
+          <TabsContent value="atividade" className="mt-4 flex flex-col gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Trophy size={18} aria-hidden="true" />
+                  Ranking e pontuação
+                </CardTitle>
+                <CardDescription>
+                  Resumo real da sua contribuição e posição semanal.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-lg border border-card-border bg-background px-3 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                    Pontos totais
+                  </p>
+                  <p className="mt-2 text-2xl font-bold text-text-primary">
+                    {profile.gamification.totalPoints}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-card-border bg-background px-3 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                    Ranking semanal
+                  </p>
+                  <p className="mt-2 text-sm font-semibold text-text-primary">{weeklyRankLabel}</p>
+                </div>
+                <div className="rounded-lg border border-card-border bg-background px-3 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                    Streak
+                  </p>
+                  <p className="mt-2 text-sm font-semibold text-text-primary">
+                    {profile.gamification.streakCurrentDays} dias agora
+                  </p>
+                  <p className="text-xs text-text-secondary">
+                    Melhor: {profile.gamification.streakBestDays} dias
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
-              <ToggleRow
-                label="Detalhamento do ranking"
-                trailing={<Badge variant="info">{rankingDetailLabel}</Badge>}
-                onClick={handleCycleRankingDetail}
-                disabled={isUpdatingProfile}
-              />
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Medal size={18} aria-hidden="true" />
+                  Emblemas e histórico
+                </CardTitle>
+                <CardDescription>
+                  Emblemas desbloqueados, progresso e atividade dos últimos 30 dias.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <AchievementsGrid
+                  unlocked={profile.gamification.achievementsUnlocked}
+                  locked={profile.gamification.achievementsLocked}
+                />
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-text-primary">
+                    Ritmo dos últimos 30 dias
+                  </h3>
+                  <ContributionHeatmap history={profile.gamification.contributionHistory30d} />
+                </div>
+                <div className="space-y-2 rounded-lg border border-card-border bg-background px-3 py-3">
+                  <h3 className="text-sm font-semibold text-text-primary">Eventos recentes</h3>
+                  <div className="space-y-2 text-sm text-text-secondary">
+                    {profile.gamification.recentPointEvents.length === 0 ? (
+                      <p className="text-text-tertiary">Nenhum evento recente.</p>
+                    ) : (
+                      profile.gamification.recentPointEvents.map((event) => (
+                        <p key={`${event.reason}-${event.earnedAt}`}>{event.message}</p>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Bell size={18} aria-hidden="true" />
-                Notificações e consentimento
-              </CardTitle>
-              <CardDescription>
-                Estado de consentimento LGPD e preferência de notificações para eventos
-                colaborativos.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-1.5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                  Perfil de notificação
-                </p>
-                <SegmentedControl
-                  options={[
-                    { value: 'minimo', label: 'Mínimo' },
-                    { value: 'normal', label: 'Normal' },
-                    { value: 'tudo', label: 'Tudo' },
-                  ]}
-                  value={profile.notificationProfile}
-                  onChange={(value) => void handleProfileUpdate({ notificationProfile: value })}
+          {/* ─── Configurações ─── */}
+          <TabsContent value="configuracoes" className="mt-4 flex flex-col gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Eye size={18} aria-hidden="true" />
+                  Privacidade e visibilidade
+                </CardTitle>
+                <CardDescription>
+                  Controle do perfil público, marcador no mapa e detalhamento de ranking.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <SwitchRow
+                  label="Perfil público"
+                  checked={profile.profilePublic}
+                  onClick={handleToggleProfilePublic}
                   disabled={isUpdatingProfile}
                 />
-              </div>
+                <SwitchRow
+                  label={
+                    <span className="flex items-center gap-2">
+                      <MapPin size={16} aria-hidden="true" />
+                      Marcador no mapa
+                    </span>
+                  }
+                  checked={profile.mapMarkerVisible}
+                  onClick={handleToggleMapMarker}
+                  disabled={isUpdatingProfile}
+                />
+                <ToggleRow
+                  label="Detalhamento do ranking"
+                  trailing={<Badge variant="info">{rankingDetailLabel}</Badge>}
+                  onClick={handleCycleRankingDetail}
+                  disabled={isUpdatingProfile}
+                />
+              </CardContent>
+            </Card>
 
-              <SwitchRow
-                label={
-                  <span className="flex items-center gap-2">
-                    <MapPin size={16} aria-hidden="true" />
-                    Consentimento GPS
-                  </span>
-                }
-                checked={!!profile.consentGpsAt}
-                onClick={() => void handleToggleConsentGps()}
-                disabled={isUpdatingProfile}
-              />
-
-              <SwitchRow
-                label="Consentimento pesquisa"
-                checked={!!profile.consentResearchAt}
-                onClick={() => void handleToggleConsentResearch()}
-                disabled={isUpdatingProfile}
-              />
-
-              <div className="rounded-lg border border-card-border bg-background px-3 py-2 text-sm text-text-secondary">
-                <p className="font-medium text-text-primary">
-                  Eventos colaborativos ativos neste perfil
-                </p>
-                <p className="mt-1">
-                  Viagem encerrada automaticamente, pedido de avaliação pós-viagem, alerta de
-                  serviço aprovado e risco de streak usam esta preferência.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="lg:col-span-2">
-            <SupportActionsCard monetization={profile.monetization} />
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Trophy size={18} aria-hidden="true" />
-                Ranking e pontuação
-              </CardTitle>
-              <CardDescription>Resumo real da sua contribuição e posição semanal.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-lg border border-card-border bg-background px-3 py-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                  Pontos totais
-                </p>
-                <p className="mt-2 text-2xl font-bold text-text-primary">
-                  {profile.gamification.totalPoints}
-                </p>
-              </div>
-              <div className="rounded-lg border border-card-border bg-background px-3 py-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                  Ranking semanal
-                </p>
-                <p className="mt-2 text-sm font-semibold text-text-primary">{weeklyRankLabel}</p>
-              </div>
-              <div className="rounded-lg border border-card-border bg-background px-3 py-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                  Streak
-                </p>
-                <p className="mt-2 text-sm font-semibold text-text-primary">
-                  {profile.gamification.streakCurrentDays} dias agora
-                </p>
-                <p className="text-xs text-text-secondary">
-                  Melhor sequência: {profile.gamification.streakBestDays} dias
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Medal size={18} aria-hidden="true" />
-                Emblemas e histórico
-              </CardTitle>
-              <CardDescription>
-                Emblemas desbloqueados, progresso atual e atividade dos últimos 30 dias.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <AchievementsGrid
-                unlocked={profile.gamification.achievementsUnlocked}
-                locked={profile.gamification.achievementsLocked}
-              />
-              <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-text-primary">
-                  Ritmo dos últimos 30 dias
-                </h3>
-                <ContributionHeatmap history={profile.gamification.contributionHistory30d} />
-              </div>
-              <div className="space-y-2 rounded-lg border border-card-border bg-background px-3 py-3">
-                <h3 className="text-sm font-semibold text-text-primary">Eventos recentes</h3>
-                <div className="space-y-2 text-sm text-text-secondary">
-                  {profile.gamification.recentPointEvents.map((event) => (
-                    <p key={`${event.reason}-${event.earnedAt}`}>{event.message}</p>
-                  ))}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Bell size={18} aria-hidden="true" />
+                  Notificações e consentimento
+                </CardTitle>
+                <CardDescription>
+                  Preferência de notificações e consentimento LGPD para dados de localização.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-1.5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                    Perfil de notificação
+                  </p>
+                  <SegmentedControl
+                    options={[
+                      { value: 'minimo', label: 'Mínimo' },
+                      { value: 'normal', label: 'Normal' },
+                      { value: 'tudo', label: 'Tudo' },
+                    ]}
+                    value={profile.notificationProfile}
+                    onChange={(value) => void handleProfileUpdate({ notificationProfile: value })}
+                    disabled={isUpdatingProfile}
+                  />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <AlertTriangle size={18} aria-hidden="true" />
-              Sessão e conta
-            </CardTitle>
-            <CardDescription>
-              Encerre sua sessão atual ou solicite exclusão da conta conforme LGPD.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="min-h-11"
-              disabled={isLogoutPending || isDeletingAccount}
-              onClick={() => void handleLogout()}
-            >
-              Encerrar sessão
-            </Button>
-            <Button
-              type="button"
-              variant="danger"
-              className="min-h-11"
-              disabled={isLogoutPending || isDeletingAccount}
-              onClick={() => setIsDeleteDialogOpen(true)}
-              leftIcon={profile.profilePublic ? <EyeOff size={16} aria-hidden="true" /> : undefined}
-            >
-              Solicitar exclusão de conta
-            </Button>
-          </CardContent>
-        </Card>
+                <SwitchRow
+                  label={
+                    <span className="flex items-center gap-2">
+                      <MapPin size={16} aria-hidden="true" />
+                      Compartilhar localização
+                    </span>
+                  }
+                  checked={!!profile.consentGpsAt}
+                  onClick={() => void handleToggleConsentGps()}
+                  disabled={isUpdatingProfile}
+                />
+
+                <div className="rounded-lg border border-card-border bg-background px-3 py-2 text-xs text-text-secondary">
+                  Ao usar o app, você contribui com dados de localização por padrão — isso melhora
+                  as informações em tempo real para todos os usuários. Você pode desativar a
+                  qualquer momento usando o botão acima.
+                </div>
+
+                <SwitchRow
+                  label="Consentimento pesquisa"
+                  checked={!!profile.consentResearchAt}
+                  onClick={() => void handleToggleConsentResearch()}
+                  disabled={isUpdatingProfile}
+                />
+
+                <div className="rounded-lg border border-card-border bg-background px-3 py-2 text-sm text-text-secondary">
+                  <p className="font-medium text-text-primary">
+                    Eventos colaborativos ativos neste perfil
+                  </p>
+                  <p className="mt-1">
+                    Viagem encerrada automaticamente, pedido de avaliação pós-viagem, alerta de
+                    serviço aprovado e risco de streak usam esta preferência.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ─── Apoio ─── */}
+          <TabsContent value="apoio" className="mt-4">
+            <SupportActionsCard monetization={profile.monetization} />
+          </TabsContent>
+
+          {/* ─── Conta ─── */}
+          <TabsContent value="conta" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <AlertTriangle size={18} aria-hidden="true" />
+                  Sessão e conta
+                </CardTitle>
+                <CardDescription>
+                  Encerre sua sessão atual ou solicite exclusão da conta conforme LGPD.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-11"
+                  disabled={isLogoutPending || isDeletingAccount}
+                  onClick={() => void handleLogout()}
+                >
+                  Encerrar sessão
+                </Button>
+                <Button
+                  type="button"
+                  variant="danger"
+                  className="min-h-11"
+                  disabled={isLogoutPending || isDeletingAccount}
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  leftIcon={
+                    profile.profilePublic ? <EyeOff size={16} aria-hidden="true" /> : undefined
+                  }
+                >
+                  Solicitar exclusão de conta
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <DeleteAccountDialog
