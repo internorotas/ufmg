@@ -23,10 +23,6 @@ vi.mock('@/contexts/RotasDataContext', () => ({
   useRotasData: () => ({ linhasData: { categoriasDias: [] } }),
 }));
 
-vi.mock('@tanstack/react-query', () => ({
-  useQuery: () => ({ data: null }),
-}));
-
 const mockResults: PlannerRoutesResponse = {
   originStopId: 'A',
   originStopName: 'Parada A',
