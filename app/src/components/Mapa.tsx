@@ -158,7 +158,11 @@ export function Mapa({
       />
 
       {linhaSelecionada && (
-        <GpsLiveBusMarker linha={linhaSelecionada} todasParadas={todasParadas} />
+        <GpsLiveBusMarker
+          key={linhaSelecionada.idRota}
+          linha={linhaSelecionada}
+          todasParadas={todasParadas}
+        />
       )}
 
       <PlannerMapOverlay />
