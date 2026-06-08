@@ -115,7 +115,11 @@ export function calcularPosicaoTeorica(
   if (!trajetoDetalhado || trajetoDetalhado.length < 2) return null;
   if (!horarios || horarios.length === 0) return null;
 
-  const agoraMin = agora.getHours() * 60 + agora.getMinutes() + agora.getSeconds() / 60;
+  const agoraMin =
+    agora.getHours() * 60 +
+    agora.getMinutes() +
+    agora.getSeconds() / 60 +
+    agora.getMilliseconds() / 60000;
 
   const horariosSorted = [...horarios].sort();
   let horarioSaida: string | null = null;
