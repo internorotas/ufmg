@@ -302,33 +302,33 @@ function LineCardComponent({
           <div className="flex items-start justify-between gap-2">
             <div className="flex flex-1 items-start gap-3">
               <LineIcon color={linha.corHex} />
-              <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-0.5">
-                <h3 className="text-base font-bold leading-tight text-text-primary md:text-lg">
-                  {linha.nome}
-                </h3>
-                {linha.sublinha && (
-                  <p className="col-span-2 text-sm text-text-secondary">{linha.sublinha}</p>
-                )}
-                <div className="col-start-2 row-start-1 flex items-center gap-2">
-                  {favoritado && (
-                    <span
-                      className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold"
-                      style={{
-                        borderColor: hexToRgba(linha.corHex, 0.32),
-                        backgroundColor: hexToRgba(linha.corHex, 0.12),
-                        color: linha.corHex,
-                      }}
-                    >
-                      <Star className="size-3 fill-current" aria-hidden="true" />
-                      {t('favorite')}
-                    </span>
-                  )}
-                  <LineStatusBadge status={statusType} label={status} size="xs" />
-                  <ChevronRight
-                    className="size-5 shrink-0 text-text-secondary"
-                    aria-hidden="true"
-                  />
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div className="flex min-w-0 items-start gap-2">
+                  <h3 className="min-w-0 flex-1 text-base font-bold leading-snug text-text-primary md:text-lg">
+                    {linha.nome}
+                  </h3>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    {favoritado && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                        style={{
+                          borderColor: hexToRgba(linha.corHex, 0.32),
+                          backgroundColor: hexToRgba(linha.corHex, 0.12),
+                          color: linha.corHex,
+                        }}
+                      >
+                        <Star className="size-3 fill-current" aria-hidden="true" />
+                        {t('favorite')}
+                      </span>
+                    )}
+                    <LineStatusBadge status={statusType} label={status} size="xs" />
+                    <ChevronRight
+                      className="size-5 shrink-0 text-text-secondary"
+                      aria-hidden="true"
+                    />
+                  </div>
                 </div>
+                {linha.sublinha && <p className="text-sm text-text-secondary">{linha.sublinha}</p>}
               </div>
             </div>
           </div>
