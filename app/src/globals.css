@@ -335,6 +335,11 @@ body {
   isolation: isolate;
 }
 
+/* Marcadores de ônibus no mapa */
+.bus-marker-t {
+  transition: transform 5s linear;
+}
+
 /* Leaflet z-index management - preserve popup functionality */
 .leaflet-pane {
   z-index: 400;

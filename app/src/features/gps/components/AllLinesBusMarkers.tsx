@@ -1,27 +1,15 @@
 import L from 'leaflet';
-import { useMemo } from 'react';
 import { Marker, Popup } from 'react-leaflet';
+import type { PosicaoTeorica } from '@/lib/busPosition';
+import { hexToRgba } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
 import { useAllBusPositions } from '../hooks/useAllBusPositions';
+import { numLinha } from '../lib/markerUtils';
 
 interface AllLinesBusMarkersProps {
   linhas: Linha[];
   todasParadas: Parada[];
   linhaExcluida?: string | null;
-}
-
-function hexToRgba(hex: string, opacity: number): string {
-  const clean = hex.startsWith('#') ? hex : `#${hex}`;
-  const r = parseInt(clean.slice(1, 3), 16);
-  const g = parseInt(clean.slice(3, 5), 16);
-  const b = parseInt(clean.slice(5, 7), 16);
-  return `rgba(${r},${g},${b},${opacity})`;
-}
-
-function numLinha(linha: Linha): string {
-  if (linha.linha) return String(linha.linha);
-  const m = linha.idRota.match(/^\d+/);
-  return m ? m[0] : linha.idRota.slice(0, 3).toUpperCase();
 }
 
 function criarIconeMini(corHex: string): L.DivIcon {
@@ -43,13 +31,52 @@ function criarIconeMini(corHex: string): L.DivIcon {
   });
 }
 
+interface BusMarkerPopupProps {
+  linha: Linha;
+  pos: PosicaoTeorica;
+}
+
+function BusMarkerPopup({ linha, pos }: BusMarkerPopupProps) {
+  const num = numLinha(linha);
+  return (
+    <div className="flex flex-col gap-2 font-sans text-sm">
+      <div className="flex items-center gap-2">
+        <span
+          className="shrink-0 rounded px-1.5 py-0.5 text-xs font-extrabold text-white"
+          style={{ background: linha.corHex }}
+        >
+          {num}
+        </span>
+        <span className="min-w-0 flex-1 truncate font-bold text-text-primary">{linha.nome}</span>
+      </div>
+
+      <div className="border-t border-card-border" />
+
+      <div className="flex flex-col gap-1 text-xs text-text-secondary">
+        <div className="flex items-center gap-1.5">
+          <span aria-hidden="true">🕐</span>
+          <span className="font-semibold text-text-primary">Estimativa de posição</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span aria-hidden="true">🚌</span>
+          <span>
+            Saída <strong className="text-text-primary">{pos.horarioSaida}</strong>
+            {' · '}
+            {Math.round(pos.elapsedMin)} min em rota
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AllLinesBusMarkers({
   linhas,
   todasParadas,
   linhaExcluida,
 }: AllLinesBusMarkersProps) {
   const posicoes = useAllBusPositions(linhas, todasParadas);
-  const linhaMap = useMemo(() => new Map(linhas.map((l) => [l.idRota, l])), [linhas]);
+  const linhaMap = new Map(linhas.map((l) => [l.idRota, l]));
 
   return (
     <>
@@ -59,84 +86,10 @@ export function AllLinesBusMarkers({
           const linha = linhaMap.get(idRota);
           if (!linha) return null;
 
-          const icon = criarIconeMini(linha.corHex);
-          const num = numLinha(linha);
-
           return (
-            <Marker key={idRota} position={[pos.lat, pos.lng]} icon={icon}>
+            <Marker key={idRota} position={[pos.lat, pos.lng]} icon={criarIconeMini(linha.corHex)}>
               <Popup minWidth={190}>
-                <div
-                  style={{
-                    fontFamily: 'system-ui,sans-serif',
-                    fontSize: '13px',
-                    lineHeight: '1.5',
-                  }}
-                >
-                  {/* Cabeçalho */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '7px',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    <span
-                      style={{
-                        background: linha.corHex,
-                        color: 'white',
-                        fontSize: '12px',
-                        fontWeight: '800',
-                        borderRadius: '4px',
-                        padding: '2px 6px',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {num}
-                    </span>
-                    <span
-                      style={{
-                        fontWeight: '700',
-                        color: '#111',
-                        flex: 1,
-                        minWidth: 0,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {linha.nome}
-                    </span>
-                  </div>
-
-                  <div style={{ height: '1px', background: '#f0f0f0', marginBottom: '8px' }} />
-
-                  {/* Info */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4px',
-                      color: '#6b7280',
-                      fontSize: '12px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      <span>🕐</span>
-                      <span style={{ fontWeight: '600', color: '#374151' }}>
-                        Estimativa de posição
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      <span>🚌</span>
-                      <span>
-                        Saída <strong style={{ color: '#111' }}>{pos.horarioSaida}</strong>
-                        {' · '}
-                        {Math.round(pos.elapsedMin)} min em rota
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                <BusMarkerPopup linha={linha} pos={pos} />
               </Popup>
             </Marker>
           );
