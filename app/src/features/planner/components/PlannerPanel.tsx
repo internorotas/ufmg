@@ -202,6 +202,10 @@ export function PlannerPanel() {
   const [originSearch, setOriginSearch] = useState('');
   const [destSearch, setDestSearch] = useState('');
   const [activeField, setActiveField] = useState<'origin' | 'destination' | null>(null);
+  const [departureTime, setDepartureTime] = useState(() => {
+    const now = new Date();
+    return now.toTimeString().slice(0, 5);
+  });
 
   const {
     mutate: planRoute,
@@ -266,7 +270,9 @@ export function PlannerPanel() {
     const o = origin as PlannerStop;
     const d = destination as PlannerStop;
     resetMutation();
-    planRoute({ originStopId: o.idParada, destinationStopId: d.idParada });
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const departureAt = new Date(`${todayIso}T${departureTime}:00`).toISOString();
+    planRoute({ originStopId: o.idParada, destinationStopId: d.idParada, departureAt });
   };
 
   const sameEndpoint = isSameEndpoint();
@@ -324,6 +330,19 @@ export function PlannerPanel() {
           }}
           onUseLocation={handleUseLocation('destination')}
           inputId={destInputId}
+        />
+      </div>
+
+      <div className={fieldContainerVariants()}>
+        <label htmlFor="planner-departure-time" className={fieldLabelVariants()}>
+          Horário de partida
+        </label>
+        <input
+          id="planner-departure-time"
+          type="time"
+          value={departureTime}
+          onChange={(e) => setDepartureTime(e.target.value)}
+          className={searchInputVariants()}
         />
       </div>
 

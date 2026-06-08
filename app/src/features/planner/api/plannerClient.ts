@@ -21,6 +21,9 @@ export async function fetchPlannerRoutes(
   if (query.categoryDay) {
     url.searchParams.set('categoryDay', query.categoryDay);
   }
+  if (query.departureAt) {
+    url.searchParams.set('departureAt', query.departureAt);
+  }
 
   const authToken = useAuthStore.getState().accessToken;
   const baseHeaders: HeadersInit = authToken ? { Authorization: `Bearer ${authToken}` } : {};

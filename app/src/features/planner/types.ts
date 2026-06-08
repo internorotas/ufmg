@@ -86,4 +86,5 @@ export interface PlannerClientQuery {
   originStopId: string;
   destinationStopId: string;
   categoryDay?: string;
+  departureAt?: string;
 }
