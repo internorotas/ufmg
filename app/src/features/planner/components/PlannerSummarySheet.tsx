@@ -6,7 +6,7 @@ import { ArrowLeft, Bus, Clock, Footprints, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { tv } from 'tailwind-variants';
-import { formatTimeSP } from '@/lib/formatters';
+import { formatMinutes, formatTimeSP } from '@/lib/formatters';
 import { usePlannerStore } from '../store/plannerStore';
 import type { PlannerBusLeg } from '../types';
 import { ETA_SOURCE_LABEL } from '../types';
@@ -167,7 +167,7 @@ export function PlannerSummarySheet({
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex flex-col gap-0.5">
             <span className="text-2xl font-bold tabular-nums text-text-primary">
-              {route.totalMinutes} min
+              {formatMinutes(route.totalMinutes)}
             </span>
             <span className="text-xs tabular-nums text-text-secondary">
               Chegada {formatTimeSP(route.arrivalTime)} · {route.transferCount} troca

@@ -6,7 +6,7 @@
 import { Bus, Footprints, Map as MapIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { tv } from 'tailwind-variants';
-import { formatTimeSP } from '@/lib/formatters';
+import { formatMinutes, formatTimeSP } from '@/lib/formatters';
 import { usePlannerStore } from '../store/plannerStore';
 import {
   ETA_SOURCE_LABEL,
@@ -160,7 +160,7 @@ function AlternativeCard({ alternative, isSelected, onSelect }: AlternativeCardP
       <header className="mb-3 flex items-start justify-between gap-2">
         <div className="flex flex-col gap-0.5">
           <span className="text-xl font-bold tabular-nums text-text-primary">
-            {alternative.totalMinutes} min
+            {formatMinutes(alternative.totalMinutes)}
           </span>
           <span className="text-xs tabular-nums text-text-secondary">
             Chegada {formatTimeSP(alternative.arrivalTime)} · {alternative.transferCount} troca

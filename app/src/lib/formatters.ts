@@ -41,3 +41,10 @@ export function formatConsent(consentAt: string | null): string {
   if (!consentAt) return 'Não concedido';
   return formatDateTimePtBr(consentAt);
 }
+
+export function formatMinutes(totalMinutes: number): string {
+  if (totalMinutes < 60) return `${totalMinutes} min`;
+  const h = Math.floor(totalMinutes / 60);
+  const min = totalMinutes % 60;
+  return min > 0 ? `${h}h ${min}min` : `${h}h`;
+}
