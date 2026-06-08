@@ -419,6 +419,11 @@ function AppContent() {
     return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handler);
   }, [handleInactivityTimeout, trackEvent]);
 
+  const linhasAtivas = useMemo(
+    () => linhasData?.categoriasDias?.flatMap((cat) => cat.linhas) ?? [],
+    [linhasData],
+  );
+
   // Validação dos dados
   if (isLoadingData) {
     return (
@@ -466,11 +471,6 @@ function AppContent() {
       />
     );
   }
-
-  const linhasAtivas = useMemo(
-    () => linhasData.categoriasDias.flatMap((cat) => cat.linhas),
-    [linhasData],
-  );
 
   const handleAuthAction = () => {
     if (isAuthenticated) {
