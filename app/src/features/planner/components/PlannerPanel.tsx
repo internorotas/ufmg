@@ -8,7 +8,6 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { Button } from '@/components/ui/Button';
 import { useRotasData } from '@/contexts/RotasDataContext';
-import { encontrarParadaMaisProxima } from '@/lib/busPosition';
 import type { Parada } from '@/types/data.types';
 import { usePlannerRoutes } from '../api/usePlannerRoutes';
 import { type PlannerEndpoint, type PlannerStop, usePlannerStore } from '../store/plannerStore';
@@ -264,27 +263,36 @@ export function PlannerPanel() {
     setIsLocating(true);
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setIsLocating(false);
-        const parada = encontrarParadaMaisProxima(
-          pos.coords.latitude,
-          pos.coords.longitude,
-          todasParadas,
-        );
-        if (!parada) return;
-        const endpoint: PlannerEndpoint = {
-          kind: 'stop',
-          idParada: parada.idParada,
-          nome: parada.nome,
-        };
-        if (field === 'origin') {
-          setOrigin(endpoint);
-          setOriginSearch('');
-        } else {
-          setDestination(endpoint);
-          setDestSearch('');
+      async (pos) => {
+        try {
+          const { latitude: lat, longitude: lng } = pos.coords;
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 6000);
+          const res = await fetch(
+            `/v1/transit/stops/nearest?lat=${lat}&lng=${lng}&limit=1`,
+            { signal: controller.signal },
+          );
+          clearTimeout(timeoutId);
+          if (!res.ok) return;
+          const paradas: Parada[] = await res.json();
+          if (!paradas.length) return;
+          const parada = paradas[0];
+          const endpoint: PlannerEndpoint = {
+            kind: 'stop',
+            idParada: parada.idParada,
+            nome: parada.nome,
+          };
+          if (field === 'origin') {
+            setOrigin(endpoint);
+            setOriginSearch('');
+          } else {
+            setDestination(endpoint);
+            setDestSearch('');
+          }
+          setActiveField(null);
+        } finally {
+          setIsLocating(false);
         }
-        setActiveField(null);
       },
       () => {
         setIsLocating(false);

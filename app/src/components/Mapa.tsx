@@ -13,6 +13,7 @@
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { AllLinesBusMarkers } from '@/features/gps/components/AllLinesBusMarkers';
 import { GpsLiveBusMarker } from '@/features/gps/components/GpsLiveBusMarker';
 import { GpsRouteOverlay } from '@/features/gps/components/GpsRouteOverlay';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
@@ -37,6 +38,7 @@ export interface MapaRef {
 
 interface MapaProps {
   todasParadas: Parada[];
+  linhasAtivas: Linha[];
   linhaSelecionada: Linha | null;
   paradaSelecionada: Parada | null;
   /** Coordenadas do usuário [lat, lng] */
@@ -98,6 +100,7 @@ function MapImperativeHandler({
 
 export function Mapa({
   todasParadas,
+  linhasAtivas,
   linhaSelecionada,
   paradaSelecionada,
   localizacaoUsuario,
@@ -147,6 +150,12 @@ export function Mapa({
       {rastreioColaborativo?.isActive && linhaSelecionada && (
         <GpsRouteOverlay linha={linhaSelecionada} />
       )}
+
+      <AllLinesBusMarkers
+        linhas={linhasAtivas}
+        todasParadas={todasParadas}
+        linhaExcluida={linhaSelecionada?.idRota ?? null}
+      />
 
       {linhaSelecionada && (
         <GpsLiveBusMarker linha={linhaSelecionada} todasParadas={todasParadas} />

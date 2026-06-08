@@ -210,7 +210,14 @@ export function useLinhasFilter(
     [linhasData.categoriasDias, categoriaAtiva],
   );
 
-  const linhasDaCategoriaAtiva = useMemo(() => categoriaAtual?.linhas ?? [], [categoriaAtual]);
+  const linhasDaCategoriaAtiva = useMemo(() => {
+    const vistas = new Set<string>();
+    return (categoriaAtual?.linhas ?? []).filter((l) => {
+      if (vistas.has(l.idRota)) return false;
+      vistas.add(l.idRota);
+      return true;
+    });
+  }, [categoriaAtual]);
 
   const linhasFiltradas = useMemo(() => {
     return sortLinhas(filterLinhas(linhasDaCategoriaAtiva, deferredSearchTerm), currentTime);

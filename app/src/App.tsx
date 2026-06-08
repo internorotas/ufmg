@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { BottomNav } from './components/app/BottomNav';
@@ -467,6 +467,11 @@ function AppContent() {
     );
   }
 
+  const linhasAtivas = useMemo(
+    () => linhasData.categoriasDias.flatMap((cat) => cat.linhas),
+    [linhasData],
+  );
+
   const handleAuthAction = () => {
     if (isAuthenticated) {
       setIsProfileSheetOpen(true);
@@ -537,6 +542,7 @@ function AppContent() {
                 <Mapa
                   ref={mapaRef}
                   todasParadas={todasParadas}
+                  linhasAtivas={linhasAtivas}
                   linhaSelecionada={linhaSelecionada}
                   paradaSelecionada={paradaSelecionada}
                   localizacaoUsuario={localizacao}
