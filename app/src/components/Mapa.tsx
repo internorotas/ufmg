@@ -148,7 +148,9 @@ export function Mapa({
         <GpsRouteOverlay linha={linhaSelecionada} />
       )}
 
-      {linhaSelecionada && <GpsLiveBusMarker linha={linhaSelecionada} />}
+      {linhaSelecionada && (
+        <GpsLiveBusMarker linha={linhaSelecionada} todasParadas={todasParadas} />
+      )}
 
       <PlannerMapOverlay />
 

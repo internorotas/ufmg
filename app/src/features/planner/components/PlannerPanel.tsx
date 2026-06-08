@@ -3,11 +3,12 @@
  * Embutido no MenuLateral, abaixo da busca e acima das tabs de categoria.
  */
 
-import { ArrowLeftRight, LocateFixed, MapPin, X } from 'lucide-react';
+import { ArrowLeftRight, Loader2, LocateFixed, MapPin, X } from 'lucide-react';
 import { useEffect, useId, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { Button } from '@/components/ui/Button';
 import { useRotasData } from '@/contexts/RotasDataContext';
+import { encontrarParadaMaisProxima } from '@/lib/busPosition';
 import type { Parada } from '@/types/data.types';
 import { usePlannerRoutes } from '../api/usePlannerRoutes';
 import { type PlannerEndpoint, type PlannerStop, usePlannerStore } from '../store/plannerStore';
@@ -73,6 +74,7 @@ interface EndpointFieldProps {
   endpoint: PlannerEndpoint | null;
   searchValue: string;
   isActive: boolean;
+  isLocating: boolean;
   suggestions: Parada[];
   onActivate: () => void;
   onSearch: (q: string) => void;
@@ -87,6 +89,7 @@ function EndpointField({
   endpoint,
   searchValue,
   isActive,
+  isLocating,
   suggestions,
   onActivate,
   onSearch,
@@ -139,10 +142,15 @@ function EndpointField({
           <button
             type="button"
             onClick={onUseLocation}
-            className="flex min-h-9 items-center gap-1.5 rounded-md px-2 py-1 text-xs text-brand-primary hover:bg-brand-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            disabled={isLocating}
+            className="flex min-h-9 items-center gap-1.5 rounded-md px-2 py-1 text-xs text-brand-primary hover:bg-brand-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <LocateFixed size={13} aria-hidden="true" />
-            Minha localização · usar parada mais próxima
+            {isLocating ? (
+              <Loader2 size={13} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <LocateFixed size={13} aria-hidden="true" />
+            )}
+            {isLocating ? 'Obtendo localização…' : 'Minha localização · usar parada mais próxima'}
           </button>
 
           {isActive && suggestions.length > 0 && (
@@ -202,6 +210,7 @@ export function PlannerPanel() {
   const [originSearch, setOriginSearch] = useState('');
   const [destSearch, setDestSearch] = useState('');
   const [activeField, setActiveField] = useState<'origin' | 'destination' | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
   const [departureTime, setDepartureTime] = useState(() => {
     const now = new Date();
     return now.toTimeString().slice(0, 5);
@@ -251,18 +260,37 @@ export function PlannerPanel() {
   };
 
   const handleUseLocation = (field: 'origin' | 'destination') => () => {
-    const endpoint: PlannerEndpoint = {
-      kind: 'current-location',
-      nome: 'Minha localização',
-    };
-    if (field === 'origin') {
-      setOrigin(endpoint);
-      setOriginSearch('');
-    } else {
-      setDestination(endpoint);
-      setDestSearch('');
-    }
-    setActiveField(null);
+    if (!navigator.geolocation) return;
+    setIsLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setIsLocating(false);
+        const parada = encontrarParadaMaisProxima(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          todasParadas,
+        );
+        if (!parada) return;
+        const endpoint: PlannerEndpoint = {
+          kind: 'stop',
+          idParada: parada.idParada,
+          nome: parada.nome,
+        };
+        if (field === 'origin') {
+          setOrigin(endpoint);
+          setOriginSearch('');
+        } else {
+          setDestination(endpoint);
+          setDestSearch('');
+        }
+        setActiveField(null);
+      },
+      () => {
+        setIsLocating(false);
+      },
+      { timeout: 8000, maximumAge: 60_000 },
+    );
   };
 
   const handleSubmit = () => {
@@ -285,6 +313,7 @@ export function PlannerPanel() {
           endpoint={origin}
           searchValue={originSearch}
           isActive={activeField === 'origin'}
+          isLocating={isLocating}
           suggestions={originSuggestions}
           onActivate={() => setActiveField('origin')}
           onSearch={setOriginSearch}
@@ -319,6 +348,7 @@ export function PlannerPanel() {
           endpoint={destination}
           searchValue={destSearch}
           isActive={activeField === 'destination'}
+          isLocating={isLocating}
           suggestions={destSuggestions}
           onActivate={() => setActiveField('destination')}
           onSearch={setDestSearch}
