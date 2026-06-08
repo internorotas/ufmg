@@ -18,13 +18,19 @@ function hexToRgba(hex: string, opacity: number): string {
   return `rgba(${r},${g},${b},${opacity})`;
 }
 
+function numLinha(linha: Linha): string {
+  if (linha.linha) return String(linha.linha);
+  const m = linha.idRota.match(/^\d+/);
+  return m ? m[0] : linha.idRota.slice(0, 3).toUpperCase();
+}
+
 function criarIconeMini(corHex: string): L.DivIcon {
   const bg = hexToRgba(corHex, 0.7);
   return L.divIcon({
-    className: '',
+    className: 'bus-marker-t',
     iconSize: [28, 28],
     iconAnchor: [14, 14],
-    popupAnchor: [0, -14],
+    popupAnchor: [0, -16],
     html: `
       <div style="position:relative;width:28px;height:28px;">
         <div style="position:absolute;inset:3px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.2);">
@@ -37,9 +43,12 @@ function criarIconeMini(corHex: string): L.DivIcon {
   });
 }
 
-export function AllLinesBusMarkers({ linhas, todasParadas, linhaExcluida }: AllLinesBusMarkersProps) {
+export function AllLinesBusMarkers({
+  linhas,
+  todasParadas,
+  linhaExcluida,
+}: AllLinesBusMarkersProps) {
   const posicoes = useAllBusPositions(linhas, todasParadas);
-
   const linhaMap = useMemo(() => new Map(linhas.map((l) => [l.idRota, l])), [linhas]);
 
   return (
@@ -51,34 +60,80 @@ export function AllLinesBusMarkers({ linhas, todasParadas, linhaExcluida }: AllL
           if (!linha) return null;
 
           const icon = criarIconeMini(linha.corHex);
+          const num = numLinha(linha);
 
           return (
             <Marker key={idRota} position={[pos.lat, pos.lng]} icon={icon}>
-              <Popup>
-                <div style={{ minWidth: '160px', fontFamily: 'sans-serif', fontSize: '13px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+              <Popup minWidth={190}>
+                <div
+                  style={{
+                    fontFamily: 'system-ui,sans-serif',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                  }}
+                >
+                  {/* Cabeçalho */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '7px',
+                      marginBottom: '8px',
+                    }}
+                  >
                     <span
                       style={{
                         background: linha.corHex,
                         color: 'white',
-                        fontSize: '11px',
+                        fontSize: '12px',
                         fontWeight: '800',
                         borderRadius: '4px',
-                        padding: '1px 5px',
+                        padding: '2px 6px',
                         flexShrink: 0,
                       }}
                     >
-                      {linha.linha}
+                      {num}
                     </span>
-                    <span style={{ fontWeight: '600', color: '#111', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span
+                      style={{
+                        fontWeight: '700',
+                        color: '#111',
+                        flex: 1,
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {linha.nome}
                     </span>
                   </div>
-                  <div style={{ color: '#6b7280', fontSize: '12px', lineHeight: '1.5' }}>
-                    <div>🕐 Estimativa de posição</div>
-                    <div>
-                      Saída às <strong style={{ color: '#111' }}>{pos.horarioSaida}</strong>
-                      {' · '}há {Math.round(pos.elapsedMin)} min
+
+                  <div style={{ height: '1px', background: '#f0f0f0', marginBottom: '8px' }} />
+
+                  {/* Info */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      color: '#6b7280',
+                      fontSize: '12px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <span>🕐</span>
+                      <span style={{ fontWeight: '600', color: '#374151' }}>
+                        Estimativa de posição
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <span>🚌</span>
+                      <span>
+                        Saída <strong style={{ color: '#111' }}>{pos.horarioSaida}</strong>
+                        {' · '}
+                        {Math.round(pos.elapsedMin)} min em rota
+                      </span>
                     </div>
                   </div>
                 </div>

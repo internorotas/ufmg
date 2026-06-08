@@ -268,10 +268,9 @@ export function PlannerPanel() {
           const { latitude: lat, longitude: lng } = pos.coords;
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 6000);
-          const res = await fetch(
-            `/v1/transit/stops/nearest?lat=${lat}&lng=${lng}&limit=1`,
-            { signal: controller.signal },
-          );
+          const res = await fetch(`/v1/transit/stops/nearest?lat=${lat}&lng=${lng}&limit=1`, {
+            signal: controller.signal,
+          });
           clearTimeout(timeoutId);
           if (!res.ok) return;
           const paradas: Parada[] = await res.json();

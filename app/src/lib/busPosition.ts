@@ -24,34 +24,52 @@ function calcularHeading(lat1: number, lng1: number, lat2: number, lng2: number)
   return ((Math.atan2(dLng, dLat) * 180) / Math.PI + 360) % 360;
 }
 
-export function calcularPosicaoTeorica(
-  linha: Linha,
-  todasParadas: Parada[],
-  agora: Date,
+// Interpola ao longo das coordenadas do trajeto (geometria real das ruas)
+function interpolarNaTrajeto(
+  coords: [number, number][],
+  progress: number,
+  horarioSaida: string,
+  elapsedMin: number,
 ): PosicaoTeorica | null {
-  const { trajetoDetalhado, horarios } = linha;
-  if (!trajetoDetalhado || trajetoDetalhado.length < 2) return null;
-  if (!horarios || horarios.length === 0) return null;
+  const cumDist: number[] = [0];
+  for (let i = 1; i < coords.length; i++) {
+    const d = calcularDistanciaKm(coords[i - 1][0], coords[i - 1][1], coords[i][0], coords[i][1]);
+    cumDist.push(cumDist[i - 1] + d);
+  }
+  const totalKm = cumDist[cumDist.length - 1];
+  if (totalKm === 0) return null;
 
-  const agoraMin = agora.getHours() * 60 + agora.getMinutes() + agora.getSeconds() / 60;
+  const targetKm = Math.min(progress * totalKm, totalKm);
 
-  // Horário de saída mais recente que já passou
-  const horariosSorted = [...horarios].sort();
-  let horarioSaida: string | null = null;
-  for (let i = horariosSorted.length - 1; i >= 0; i--) {
-    if (horaParaMinutos(horariosSorted[i]) <= agoraMin) {
-      horarioSaida = horariosSorted[i];
+  let segIdx = coords.length - 1;
+  for (let i = 1; i < cumDist.length; i++) {
+    if (targetKm <= cumDist[i]) {
+      segIdx = i;
       break;
     }
   }
-  if (!horarioSaida) return null;
 
-  const elapsedMin = agoraMin - horaParaMinutos(horarioSaida);
+  const segLen = cumDist[segIdx] - cumDist[segIdx - 1];
+  const t = segLen > 0 ? (targetKm - cumDist[segIdx - 1]) / segLen : 0;
+  const [latA, lngA] = coords[segIdx - 1];
+  const [latB, lngB] = coords[segIdx];
 
-  const duracaoTotal = trajetoDetalhado.reduce((acc, t) => acc + t.tempoDoAnteriorMinutos, 0);
-  if (elapsedMin >= duracaoTotal) return null;
+  return {
+    lat: lerp(latA, latB, t),
+    lng: lerp(lngA, lngB, t),
+    heading: calcularHeading(latA, lngA, latB, lngB),
+    horarioSaida,
+    elapsedMin,
+  };
+}
 
-  // Tempos cumulativos por parada
+// Fallback: interpola em linha reta entre paradas consecutivas
+function interpolarEntreParadas(
+  trajetoDetalhado: { idParada: string; tempoDoAnteriorMinutos: number }[],
+  todasParadas: Parada[],
+  elapsedMin: number,
+  horarioSaida: string,
+): PosicaoTeorica | null {
   const cumTimes: number[] = [0];
   for (let i = 1; i < trajetoDetalhado.length; i++) {
     cumTimes.push(cumTimes[i - 1] + trajetoDetalhado[i].tempoDoAnteriorMinutos);
@@ -59,7 +77,6 @@ export function calcularPosicaoTeorica(
 
   const paradaMap = new Map(todasParadas.map((p) => [p.idParada, p]));
 
-  // Segmento atual
   let segIdx = trajetoDetalhado.length - 1;
   for (let i = 1; i < cumTimes.length; i++) {
     if (elapsedMin < cumTimes[i]) {
@@ -87,6 +104,42 @@ export function calcularPosicaoTeorica(
     horarioSaida,
     elapsedMin,
   };
+}
+
+export function calcularPosicaoTeorica(
+  linha: Linha,
+  todasParadas: Parada[],
+  agora: Date,
+): PosicaoTeorica | null {
+  const { trajetoDetalhado, horarios, coordenadasTrajeto } = linha;
+  if (!trajetoDetalhado || trajetoDetalhado.length < 2) return null;
+  if (!horarios || horarios.length === 0) return null;
+
+  const agoraMin = agora.getHours() * 60 + agora.getMinutes() + agora.getSeconds() / 60;
+
+  const horariosSorted = [...horarios].sort();
+  let horarioSaida: string | null = null;
+  for (let i = horariosSorted.length - 1; i >= 0; i--) {
+    if (horaParaMinutos(horariosSorted[i]) <= agoraMin) {
+      horarioSaida = horariosSorted[i];
+      break;
+    }
+  }
+  if (!horarioSaida) return null;
+
+  const elapsedMin = agoraMin - horaParaMinutos(horarioSaida);
+  const duracaoTotal = trajetoDetalhado.reduce((acc, t) => acc + t.tempoDoAnteriorMinutos, 0);
+  if (duracaoTotal <= 0 || elapsedMin >= duracaoTotal) return null;
+
+  const progress = elapsedMin / duracaoTotal;
+
+  // Preferir trajeto geométrico (segue as ruas)
+  if (Array.isArray(coordenadasTrajeto) && coordenadasTrajeto.length >= 2) {
+    return interpolarNaTrajeto(coordenadasTrajeto, progress, horarioSaida, elapsedMin);
+  }
+
+  // Fallback: interpolação linear entre paradas
+  return interpolarEntreParadas(trajetoDetalhado, todasParadas, elapsedMin, horarioSaida);
 }
 
 export function encontrarParadaMaisProxima(

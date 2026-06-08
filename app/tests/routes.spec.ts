@@ -30,9 +30,9 @@ test('home – campo de busca está acessível', async ({ page }) => {
   await page.goto(`${BASE}/`);
   await page.waitForSelector('.leaflet-container', { timeout: 15_000 });
   await ensureSearchVisible(page);
-  await expect(
-    page.getByRole('searchbox', { name: /Pesquisar linha/i }),
-  ).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('searchbox', { name: /Pesquisar linha/i })).toBeVisible({
+    timeout: 10_000,
+  });
 });
 
 test('login – renderiza botão Google e link anonimato', async ({ page }) => {
@@ -70,9 +70,7 @@ test('linhas – página carrega com header e busca', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /Linhas e paradas/i })).toBeVisible({
     timeout: 8_000,
   });
-  await expect(
-    page.getByRole('searchbox', { name: /Pesquisar linha/i }),
-  ).toBeVisible();
+  await expect(page.getByRole('searchbox', { name: /Pesquisar linha/i })).toBeVisible();
 });
 
 test('ranking – carrega sem erro', async ({ page }) => {

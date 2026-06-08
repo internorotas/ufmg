@@ -37,10 +37,7 @@ test('pwa – site.webmanifest retorna 200 com content-type correto', async ({ p
   }
 });
 
-test('pwa – navegacao client-side funciona offline (React Router)', async ({
-  page,
-  context,
-}) => {
+test('pwa – navegacao client-side funciona offline (React Router)', async ({ page, context }) => {
   await page.goto(`${BASE}/`);
   await page.waitForLoadState('networkidle');
 

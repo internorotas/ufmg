@@ -13,11 +13,10 @@ export function useBusPosition(linha: Linha | null, todasParadas: Parada[]): Pos
       return;
     }
 
-    const calcular = () =>
-      setPosicao(calcularPosicaoTeorica(linha, todasParadas, new Date()));
+    const calcular = () => setPosicao(calcularPosicaoTeorica(linha, todasParadas, new Date()));
 
     calcular();
-    const id = setInterval(calcular, 30_000);
+    const id = setInterval(calcular, 1_000);
     return () => clearInterval(id);
   }, [linha, todasParadas]);
 

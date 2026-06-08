@@ -1,7 +1,6 @@
 (function forceCacheRecovery() {
   var isLocalhost =
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1';
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   if (isLocalhost) {
     return;
@@ -14,7 +13,7 @@
 
   var pathSegments = window.location.pathname.split('/').filter(Boolean);
   var tenantSlug = pathSegments[0] || 'ufmg';
-  var appBasePath = isLocalhost ? '/' : ('/' + tenantSlug + '/');
+  var appBasePath = isLocalhost ? '/' : '/' + tenantSlug + '/';
   var recoveryKey = 'interno-rotas:' + tenantSlug + ':cache-recovery:v2';
   var alreadyRan = false;
 
@@ -39,40 +38,36 @@
   document.documentElement.setAttribute('data-cache-recovery', 'in-progress');
 
   Promise.resolve()
-    .then(function () {
+    .then(() => {
       if (!('serviceWorker' in navigator)) {
         return;
       }
 
-      return navigator.serviceWorker
-        .getRegistrations()
-        .then(function (registrations) {
-          return Promise.all(
-            registrations.map(function (registration) {
-              var scopePathname = new URL(registration.scope).pathname;
-              var shouldResetRegistration =
-                scopePathname === '/' || scopePathname.indexOf(appBasePath) === 0;
+      return navigator.serviceWorker.getRegistrations().then((registrations) =>
+        Promise.all(
+          registrations.map((registration) => {
+            var scopePathname = new URL(registration.scope).pathname;
+            var shouldResetRegistration =
+              scopePathname === '/' || scopePathname.indexOf(appBasePath) === 0;
 
-              if (!shouldResetRegistration) {
-                return Promise.resolve(false);
-              }
+            if (!shouldResetRegistration) {
+              return Promise.resolve(false);
+            }
 
-              return registration.unregister();
-            }),
-          );
-        });
+            return registration.unregister();
+          }),
+        ),
+      );
     })
-    .then(function () {
+    .then(() => {
       if (!('caches' in window)) {
         return;
       }
 
-      return caches.keys().then(function (keys) {
-        return Promise.all(keys.map(function (key) { return caches.delete(key); }));
-      });
+      return caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))));
     })
-    .catch(function () { return undefined; })
-    .finally(function () {
+    .catch(() => undefined)
+    .finally(() => {
       url.searchParams.set('cache-recovery', 'done');
       url.searchParams.set('v', String(Date.now()));
       window.location.replace(url.toString());

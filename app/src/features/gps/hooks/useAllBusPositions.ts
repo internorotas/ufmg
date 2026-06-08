@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 import { calcularPosicaoTeorica, type PosicaoTeorica } from '@/lib/busPosition';
 import type { Linha, Parada } from '@/types/data.types';
 
-function calcularTodasPosicoes(linhas: Linha[], todasParadas: Parada[], agora: Date): Map<string, PosicaoTeorica> {
+function calcularTodasPosicoes(
+  linhas: Linha[],
+  todasParadas: Parada[],
+  agora: Date,
+): Map<string, PosicaoTeorica> {
   const mapa = new Map<string, PosicaoTeorica>();
   for (const linha of linhas) {
     const pos = calcularPosicaoTeorica(linha, todasParadas, agora);
@@ -24,7 +28,7 @@ export function useAllBusPositions(
 
     const id = setInterval(() => {
       setPosicoes(calcularTodasPosicoes(linhas, todasParadas, new Date()));
-    }, 30_000);
+    }, 5_000);
 
     return () => clearInterval(id);
   }, [linhas, todasParadas]);

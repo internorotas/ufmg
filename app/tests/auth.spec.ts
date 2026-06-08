@@ -34,7 +34,9 @@ test('login – título e estrutura correta', async ({ page }) => {
   await expect(googleBtn).toBeEnabled();
 });
 
-test('login – botão Google inicia fluxo OAuth (network request para /v1/auth)', async ({ page }) => {
+test('login – botão Google inicia fluxo OAuth (network request para /v1/auth)', async ({
+  page,
+}) => {
   // Mock do endpoint OAuth para não navegar para fora
   await page.route('**/v1/auth/google/start**', (route) =>
     route.fulfill({
@@ -51,10 +53,9 @@ test('login – botão Google inicia fluxo OAuth (network request para /v1/auth)
   await expect(googleBtn).toBeVisible({ timeout: 10_000 });
 
   // Intercepta request antes de clicar
-  const requestPromise = page.waitForRequest(
-    (req) => req.url().includes('/v1/auth/google/start'),
-    { timeout: 10_000 },
-  );
+  const requestPromise = page.waitForRequest((req) => req.url().includes('/v1/auth/google/start'), {
+    timeout: 10_000,
+  });
 
   await googleBtn.click();
   const req = await requestPromise;
