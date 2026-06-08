@@ -59,12 +59,20 @@ export function GpsLiveBusMarker({ linha, todasParadas }: GpsLiveBusMarkerProps)
   const markerRef = useRef<L.Marker>(null);
   const prevHeadingRef = useRef<number | null>(null);
 
-  // Posição e ícone iniciais — calculados uma única vez na montagem
-  const [initialPos] = useState<[number, number] | null>(() => {
+  // Posição inicial — calculada uma vez na montagem; se não houver horário ativo,
+  // livePos pode ainda fornecer posição quando um usuário estiver compartilhando
+  const [initialPos, setInitialPos] = useState<[number, number] | null>(() => {
     const pos = calcularPosicaoTeorica(linha, todasParadas, new Date());
     return pos ? [pos.lat, pos.lng] : null;
   });
   const [initialIcon] = useState<L.DivIcon>(() => criarIcone(linha.corHex, null, false));
+
+  // Se não há posição teórica mas chega GPS ao vivo, monta o marcador com essa posição
+  useEffect(() => {
+    if (!initialPos && livePos) {
+      setInitialPos([livePos.lat, livePos.lng]);
+    }
+  }, [livePos, initialPos]);
 
   // Posição em tempo real via WebSocket
   useEffect(() => {
