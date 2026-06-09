@@ -11,14 +11,14 @@ type SubscriptionStatus = 'pending' | 'active' | 'cancelled' | 'expired';
 
 export interface CreatedCheckoutResponse {
   id: number;
-  provider: 'abacatepay';
+  provider: 'mercadopago';
   kind: 'donation' | 'subscription';
   status: DonationStatus | SubscriptionStatus;
   checkoutUrl: string;
 }
 
 export interface PaymentsOverview {
-  provider: 'abacatepay';
+  provider: 'mercadopago';
   donations: Array<{
     id: number;
     status: DonationStatus;

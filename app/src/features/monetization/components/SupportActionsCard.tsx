@@ -112,7 +112,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
           Apoio ao projeto
         </CardTitle>
         <CardDescription>
-          Checkout hospedado pela AbacatePay, com transparência sobre apoio pontual, Premium e
+          Checkout hospedado pelo Mercado Pago, com transparência sobre apoio pontual, Premium e
           histórico recente.
         </CardDescription>
       </CardHeader>
