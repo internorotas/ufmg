@@ -7,8 +7,10 @@ import {
   useRef,
   useState,
 } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { useLinhasQuery } from '@/features/transit-data/queries/useLinhasQuery';
 import { useParadasQuery } from '@/features/transit-data/queries/useParadasQuery';
+import { useTransitSession } from '@/features/transit-data/hooks/useTransitSession';
 import { useMounted } from '@/hooks/useMounted';
 import {
   type IRotasService,
@@ -17,7 +19,10 @@ import {
   RotasService,
   RotasServiceImpl,
 } from '@/services/RotasService';
+import { fetchTransitDataBinary } from '@/services/api/transitApi';
 import type { CategoriaLinhas, Parada } from '@/types/data.types';
+
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
 
 export interface RotasDataContextData {
   linhasData: CategoriaLinhas;
@@ -46,10 +51,47 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
   const [dataUpdatedAt, setDataUpdatedAt] = useState('');
 
   const fallbackAttemptedRef = useRef(false);
+  const binaryLoadedRef = useRef(false);
   const isMounted = useMounted();
 
-  const linhasQuery = useLinhasQuery(true);
-  const paradasQuery = useParadasQuery(true);
+  const transitSession = useTransitSession();
+
+  // Rota binária: quando transit token disponível, busca dados em Protobuf
+  useEffect(() => {
+    if (!transitSession.transitToken || binaryLoadedRef.current) return;
+
+    const token = transitSession.transitToken;
+    binaryLoadedRef.current = true;
+
+    const loadBinary = async () => {
+      try {
+        const { linhas, paradas } = await fetchTransitDataBinary(token);
+        if (!isMounted()) return;
+        setRotasService(RotasServiceImpl.fromData(linhas, { paradas }));
+        setDataSource('api');
+        setDataVersion('v1');
+        setDataUpdatedAt(new Date().toISOString());
+        setDataError(null);
+        setIsLoadingData(false);
+        fallbackAttemptedRef.current = false;
+      } catch {
+        // binary falhou — JSON path assume o controle abaixo
+        binaryLoadedRef.current = false;
+      }
+    };
+
+    void loadBinary();
+  }, [transitSession.transitToken, isMounted]);
+
+  // Reset binary flag quando token expira (transitToken volta a null)
+  useEffect(() => {
+    if (!transitSession.transitToken) {
+      binaryLoadedRef.current = false;
+    }
+  }, [transitSession.transitToken]);
+
+  const linhasQuery = useLinhasQuery(!transitSession.disabled);
+  const paradasQuery = useParadasQuery(!transitSession.disabled);
 
   const hasApiData = Boolean(linhasQuery.data && paradasQuery.data);
   const hasApiError = linhasQuery.isError || paradasQuery.isError;
@@ -136,7 +178,21 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
     ],
   );
 
-  return <RotasDataContext.Provider value={contextValue}>{children}</RotasDataContext.Provider>;
+  return (
+    <RotasDataContext.Provider value={contextValue}>
+      {TURNSTILE_SITE_KEY && !transitSession.disabled && (
+        <Turnstile
+          siteKey={TURNSTILE_SITE_KEY}
+          options={{ size: 'invisible', execution: 'render' }}
+          onSuccess={(token) => { void transitSession.onTurnstileSuccess(token); }}
+          onError={transitSession.onTurnstileError}
+          onExpire={transitSession.onTurnstileError}
+          style={{ display: 'none' }}
+        />
+      )}
+      {children}
+    </RotasDataContext.Provider>
+  );
 }
 
 export function useRotasData(): RotasDataContextData {
