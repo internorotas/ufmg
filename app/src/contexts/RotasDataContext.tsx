@@ -90,8 +90,11 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
     }
   }, [transitSession.transitToken]);
 
-  const linhasQuery = useLinhasQuery(!transitSession.disabled);
-  const paradasQuery = useParadasQuery(!transitSession.disabled);
+  // Queries JSON sempre habilitadas — /v1/linhas e /v1/paradas são públicos e têm
+  // fallback para dados locais. O binary path (fetchTransitDataBinary) complementa
+  // quando o transit token estiver disponível via Turnstile.
+  const linhasQuery = useLinhasQuery(true);
+  const paradasQuery = useParadasQuery(true);
 
   const hasApiData = Boolean(linhasQuery.data && paradasQuery.data);
   const hasApiError = linhasQuery.isError || paradasQuery.isError;
@@ -99,6 +102,10 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
 
   useEffect(() => {
     if (!linhasQuery.data || !paradasQuery.data) {
+      return;
+    }
+    // Não sobrescreve se o binary path já carregou dados mais completos
+    if (binaryLoadedRef.current) {
       return;
     }
 
