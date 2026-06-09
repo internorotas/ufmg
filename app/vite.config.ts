@@ -61,6 +61,11 @@ export default defineConfig({
     },
   },
   server: {
+    headers: {
+      // 🛡️ Sentinel: Prevent MIME type sniffing and clickjacking attacks
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
     fs: {
       // Permite que o servidor de desenvolvimento acesse o workspace e o
       // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
@@ -100,6 +105,13 @@ export default defineConfig({
           return 'vendor-misc';
         },
       },
+    },
+  },
+  preview: {
+    headers: {
+      // 🛡️ Sentinel: Prevent MIME type sniffing and clickjacking attacks in preview
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
     },
   },
 });
