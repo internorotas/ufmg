@@ -136,6 +136,9 @@ async function fetchTransit<T>(
     ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
   });
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15_000);
+
   let response: Response;
 
   try {
@@ -144,13 +147,17 @@ async function fetchTransit<T>(
       cache: 'no-store',
       credentials: 'include',
       headers,
+      signal: controller.signal,
     });
   } catch (error) {
+    clearTimeout(timeoutId);
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(
       `Não foi possível conectar ao backend (${endpoint}). Verifique se a API está ativa em ${getApiBaseUrl() || 'proxy /v1'}. Detalhe: ${detail}`,
     );
   }
+
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     if (response.status === 502) {
