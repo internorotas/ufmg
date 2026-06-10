@@ -30,21 +30,28 @@ export function RankingPage() {
   const [scope, setScope] = useState<RankingScope>('geral');
   const [publicRanking, setPublicRanking] = useState<PublicRankingResponse | null>(null);
   const [privateRanking, setPrivateRanking] = useState<AuthenticatedRankingResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [publicError, setPublicError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const isMounted = useMounted();
 
   useEffect(() => {
-    setError(null);
+    setPublicError(null);
+    setIsLoading(true);
 
     void getPublicRanking({ period, scope })
       .then((response) => {
-        if (isMounted()) setPublicRanking(response);
+        if (isMounted()) {
+          setPublicRanking(response);
+          setIsLoading(false);
+        }
       })
-      .catch((currentError) => {
-        if (isMounted())
-          setError(
-            currentError instanceof Error ? currentError.message : 'Falha ao carregar ranking.',
+      .catch((currentError: unknown) => {
+        if (isMounted()) {
+          setPublicError(
+            currentError instanceof Error ? currentError.message : 'Falha ao carregar ranking público.',
           );
+          setIsLoading(false);
+        }
       });
 
     if (!isAuthenticated) {
@@ -56,13 +63,9 @@ export function RankingPage() {
       .then((response) => {
         if (isMounted()) setPrivateRanking(response);
       })
-      .catch((currentError) => {
-        if (isMounted())
-          setError(
-            currentError instanceof Error
-              ? currentError.message
-              : 'Falha ao carregar ranking autenticado.',
-          );
+      .catch(() => {
+        // Falha no ranking autenticado não bloqueia o ranking público
+        if (isMounted()) setPrivateRanking(null);
       });
   }, [isAuthenticated, isMounted, period, scope]);
 
@@ -105,7 +108,7 @@ export function RankingPage() {
           </div>
         ) : null}
 
-        {error ? <FeedbackBanner message={error} /> : null}
+        {publicError ? <FeedbackBanner message={publicError} /> : null}
 
         <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
           <Card>
@@ -180,29 +183,37 @@ export function RankingPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {entries.map((entry, index) => (
-                <div
-                  key={`${entry.displayName}-${entry.score}`}
-                  className="flex items-center justify-between rounded-xl border border-card-border bg-background px-3 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-9 items-center justify-center rounded-full border border-card-border bg-card">
-                      {index === 0 ? (
-                        <Trophy size={16} aria-hidden="true" />
-                      ) : (
-                        <Medal size={16} aria-hidden="true" />
-                      )}
+              {isLoading ? (
+                <p className="py-4 text-center text-sm text-text-secondary">Carregando...</p>
+              ) : entries.length === 0 ? (
+                <p className="py-4 text-center text-sm text-text-secondary">
+                  Nenhuma entrada no ranking ainda.
+                </p>
+              ) : (
+                entries.map((entry, index) => (
+                  <div
+                    key={`rank-${index}`}
+                    className="flex items-center justify-between rounded-xl border border-card-border bg-background px-3 py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-9 items-center justify-center rounded-full border border-card-border bg-card">
+                        {index === 0 ? (
+                          <Trophy size={16} aria-hidden="true" />
+                        ) : (
+                          <Medal size={16} aria-hidden="true" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-text-primary">
+                          #{index + 1} {entry.displayName}
+                        </p>
+                        <p className="text-xs text-text-secondary">Pontuação pública mínima</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-text-primary">
-                        #{index + 1} {entry.displayName}
-                      </p>
-                      <p className="text-xs text-text-secondary">Pontuação pública mínima</p>
-                    </div>
+                    <Badge variant={index === 0 ? 'ouro' : 'prata'}>{entry.score} pts</Badge>
                   </div>
-                  <Badge variant={index === 0 ? 'ouro' : 'prata'}>{entry.score} pts</Badge>
-                </div>
-              ))}
+                ))
+              )}
 
               {isAuthenticated && privateRanking?.currentUser ? (
                 <div className="rounded-xl border border-info-border bg-info-bg px-4 py-3 text-sm text-info-text">
