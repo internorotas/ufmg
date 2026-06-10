@@ -7,6 +7,7 @@
 
 import L from 'leaflet';
 import React, { useMemo } from 'react';
+import { useOsrmRoute } from '../../hooks/useOsrmRoute';
 import type { Linha } from '../../types/data.types';
 import { AntPathComponent } from '../AntPathComponent';
 
@@ -31,13 +32,18 @@ const DEFAULT_ANT_PATH_OPTIONS = {
  * Usa o AntPath para criar o efeito de "formigas marchando".
  */
 export const MapRoute = React.memo(function MapRoute({ linha }: MapRouteProps) {
-  // Coordenadas memoizadas
-  const coordinates = useMemo(
-    () => (linha?.coordenadasTrajeto as L.LatLngExpression[]) || [],
+  const fallbackCoords = useMemo(
+    () => (linha?.coordenadasTrajeto ?? []) as [number, number][],
     [linha?.coordenadasTrajeto],
   );
 
-  // Opções do AntPath com a cor da linha
+  const snappedCoords = useOsrmRoute(linha?.idRota, fallbackCoords);
+
+  const coordinates = useMemo(
+    () => snappedCoords as L.LatLngExpression[],
+    [snappedCoords],
+  );
+
   const options = useMemo(
     () => ({
       ...DEFAULT_ANT_PATH_OPTIONS,
@@ -47,7 +53,6 @@ export const MapRoute = React.memo(function MapRoute({ linha }: MapRouteProps) {
     [linha?.corHex],
   );
 
-  // Não renderiza se não há linha ou coordenadas
   if (!linha || coordinates.length === 0) {
     return null;
   }
