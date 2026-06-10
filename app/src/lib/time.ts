@@ -11,7 +11,19 @@ const saoPauloFormatter = new Intl.DateTimeFormat('en-CA', {
   hour12: false,
 });
 
+// Cache for Intl.DateTimeFormat output to avoid expensive formatToParts calls.
+// Max cache size set to 1000 items to prevent unbounded memory growth.
+const cache = new Map<number, number>();
+const MAX_CACHE_SIZE = 1000;
+
 export function toSaoPauloDate(date: Date): Date {
+  const time = date.getTime();
+  const cachedTime = cache.get(time);
+
+  if (cachedTime !== undefined) {
+    return new Date(cachedTime);
+  }
+
   const parts = saoPauloFormatter.formatToParts(date);
 
   // Single pass over parts is faster than multiple find() calls
@@ -33,7 +45,15 @@ export function toSaoPauloDate(date: Date): Date {
     else if (part.type === 'second') second = Number(part.value);
   }
 
-  return new Date(year, month - 1, day, hour, minute, second);
+  const result = new Date(year, month - 1, day, hour, minute, second);
+  const resultTime = result.getTime();
+
+  if (cache.size >= MAX_CACHE_SIZE) {
+    cache.clear();
+  }
+
+  cache.set(time, resultTime);
+  return new Date(resultTime);
 }
 
 export function getSaoPauloNow(): Date {
