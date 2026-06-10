@@ -125,10 +125,25 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
     [parada.idParada, parada.linhasAtendidas, rotasService, currentTime],
   );
 
-  const linhasDisponiveis = useMemo(
-    () => linhasResolvidas.filter(({ linha }) => linha !== null),
-    [linhasResolvidas],
-  );
+  // Agrupa por nome-base da linha; exibe apenas a sublinha com menor ETA
+  const linhasDisponiveis = useMemo(() => {
+    const byNome = new Map<string, (typeof linhasResolvidas)[0]>();
+    for (const entry of linhasResolvidas) {
+      if (!entry.linha) continue;
+      const key = entry.linha.nome;
+      const existing = byNome.get(key);
+      if (!existing) {
+        byNome.set(key, entry);
+        continue;
+      }
+      const thisMin = entry.minutosFaltantes;
+      const prevMin = existing.minutosFaltantes;
+      if (thisMin !== null && (prevMin === null || thisMin < prevMin)) {
+        byNome.set(key, entry);
+      }
+    }
+    return Array.from(byNome.values());
+  }, [linhasResolvidas]);
   const totalLinhas = linhasDisponiveis.length;
   const headingId = `popup-parada-${parada.idParada}`;
   const linhasLabelId = `popup-parada-${parada.idParada}-linhas`;

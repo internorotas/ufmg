@@ -110,6 +110,7 @@ export function calcularPosicaoTeorica(
   linha: Linha,
   todasParadas: Parada[],
   agora: Date,
+  osrmCoords?: [number, number][],
 ): PosicaoTeorica | null {
   const { trajetoDetalhado, horarios, coordenadasTrajeto } = linha;
   if (!trajetoDetalhado || trajetoDetalhado.length < 2) return null;
@@ -137,9 +138,16 @@ export function calcularPosicaoTeorica(
 
   const progress = elapsedMin / duracaoTotal;
 
-  // Preferir trajeto geométrico (segue as ruas)
-  if (Array.isArray(coordenadasTrajeto) && coordenadasTrajeto.length >= 2) {
-    return interpolarNaTrajeto(coordenadasTrajeto, progress, horarioSaida, elapsedMin);
+  // Prioridade: coords OSRM passadas pelo caller > trajeto do backend > interpolação linear
+  const geomCoords =
+    (osrmCoords && osrmCoords.length >= 2)
+      ? osrmCoords
+      : Array.isArray(coordenadasTrajeto) && coordenadasTrajeto.length >= 2
+        ? (coordenadasTrajeto as [number, number][])
+        : null;
+
+  if (geomCoords) {
+    return interpolarNaTrajeto(geomCoords, progress, horarioSaida, elapsedMin);
   }
 
   // Fallback: interpolação linear entre paradas

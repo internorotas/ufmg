@@ -2,6 +2,19 @@ import { useEffect, useState } from 'react';
 import { calcularPosicaoTeorica, type PosicaoTeorica } from '@/lib/busPosition';
 import type { Linha, Parada } from '@/types/data.types';
 
+const OSRM_CACHE_KEY_PREFIX = 'osrm_route_v1_';
+const OSRM_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+function lerOsrmCache(lineId: string): [number, number][] | null {
+  try {
+    const raw = localStorage.getItem(OSRM_CACHE_KEY_PREFIX + lineId);
+    if (!raw) return null;
+    const entry = JSON.parse(raw) as { ts: number; data: [number, number][] };
+    if (Date.now() - entry.ts < OSRM_CACHE_TTL_MS && entry.data.length > 0) return entry.data;
+  } catch {}
+  return null;
+}
+
 function calcularTodasPosicoes(
   linhas: Linha[],
   todasParadas: Parada[],
@@ -9,7 +22,8 @@ function calcularTodasPosicoes(
 ): Map<string, PosicaoTeorica> {
   const mapa = new Map<string, PosicaoTeorica>();
   for (const linha of linhas) {
-    const pos = calcularPosicaoTeorica(linha, todasParadas, agora);
+    const osrm = lerOsrmCache(linha.idRota) ?? undefined;
+    const pos = calcularPosicaoTeorica(linha, todasParadas, agora, osrm);
     if (pos) mapa.set(linha.idRota, pos);
   }
   return mapa;
