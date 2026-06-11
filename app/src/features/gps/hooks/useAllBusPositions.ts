@@ -4,6 +4,8 @@ import type { Linha, Parada } from '@/types/data.types';
 
 const OSRM_CACHE_KEY_PREFIX = 'osrm_route_v2_';
 const OSRM_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+// Espelha MIN_POINTS_FOR_REAL_ROUTE de useOsrmRoute.ts.
+const MIN_POINTS_FOR_REAL_ROUTE = 30;
 
 function lerOsrmCache(lineId: string): [number, number][] | null {
   try {
@@ -22,7 +24,11 @@ function calcularTodasPosicoes(
 ): Map<string, PosicaoTeorica> {
   const mapa = new Map<string, PosicaoTeorica>();
   for (const linha of linhas) {
-    const osrm = lerOsrmCache(linha.idRota) ?? undefined;
+    // Rota real do banco (>= 30 pontos) tem prioridade — ignora OSRM.
+    const osrm =
+      linha.coordenadasTrajeto.length >= MIN_POINTS_FOR_REAL_ROUTE
+        ? undefined
+        : (lerOsrmCache(linha.idRota) ?? undefined);
     const pos = calcularPosicaoTeorica(linha, todasParadas, agora, osrm);
     if (pos) mapa.set(linha.idRota, pos);
   }
