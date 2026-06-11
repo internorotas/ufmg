@@ -55,6 +55,11 @@ function findCategoryIndex(
   );
 }
 
+export function getActiveCategoryLinhas(linhasData: CategoriaLinhas): Linha[] {
+  const idx = getInitialCategory(linhasData);
+  return linhasData.categoriasDias[idx]?.linhas ?? [];
+}
+
 function getInitialCategory(linhasData: CategoriaLinhas): number {
   if (!linhasData.categoriasDias.length) return 0;
 

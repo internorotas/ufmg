@@ -33,6 +33,7 @@ import { logout } from './features/profile/api/profileClient';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { useInactivityTimer } from './hooks/useInactivityTimer';
+import { getActiveCategoryLinhas } from './hooks/useLinhasFilter';
 import { COORDENADAS_CAMPUS } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { calcularDistanciaKm } from './lib/utils';
@@ -420,7 +421,7 @@ function AppContent() {
   }, [handleInactivityTimeout, trackEvent]);
 
   const linhasAtivas = useMemo(
-    () => linhasData?.categoriasDias?.flatMap((cat) => cat.linhas) ?? [],
+    () => (linhasData ? getActiveCategoryLinhas(linhasData) : []),
     [linhasData],
   );
 

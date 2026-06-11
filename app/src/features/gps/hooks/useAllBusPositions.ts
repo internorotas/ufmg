@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { calcularPosicaoTeorica, type PosicaoTeorica } from '@/lib/busPosition';
 import type { Linha, Parada } from '@/types/data.types';
 
-const OSRM_CACHE_KEY_PREFIX = 'osrm_route_v1_';
+const OSRM_CACHE_KEY_PREFIX = 'osrm_route_v2_';
 const OSRM_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 function lerOsrmCache(lineId: string): [number, number][] | null {

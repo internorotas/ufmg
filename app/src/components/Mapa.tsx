@@ -154,7 +154,7 @@ export function Mapa({
       <AllLinesBusMarkers
         linhas={linhasAtivas}
         todasParadas={todasParadas}
-        linhaExcluida={linhaSelecionada?.idRota ?? null}
+        linhaNumeroExcluido={linhaSelecionada?.linha ?? null}
       />
 
       {linhaSelecionada && (

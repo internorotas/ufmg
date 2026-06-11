@@ -108,7 +108,7 @@ export function GpsLiveBusMarker({ linha, todasParadas }: GpsLiveBusMarkerProps)
   const num = numLinha(linha);
 
   return (
-    <Marker ref={markerRef} position={initialPos} icon={initialIcon}>
+    <Marker ref={markerRef} position={initialPos} icon={initialIcon} zIndexOffset={1000}>
       <Popup minWidth={200}>
         <BusPopup
           linha={linha}

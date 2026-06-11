@@ -9,7 +9,7 @@ import { numLinha } from '../lib/markerUtils';
 interface AllLinesBusMarkersProps {
   linhas: Linha[];
   todasParadas: Parada[];
-  linhaExcluida?: string | null;
+  linhaNumeroExcluido?: number | null;
 }
 
 function criarIconeMini(corHex: string): L.DivIcon {
@@ -73,7 +73,7 @@ function BusMarkerPopup({ linha, pos }: BusMarkerPopupProps) {
 export function AllLinesBusMarkers({
   linhas,
   todasParadas,
-  linhaExcluida,
+  linhaNumeroExcluido,
 }: AllLinesBusMarkersProps) {
   const posicoes = useAllBusPositions(linhas, todasParadas);
   const linhaMap = new Map(linhas.map((l) => [l.idRota, l]));
@@ -81,13 +81,21 @@ export function AllLinesBusMarkers({
   return (
     <>
       {Array.from(posicoes.entries())
-        .filter(([idRota]) => idRota !== linhaExcluida)
+        .filter(([idRota]) => {
+          const l = linhaMap.get(idRota);
+          return l?.linha !== linhaNumeroExcluido;
+        })
         .map(([idRota, pos]) => {
           const linha = linhaMap.get(idRota);
           if (!linha) return null;
 
           return (
-            <Marker key={idRota} position={[pos.lat, pos.lng]} icon={criarIconeMini(linha.corHex)}>
+            <Marker
+              key={idRota}
+              position={[pos.lat, pos.lng]}
+              icon={criarIconeMini(linha.corHex)}
+              zIndexOffset={500}
+            >
               <Popup minWidth={190}>
                 <BusMarkerPopup linha={linha} pos={pos} />
               </Popup>
