@@ -167,6 +167,13 @@ function registerAppServiceWorker(): void {
   });
 
   navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type === 'sw-activated') {
+      // Fallback para controllerchange: garante reload mesmo que o evento
+      // controllerchange tenha sido perdido (ex: aba aberta antes do claim).
+      triggerSingleReloadForUpdatedServiceWorker();
+      return;
+    }
+
     if (event.data?.type === 'gps-flush-queue') {
       window.dispatchEvent(new CustomEvent('interno-rotas:gps-flush-queue'));
       return;

@@ -39,10 +39,16 @@ const NAVIGATION_DENYLIST = [
   new RegExp(`${escapeRegExp(MANIFEST_PATH)}$`),
 ];
 
-const API_CACHE_NAME = getTenantCacheName('api-v1');
-const RUNTIME_CACHE_NAME = getTenantCacheName('runtime-v1');
+// BUILD_SLUG muda a cada build (primeiros 13 chars do ISO timestamp, ex: "2026-06-11T15").
+// Isso faz o RUNTIME_CACHE_NAME mudar a cada deploy, forçando cache miss nos arquivos de
+// dados (linhas.json, paradas.json) na primeira carga pós-deploy. O activate limpa o cache
+// anterior automaticamente pois o nome antigo começa com TENANT_CACHE_PREFIX.
+const BUILD_SLUG = (import.meta.env.VITE_BUILD_ID as string | undefined)?.slice(0, 13) ?? 'dev';
 
-const LEGACY_CACHE_PREFIXES = ['api-cache-v', 'runtime-v'];
+const API_CACHE_NAME = getTenantCacheName('api-v1');
+const RUNTIME_CACHE_NAME = getTenantCacheName(`data-${BUILD_SLUG}`);
+
+const LEGACY_CACHE_PREFIXES = ['api-cache-v', 'runtime-v', 'data-'];
 
 const API_NETWORK_TIMEOUT_SECONDS = 5;
 const API_CACHE_MAX_ENTRIES = 120;
@@ -142,6 +148,13 @@ self.addEventListener('activate', (event) => {
 
       await Promise.all(cachesToDelete.map((cacheName) => caches.delete(cacheName)));
       await self.clients.claim();
+
+      // Notifica todas as abas abertas para recarregar e pegar o novo SW.
+      // Complementa o controllerchange do main.tsx como fallback.
+      const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      for (const client of allClients) {
+        client.postMessage({ type: 'sw-activated', buildSlug: BUILD_SLUG });
+      }
     })(),
   );
 });
