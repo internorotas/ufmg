@@ -233,6 +233,9 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           onChange={handleChange}
           aria-label={fallbackAriaLabel}
           enterKeyHint="search"
+          aria-keyshortcuts={
+            shortcut ? shortcut.replace('⌘', 'Meta+').replace('Ctrl', 'Control') : undefined
+          }
           className={cn(
             inputVariants({
               hasLeftIcon: true,
@@ -258,7 +261,11 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           </button>
         ) : shortcut ? (
           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 hidden md:block">
-            <kbd className="inline-flex h-5 items-center rounded border border-card-border bg-background px-1.5 text-[10px] font-medium text-text-tertiary font-mono">
+            {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: visual shortcut hint only */}
+            <kbd
+              aria-hidden="true"
+              className="inline-flex h-5 items-center rounded border border-card-border bg-background px-1.5 text-[10px] font-medium text-text-tertiary font-mono"
+            >
               {shortcut}
             </kbd>
           </div>
