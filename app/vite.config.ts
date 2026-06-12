@@ -61,12 +61,26 @@ export default defineConfig({
     },
   },
   server: {
+    headers: {
+      // 🛡️ Sentinel: Prevent MIME type sniffing
+      'X-Content-Type-Options': 'nosniff',
+      // 🛡️ Sentinel: Prevent clickjacking attacks by disallowing framing
+      'X-Frame-Options': 'DENY',
+    },
     fs: {
       // Permite que o servidor de desenvolvimento acesse o workspace e o
       // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
       // do @fontsource/poppins resolvidos via pnpm ficam fora da allow list
       // e retornam 403 no ambiente local.
       allow: ['..', '../..'],
+    },
+  },
+  preview: {
+    headers: {
+      // 🛡️ Sentinel: Prevent MIME type sniffing
+      'X-Content-Type-Options': 'nosniff',
+      // 🛡️ Sentinel: Prevent clickjacking attacks by disallowing framing
+      'X-Frame-Options': 'DENY',
     },
   },
   define: {
