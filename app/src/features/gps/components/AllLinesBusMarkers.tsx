@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import { useMemo } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import type { PosicaoTeorica } from '@/lib/busPosition';
 import { hexToRgba } from '@/lib/utils';
@@ -76,7 +77,7 @@ export function AllLinesBusMarkers({
   linhaNumeroExcluido,
 }: AllLinesBusMarkersProps) {
   const posicoes = useAllBusPositions(linhas, todasParadas);
-  const linhaMap = new Map(linhas.map((l) => [l.idRota, l]));
+  const linhaMap = useMemo(() => new Map(linhas.map((l) => [l.idRota, l])), [linhas]);
 
   return (
     <>

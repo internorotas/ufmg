@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { isLineAvailableToday } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { usePrevisaoChegada } from '../hooks/usePrevisaoChegada';
@@ -35,7 +35,11 @@ function formatarAtrasoHistorico(segundos: number | null | undefined): string | 
   return `${sinal}${minutos} min`;
 }
 
-export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBadgeProps) {
+export const PrevisaoBadge = memo(function PrevisaoBadge({
+  linha,
+  idParada,
+  compacto = false,
+}: PrevisaoBadgeProps) {
   const { trackEvent } = useAnalytics();
   const linhaVigente = isLineAvailableToday(linha.categoriaDia);
   const previsao = usePrevisaoChegada(linha, idParada);
@@ -164,4 +168,4 @@ export function PrevisaoBadge({ linha, idParada, compacto = false }: PrevisaoBad
       ) : null}
     </div>
   );
-}
+});
