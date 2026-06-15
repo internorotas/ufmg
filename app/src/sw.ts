@@ -47,12 +47,15 @@ const BUILD_SLUG = (import.meta.env.VITE_BUILD_ID as string | undefined)?.slice(
 
 const API_CACHE_NAME = getTenantCacheName('api-v1');
 const RUNTIME_CACHE_NAME = getTenantCacheName(`data-${BUILD_SLUG}`);
+const TILES_CACHE_NAME = getTenantCacheName('tiles-v1');
 
 const LEGACY_CACHE_PREFIXES = ['api-cache-v', 'runtime-v', 'data-'];
 
 const API_NETWORK_TIMEOUT_SECONDS = 5;
 const API_CACHE_MAX_ENTRIES = 120;
 const API_CACHE_MAX_AGE_SECONDS = 60 * 60;
+const TILES_CACHE_MAX_ENTRIES = 500;
+const TILES_CACHE_MAX_AGE_SECONDS = 30 * 24 * 60 * 60; // 30 dias
 
 const RUNTIME_CACHE_MAX_ENTRIES = 40;
 const RUNTIME_CACHE_MAX_AGE_SECONDS = 24 * 60 * 60;
@@ -118,6 +121,20 @@ registerRoute(
 );
 
 registerRoute(
+  ({ url }: { url: URL }) => url.hostname === 'tile.openstreetmap.org',
+  new StaleWhileRevalidate({
+    cacheName: TILES_CACHE_NAME,
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({
+        maxEntries: TILES_CACHE_MAX_ENTRIES,
+        maxAgeSeconds: TILES_CACHE_MAX_AGE_SECONDS,
+      }),
+    ],
+  }),
+);
+
+registerRoute(
   ({ url }: { url: URL }) => url.pathname.startsWith(DATA_PATH_PREFIX),
   new StaleWhileRevalidate({
     cacheName: RUNTIME_CACHE_NAME,
@@ -136,7 +153,11 @@ self.addEventListener('activate', (event) => {
     (async () => {
       const cacheNames = await caches.keys();
       const cachesToDelete = cacheNames.filter((cacheName) => {
-        if (cacheName === API_CACHE_NAME || cacheName === RUNTIME_CACHE_NAME) {
+        if (
+          cacheName === API_CACHE_NAME ||
+          cacheName === RUNTIME_CACHE_NAME ||
+          cacheName === TILES_CACHE_NAME
+        ) {
           return false;
         }
 
