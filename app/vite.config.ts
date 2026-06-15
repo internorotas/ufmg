@@ -68,6 +68,21 @@ export default defineConfig({
       // e retornam 403 no ambiente local.
       allow: ['..', '../..'],
     },
+    headers: {
+      // 🛡️ Sentinel: Adicionando cabeçalhos de segurança básicos para ambiente de dev
+      'Content-Security-Policy':
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org; connect-src 'self' ws: wss: https://*.tile.openstreetmap.org;",
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
+  },
+  preview: {
+    headers: {
+      'Content-Security-Policy':
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org; connect-src 'self' ws: wss: https://*.tile.openstreetmap.org;",
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
   },
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version),
