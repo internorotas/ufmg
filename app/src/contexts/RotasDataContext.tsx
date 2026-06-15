@@ -1,3 +1,4 @@
+import { Turnstile } from '@marsidev/react-turnstile';
 import {
   createContext,
   type ReactNode,
@@ -7,11 +8,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Turnstile } from '@marsidev/react-turnstile';
+import { useTransitSession } from '@/features/transit-data/hooks/useTransitSession';
 import { useLinhasQuery } from '@/features/transit-data/queries/useLinhasQuery';
 import { useParadasQuery } from '@/features/transit-data/queries/useParadasQuery';
-import { useTransitSession } from '@/features/transit-data/hooks/useTransitSession';
 import { useMounted } from '@/hooks/useMounted';
+import { fetchTransitDataBinary } from '@/services/api/transitApi';
 import {
   type IRotasService,
   loadRotasFallbackData,
@@ -19,7 +20,6 @@ import {
   RotasService,
   RotasServiceImpl,
 } from '@/services/RotasService';
-import { fetchTransitDataBinary } from '@/services/api/transitApi';
 import type { CategoriaLinhas, Parada } from '@/types/data.types';
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
@@ -191,7 +191,9 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
         <Turnstile
           siteKey={TURNSTILE_SITE_KEY}
           options={{ size: 'invisible', execution: 'render' }}
-          onSuccess={(token) => { void transitSession.onTurnstileSuccess(token); }}
+          onSuccess={(token) => {
+            void transitSession.onTurnstileSuccess(token);
+          }}
           onError={transitSession.onTurnstileError}
           onExpire={transitSession.onTurnstileError}
           style={{ display: 'none' }}

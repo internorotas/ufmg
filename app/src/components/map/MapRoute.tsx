@@ -39,10 +39,7 @@ export const MapRoute = React.memo(function MapRoute({ linha }: MapRouteProps) {
 
   const snappedCoords = useOsrmRoute(linha?.idRota, fallbackCoords);
 
-  const coordinates = useMemo(
-    () => snappedCoords as L.LatLngExpression[],
-    [snappedCoords],
-  );
+  const coordinates = useMemo(() => snappedCoords as L.LatLngExpression[], [snappedCoords]);
 
   const options = useMemo(
     () => ({

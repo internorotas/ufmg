@@ -48,7 +48,9 @@ export function RankingPage() {
       .catch((currentError: unknown) => {
         if (isMounted()) {
           setPublicError(
-            currentError instanceof Error ? currentError.message : 'Falha ao carregar ranking público.',
+            currentError instanceof Error
+              ? currentError.message
+              : 'Falha ao carregar ranking público.',
           );
           setIsLoading(false);
         }
@@ -192,7 +194,7 @@ export function RankingPage() {
               ) : (
                 entries.map((entry, index) => (
                   <div
-                    key={`rank-${index}`}
+                    key={entry.displayName}
                     className="flex items-center justify-between rounded-xl border border-card-border bg-background px-3 py-3"
                   >
                     <div className="flex items-center gap-3">

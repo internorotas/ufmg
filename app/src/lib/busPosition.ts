@@ -140,7 +140,7 @@ export function calcularPosicaoTeorica(
 
   // Prioridade: coords OSRM passadas pelo caller > trajeto do backend > interpolação linear
   const geomCoords =
-    (osrmCoords && osrmCoords.length >= 2)
+    osrmCoords && osrmCoords.length >= 2
       ? osrmCoords
       : Array.isArray(coordenadasTrajeto) && coordenadasTrajeto.length >= 2
         ? (coordenadasTrajeto as [number, number][])
