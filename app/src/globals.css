@@ -164,6 +164,12 @@ body,
   --gamification-gps-uncertain-bg: #fff7db;
   --gamification-gps-uncertain-border: #f7d774;
   --gamification-gps-uncertain-text: #8a5a00;
+
+  /* Neo-Brutalismo — sombras com offset pronunciado e borda sólida */
+  --neo-shadow-sm: 2px 2px 0 #1a1819;
+  --neo-shadow: 4px 4px 0 #1a1819;
+  --neo-shadow-lg: 6px 6px 0 #1a1819;
+  --neo-border: 2px solid #1a1819;
 }
 
 .dark {
@@ -678,4 +684,44 @@ body {
 .text-sm-medium {
   font-size: 15px;
   line-height: 1.4;
+}
+
+/* ============================================================================
+   NEO-BRUTALISMO UTILITIES
+   Linguagem visual: bordas sólidas pronunciadas + sombras com offset.
+   Use como complement ao design system existente — não substitua tokens.
+   Garantem WCAG AA (não alteram contraste de texto).
+   ============================================================================ */
+
+.neo-brutal {
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow);
+}
+
+.neo-brutal-sm {
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-sm);
+}
+
+.neo-brutal-lg {
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow-lg);
+}
+
+.neo-brutal-interactive {
+  border: var(--neo-border);
+  box-shadow: var(--neo-shadow);
+  transition:
+    box-shadow 0.1s ease,
+    transform 0.1s ease;
+}
+
+.neo-brutal-interactive:hover {
+  box-shadow: var(--neo-shadow-sm);
+  transform: translate(2px, 2px);
+}
+
+.neo-brutal-interactive:active {
+  box-shadow: none;
+  transform: translate(4px, 4px);
 }
