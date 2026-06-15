@@ -126,6 +126,7 @@ function AppContent() {
     isLoadingData,
     dataError,
     dataSource,
+    dataUpdatedAt,
     isOfflineDataFallback,
     linhaSelecionada,
     paradaSelecionada,
@@ -444,15 +445,9 @@ function AppContent() {
   if (!todasParadas || todasParadas.length === 0) {
     return (
       <DataStatusScreen
-        title="⚠️ Dados não encontrados"
+        title="Dados indisponíveis"
         variant="warning"
-        description={
-          <>
-            Não foi possível carregar os dados de paradas.
-            <br />
-            Verifique a integridade dos arquivos em <code>/public/data/paradas.json</code>.
-          </>
-        }
+        description="Não foi possível carregar as paradas. Verifique sua conexão ou tente novamente mais tarde."
       />
     );
   }
@@ -460,13 +455,12 @@ function AppContent() {
   if (!linhasData?.categoriasDias) {
     return (
       <DataStatusScreen
-        title="⚠️ Erro nos Dados de Linhas"
+        title="Dados indisponíveis"
         variant="warning"
         description={
           <>
-            Não foi possível carregar os dados das linhas.
-            <br />
-            Verifique a integridade dos arquivos em <code>/public/data/linhas.json</code>.
+            Não foi possível carregar as linhas. Verifique sua conexão ou tente novamente mais
+            tarde.
           </>
         }
       />
@@ -513,7 +507,11 @@ function AppContent() {
             onRegisterMenuOpen={handleRegisterMenuOpen}
             onAuthAction={handleAuthAction}
           />
-          <DataSourceBanner isVisible={isOfflineDataFallback} source={dataSource} />
+          <DataSourceBanner
+            isVisible={isOfflineDataFallback}
+            source={dataSource}
+            updatedAt={dataUpdatedAt}
+          />
           <main
             id="main-content"
             tabIndex={-1}
