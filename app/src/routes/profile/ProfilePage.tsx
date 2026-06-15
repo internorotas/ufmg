@@ -287,7 +287,7 @@ export function ProfilePage() {
         {/* Cabeçalho com avatar e nome — sempre visível */}
         <header className="flex flex-wrap items-center gap-3 rounded-xl border border-card-border bg-card px-4 py-4 shadow-sm sm:px-5">
           <div className="flex min-w-0 flex-1 items-center gap-3">
-            {profile.avatarUrl ? (
+            {profile.avatarUrl && /^https?:\/\//i.test(profile.avatarUrl) ? (
               <img
                 src={profile.avatarUrl}
                 alt={`Avatar de ${profile.displayName}`}

@@ -125,7 +125,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
 
           <div className="flex flex-col gap-4 overflow-y-auto p-4">
             <div className="flex items-center gap-3 rounded-xl border border-card-border bg-card p-3">
-              {userDisplay.avatarUrl ? (
+              {userDisplay.avatarUrl && /^https?:\/\//i.test(userDisplay.avatarUrl) ? (
                 <img
                   src={userDisplay.avatarUrl}
                   alt={`Avatar de ${userDisplay.displayName}`}
