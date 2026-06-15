@@ -276,17 +276,33 @@ export function calcularDistanciaKm(
 export function findScheduleIndex<T>(
   sortedArray: T[],
   target: number,
-  getVal: (item: T) => number = (item) => item as unknown as number,
+  getVal?: (item: T) => number,
 ): number {
+  // ⚡ Bolt Optimization:
+  // 1. Hoisted the getVal existence check out of the loop to avoid continuous branching
+  //    or executing a default fallback accessor function on every iteration.
+  // 2. Used unsigned right shift (>>> 1) instead of Math.floor for integer division,
+  //    which is faster and prevents 32-bit integer overflow.
   let left = 0;
   let right = sortedArray.length;
 
-  while (left < right) {
-    const mid = Math.floor((left + right) / 2);
-    if (getVal(sortedArray[mid]) > target) {
-      right = mid;
-    } else {
-      left = mid + 1;
+  if (getVal) {
+    while (left < right) {
+      const mid = (left + right) >>> 1;
+      if (getVal(sortedArray[mid]) > target) {
+        right = mid;
+      } else {
+        left = mid + 1;
+      }
+    }
+  } else {
+    while (left < right) {
+      const mid = (left + right) >>> 1;
+      if ((sortedArray[mid] as unknown as number) > target) {
+        right = mid;
+      } else {
+        left = mid + 1;
+      }
     }
   }
 
