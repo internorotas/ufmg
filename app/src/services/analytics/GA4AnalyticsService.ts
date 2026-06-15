@@ -94,6 +94,8 @@ export class GA4AnalyticsService implements IAnalyticsService {
       testMode: import.meta.env.MODE === 'test',
       gtagOptions: {
         debug_mode: import.meta.env.DEV,
+        // LGPD: anonimiza IP antes de enviar ao Google
+        anonymize_ip: true,
       },
     });
     this.initialized = true;
