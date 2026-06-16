@@ -1,4 +1,4 @@
-import { ArrowLeft, Info } from 'lucide-react';
+import { ArrowLeft, Info, LayoutList } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -18,11 +18,25 @@ const LinhaDetalhesModal = React.lazy(() =>
   import('@/components/LinhaDetalhesModal').then((m) => ({ default: m.LinhaDetalhesModal })),
 );
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return isDesktop;
+}
+
 export function LinhasPage() {
   const navigate = useNavigate();
   const { trackEvent, trackPageView } = useAnalytics();
   const { linhasData, todasParadas } = useRotasData();
   const { linhaSelecionada, selecionarLinha } = useRotasSelection();
+  const isDesktop = useIsDesktop();
 
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
   const [movimentoPorId, setMovimentoPorId] = useState<Record<string, 'up' | 'down'>>({});
@@ -132,6 +146,17 @@ export function LinhasPage() {
     [navigate],
   );
 
+  const handleCloseDetails = useCallback(() => {
+    if (linhaDetalhesAberta) {
+      trackEvent({
+        category: 'navigation',
+        action: 'close_line_details_modal',
+        label: linhaDetalhesAberta.nome,
+      });
+    }
+    setLinhaDetalhesAberta(null);
+  }, [linhaDetalhesAberta, trackEvent]);
+
   return (
     <div className="flex flex-1 min-h-0 flex-col overflow-hidden text-text-primary">
       {/* Header */}
@@ -165,121 +190,148 @@ export function LinhasPage() {
         onSelect={handleCategoriaChange}
       />
 
-      {/* Scrollable list */}
-      <main
-        id="linhas-main"
-        tabIndex={-1}
-        className="flex-1 overflow-y-auto bg-background p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-4"
-        aria-label="Lista de linhas"
-      >
-        {specialPeriod ? (
-          <SystemBanner
-            variant="warning"
-            icon={<Info aria-hidden="true" />}
-            title={specialPeriod.name}
-            description={
-              <>
-                <p>
-                  <Trans
-                    i18nKey="vacation.description"
-                    ns="system-banner"
-                    values={{
-                      start: specialPeriod.startDate.toLocaleDateString('pt-BR'),
-                      end: specialPeriod.endDate.toLocaleDateString('pt-BR'),
-                    }}
-                  />
-                </p>
-                {!isWeekdayToday && (
-                  <p className="mt-2 font-semibold">
-                    <Trans i18nKey="vacation.weekendWarning" ns="system-banner" />
+      {/* Two-column area */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        {/* Left: scrollable list */}
+        <main
+          id="linhas-main"
+          tabIndex={-1}
+          className="flex-1 overflow-y-auto bg-background p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-4 lg:max-w-120 lg:shrink-0 lg:border-r lg:border-card-border"
+          aria-label="Lista de linhas"
+        >
+          {specialPeriod ? (
+            <SystemBanner
+              variant="warning"
+              icon={<Info aria-hidden="true" />}
+              title={specialPeriod.name}
+              description={
+                <>
+                  <p>
+                    <Trans
+                      i18nKey="vacation.description"
+                      ns="system-banner"
+                      values={{
+                        start: specialPeriod.startDate.toLocaleDateString('pt-BR'),
+                        end: specialPeriod.endDate.toLocaleDateString('pt-BR'),
+                      }}
+                    />
                   </p>
-                )}
-              </>
+                  {!isWeekdayToday && (
+                    <p className="mt-2 font-semibold">
+                      <Trans i18nKey="vacation.weekendWarning" ns="system-banner" />
+                    </p>
+                  )}
+                </>
+              }
+            />
+          ) : null}
+
+          <SystemBanner
+            variant="info"
+            icon={<Info aria-hidden="true" />}
+            description={
+              <Trans
+                i18nKey="info.description"
+                ns="system-banner"
+                components={{ strong: <strong /> }}
+              />
             }
           />
-        ) : null}
 
-        <SystemBanner
-          variant="info"
-          icon={<Info aria-hidden="true" />}
-          description={
-            <Trans
-              i18nKey="info.description"
-              ns="system-banner"
-              components={{ strong: <strong /> }}
-            />
-          }
-        />
+          {hasFavoritas && (
+            <section aria-label="Linhas favoritas">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+                Favoritas
+              </p>
+              {linhasFavoritas.map((linha) => (
+                <div
+                  key={linha.idRota}
+                  className={
+                    movimentoPorId[linha.idRota] === 'up'
+                      ? 'motion-safe:animate-line-favorite-up'
+                      : ''
+                  }
+                >
+                  <LineCard
+                    linha={linha}
+                    onClick={handleFavoritaClick}
+                    onDetailsClick={handleDetailsClick}
+                    isSelected={linhaSelecionada?.idRota === linha.idRota}
+                    isFavorita={true}
+                  />
+                </div>
+              ))}
+              <div className="mb-3 mt-1 border-b border-card-border" aria-hidden="true" />
+            </section>
+          )}
 
-        {hasFavoritas && (
-          <section aria-label="Linhas favoritas">
+          {hasFavoritas && hasRegularResults && (
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
-              Favoritas
+              Todas as Linhas
             </p>
-            {linhasFavoritas.map((linha) => (
-              <div
-                key={linha.idRota}
-                className={
-                  movimentoPorId[linha.idRota] === 'up'
-                    ? 'motion-safe:animate-line-favorite-up'
-                    : ''
-                }
-              >
-                <LineCard
-                  linha={linha}
-                  onClick={handleFavoritaClick}
-                  onDetailsClick={handleDetailsClick}
-                  isSelected={linhaSelecionada?.idRota === linha.idRota}
-                  isFavorita={true}
-                />
-              </div>
-            ))}
-            <div className="mb-3 mt-1 border-b border-card-border" aria-hidden="true" />
-          </section>
-        )}
+          )}
 
-        {hasFavoritas && hasRegularResults && (
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
-            Todas as Linhas
-          </p>
-        )}
+          {hasRegularResults
+            ? linhasRegulares.map((linha) => (
+                <div
+                  key={linha.idRota}
+                  className={
+                    movimentoPorId[linha.idRota] === 'down'
+                      ? 'motion-safe:animate-line-favorite-down'
+                      : ''
+                  }
+                >
+                  <LineCard
+                    linha={linha}
+                    onClick={handleLinhaClick}
+                    onDetailsClick={handleDetailsClick}
+                    isSelected={linhaSelecionada?.idRota === linha.idRota}
+                    isFavorita={false}
+                  />
+                </div>
+              ))
+            : !hasFavoritas && (
+                <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
+              )}
+        </main>
 
-        {hasRegularResults
-          ? linhasRegulares.map((linha) => (
-              <div
-                key={linha.idRota}
-                className={
-                  movimentoPorId[linha.idRota] === 'down'
-                    ? 'motion-safe:animate-line-favorite-down'
-                    : ''
-                }
-              >
-                <LineCard
-                  linha={linha}
-                  onClick={handleLinhaClick}
-                  onDetailsClick={handleDetailsClick}
-                  isSelected={linhaSelecionada?.idRota === linha.idRota}
-                  isFavorita={false}
+        {/* Right: inline details panel (desktop only) */}
+        {isDesktop && (
+          <aside className="flex flex-1 flex-col overflow-hidden bg-background border-l border-card-border">
+            {linhaDetalhesAberta ? (
+              <Suspense fallback={null}>
+                <LinhaDetalhesModal
+                  inline
+                  isOpen={true}
+                  onClose={handleCloseDetails}
+                  linha={linhaDetalhesAberta}
+                  todasParadas={todasParadas}
+                  onParadaClick={handleParadaClick}
                 />
+              </Suspense>
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
+                <div className="flex size-14 items-center justify-center rounded-(--shape-lg) bg-background-secondary text-text-tertiary">
+                  <LayoutList size={24} aria-hidden="true" />
+                </div>
+                <p className="text-sm font-medium text-text-secondary">
+                  Selecione uma linha para ver itinerário e horários
+                </p>
+                <p className="text-xs text-text-tertiary">
+                  Clique em "Detalhes" em qualquer linha da lista
+                </p>
               </div>
-            ))
-          : !hasFavoritas && (
-              <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
             )}
-      </main>
+          </aside>
+        )}
+      </div>
 
-      {linhaDetalhesAberta && (
+      {/* Mobile: overlay modal */}
+      {!isDesktop && linhaDetalhesAberta && (
         <Suspense fallback={null}>
           <LinhaDetalhesModal
             isOpen={true}
-            onClose={() => {
-              trackEvent({
-                category: 'navigation',
-                action: 'close_line_details_modal',
-                label: linhaDetalhesAberta.nome,
-              });
-              setLinhaDetalhesAberta(null);
-            }}
+            onClose={handleCloseDetails}
             linha={linhaDetalhesAberta}
             todasParadas={todasParadas}
             onParadaClick={handleParadaClick}

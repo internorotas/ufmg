@@ -12,6 +12,7 @@ import {
   Map as MapIcon,
   MapPin,
   Route,
+  X,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,37 +36,22 @@ import { Modal } from './Modal';
 import { FeedbackBanner } from './ui/FeedbackBanner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
 
-/**
- * Variantes do container do título
- */
 export const titleContainerVariants = tv({
   base: 'flex items-center gap-3',
 });
 
-/**
- * Variantes do ícone do título
- */
 export const titleIconVariants = tv({
   base: ['flex size-12 shrink-0 items-center justify-center neo-brutal-sm'],
 });
 
-/**
- * Variantes do botão de parada
- */
 export const stopButtonVariants = tv({
   base: 'group flex w-full items-start gap-3 rounded px-2 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
 });
 
-/**
- * Variantes do container do ícone de parada
- */
 export const stopIconContainerVariants = tv({
   base: ['relative z-10 mt-0.5 shrink-0', 'flex size-6 items-center justify-center rounded'],
 });
 
-/**
- * Variantes do card de horário
- */
 export const scheduleCardVariants = tv({
   base: 'rounded border bg-card p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
   variants: {
@@ -81,9 +67,6 @@ export const scheduleCardVariants = tv({
   },
 });
 
-/**
- * Variantes do card de informação
- */
 export const infoCardVariants = tv({
   base: ['neo-brutal-sm p-4 text-center text-sm', 'bg-card'],
 });
@@ -94,6 +77,8 @@ export interface LinhaDetalhesModalProps {
   linha: Linha;
   todasParadas: Parada[];
   onParadaClick: (parada: Parada) => void;
+  /** Renderiza como painel inline em vez de overlay modal */
+  inline?: boolean;
 }
 
 type TabType = 'itinerario' | 'horarios';
@@ -155,10 +140,6 @@ function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
   );
 }
 
-/**
- * Linha do itinerário memoizada: cada parada só recalcula quando sua previsão muda.
- * Substitui o IIFE inline que executava calcularPrevisaoChegada sem cache a cada render.
- */
 interface ParadaItinerarioRowProps {
   parada: Parada;
   linha: Linha;
@@ -288,7 +269,6 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
         </div>
       </button>
 
-      {/* Botão de alarme — mínimo 44px de touch target */}
       {bellVisible && (
         <button
           type="button"
@@ -340,26 +320,13 @@ function getAllLineSchedules(linha: Linha): string[] {
     .sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
 }
 
-/**
- * Modal que exibe informações detalhadas sobre uma linha de ônibus.
- *
- * @example
- * ```tsx
- * <LinhaDetalhesModal
- *   isOpen={true}
- *   onClose={() => setOpen(false)}
- *   linha={linhaData}
- *   todasParadas={paradasData}
- *   onParadaClick={(parada) => focusOnMap(parada)}
- * />
- * ```
- */
 export function LinhaDetalhesModal({
   isOpen,
   onClose,
   linha,
   todasParadas,
   onParadaClick,
+  inline = false,
 }: LinhaDetalhesModalProps) {
   const { t } = useTranslation('line-details');
   const [tabAtiva, setTabAtiva] = useState<TabType>('itinerario');
@@ -368,9 +335,9 @@ export function LinhaDetalhesModal({
   useSessionTiming(`Linha: ${linha.nome}`, 'engagement');
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen && !inline) return;
     trackPageView(`/modal/linha-detalhes/${linha.idRota}`);
-  }, [isOpen, linha.idRota, trackPageView]);
+  }, [isOpen, inline, linha.idRota, trackPageView]);
 
   const now = useCurrentTime();
   const currentMinutes = getSaoPauloMinutesOfDay(now);
@@ -436,224 +403,241 @@ export function LinhaDetalhesModal({
     [trackEvent, onParadaClick, onClose, linha.nome],
   );
 
+  const titleNode = (
+    <div className={titleContainerVariants()}>
+      <div
+        className={cn(titleIconVariants(), 'border')}
+        style={{
+          backgroundColor: hexToRgba(linha.corHex, 0.12),
+          borderColor: hexToRgba(linha.corHex, 0.24),
+        }}
+      >
+        <Bus size={24} className="drop-shadow-sm" style={{ color: linha.corHex }} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <h2 className="truncate text-lg font-bold leading-tight text-text-primary">{linha.nome}</h2>
+        {linha.sublinha && (
+          <p className="mt-0.5 truncate text-xs text-text-secondary">{linha.sublinha}</p>
+        )}
+      </div>
+    </div>
+  );
+
+  const tabsNode = (
+    <Tabs value={tabAtiva} onValueChange={(value) => handleTabChange(value as TabType)}>
+      <TabsList
+        variant="underline"
+        className="mb-6"
+        aria-label={t('title.description', { titleLabel })}
+      >
+        <TabsTrigger
+          value="itinerario"
+          className="min-h-11"
+          style={{ '--line-color': linha.corHex } as React.CSSProperties}
+        >
+          <MapIcon size={20} aria-hidden="true" />
+          {t('tabs.itinerary')}
+        </TabsTrigger>
+        <TabsTrigger
+          value="horarios"
+          className="min-h-11"
+          style={{ '--line-color': linha.corHex } as React.CSSProperties}
+        >
+          <Clock size={20} aria-hidden="true" />
+          {t('tabs.schedules')}
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="itinerario" data-slot="itinerary-tab" className="relative">
+        <section className="mb-4 space-y-2" aria-label="Mini-mapa do itinerário">
+          <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+            <Route size={16} style={{ color: linha.corHex }} aria-hidden="true" />
+            {t('miniMap.title')}
+          </div>
+          <MiniRouteMap linha={linha} paradas={paradasDoItinerario} />
+        </section>
+
+        {paradasDoItinerario.length > 0 ? (
+          <div className="relative">
+            {paradasDoItinerario.map((parada, idx) => {
+              const isLast = idx === paradasDoItinerario.length - 1;
+              return (
+                <div key={parada.idParada} className="relative flex">
+                  {!isLast && (
+                    <div
+                      className="absolute left-5 top-7 h-full w-0.5"
+                      style={{
+                        backgroundColor: hexToRgba(linha.corHex, 0.25),
+                        backgroundImage: `repeating-linear-gradient(0deg, ${hexToRgba(linha.corHex, 0.25)}, ${hexToRgba(linha.corHex, 0.25)} 6px, transparent 6px, transparent 12px)`,
+                      }}
+                    />
+                  )}
+                  <ParadaItinerarioRow
+                    parada={parada}
+                    linha={linha}
+                    isFirst={idx === 0}
+                    isLast={isLast}
+                    onClick={handleParadaClick}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="py-8 text-center text-text-secondary">
+            <p>{t('itinerary.empty')}</p>
+          </div>
+        )}
+
+        <div className={cn(infoCardVariants(), 'mt-6')}>
+          <p className="text-text-secondary">{t('itinerary.tip')}</p>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="horarios" data-slot="schedules-tab" className="space-y-6">
+        {!isLineRunningToday && (
+          <div data-slot="not-running-notice" className="neo-brutal-sm bg-warning-bg p-4">
+            <div className="flex items-center gap-3">
+              <AlertTriangle size={24} className="shrink-0 text-warning-text" />
+              <p className="text-sm font-medium text-warning-text">
+                {t('lineNotRunning.warning', { text: statusLinha.texto })}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {isLineRunningToday && proximoHorario && (
+          <section
+            data-slot="next-schedule-highlight"
+            className="neo-brutal p-4"
+            style={{ borderColor: hexToRgba(linha.corHex, 0.32) }}
+          >
+            <p className="text-xs font-semibold tracking-wide text-text-secondary uppercase">
+              {t('schedules.nextHighlight')}
+            </p>
+            <div className="mt-2 flex items-end justify-between gap-3">
+              <span
+                className="font-bold text-[clamp(2.25rem,8vw,3rem)] leading-none tabular-nums"
+                style={{ color: linha.corHex }}
+              >
+                {proximoHorario.horario}
+              </span>
+              <span
+                className="rounded px-2.5 py-1 text-xs font-semibold"
+                style={{ backgroundColor: hexToRgba(linha.corHex, 0.12), color: linha.corHex }}
+              >
+                {t('schedules.nextBadge')}
+              </span>
+            </div>
+          </section>
+        )}
+
+        {isLineRunningToday && horariosSeguintes.length > 0 && (
+          <section data-slot="next-schedules-list" aria-label={t('schedules.nextListTitle')}>
+            <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-text-primary">
+              <Clock size={18} aria-hidden="true" style={{ color: linha.corHex }} />
+              {t('schedules.nextListTitle')}
+            </h3>
+            <ul className="space-y-2">
+              {horariosSeguintes.map(({ horario, id }) => (
+                <li key={`seguinte-${id}`}>
+                  <button
+                    type="button"
+                    aria-label={t('a11y.nextTime', { horario })}
+                    onClick={() => handleHorarioClick(horario)}
+                    className="flex min-h-11 w-full items-center justify-between rounded border border-card-border px-3 py-2 text-left transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                  >
+                    <span className="text-sm text-text-secondary">{t('schedules.departure')}</span>
+                    <span className="text-base font-semibold tabular-nums text-text-primary">
+                      {horario}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {isLineRunningToday && !proximoHorario && (
+          <div className="neo-brutal bg-neutral-bg p-4 text-sm text-neutral-text">
+            {t('schedules.noFuture')}
+          </div>
+        )}
+
+        {isLineRunningToday && passados.length > 0 && (
+          <div data-slot="passed-schedules">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+              <Clock size={20} />
+              {t('schedules.pastTitle', { count: passados.length })}
+            </h3>
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+              {passados.map(({ horario, id }) => (
+                <button
+                  type="button"
+                  key={`passado-${id}`}
+                  aria-label={t('a11y.pastTime', { horario })}
+                  onClick={() => handleHorarioClick(horario)}
+                  className={scheduleCardVariants({ status: 'passed' })}
+                >
+                  <p className="text-lg font-semibold text-text-secondary">{horario}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!isLineRunningToday && (
+          <div data-slot="all-schedules">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
+              <Clock size={20} />
+              {t('schedules.allTitle', { count: todos.length })}
+            </h3>
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+              {todos.map(({ horario, id }) => (
+                <div key={`horario-${id}`} className={scheduleCardVariants({ status: 'passed' })}>
+                  <p className="text-lg font-semibold text-text-secondary">{horario}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div data-slot="summary" className={infoCardVariants()}>
+          <p className="text-text-secondary">{t('schedules.summary', { count: todos.length })}</p>
+        </div>
+      </TabsContent>
+    </Tabs>
+  );
+
+  if (inline) {
+    return (
+      <section className="flex h-full flex-col overflow-hidden" aria-label={titleLabel}>
+        <div className="flex shrink-0 items-center justify-between border-b border-card-border bg-background-secondary px-4 py-3">
+          {titleNode}
+          <button
+            type="button"
+            onClick={onClose}
+            className="ml-2 shrink-0 rounded-lg p-1.5 text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            aria-label="Fechar detalhes da linha"
+          >
+            <X size={18} aria-hidden="true" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">{tabsNode}</div>
+      </section>
+    );
+  }
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       titleLabel={t('title.aria', { titleLabel })}
       description={t('title.description', { titleLabel })}
-      title={
-        <div className={titleContainerVariants()}>
-          <div
-            className={cn(titleIconVariants(), 'border')}
-            style={{
-              backgroundColor: hexToRgba(linha.corHex, 0.12),
-              borderColor: hexToRgba(linha.corHex, 0.24),
-            }}
-          >
-            <Bus size={24} className="drop-shadow-sm" style={{ color: linha.corHex }} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="truncate text-lg font-bold leading-tight text-text-primary">
-              {linha.nome}
-            </h2>
-            {linha.sublinha && (
-              <p className="mt-0.5 truncate text-xs text-text-secondary">{linha.sublinha}</p>
-            )}
-          </div>
-        </div>
-      }
+      title={titleNode}
       size="2xl"
     >
-      <Tabs value={tabAtiva} onValueChange={(value) => handleTabChange(value as TabType)}>
-        <TabsList
-          variant="underline"
-          className="mb-6"
-          aria-label={t('title.description', { titleLabel })}
-        >
-          <TabsTrigger
-            value="itinerario"
-            className="min-h-11"
-            style={{ '--line-color': linha.corHex } as React.CSSProperties}
-          >
-            <MapIcon size={20} aria-hidden="true" />
-            {t('tabs.itinerary')}
-          </TabsTrigger>
-          <TabsTrigger
-            value="horarios"
-            className="min-h-11"
-            style={{ '--line-color': linha.corHex } as React.CSSProperties}
-          >
-            <Clock size={20} aria-hidden="true" />
-            {t('tabs.schedules')}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="itinerario" data-slot="itinerary-tab" className="relative">
-          <section className="mb-4 space-y-2" aria-label="Mini-mapa do itinerário">
-            <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-              <Route size={16} style={{ color: linha.corHex }} aria-hidden="true" />
-              {t('miniMap.title')}
-            </div>
-            <MiniRouteMap linha={linha} paradas={paradasDoItinerario} />
-          </section>
-
-          {paradasDoItinerario.length > 0 ? (
-            <div className="relative">
-              {paradasDoItinerario.map((parada, idx) => {
-                const isLast = idx === paradasDoItinerario.length - 1;
-                return (
-                  <div key={parada.idParada} className="relative flex">
-                    {!isLast && (
-                      <div
-                        className="absolute left-5 top-7 h-full w-0.5"
-                        style={{
-                          backgroundColor: hexToRgba(linha.corHex, 0.25),
-                          backgroundImage: `repeating-linear-gradient(0deg, ${hexToRgba(linha.corHex, 0.25)}, ${hexToRgba(linha.corHex, 0.25)} 6px, transparent 6px, transparent 12px)`,
-                        }}
-                      />
-                    )}
-                    <ParadaItinerarioRow
-                      parada={parada}
-                      linha={linha}
-                      isFirst={idx === 0}
-                      isLast={isLast}
-                      onClick={handleParadaClick}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="py-8 text-center text-text-secondary">
-              <p>{t('itinerary.empty')}</p>
-            </div>
-          )}
-
-          <div className={cn(infoCardVariants(), 'mt-6')}>
-            <p className="text-text-secondary">{t('itinerary.tip')}</p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="horarios" data-slot="schedules-tab" className="space-y-6">
-          {/* Aviso quando a linha não está circulando */}
-          {!isLineRunningToday && (
-            <div data-slot="not-running-notice" className="neo-brutal-sm bg-warning-bg p-4">
-              <div className="flex items-center gap-3">
-                <AlertTriangle size={24} className="shrink-0 text-warning-text" />
-                <p className="text-sm font-medium text-warning-text">
-                  {t('lineNotRunning.warning', { text: statusLinha.texto })}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {isLineRunningToday && proximoHorario && (
-            <section
-              data-slot="next-schedule-highlight"
-              className="neo-brutal p-4"
-              style={{ borderColor: hexToRgba(linha.corHex, 0.32) }}
-            >
-              <p className="text-xs font-semibold tracking-wide text-text-secondary uppercase">
-                {t('schedules.nextHighlight')}
-              </p>
-              <div className="mt-2 flex items-end justify-between gap-3">
-                <span
-                  className="font-bold text-[clamp(2.25rem,8vw,3rem)] leading-none tabular-nums"
-                  style={{ color: linha.corHex }}
-                >
-                  {proximoHorario.horario}
-                </span>
-                <span
-                  className="rounded px-2.5 py-1 text-xs font-semibold"
-                  style={{ backgroundColor: hexToRgba(linha.corHex, 0.12), color: linha.corHex }}
-                >
-                  {t('schedules.nextBadge')}
-                </span>
-              </div>
-            </section>
-          )}
-
-          {isLineRunningToday && horariosSeguintes.length > 0 && (
-            <section data-slot="next-schedules-list" aria-label={t('schedules.nextListTitle')}>
-              <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-text-primary">
-                <Clock size={18} aria-hidden="true" style={{ color: linha.corHex }} />
-                {t('schedules.nextListTitle')}
-              </h3>
-              <ul className="space-y-2">
-                {horariosSeguintes.map(({ horario, id }) => (
-                  <li key={`seguinte-${id}`}>
-                    <button
-                      type="button"
-                      aria-label={t('a11y.nextTime', { horario })}
-                      onClick={() => handleHorarioClick(horario)}
-                      className="flex min-h-11 w-full items-center justify-between rounded border border-card-border px-3 py-2 text-left transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-                    >
-                      <span className="text-sm text-text-secondary">
-                        {t('schedules.departure')}
-                      </span>
-                      <span className="text-base font-semibold tabular-nums text-text-primary">
-                        {horario}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {isLineRunningToday && !proximoHorario && (
-            <div className="neo-brutal bg-neutral-bg p-4 text-sm text-neutral-text">
-              {t('schedules.noFuture')}
-            </div>
-          )}
-
-          {/* Horários passados só aparecem quando a linha está vigente */}
-          {isLineRunningToday && passados.length > 0 && (
-            <div data-slot="passed-schedules">
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
-                <Clock size={20} />
-                {t('schedules.pastTitle', { count: passados.length })}
-              </h3>
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {passados.map(({ horario, id }) => (
-                  <button
-                    type="button"
-                    key={`passado-${id}`}
-                    aria-label={t('a11y.pastTime', { horario })}
-                    onClick={() => handleHorarioClick(horario)}
-                    className={scheduleCardVariants({ status: 'passed' })}
-                  >
-                    <p className="text-lg font-semibold text-text-secondary">{horario}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Linha não vigente hoje: exibe somente os horários da própria linha */}
-          {!isLineRunningToday && (
-            <div data-slot="all-schedules">
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-text-secondary">
-                <Clock size={20} />
-                {t('schedules.allTitle', { count: todos.length })}
-              </h3>
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-                {todos.map(({ horario, id }) => (
-                  <div key={`horario-${id}`} className={scheduleCardVariants({ status: 'passed' })}>
-                    <p className="text-lg font-semibold text-text-secondary">{horario}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Resumo */}
-          <div data-slot="summary" className={infoCardVariants()}>
-            <p className="text-text-secondary">{t('schedules.summary', { count: todos.length })}</p>
-          </div>
-        </TabsContent>
-      </Tabs>
+      {tabsNode}
     </Modal>
   );
 }

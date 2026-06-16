@@ -95,39 +95,48 @@ export function RankingPage() {
   const isMounted = useMounted();
 
   useEffect(() => {
-    setPublicError(null);
-    setIsLoading(true);
+    const fetchAll = () => {
+      setPublicError(null);
+      setIsLoading(true);
 
-    void getPublicRanking({ period, scope })
-      .then((response) => {
-        if (isMounted()) {
-          setPublicRanking(response);
-          setIsLoading(false);
-        }
-      })
-      .catch((currentError: unknown) => {
-        if (isMounted()) {
-          setPublicError(
-            currentError instanceof Error
-              ? currentError.message
-              : 'Falha ao carregar ranking público.',
-          );
-          setIsLoading(false);
-        }
-      });
+      void getPublicRanking({ period, scope })
+        .then((response) => {
+          if (isMounted()) {
+            setPublicRanking(response);
+            setIsLoading(false);
+          }
+        })
+        .catch((currentError: unknown) => {
+          if (isMounted()) {
+            setPublicError(
+              currentError instanceof Error
+                ? currentError.message
+                : 'Falha ao carregar ranking público.',
+            );
+            setIsLoading(false);
+          }
+        });
 
-    if (!isAuthenticated) {
-      setPrivateRanking(null);
-      return;
-    }
+      if (!isAuthenticated) {
+        setPrivateRanking(null);
+        return;
+      }
 
-    void getAuthenticatedRanking({ period, scope })
-      .then((response) => {
-        if (isMounted()) setPrivateRanking(response);
-      })
-      .catch(() => {
-        if (isMounted()) setPrivateRanking(null);
-      });
+      void getAuthenticatedRanking({ period, scope })
+        .then((response) => {
+          if (isMounted()) setPrivateRanking(response);
+        })
+        .catch(() => {
+          if (isMounted()) setPrivateRanking(null);
+        });
+    };
+
+    fetchAll();
+
+    if (!isAuthenticated) return;
+
+    const id = setInterval(fetchAll, 60_000);
+    return () => clearInterval(id);
   }, [isAuthenticated, isMounted, period]);
 
   const entries = useMemo(() => {
