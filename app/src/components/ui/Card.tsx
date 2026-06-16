@@ -14,23 +14,30 @@ import { cn } from '../../lib/utils';
  * Variantes do card root
  */
 export const cardVariants = tv({
-  base: ['rounded-xl border bg-card text-text-primary', 'transition-all duration-200'],
+  base: [
+    'rounded bg-card text-text-primary',
+    'border-2 border-[var(--neo-color)]',
+    'transition-[box-shadow,transform] duration-100',
+  ],
   variants: {
     variant: {
-      default: 'border-card-border shadow-sm',
-      elevated: 'border-card-border shadow-md hover:shadow-lg',
-      outline: 'border-card-border bg-transparent',
-      ghost: 'border-transparent bg-transparent shadow-none',
+      default: 'shadow-[4px_4px_0_var(--neo-color)]',
+      elevated: [
+        'shadow-[6px_6px_0_var(--neo-color)]',
+        'hover:-translate-x-px hover:-translate-y-px hover:shadow-[7px_7px_0_var(--neo-color)]',
+      ],
+      outline: 'bg-transparent shadow-[4px_4px_0_var(--neo-color)]',
+      ghost: 'border-transparent shadow-none',
       interactive: [
-        'border-card-border shadow-sm cursor-pointer',
-        'hover:border-info-border hover:shadow-md',
-        'active:scale-[0.99]',
+        'cursor-pointer shadow-[4px_4px_0_var(--neo-color)]',
+        'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_var(--neo-color)]',
+        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0_var(--neo-color)]',
       ],
     },
     selected: {
       true: [
-        'border-2 border-internoRotas-azul-eletrico shadow-lg',
-        'ring-1 ring-internoRotas-azul-eletrico/20',
+        'border-[3px] border-[var(--color-brand-primary)]',
+        'shadow-[4px_4px_0_var(--color-brand-primary)]',
       ],
       false: '',
     },

@@ -15,9 +15,9 @@ import { cn } from '../../lib/utils';
  */
 export const badgeVariants = tv({
   base: [
-    'inline-flex items-center justify-center gap-1 rounded-full',
-    'font-semibold whitespace-nowrap border',
-    'transition-colors duration-150',
+    'inline-flex items-center justify-center gap-1 rounded-sm',
+    'font-bold whitespace-nowrap border-2 border-[var(--neo-color)]',
+    'transition-[box-shadow,transform] duration-100',
   ],
   variants: {
     variant: {
@@ -79,7 +79,13 @@ export const badgeVariants = tv({
       lg: 'h-8 px-3 text-sm',
     },
     clickable: {
-      true: 'cursor-pointer hover:opacity-80 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1',
+      true: [
+        'cursor-pointer',
+        'shadow-[2px_2px_0_var(--neo-color)]',
+        'hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_var(--neo-color)]',
+        'active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_var(--neo-color)]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1',
+      ],
       false: '',
     },
   },

@@ -58,7 +58,9 @@ export const dialogBackdropVariants = tv({
 export const dialogPopupVariants = tv({
   base: [
     'relative flex max-h-[90dvh] w-full flex-col',
-    'rounded-xl border border-card-border bg-modal text-text-primary shadow-2xl',
+    'rounded bg-modal text-text-primary',
+    'border-2 border-[var(--neo-color)]',
+    'shadow-[8px_8px_0_var(--neo-color)]',
     'data-[state=open]:animate-modal-in',
     'data-[state=closed]:animate-modal-out',
   ],
@@ -99,9 +101,12 @@ export const dialogDescriptionVariants = tv({
  */
 export const dialogCloseVariants = tv({
   base: [
-    'inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2',
-    'text-text-secondary transition-colors cursor-pointer',
-    'hover:bg-card hover:text-text-primary',
+    'inline-flex min-h-11 min-w-11 items-center justify-center rounded p-2',
+    'text-text-secondary cursor-pointer',
+    'border-2 border-[var(--neo-color)] shadow-[2px_2px_0_var(--neo-color)]',
+    'transition-[box-shadow,transform] duration-100',
+    'hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_var(--neo-color)] hover:bg-card hover:text-text-primary',
+    'active:translate-x-px active:translate-y-px active:shadow-none',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   ],
 });

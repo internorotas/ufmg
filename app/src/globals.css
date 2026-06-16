@@ -166,10 +166,14 @@ body,
   --gamification-gps-uncertain-text: #8a5a00;
 
   /* Neo-Brutalismo — sombras com offset pronunciado e borda sólida */
-  --neo-shadow-sm: 2px 2px 0 #1a1819;
-  --neo-shadow: 4px 4px 0 #1a1819;
-  --neo-shadow-lg: 6px 6px 0 #1a1819;
-  --neo-border: 2px solid #1a1819;
+  --neo-color: #1a1819;
+  --neo-shadow-sm: 2px 2px 0 var(--neo-color);
+  --neo-shadow: 4px 4px 0 var(--neo-color);
+  --neo-shadow-lg: 6px 6px 0 var(--neo-color);
+  --neo-shadow-xl: 8px 8px 0 var(--neo-color);
+  --neo-border: 2px solid var(--neo-color);
+  --neo-border-color: var(--neo-color);
+  --neo-radius: 4px;
 }
 
 .dark {
@@ -250,6 +254,9 @@ body,
   --gamification-gps-uncertain-bg: #422006;
   --gamification-gps-uncertain-border: #a16207;
   --gamification-gps-uncertain-text: #fef08a;
+
+  /* Neo-Brutalismo dark mode — sombras claras sobre fundo escuro */
+  --neo-color: #e8e4e3;
 }
 
 /* Global Reset & Typography */
@@ -696,32 +703,36 @@ body {
 .neo-brutal {
   border: var(--neo-border);
   box-shadow: var(--neo-shadow);
+  border-radius: var(--neo-radius);
 }
 
 .neo-brutal-sm {
   border: var(--neo-border);
   box-shadow: var(--neo-shadow-sm);
+  border-radius: var(--neo-radius);
 }
 
 .neo-brutal-lg {
   border: var(--neo-border);
   box-shadow: var(--neo-shadow-lg);
+  border-radius: var(--neo-radius);
 }
 
 .neo-brutal-interactive {
   border: var(--neo-border);
   box-shadow: var(--neo-shadow);
+  border-radius: var(--neo-radius);
   transition:
-    box-shadow 0.1s ease,
-    transform 0.1s ease;
+    box-shadow 0.08s ease,
+    transform 0.08s ease;
 }
 
 .neo-brutal-interactive:hover {
-  box-shadow: var(--neo-shadow-sm);
-  transform: translate(2px, 2px);
+  box-shadow: var(--neo-shadow-lg);
+  transform: translate(-2px, -2px);
 }
 
 .neo-brutal-interactive:active {
-  box-shadow: none;
-  transform: translate(4px, 4px);
+  box-shadow: var(--neo-shadow-sm);
+  transform: translate(2px, 2px);
 }

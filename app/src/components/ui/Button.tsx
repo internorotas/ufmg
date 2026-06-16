@@ -15,38 +15,35 @@ import { cn } from '../../lib/utils';
  */
 export const buttonVariants = tv({
   base: [
-    'inline-flex items-center justify-center gap-2 rounded-lg',
-    'font-semibold transition-all duration-150 ease-out cursor-pointer',
+    'inline-flex items-center justify-center gap-2 rounded',
+    'font-bold transition-[box-shadow,transform] duration-100 ease-out cursor-pointer',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     'disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed',
-    'active:scale-[0.97] hover:brightness-105',
+    'border-2 border-[var(--neo-color)]',
+    'shadow-[3px_3px_0_var(--neo-color)]',
+    'hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_var(--neo-color)]',
+    'active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_var(--neo-color)]',
   ],
   variants: {
     variant: {
-      primary: [
-        'bg-brand-primary text-text-inverse shadow-sm',
-        'hover:bg-brand-primary/90 focus-visible:ring-brand-primary',
-      ],
-      secondary: [
-        'bg-brand-accent text-text-inverse shadow-sm',
-        'hover:bg-brand-accent/90 focus-visible:ring-brand-accent',
-      ],
-      success: [
-        'bg-success-border text-text-inverse shadow-sm',
-        'hover:bg-success-border/90 focus-visible:ring-success-border',
-      ],
-      danger: ['bg-red-600 text-white shadow-sm', 'hover:bg-red-500 focus-visible:ring-red-500'],
+      primary: ['bg-brand-primary text-text-inverse', 'focus-visible:ring-brand-primary'],
+      secondary: ['bg-brand-accent text-text-inverse', 'focus-visible:ring-brand-accent'],
+      success: ['bg-success-border text-text-inverse', 'focus-visible:ring-success-border'],
+      danger: ['bg-red-600 text-white', 'focus-visible:ring-red-500'],
       ghost: [
+        'bg-transparent text-text-primary border-transparent',
+        'shadow-none hover:shadow-none hover:bg-card-hover hover:border-[var(--neo-color)] hover:shadow-[3px_3px_0_var(--neo-color)]',
+        'active:translate-x-0.5 active:translate-y-0.5',
+        'focus-visible:ring-brand-primary',
+      ],
+      outline: [
         'bg-transparent text-text-primary',
         'hover:bg-card-hover focus-visible:ring-brand-primary',
       ],
-      outline: [
-        'border border-card-border bg-transparent text-text-primary',
-        'hover:bg-card-hover hover:border-neutral-border focus-visible:ring-brand-primary',
-      ],
       link: [
         'bg-transparent text-internoRotas-azul-eletrico underline-offset-4',
-        'hover:underline focus-visible:ring-brand-primary',
+        'border-transparent shadow-none hover:shadow-none hover:underline hover:-translate-x-0 hover:-translate-y-0',
+        'focus-visible:ring-brand-primary',
       ],
     },
     size: {
