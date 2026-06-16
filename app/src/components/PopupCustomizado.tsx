@@ -32,15 +32,6 @@ export const popupSectionVariants = tv({
   base: 'border-t border-card-border pt-3',
 });
 
-export const lineButtonVariants = tv({
-  base: [
-    'group inline-flex min-h-11 w-full items-center gap-2 rounded-md border bg-card px-2.5 py-1.5 text-left text-xs font-semibold leading-tight',
-    'border-card-border border-l-[3px] text-text-primary whitespace-normal break-words',
-    'transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'disabled:cursor-not-allowed disabled:opacity-60',
-  ],
-});
-
 const SUBLINHAS_CALENDARIO = ['Sábado', 'Férias e Recessos'];
 
 function getNomeExibicao(linha: Linha | null, nomeLinha: string): string {
@@ -142,7 +133,12 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
         byNome.set(key, entry);
       }
     }
-    return Array.from(byNome.values());
+    return Array.from(byNome.values()).sort((a, b) => {
+      if (a.minutosFaltantes === null && b.minutosFaltantes === null) return 0;
+      if (a.minutosFaltantes === null) return 1;
+      if (b.minutosFaltantes === null) return -1;
+      return a.minutosFaltantes - b.minutosFaltantes;
+    });
   }, [linhasResolvidas]);
   const totalLinhas = linhasDisponiveis.length;
   const headingId = `popup-parada-${parada.idParada}`;
@@ -207,11 +203,14 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                   const showBell = Boolean(linha) && suportado && minutosFaltantes !== null;
 
                   return (
-                    <li key={nomeLinha} className="neo-brutal-sm bg-card p-2">
-                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                    <li
+                      key={nomeLinha}
+                      className="rounded-(--shape-xs) border border-card-border bg-card p-2"
+                    >
+                      <div className="flex items-center justify-between gap-2">
                         <button
                           type="button"
-                          className={lineButtonVariants()}
+                          className="flex min-h-9 flex-1 items-center gap-1.5 truncate rounded px-1 py-0.5 text-left text-xs font-semibold leading-tight text-text-primary transition-colors hover:text-brand-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
                           title={nomeExibicao}
                           style={linha ? { borderLeftColor: linha.corHex } : undefined}
                           disabled={!linha}
@@ -230,64 +229,71 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                             selecionarLinha(linha);
                           }}
                         >
-                          <span>{nomeExibicao}</span>
+                          {linha && (
+                            <span
+                              className="mr-1 inline-block h-3.5 w-1 shrink-0 rounded-full"
+                              style={{ backgroundColor: linha.corHex }}
+                              aria-hidden="true"
+                            />
+                          )}
+                          <span className="truncate">{nomeExibicao}</span>
                         </button>
 
-                        <div className="flex shrink-0 items-center gap-1">
-                          {linha ? (
-                            <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
-                          ) : (
-                            <span
-                              className="rounded-full px-2 py-0.5 text-xs font-medium"
-                              style={{
-                                backgroundColor: 'var(--neutral-bg)',
-                                color: 'var(--neutral-text)',
-                              }}
-                            >
-                              Sem previsão
-                            </span>
-                          )}
-
-                          {showBell && linha && minutosFaltantes !== null ? (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)
-                              }
-                              className={cn(
-                                'flex size-11 shrink-0 items-center justify-center rounded-full transition-colors',
-                                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95',
-                                isAlarmAtivo
-                                  ? 'bg-brand-accent/20 text-brand-accent hover:bg-brand-accent/30'
-                                  : 'text-text-secondary hover:bg-card-hover hover:text-text-primary',
-                              )}
-                              aria-label={
-                                isAlarmAtivo
-                                  ? `Cancelar alarme de chegada para ${nomeExibicao}`
-                                  : `Avisar quando ${nomeExibicao} chegar`
-                              }
-                              aria-pressed={isAlarmAtivo}
-                              title={
-                                isAlarmAtivo
-                                  ? 'Cancelar alarme de chegada'
-                                  : 'Avisar quando o ônibus chegar'
-                              }
-                            >
-                              {isAlarmAtivo ? (
-                                <BellRing size={18} aria-hidden="true" />
-                              ) : (
-                                <Bell size={18} aria-hidden="true" />
-                              )}
-                            </button>
-                          ) : null}
-                        </div>
+                        {showBell && linha && minutosFaltantes !== null ? (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)
+                            }
+                            className={cn(
+                              'flex size-8 shrink-0 items-center justify-center rounded-full transition-colors',
+                              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95',
+                              isAlarmAtivo
+                                ? 'bg-brand-accent/20 text-brand-accent hover:bg-brand-accent/30'
+                                : 'text-text-secondary hover:bg-card-hover hover:text-text-primary',
+                            )}
+                            aria-label={
+                              isAlarmAtivo
+                                ? `Cancelar alarme de chegada para ${nomeExibicao}`
+                                : `Avisar quando ${nomeExibicao} chegar`
+                            }
+                            aria-pressed={isAlarmAtivo}
+                            title={
+                              isAlarmAtivo
+                                ? 'Cancelar alarme de chegada'
+                                : 'Avisar quando o ônibus chegar'
+                            }
+                          >
+                            {isAlarmAtivo ? (
+                              <BellRing size={15} aria-hidden="true" />
+                            ) : (
+                              <Bell size={15} aria-hidden="true" />
+                            )}
+                          </button>
+                        ) : null}
                       </div>
 
-                      {minutosUltimoPassou !== null ? (
-                        <p className="mt-1.5 border-t border-card-border/60 pt-1.5 text-xs text-text-secondary">
-                          Último passou há {minutosUltimoPassou} min
-                        </p>
-                      ) : null}
+                      <div className="mt-1.5 flex items-center justify-between gap-1">
+                        {linha ? (
+                          <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                        ) : (
+                          <span
+                            className="rounded px-2 py-0.5 text-xs font-medium"
+                            style={{
+                              backgroundColor: 'var(--neutral-bg)',
+                              color: 'var(--neutral-text)',
+                            }}
+                          >
+                            Sem previsão
+                          </span>
+                        )}
+
+                        {minutosUltimoPassou !== null ? (
+                          <p className="text-[11px] text-text-secondary">
+                            Último há {minutosUltimoPassou}min
+                          </p>
+                        ) : null}
+                      </div>
                     </li>
                   );
                 },
@@ -332,7 +338,7 @@ function PlannerStopActions({ parada }: { parada: Parada }) {
       <button
         type="button"
         onClick={handleUseAsOrigin}
-        className="flex min-h-11 flex-1 items-center justify-center gap-1.5 neo-brutal-interactive bg-background px-2 py-1.5 text-xs font-semibold text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-(--shape-sm) border border-card-border bg-background px-2 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
         aria-label={`Usar ${parada.nome} como origem no planejador`}
       >
         <Navigation size={14} aria-hidden="true" />
@@ -341,7 +347,7 @@ function PlannerStopActions({ parada }: { parada: Parada }) {
       <button
         type="button"
         onClick={handleUseAsDestination}
-        className="flex min-h-11 flex-1 items-center justify-center gap-1.5 neo-brutal-interactive bg-background px-2 py-1.5 text-xs font-semibold text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-(--shape-sm) border border-card-border bg-background px-2 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
         aria-label={`Usar ${parada.nome} como destino no planejador`}
       >
         <MapPin size={14} aria-hidden="true" />

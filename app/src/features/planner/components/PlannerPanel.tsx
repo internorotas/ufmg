@@ -20,7 +20,7 @@ import { PlannerResults } from './PlannerResults';
 // ---------------------------------------------------------------------------
 
 const panelVariants = tv({
-  base: 'flex flex-col gap-3 border-b-2 border-(--neo-border-color) bg-background-secondary p-3 lg:p-4',
+  base: 'flex flex-col gap-3 border-b border-card-border bg-background-secondary p-3 lg:p-4',
 });
 
 const fieldContainerVariants = tv({
@@ -33,14 +33,17 @@ const fieldLabelVariants = tv({
 
 const tokenRowVariants = tv({
   base: [
-    'flex min-h-11 items-center gap-2 neo-brutal-sm',
+    'flex min-h-11 items-center gap-2 rounded-(--shape-sm) border border-card-border',
     'bg-card px-3 py-2',
     'text-sm font-semibold text-text-primary',
   ],
 });
 
 const suggestionsListVariants = tv({
-  base: ['mt-1 max-h-48 overflow-y-auto neo-brutal', 'bg-card'],
+  base: [
+    'mt-1 max-h-48 overflow-y-auto rounded-(--shape-sm) border border-card-border shadow-(--elevation-3)',
+    'bg-card',
+  ],
 });
 
 const suggestionItemVariants = tv({
@@ -211,6 +214,7 @@ export function PlannerPanel() {
   const [destSearch, setDestSearch] = useState('');
   const [activeField, setActiveField] = useState<'origin' | 'destination' | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [departureTime, setDepartureTime] = useState(() => {
     const now = new Date();
     return now.toTimeString().slice(0, 5);
@@ -260,8 +264,12 @@ export function PlannerPanel() {
   };
 
   const handleUseLocation = (field: 'origin' | 'destination') => () => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      setLocationError('Geolocalização não suportada neste navegador.');
+      return;
+    }
     setIsLocating(true);
+    setLocationError(null);
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -275,9 +283,15 @@ export function PlannerPanel() {
             headers: withTenantHeaders(),
           });
           clearTimeout(timeoutId);
-          if (!res.ok) return;
-          const paradas: Parada[] = await res.json();
-          if (!paradas.length) return;
+          if (!res.ok) {
+            setLocationError('Não foi possível encontrar paradas próximas. Tente novamente.');
+            return;
+          }
+          const paradas: Parada[] = (await res.json()) as Parada[];
+          if (!paradas.length) {
+            setLocationError('Nenhuma parada encontrada próxima à sua localização.');
+            return;
+          }
           const parada = paradas[0];
           const endpoint: PlannerEndpoint = {
             kind: 'stop',
@@ -292,12 +306,24 @@ export function PlannerPanel() {
             setDestSearch('');
           }
           setActiveField(null);
+          setLocationError(null);
+        } catch {
+          setLocationError('Tempo esgotado ao buscar localização. Tente novamente.');
         } finally {
           setIsLocating(false);
         }
       },
-      () => {
+      (err) => {
         setIsLocating(false);
+        if (err.code === 1) {
+          setLocationError(
+            'Permissão de localização negada. Verifique as configurações do navegador.',
+          );
+        } else if (err.code === 3) {
+          setLocationError('Tempo esgotado ao obter localização. Tente novamente.');
+        } else {
+          setLocationError('Não foi possível obter sua localização.');
+        }
       },
       { timeout: 8000, maximumAge: 60_000 },
     );
@@ -389,6 +415,12 @@ export function PlannerPanel() {
       {sameEndpoint && (
         <p className={inlineErrorVariants()} role="alert">
           Origem e destino são a mesma parada.
+        </p>
+      )}
+
+      {locationError && (
+        <p className={inlineErrorVariants()} role="alert">
+          {locationError}
         </p>
       )}
 
