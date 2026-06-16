@@ -12,7 +12,7 @@ export interface LiveLocationPayload {
   updatedAt: string;
 }
 
-const POLL_INTERVAL_MS = 120_000;
+const POLL_INTERVAL_MS = 10_000;
 
 export function useGpsLiveTracking(linhaId: string | null): LiveLocationPayload | null {
   const [position, setPosition] = useState<LiveLocationPayload | null>(null);
