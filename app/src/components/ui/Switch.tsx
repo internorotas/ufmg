@@ -33,7 +33,7 @@ export function Switch({ checked, disabled, className }: SwitchProps) {
     >
       <span
         className={cn(
-          'pointer-events-none inline-block size-5 rounded bg-white shadow-sm ring-0',
+          'pointer-events-none inline-block size-5 rounded bg-text-inverse shadow-sm ring-0',
           'transform transition-transform duration-150 ease-in-out',
           checked ? 'translate-x-[22px]' : 'translate-x-[2px]',
         )}

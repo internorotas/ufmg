@@ -34,7 +34,7 @@ export const emptyStateVariants = tv({
  */
 export const emptyStateIconVariants = tv({
   base: [
-    'neo-brutal-sm flex items-center justify-center rounded',
+    'flex items-center justify-center rounded-(--shape-lg)',
     'bg-brand-secondary text-text-tertiary',
   ],
   variants: {

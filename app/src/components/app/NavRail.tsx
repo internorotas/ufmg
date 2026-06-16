@@ -30,7 +30,7 @@ export function NavRail() {
       aria-label="Navegação principal"
       className={cn(
         'hidden md:flex md:w-20 md:shrink-0 md:flex-col md:items-stretch',
-        'md:border-r-2 md:border-(--neo-border-color) md:bg-sidebar',
+        'md:border-r md:border-(--card-border) md:bg-sidebar',
       )}
     >
       <nav aria-label="Páginas principais" className="mt-4 flex flex-1 flex-col gap-1 px-2">

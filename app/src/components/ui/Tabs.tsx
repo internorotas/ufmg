@@ -47,7 +47,7 @@ export const tabsListVariants = tv({
   base: 'flex',
   variants: {
     variant: {
-      default: 'neo-brutal-sm gap-1 bg-card-hover p-1',
+      default: 'gap-1 rounded-(--shape-md) bg-background-secondary p-1',
       underline: 'gap-2 border-b-2 border-brand-dark',
       pills: 'gap-2',
     },

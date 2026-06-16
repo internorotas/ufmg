@@ -15,8 +15,8 @@ import { cn } from '../../lib/utils';
  */
 export const badgeVariants = tv({
   base: [
-    'inline-flex items-center justify-center gap-1 rounded-sm',
-    'font-bold whitespace-nowrap border-2 border-[var(--neo-color)]',
+    'inline-flex items-center justify-center gap-1 rounded-(--shape-xs)',
+    'font-bold whitespace-nowrap border',
     'transition-[box-shadow,transform] duration-100',
   ],
   variants: {

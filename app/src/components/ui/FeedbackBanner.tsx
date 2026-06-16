@@ -18,7 +18,7 @@ export function FeedbackBanner({
       role="status"
       aria-live={live}
       className={cn(
-        'neo-brutal px-4 py-3 text-sm',
+        'rounded-(--shape-sm) border px-4 py-3 text-sm',
         type === 'success'
           ? 'border-success-border bg-success-bg text-success-text'
           : 'border-warning-border bg-warning-bg text-warning-text',

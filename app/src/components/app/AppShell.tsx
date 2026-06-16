@@ -41,7 +41,7 @@ export function AppShell({
       </a>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="sticky top-0 z-30 border-b-2 border-(--neo-border-color) bg-card">
+        <header className="sticky top-0 z-30 border-b border-(--card-border) bg-card shadow-(--elevation-1)">
           <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-4 py-3 sm:px-6">
             <Link
               to={backTo}

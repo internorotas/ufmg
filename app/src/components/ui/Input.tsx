@@ -15,11 +15,11 @@ import { cn } from '../../lib/utils';
  */
 export const inputVariants = tv({
   base: [
-    'w-full rounded bg-input',
-    'border-2 border-[var(--neo-color)] text-text-primary',
+    'w-full rounded-(--shape-sm) bg-input',
+    'border border-(--card-border) text-text-primary',
     'placeholder:text-text-tertiary',
     'transition-[box-shadow,border-color] duration-100',
-    'focus:border-[var(--color-brand-primary)] focus:outline-none focus:shadow-[3px_3px_0_var(--color-brand-primary)]',
+    'focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-1',
     'disabled:cursor-not-allowed disabled:opacity-50',
   ],
   variants: {
@@ -37,7 +37,7 @@ export const inputVariants = tv({
       false: '',
     },
     error: {
-      true: 'border-red-600 focus:border-red-600 focus:shadow-[3px_3px_0_rgb(220_38_38)]',
+      true: 'border-warning-border focus:border-warning-border focus:ring-warning-border',
       false: '',
     },
   },

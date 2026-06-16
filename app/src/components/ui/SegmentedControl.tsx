@@ -40,7 +40,7 @@ export function SegmentedControl<T extends string = string>({
     <div
       role="group"
       className={cn(
-        'flex gap-1 neo-brutal-sm bg-background-secondary p-1',
+        'flex gap-1 rounded-(--shape-sm) bg-background-secondary p-1',
         disabled && 'pointer-events-none opacity-50',
         className,
       )}
@@ -58,7 +58,7 @@ export function SegmentedControl<T extends string = string>({
               'flex-1 rounded px-3 py-1.5 text-xs font-semibold transition-all duration-150',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background-secondary',
               isActive
-                ? 'neo-brutal-sm bg-brand-primary text-text-inverse'
+                ? 'bg-brand-primary text-text-inverse shadow-(--elevation-2)'
                 : 'text-text-secondary hover:bg-card-hover hover:text-text-primary',
             )}
           >

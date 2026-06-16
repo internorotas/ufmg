@@ -15,28 +15,27 @@ import { cn } from '../../lib/utils';
  */
 export const cardVariants = tv({
   base: [
-    'rounded bg-card text-text-primary',
-    'border-2 border-[var(--neo-color)]',
+    'rounded-(--shape-sm) bg-card text-text-primary',
     'transition-[box-shadow,transform] duration-100',
   ],
   variants: {
     variant: {
-      default: 'shadow-[4px_4px_0_var(--neo-color)]',
+      default: 'border border-(--card-border) shadow-(--elevation-1)',
       elevated: [
-        'shadow-[6px_6px_0_var(--neo-color)]',
-        'hover:-translate-x-px hover:-translate-y-px hover:shadow-[7px_7px_0_var(--neo-color)]',
+        'border border-(--card-border) shadow-(--elevation-3)',
+        'hover:shadow-(--elevation-4)',
       ],
-      outline: 'bg-transparent shadow-[4px_4px_0_var(--neo-color)]',
+      outline: 'bg-transparent border border-(--card-border)',
       ghost: 'border-transparent shadow-none',
       interactive: [
-        'cursor-pointer shadow-[4px_4px_0_var(--neo-color)]',
-        'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_var(--neo-color)]',
-        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0_var(--neo-color)]',
+        'cursor-pointer border border-(--card-border) shadow-(--elevation-1)',
+        'hover:shadow-(--elevation-3) hover:-translate-y-px',
+        'active:translate-y-0 active:shadow-(--elevation-1)',
       ],
     },
     selected: {
       true: [
-        'border-[3px] border-[var(--color-brand-primary)]',
+        'border-2 border-(--color-brand-primary)',
         'shadow-[4px_4px_0_var(--color-brand-primary)]',
       ],
       false: '',
