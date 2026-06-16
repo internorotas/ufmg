@@ -1,7 +1,7 @@
 // Custom render utilities that use react-dom/createRoot directly (Vite's module system),
 // avoiding the dual React instance issue that occurs with @testing-library/react's render
 // when running under pnpm + Windows junctions + Vitest 4.
-import { type ReactNode, act } from 'react';
+import { act, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 interface RenderResult {
