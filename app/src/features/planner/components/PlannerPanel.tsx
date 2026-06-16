@@ -277,7 +277,7 @@ export function PlannerPanel() {
           const { latitude: lat, longitude: lng } = pos.coords;
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 6000);
-          const url = resolveApiEndpoint(`/stops/nearest?lat=${lat}&lng=${lng}&limit=1`);
+          const url = resolveApiEndpoint(`/v1/stops/nearest?lat=${lat}&lng=${lng}&limit=1`);
           const res = await fetch(url, {
             signal: controller.signal,
             headers: withTenantHeaders(),

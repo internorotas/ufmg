@@ -56,7 +56,7 @@ export function useGpsLiveTracking(linhaId: string | null): LiveLocationPayload 
     // Anonymous: poll HTTP endpoint every 15s
     const poll = async () => {
       try {
-        const url = resolveApiEndpoint(`/gps/location/${encodeURIComponent(linhaId)}`);
+        const url = resolveApiEndpoint(`/v1/gps/location/${encodeURIComponent(linhaId)}`);
         const res = await fetch(url, { headers: withTenantHeaders() });
         if (!res.ok) return;
         const data: LiveLocationPayload | null = (await res.json()) as LiveLocationPayload | null;
