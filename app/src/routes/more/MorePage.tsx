@@ -8,6 +8,7 @@
 
 import {
   ArrowUpRight,
+  BarChart3,
   ExternalLink,
   FileText,
   Heart,
@@ -27,10 +28,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
 import { Badge } from '@/components/ui/Badge';
 import { Switch } from '@/components/ui/Switch';
+import { GA_MEASUREMENT_ID } from '@/config/analytics';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAnalyticsConsent } from '@/hooks/useAnalyticsConsent';
 import { tenantConfig } from '@/tenants/tenantConfig';
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
@@ -226,6 +229,11 @@ export function MorePage() {
   const { logout, isPending: isLogoutPending } = useLogout();
   const { theme, toggleTheme } = useTheme();
   const { trackPageView, trackEvent } = useAnalytics();
+  const {
+    consent: analyticsConsent,
+    accept: acceptAnalytics,
+    decline: declineAnalytics,
+  } = useAnalyticsConsent();
 
   useEffect(() => {
     trackPageView('/mais');
@@ -346,8 +354,8 @@ export function MorePage() {
     [],
   );
 
-  const preferencias: MoreItem[] = useMemo(
-    () => [
+  const preferencias: MoreItem[] = useMemo(() => {
+    const items: MoreItem[] = [
       {
         kind: 'switch',
         icon: SunMoon,
@@ -363,9 +371,30 @@ export function MorePage() {
           toggleTheme();
         },
       },
-    ],
-    [theme, toggleTheme, trackEvent],
-  );
+    ];
+
+    if (GA_MEASUREMENT_ID) {
+      items.push({
+        kind: 'switch',
+        icon: BarChart3,
+        label: 'Analytics de uso',
+        description:
+          analyticsConsent === 'accepted'
+            ? 'Coleta de métricas ativa. Nenhum dado pessoal identificável.'
+            : 'Coleta de métricas desativada.',
+        checked: analyticsConsent === 'accepted',
+        onToggle: () => {
+          if (analyticsConsent === 'accepted') {
+            declineAnalytics();
+          } else {
+            acceptAnalytics();
+          }
+        },
+      });
+    }
+
+    return items;
+  }, [theme, toggleTheme, trackEvent, analyticsConsent, acceptAnalytics, declineAnalytics]);
 
   return (
     <AppShell

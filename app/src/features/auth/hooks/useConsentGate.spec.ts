@@ -9,8 +9,10 @@ describe('resolveConsentStatus', () => {
       loadConsentState: async () => ({
         consentGps: true,
         consentResearch: true,
+        consentAnalytics: true,
         consentGpsAt: '2026-05-11T00:00:00.000Z',
         consentResearchAt: '2026-05-11T00:00:00.000Z',
+        consentAnalyticsAt: '2026-05-11T00:00:00.000Z',
       }),
     });
 
@@ -36,8 +38,10 @@ describe('resolveConsentStatus', () => {
       loadConsentState: async () => ({
         consentGps: true,
         consentResearch: false,
+        consentAnalytics: false,
         consentGpsAt: '2026-05-11T00:00:00.000Z',
         consentResearchAt: null,
+        consentAnalyticsAt: null,
       }),
     });
     expect(accepted satisfies ConsentGateStatus).toBe('accepted');
@@ -48,8 +52,10 @@ describe('resolveConsentStatus', () => {
       loadConsentState: async () => ({
         consentGps: false,
         consentResearch: false,
+        consentAnalytics: false,
         consentGpsAt: null,
         consentResearchAt: null,
+        consentAnalyticsAt: null,
       }),
     });
     expect(denied satisfies ConsentGateStatus).toBe('denied');

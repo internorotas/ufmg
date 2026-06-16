@@ -42,8 +42,10 @@ function resolveLoginContinueUrl(): string {
 export interface ConsentState {
   consentGps: boolean;
   consentResearch: boolean;
+  consentAnalytics: boolean;
   consentGpsAt: string | null;
   consentResearchAt: string | null;
+  consentAnalyticsAt: string | null;
 }
 
 export type AuthEndpointPath =
@@ -167,8 +169,9 @@ export async function getConsentState(): Promise<ConsentState> {
 }
 
 export async function updateConsentState(payload: {
-  consentGps: boolean;
-  consentResearch: boolean;
+  consentGps?: boolean;
+  consentResearch?: boolean;
+  consentAnalytics?: boolean;
 }): Promise<ConsentState> {
   const headers: HeadersInit = {
     ...Object.fromEntries(withTenantHeaders(getAuthHeaders()).entries()),

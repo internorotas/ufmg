@@ -75,6 +75,7 @@ function toEventCategory(category?: string): AnalyticsEvent['category'] {
 export class GA4AnalyticsService implements IAnalyticsService {
   private readonly measurementId: string | undefined;
   private initialized = false;
+  private consentGranted = false;
 
   constructor() {
     this.measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
@@ -84,8 +85,13 @@ export class GA4AnalyticsService implements IAnalyticsService {
     return !!this.measurementId && !!ReactGA;
   }
 
+  grantConsent(): void {
+    this.consentGranted = true;
+    this.initialize();
+  }
+
   initialize(): void {
-    if (!this.isEnabled || this.initialized) {
+    if (!this.isEnabled || this.initialized || !this.consentGranted) {
       return;
     }
 
@@ -102,7 +108,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
   }
 
   private ensureInitialized(): boolean {
-    if (!this.isEnabled) {
+    if (!this.isEnabled || !this.consentGranted) {
       return false;
     }
 

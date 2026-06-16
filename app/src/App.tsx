@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { AnalyticsConsentBanner } from './components/app/AnalyticsConsentBanner';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { BottomNav } from './components/app/BottomNav';
 import { DataSourceBanner } from './components/app/DataSourceBanner';
@@ -31,6 +32,7 @@ import { PlannerSummarySheet } from './features/planner/components/PlannerSummar
 import { usePlannerStore } from './features/planner/store/plannerStore';
 import { logout } from './features/profile/api/profileClient';
 import { useAnalytics } from './hooks/useAnalytics';
+import { readAnalyticsConsent } from './hooks/useAnalyticsConsent';
 import { useAppConnectivity } from './hooks/useAppConnectivity';
 import { useInactivityTimer } from './hooks/useInactivityTimer';
 import { getActiveCategoryLinhas } from './hooks/useLinhasFilter';
@@ -106,10 +108,10 @@ const LoadingMap = () => (
   </div>
 );
 
-// Lê a ID de Medição a partir das variáveis de ambiente (via src/config/analytics.ts)
-// Inicializa o Google Analytics APENAS se a ID existir
-if (GA_MEASUREMENT_ID) {
-  ga4Analytics.initialize();
+// Inicializa GA4 sincronicamente se o usuário já havia concedido consentimento em sessão anterior.
+// Deve ocorrer antes do primeiro render para não perder eventos de app_boot.
+if (GA_MEASUREMENT_ID && readAnalyticsConsent() === 'accepted') {
+  ga4Analytics.grantConsent();
 }
 
 /**
@@ -485,6 +487,7 @@ function AppContent() {
         Pular para o mapa
       </a>
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <AnalyticsConsentBanner />
         <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
         <MobileTopBar
           authStatus={authStatus}
