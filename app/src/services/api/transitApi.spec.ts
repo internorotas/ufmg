@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import localLinhas from '@/data/linhas';
 import type { CategoriaLinhas } from '@/types/data.types';
 import { fetchLinhas, fetchParadas } from './transitApi';
 
@@ -57,7 +58,7 @@ describe('transitApi', () => {
     expect(result).toEqual(paradasPayload);
   });
 
-  it('erro HTTP lança exceção com status e endpoint', async () => {
+  it('erro HTTP retorna dados locais como fallback', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -66,10 +67,11 @@ describe('transitApi', () => {
       }),
     );
 
-    await expect(fetchLinhas()).rejects.toThrow('Erro HTTP 503 em /v1/linhas');
+    const result = await fetchLinhas();
+    expect(result).toEqual(localLinhas);
   });
 
-  it('erro 502 inclui orientação de backend indisponível', async () => {
+  it('erro 502 retorna dados locais como fallback', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -78,6 +80,7 @@ describe('transitApi', () => {
       }),
     );
 
-    await expect(fetchLinhas()).rejects.toThrow('Proxy do Vite não alcançou o backend');
+    const result = await fetchLinhas();
+    expect(result).toEqual(localLinhas);
   });
 });
