@@ -207,10 +207,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                   const showBell = Boolean(linha) && suportado && minutosFaltantes !== null;
 
                   return (
-                    <li
-                      key={nomeLinha}
-                      className="rounded-lg border border-card-border/70 bg-card p-2"
-                    >
+                    <li key={nomeLinha} className="neo-brutal-sm bg-card p-2">
                       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
                         <button
                           type="button"
@@ -335,7 +332,7 @@ function PlannerStopActions({ parada }: { parada: Parada }) {
       <button
         type="button"
         onClick={handleUseAsOrigin}
-        className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-card-border bg-background px-2 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        className="flex min-h-11 flex-1 items-center justify-center gap-1.5 neo-brutal-interactive bg-background px-2 py-1.5 text-xs font-semibold text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
         aria-label={`Usar ${parada.nome} como origem no planejador`}
       >
         <Navigation size={14} aria-hidden="true" />
@@ -344,7 +341,7 @@ function PlannerStopActions({ parada }: { parada: Parada }) {
       <button
         type="button"
         onClick={handleUseAsDestination}
-        className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-card-border bg-background px-2 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        className="flex min-h-11 flex-1 items-center justify-center gap-1.5 neo-brutal-interactive bg-background px-2 py-1.5 text-xs font-semibold text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
         aria-label={`Usar ${parada.nome} como destino no planejador`}
       >
         <MapPin size={14} aria-hidden="true" />

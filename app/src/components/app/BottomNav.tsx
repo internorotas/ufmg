@@ -29,7 +29,7 @@ export function BottomNav() {
     <nav
       aria-label="Navegação principal"
       className={cn(
-        'fixed inset-x-0 bottom-0 z-1010 w-full border-t border-card-border bg-sidebar md:hidden',
+        'fixed inset-x-0 bottom-0 z-1010 w-full border-t-2 border-(--neo-border-color) bg-sidebar md:hidden',
         'pb-[env(safe-area-inset-bottom)]',
       )}
     >
@@ -55,13 +55,15 @@ export function BottomNav() {
                 className={cn(
                   'relative flex min-h-14 flex-col items-center justify-center gap-1 px-2 py-2 text-xs font-medium',
                   'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-                  active ? 'text-brand-primary' : 'text-text-secondary hover:text-text-primary',
+                  active
+                    ? 'bg-brand-primary/10 text-brand-primary'
+                    : 'text-text-secondary hover:text-text-primary',
                 )}
               >
                 <span
                   aria-hidden="true"
                   className={cn(
-                    'pointer-events-none absolute inset-x-4 top-0 h-0.5 rounded-b-full bg-brand-primary transition-opacity',
+                    'pointer-events-none absolute inset-x-4 top-0 h-0.75 rounded-none bg-brand-primary transition-opacity',
                     active ? 'opacity-100' : 'opacity-0',
                   )}
                 />

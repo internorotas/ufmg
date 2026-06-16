@@ -73,7 +73,7 @@ export function ResearchDashboardPage() {
   return (
     <main className="min-h-dvh bg-background-secondary px-4 py-6 text-text-primary sm:px-6">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
-        <header className="rounded-xl border border-card-border bg-card px-5 py-5 shadow-sm">
+        <header className="neo-brutal bg-card px-5 py-5">
           <div className="flex items-start gap-3">
             <div className="flex size-12 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
               <Database size={22} aria-hidden="true" />
@@ -109,7 +109,7 @@ export function ResearchDashboardPage() {
                 <input
                   value={linhaId}
                   onChange={(event) => setLinhaId(event.target.value)}
-                  className="min-h-11 w-full rounded-lg border border-card-border bg-background px-3 py-2"
+                  className="neo-brutal-sm min-h-11 w-full bg-background px-3 py-2"
                   placeholder="Ex: DU10"
                 />
               </label>
@@ -120,7 +120,7 @@ export function ResearchDashboardPage() {
                 <select
                   value={period}
                   onChange={(event) => setPeriod(event.target.value)}
-                  className="min-h-11 w-full rounded-lg border border-card-border bg-background px-3 py-2"
+                  className="neo-brutal-sm min-h-11 w-full bg-background px-3 py-2"
                 >
                   <option value="7d">Últimos 7 dias</option>
                   <option value="30d">Últimos 30 dias</option>
@@ -147,7 +147,7 @@ export function ResearchDashboardPage() {
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="min-h-11 w-full rounded-lg border border-card-border bg-background px-3 py-2"
+                  className="neo-brutal-sm min-h-11 w-full bg-background px-3 py-2"
                   placeholder={tenantConfig.researchEmailExample}
                 />
               </label>
@@ -164,7 +164,7 @@ export function ResearchDashboardPage() {
                 <button
                   type="button"
                   onClick={() => void handleDownload('CSV')}
-                  className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-card-border bg-background px-4 py-2 font-semibold text-text-primary"
+                  className="neo-brutal-interactive flex min-h-11 items-center justify-center gap-2 bg-background px-4 py-2 font-semibold text-text-primary"
                 >
                   <Download size={16} aria-hidden="true" />
                   CSV

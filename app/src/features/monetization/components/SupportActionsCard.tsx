@@ -127,11 +127,11 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
         </div>
 
         {feedback ? (
-          <FeedbackBanner message={feedback.message} className="rounded-lg px-3 py-2 text-sm" />
+          <FeedbackBanner message={feedback.message} className="px-3 py-2 text-sm" />
         ) : null}
 
         <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border border-card-border bg-background px-3 py-3">
+          <div className="neo-brutal-sm bg-background px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               Última doação
             </p>
@@ -140,7 +140,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
             </p>
           </div>
 
-          <div className="rounded-lg border border-card-border bg-background px-3 py-3">
+          <div className="neo-brutal-sm bg-background px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               Próximo pagamento
             </p>
@@ -149,7 +149,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
             </p>
           </div>
 
-          <div className="rounded-lg border border-card-border bg-background px-3 py-3">
+          <div className="neo-brutal-sm bg-background px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               Recorrência atual
             </p>
@@ -161,7 +161,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
           </div>
         </div>
 
-        <div className="rounded-lg border border-card-border bg-background px-3 py-3 text-sm text-text-secondary">
+        <div className="neo-brutal-sm bg-background px-3 py-3 text-sm text-text-secondary">
           <p className="font-medium text-text-primary">Sem paywall funcional no MVP</p>
           <p className="mt-1">
             Apoiar o projeto não desbloqueia funcionalidades core como mapa, ETA, linhas, paradas ou
@@ -191,7 +191,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
           </Button>
         </div>
 
-        <div className="space-y-3 rounded-lg border border-card-border bg-background px-3 py-3">
+        <div className="space-y-3 neo-brutal-sm bg-background px-3 py-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-sm font-semibold text-text-primary">Histórico recente</h3>
             <Link
@@ -208,7 +208,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
               {monetization.recentTransactions.map((transaction) => (
                 <div
                   key={`${transaction.kind}-${transaction.createdAt}-${transaction.amountCents}`}
-                  className="rounded-lg border border-card-border bg-card px-3 py-3"
+                  className="neo-brutal-sm bg-card px-3 py-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>

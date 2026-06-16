@@ -123,7 +123,7 @@ function LinhaSelector({
 
       {/* Lista dropdown */}
       {open && (
-        <div className="absolute z-9999 top-full left-0 right-0 mt-1 bg-card border border-card-border rounded shadow-xl max-h-64 overflow-y-auto">
+        <div className="absolute z-9999 top-full left-0 right-0 mt-1 bg-card neo-brutal max-h-64 overflow-y-auto">
           <button
             type="button"
             onClick={() => {
@@ -399,14 +399,14 @@ export function AdminLinhasTab({
                 <button
                   type="button"
                   onClick={handleDeleteLinha}
-                  className="flex-1 py-1.5 bg-brand-accent border border-brand-accent/80 text-text-inverse rounded text-xs font-bold hover:bg-brand-accent/90 transition-colors"
+                  className="flex-1 py-1.5 bg-brand-accent neo-brutal-sm text-text-inverse text-xs font-bold hover:bg-brand-accent/90 transition-colors"
                 >
                   Confirmar
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowDeleteLinhaConfirm(false)}
-                  className="flex-1 py-1.5 border border-card-border text-text-secondary rounded text-xs hover:bg-background-secondary"
+                  className="flex-1 py-1.5 neo-brutal-sm text-text-secondary text-xs hover:bg-background-secondary"
                 >
                   Cancelar
                 </button>

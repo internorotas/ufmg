@@ -46,32 +46,32 @@ export const titleContainerVariants = tv({
  * Variantes do ícone do título
  */
 export const titleIconVariants = tv({
-  base: ['flex size-12 shrink-0 items-center justify-center rounded-lg shadow-sm'],
+  base: ['flex size-12 shrink-0 items-center justify-center neo-brutal-sm'],
 });
 
 /**
  * Variantes do botão de parada
  */
 export const stopButtonVariants = tv({
-  base: 'group flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+  base: 'group flex w-full items-start gap-3 rounded px-2 py-2 text-left cursor-pointer transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
 });
 
 /**
  * Variantes do container do ícone de parada
  */
 export const stopIconContainerVariants = tv({
-  base: ['relative z-10 mt-0.5 shrink-0', 'flex size-6 items-center justify-center rounded-full'],
+  base: ['relative z-10 mt-0.5 shrink-0', 'flex size-6 items-center justify-center rounded'],
 });
 
 /**
  * Variantes do card de horário
  */
 export const scheduleCardVariants = tv({
-  base: 'rounded-lg border bg-card p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+  base: 'rounded border bg-card p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
   variants: {
     status: {
       upcoming:
-        'border-2 hover:scale-105 hover:shadow-md active:scale-95 cursor-pointer focus-visible:ring-brand-primary',
+        'border-2 hover:scale-105 active:scale-95 cursor-pointer focus-visible:ring-brand-primary',
       passed:
         'border border-card-border bg-card opacity-50 cursor-default focus-visible:ring-card-border',
     },
@@ -85,7 +85,7 @@ export const scheduleCardVariants = tv({
  * Variantes do card de informação
  */
 export const infoCardVariants = tv({
-  base: ['rounded-lg border p-4 text-center text-sm', 'border-card-border bg-card'],
+  base: ['neo-brutal-sm p-4 text-center text-sm', 'bg-card'],
 });
 
 export interface LinhaDetalhesModalProps {
@@ -121,11 +121,7 @@ function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
   }
 
   return (
-    <div
-      className="overflow-hidden rounded-xl border border-card-border"
-      role="img"
-      aria-label="Mapa do itinerário da linha"
-    >
+    <div className="overflow-hidden neo-brutal" role="img" aria-label="Mapa do itinerário da linha">
       <MapContainer
         center={linha.coordenadasTrajeto[0]}
         zoom={15}
@@ -542,10 +538,7 @@ export function LinhaDetalhesModal({
         <TabsContent value="horarios" data-slot="schedules-tab" className="space-y-6">
           {/* Aviso quando a linha não está circulando */}
           {!isLineRunningToday && (
-            <div
-              data-slot="not-running-notice"
-              className="rounded-lg border border-warning-border bg-warning-bg p-4"
-            >
+            <div data-slot="not-running-notice" className="neo-brutal-sm bg-warning-bg p-4">
               <div className="flex items-center gap-3">
                 <AlertTriangle size={24} className="shrink-0 text-warning-text" />
                 <p className="text-sm font-medium text-warning-text">
@@ -558,7 +551,7 @@ export function LinhaDetalhesModal({
           {isLineRunningToday && proximoHorario && (
             <section
               data-slot="next-schedule-highlight"
-              className="rounded-xl border p-4"
+              className="neo-brutal p-4"
               style={{ borderColor: hexToRgba(linha.corHex, 0.32) }}
             >
               <p className="text-xs font-semibold tracking-wide text-text-secondary uppercase">
@@ -572,7 +565,7 @@ export function LinhaDetalhesModal({
                   {proximoHorario.horario}
                 </span>
                 <span
-                  className="rounded-full px-2.5 py-1 text-xs font-semibold"
+                  className="rounded px-2.5 py-1 text-xs font-semibold"
                   style={{ backgroundColor: hexToRgba(linha.corHex, 0.12), color: linha.corHex }}
                 >
                   {t('schedules.nextBadge')}
@@ -594,7 +587,7 @@ export function LinhaDetalhesModal({
                       type="button"
                       aria-label={t('a11y.nextTime', { horario })}
                       onClick={() => handleHorarioClick(horario)}
-                      className="flex min-h-11 w-full items-center justify-between rounded-lg border border-card-border px-3 py-2 text-left transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                      className="flex min-h-11 w-full items-center justify-between rounded border border-card-border px-3 py-2 text-left transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
                     >
                       <span className="text-sm text-text-secondary">
                         {t('schedules.departure')}
@@ -610,7 +603,7 @@ export function LinhaDetalhesModal({
           )}
 
           {isLineRunningToday && !proximoHorario && (
-            <div className="rounded-xl border border-neutral-border bg-neutral-bg p-4 text-sm text-neutral-text">
+            <div className="neo-brutal bg-neutral-bg p-4 text-sm text-neutral-text">
               {t('schedules.noFuture')}
             </div>
           )}

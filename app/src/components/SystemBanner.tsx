@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 const systemBannerVariants = tv({
   slots: {
-    root: 'mb-3 rounded-lg border p-3',
+    root: 'mb-3 rounded border p-3',
     header: 'flex items-start gap-2',
     icon: 'mt-0.5 size-5 shrink-0',
     body: 'min-w-0 flex-1',
@@ -14,7 +14,7 @@ const systemBannerVariants = tv({
     description: 'mt-1 text-xs leading-relaxed lg:text-sm',
     actions: 'mt-3 flex flex-wrap gap-2',
     close: [
-      'ml-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border transition-colors',
+      'ml-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-[var(--neo-radius)] border transition-colors',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
     ],
   },

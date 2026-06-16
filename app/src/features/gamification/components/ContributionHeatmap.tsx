@@ -26,7 +26,7 @@ export function ContributionHeatmap({ history }: ContributionHeatmapProps) {
       <div className="grid grid-cols-10 gap-2 sm:grid-cols-15">
         {history.map((item) => (
           <div key={item.date} title={`${item.date}: ${item.points} pts em ${item.count} eventos`}>
-            <div className={`h-8 rounded-lg border ${resolveHeatLevel(item.points)}`} />
+            <div className={`h-8 rounded border ${resolveHeatLevel(item.points)}`} />
           </div>
         ))}
       </div>

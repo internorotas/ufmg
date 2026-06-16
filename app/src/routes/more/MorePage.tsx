@@ -85,9 +85,7 @@ function Section({ title, description, children }: SectionProps) {
   return (
     <section className="space-y-3">
       <header>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-text-tertiary">
-          {title}
-        </h2>
+        <h2 className="font-bold text-brand-dark text-xs uppercase tracking-widest">{title}</h2>
         {description ? <p className="mt-1 text-sm text-text-secondary">{description}</p> : null}
       </header>
       <div className="grid grid-cols-1 gap-2 overflow-hidden sm:grid-cols-2">{children}</div>
@@ -113,7 +111,7 @@ function ItemShell({
   return (
     <div className="flex w-full items-center gap-3">
       <span
-        className={`flex size-10 shrink-0 items-center justify-center rounded-lg shadow-sm ${
+        className={`flex size-10 shrink-0 items-center justify-center neo-brutal-sm ${
           variant === 'danger'
             ? 'bg-warning-bg text-warning-text ring-1 ring-warning-border'
             : 'bg-brand-primary text-white'
@@ -143,7 +141,7 @@ function renderItem(item: MoreItem, key: string): ReactNode {
       <Link
         key={key}
         to={item.to}
-        className="flex w-full min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        className="flex w-full min-h-14 items-center gap-3 neo-brutal-interactive bg-card px-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
       >
         <ItemShell
           icon={item.icon}
@@ -165,7 +163,7 @@ function renderItem(item: MoreItem, key: string): ReactNode {
         href={item.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex w-full min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        className="flex w-full min-h-14 items-center gap-3 neo-brutal-interactive bg-card px-3 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
       >
         <ItemShell
           icon={item.icon}
@@ -188,7 +186,7 @@ function renderItem(item: MoreItem, key: string): ReactNode {
         aria-checked={item.checked}
         onClick={item.onToggle}
         disabled={item.disabled}
-        className="flex w-full min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 text-left transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex w-full min-h-14 items-center gap-3 neo-brutal-interactive bg-card px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
       >
         <ItemShell
           icon={item.icon}
@@ -206,7 +204,7 @@ function renderItem(item: MoreItem, key: string): ReactNode {
       type="button"
       onClick={item.onClick}
       disabled={item.disabled}
-      className={`flex w-full min-h-14 items-center gap-3 rounded-xl border border-card-border bg-card px-3 py-2.5 text-left transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`flex w-full min-h-14 items-center gap-3 neo-brutal-interactive bg-card px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60 ${
         item.variant === 'danger' ? 'hover:bg-warning-bg/40' : ''
       }`}
     >
@@ -378,7 +376,7 @@ export function MorePage() {
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="hidden min-h-11 items-center justify-center rounded-lg border border-card-border bg-background px-4 text-sm font-semibold text-text-primary transition-colors hover:bg-card-hover sm:inline-flex"
+          className="hidden min-h-11 items-center justify-center neo-brutal-interactive bg-background px-4 text-sm font-semibold text-text-primary transition-colors sm:inline-flex"
         >
           Ir ao mapa
         </button>

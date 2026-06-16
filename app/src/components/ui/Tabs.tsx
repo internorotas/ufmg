@@ -47,8 +47,8 @@ export const tabsListVariants = tv({
   base: 'flex',
   variants: {
     variant: {
-      default: 'gap-1 rounded-lg bg-card-hover p-1',
-      underline: 'gap-2 border-b border-card-border',
+      default: 'neo-brutal-sm gap-1 bg-card-hover p-1',
+      underline: 'gap-2 border-b-2 border-brand-dark',
       pills: 'gap-2',
     },
     fullWidth: {
@@ -76,17 +76,17 @@ export const tabsTriggerVariants = tv({
   variants: {
     variant: {
       default: [
-        'rounded-md min-h-11 px-3 py-1.5 text-sm',
-        'data-[state=active]:bg-background data-[state=active]:text-text-primary data-[state=active]:shadow-sm',
+        'rounded min-h-11 px-3 py-1.5 text-sm',
+        'data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-brand-dark',
         'data-[state=inactive]:text-text-secondary data-[state=inactive]:hover:text-text-primary data-[state=inactive]:hover:bg-card-hover/50',
       ],
       underline: [
-        'min-h-11 border-b-2 border-transparent px-4 py-2 text-sm',
+        'min-h-11 rounded border-b-2 border-transparent px-4 py-2 text-sm',
         'data-[state=active]:border-brand-primary data-[state=active]:text-text-primary',
         'data-[state=inactive]:text-text-secondary data-[state=inactive]:hover:text-text-primary data-[state=inactive]:hover:bg-card-hover/30',
       ],
       pills: [
-        'min-h-11 rounded-full px-4 py-2 text-sm',
+        'min-h-11 rounded px-4 py-2 text-sm',
         'data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm',
         'data-[state=inactive]:bg-card data-[state=inactive]:text-text-secondary',
         'data-[state=inactive]:hover:bg-card-hover data-[state=inactive]:hover:text-text-primary',

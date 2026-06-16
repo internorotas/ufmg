@@ -177,11 +177,11 @@ export function LoginPage() {
       <main className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 pt-12 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12">
         <div className="w-full max-w-sm">
           {/* Card */}
-          <div className="rounded-2xl border border-card-border bg-card px-8 py-8 shadow-sm">
+          <div className="neo-brutal-lg bg-card px-8 py-8">
             {/* Brand header */}
             <div className="mb-8 flex flex-col items-center gap-3 text-center">
               <div
-                className="flex size-14 items-center justify-center rounded-2xl shadow-sm"
+                className="flex size-14 items-center justify-center neo-brutal-sm"
                 style={{ backgroundColor: tenantConfig.brandColor }}
               >
                 <Bus size={26} className="text-white" aria-hidden="true" />
@@ -196,7 +196,7 @@ export function LoginPage() {
               <FeedbackBanner
                 message={errorMsg}
                 live="assertive"
-                className="mb-4 rounded-lg px-3 py-2.5 text-xs leading-relaxed"
+                className="mb-4 px-3 py-2.5 text-xs leading-relaxed"
               />
             ) : null}
 
@@ -218,7 +218,7 @@ export function LoginPage() {
             <p className="mt-4 text-center text-xs text-text-tertiary">
               <Link
                 to="/"
-                className="underline underline-offset-2 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 rounded-sm"
+                className="neo-brutal-sm inline-block px-2 py-0.5 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 rounded-sm"
               >
                 Continuar sem login
               </Link>

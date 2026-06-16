@@ -15,7 +15,7 @@ const sheetVariants = tv({
   base: [
     'fixed bottom-0 left-0 right-0 z-[1100]',
     'max-h-[70vh] overflow-y-auto',
-    'rounded-t-2xl border-t border-card-border bg-modal shadow-2xl',
+    'rounded-t border-t border-card-border bg-modal',
     'focus-visible:outline-none',
   ],
 });
@@ -174,7 +174,7 @@ export function PlannerSummarySheet({
               {route.transferCount !== 1 ? 's' : ''} · {route.walkingMinutes} min a pé
             </span>
           </div>
-          <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-card-border px-2.5 py-1 text-[11px] font-semibold text-text-secondary">
+          <span className="neo-brutal-sm mt-1 inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold text-text-secondary">
             <Clock size={11} aria-hidden="true" />
             {ETA_SOURCE_LABEL[primarySource]}
           </span>

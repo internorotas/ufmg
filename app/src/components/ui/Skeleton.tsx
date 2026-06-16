@@ -145,10 +145,7 @@ export function SkeletonAvatar({ size = 'md', className, ...props }: SkeletonAva
  */
 export function SkeletonLineCard({ className }: { className?: string }) {
   return (
-    <div
-      data-slot="skeleton-line-card"
-      className={cn('rounded-xl border border-card-border bg-card p-4', className)}
-    >
+    <div data-slot="skeleton-line-card" className={cn('neo-brutal bg-card p-4', className)}>
       {/* Header */}
       <div className="mb-4 flex items-center gap-3">
         <Skeleton className="size-12" rounded="lg" />
@@ -264,9 +261,9 @@ export function SkeletonSidebar({ className }: { className?: string }) {
 
       {/* Tabs */}
       <div className="mb-4 flex gap-2">
-        <Skeleton className="h-8 flex-1" rounded="lg" />
-        <Skeleton className="h-8 flex-1" rounded="lg" />
-        <Skeleton className="h-8 flex-1" rounded="lg" />
+        <Skeleton className="h-8 flex-1" rounded="sm" />
+        <Skeleton className="h-8 flex-1" rounded="sm" />
+        <Skeleton className="h-8 flex-1" rounded="sm" />
       </div>
 
       {/* Lines list */}

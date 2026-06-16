@@ -25,13 +25,13 @@ const resultsContainerVariants = tv({
 
 const alternativeCardVariants = tv({
   base: [
-    'rounded-xl border bg-card p-4 transition-all duration-150',
+    'neo-brutal bg-card p-4 transition-all duration-150',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
   ],
   variants: {
     selected: {
-      true: 'border-2 border-internoRotas-azul-eletrico shadow-lg ring-1 ring-internoRotas-azul-eletrico/20',
-      false: 'border-card-border shadow-sm hover:shadow-md cursor-pointer',
+      true: 'border-2 border-internoRotas-azul-eletrico ring-1 ring-internoRotas-azul-eletrico/20',
+      false: 'border-card-border cursor-pointer',
     },
   },
   defaultVariants: {
@@ -40,7 +40,7 @@ const alternativeCardVariants = tv({
 });
 
 const etaBadgeVariants = tv({
-  base: 'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold',
+  base: 'inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold',
   variants: {
     source: {
       live: 'bg-success-bg text-success-text',
@@ -211,7 +211,7 @@ function AlternativeCard({ alternative, isSelected, onSelect }: AlternativeCardP
           <button
             type="button"
             onClick={onSelect}
-            className="flex min-h-9 items-center rounded-lg border border-card-border px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="neo-brutal-interactive flex min-h-9 items-center px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-label={`Comparar este itinerário: ${alternative.totalMinutes} min`}
           >
             Comparar
@@ -245,7 +245,7 @@ export function PlannerResults({ results }: PlannerResultsProps) {
 
   if (alternatives.length === 0) {
     return (
-      <div className="rounded-lg border border-card-border bg-card p-4 text-sm text-text-secondary">
+      <div className="neo-brutal-sm bg-card p-4 text-sm text-text-secondary">
         <p className="font-semibold text-text-primary">Nenhuma rota encontrada</p>
         <p className="mt-1">
           Não encontramos uma combinação viável entre essas paradas no tenant ativo. Tente outra

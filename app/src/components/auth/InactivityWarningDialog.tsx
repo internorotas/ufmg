@@ -17,7 +17,7 @@ export function InactivityWarningDialog({ open, onContinue }: InactivityWarningD
         <Dialog.Popup size="sm" className="mx-4 w-full max-w-sm">
           <div className="flex flex-col gap-4 p-5">
             <div className="flex items-center gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-warning-bg text-warning-text">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded bg-warning-bg text-warning-text">
                 <Timer size={20} aria-hidden="true" />
               </span>
               <Dialog.Title className="text-base font-semibold leading-snug">
@@ -34,7 +34,7 @@ export function InactivityWarningDialog({ open, onContinue }: InactivityWarningD
               <Button type="button" variant="primary" fullWidth onClick={onContinue}>
                 Continuar sessão
               </Button>
-              <div className="flex items-center gap-1.5 rounded-lg bg-background-secondary px-3 py-2 text-xs text-text-tertiary">
+              <div className="flex items-center gap-1.5 rounded bg-background-secondary px-3 py-2 text-xs text-text-tertiary">
                 <LogOut size={12} aria-hidden="true" />
                 <span>Logout automático em 5 min se não houver ação.</span>
               </div>

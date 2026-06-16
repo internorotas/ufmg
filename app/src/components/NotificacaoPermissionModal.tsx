@@ -59,7 +59,7 @@ export function NotificacaoPermissionModal({
     >
       <div className="flex flex-col items-center gap-5 py-4 text-center">
         {/* Ícone ilustrativo */}
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/12">
+        <div className="flex h-16 w-16 items-center justify-center rounded bg-brand-primary/12">
           <Bell size={32} className="text-brand-primary" aria-hidden="true" />
         </div>
 
@@ -76,7 +76,7 @@ export function NotificacaoPermissionModal({
 
         {/* Nota para usuários iOS */}
         {showIOSNote && (
-          <div className="flex w-full items-start gap-2 rounded-lg border border-warning-border bg-warning-bg p-3 text-left">
+          <div className="flex w-full items-start gap-2 neo-brutal bg-warning-bg p-3 text-left">
             <Info size={16} className="mt-0.5 shrink-0 text-warning-text" aria-hidden="true" />
             <p className="text-xs leading-relaxed text-warning-text">
               <Trans

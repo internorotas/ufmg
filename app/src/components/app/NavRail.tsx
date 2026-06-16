@@ -30,8 +30,7 @@ export function NavRail() {
       aria-label="Navegação principal"
       className={cn(
         'hidden md:flex md:w-20 md:shrink-0 md:flex-col md:items-stretch',
-        'md:border-r md:border-card-border md:bg-sidebar/95',
-        'md:backdrop-blur md:supports-[backdrop-filter]:bg-sidebar/80',
+        'md:border-r-2 md:border-(--neo-border-color) md:bg-sidebar',
       )}
     >
       <nav aria-label="Páginas principais" className="mt-4 flex flex-1 flex-col gap-1 px-2">
@@ -45,7 +44,7 @@ export function NavRail() {
               to={resolvedTo}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'relative flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-[11px] font-medium',
+                'relative flex flex-col items-center justify-center gap-1 rounded px-2 py-2.5 text-[11px] font-medium',
                 'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
                 active
                   ? 'bg-brand-primary/10 text-brand-primary'
@@ -55,7 +54,7 @@ export function NavRail() {
               <span
                 aria-hidden="true"
                 className={cn(
-                  'pointer-events-none absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-brand-primary transition-opacity',
+                  'pointer-events-none absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-none bg-brand-primary transition-opacity',
                   active ? 'opacity-100' : 'opacity-0',
                 )}
               />

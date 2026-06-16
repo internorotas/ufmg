@@ -35,19 +35,19 @@ export function AppShell({
     <div className="flex flex-1 min-h-0 overflow-hidden bg-background-secondary text-text-primary">
       <a
         href="#shell-main"
-        className="sr-only absolute left-4 top-4 z-[1400] rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
+        className="sr-only absolute left-4 top-4 z-1400 bg-background px-4 py-2 text-sm font-semibold text-text-primary neo-brutal focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
       >
         Pular para conteúdo
       </a>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="sticky top-0 z-30 border-b border-card-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+        <header className="sticky top-0 z-30 border-b-2 border-(--neo-border-color) bg-card">
           <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-4 py-3 sm:px-6">
             <Link
               to={backTo}
               aria-label={backLabel}
               title={backLabel}
-              className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-card-border bg-background text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              className="neo-brutal-interactive flex items-center justify-center size-11 shrink-0 bg-background text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             >
               <ArrowLeft size={20} aria-hidden="true" />
             </Link>

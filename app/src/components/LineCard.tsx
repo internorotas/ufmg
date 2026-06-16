@@ -31,15 +31,14 @@ import { LineStatusBadge, type LineStatusType } from './ui/Badge';
  */
 export const lineCardVariants = tv({
   base: [
-    'relative overflow-hidden rounded-xl border bg-card shadow-sm',
-    'transition-all duration-200 ease-out',
-    'hover:shadow-lg hover:-translate-y-0.5',
+    'relative overflow-hidden neo-brutal bg-card',
+    'hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform duration-100',
     'focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-primary focus-within:ring-offset-2',
   ],
   variants: {
     selected: {
-      true: ['border-2 border-brand-primary shadow-lg', 'ring-1 ring-brand-primary/20'],
-      false: ['border-card-border', 'hover:border-info-border'],
+      true: ['border-2 border-brand-primary shadow-[var(--neo-shadow-lg)]'],
+      false: ['border-card-border'],
     },
   },
   defaultVariants: {
@@ -52,8 +51,8 @@ export const lineCardVariants = tv({
  */
 export const detailsButtonVariants = tv({
   base: [
-    'w-full rounded-lg border bg-background px-4 py-3 font-semibold cursor-pointer',
-    'text-sm shadow-sm',
+    'w-full neo-brutal-sm bg-background px-4 py-3 font-semibold cursor-pointer',
+    'text-sm',
     'hover:bg-card-hover active:scale-[0.97] transition-all duration-150',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
   ],
@@ -310,7 +309,7 @@ function LineCardComponent({
                   <div className="flex shrink-0 items-center gap-1.5">
                     {favoritado && (
                       <span
-                        className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                        className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[11px] font-semibold"
                         style={{
                           borderColor: hexToRgba(linha.corHex, 0.32),
                           backgroundColor: hexToRgba(linha.corHex, 0.12),

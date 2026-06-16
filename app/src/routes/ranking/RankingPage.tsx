@@ -95,7 +95,7 @@ export function RankingPage() {
       }
     >
       <div className="flex flex-col gap-5">
-        <header className="rounded-xl border border-card-border bg-card px-5 py-4 shadow-sm">
+        <header className="neo-brutal bg-card px-5 py-4">
           <div className="flex items-center gap-2 text-text-secondary">
             <Trophy size={18} aria-hidden="true" className="shrink-0 text-brand-primary" />
             <p className="text-sm">
@@ -105,7 +105,7 @@ export function RankingPage() {
         </header>
 
         {collaborativeFeedback ? (
-          <div className="rounded-xl border border-info-border bg-card px-4 py-3 text-sm text-text-primary">
+          <div className="neo-brutal-sm bg-card px-4 py-3 text-sm text-text-primary">
             {collaborativeFeedback}
           </div>
         ) : null}
@@ -131,7 +131,7 @@ export function RankingPage() {
                       key={item}
                       type="button"
                       onClick={() => setPeriod(item)}
-                      className={`min-h-11 rounded-full border px-3 text-sm font-semibold ${
+                      className={`neo-brutal-interactive min-h-11 px-3 text-sm font-semibold ${
                         period === item
                           ? 'border-brand-primary bg-brand-primary text-text-inverse'
                           : 'border-card-border bg-background text-text-secondary'
@@ -152,7 +152,7 @@ export function RankingPage() {
                       key={item}
                       type="button"
                       onClick={() => setScope(item)}
-                      className={`min-h-11 rounded-full border px-3 text-sm font-semibold ${
+                      className={`neo-brutal-interactive min-h-11 px-3 text-sm font-semibold ${
                         scope === item
                           ? 'border-brand-primary bg-brand-primary text-text-inverse'
                           : 'border-card-border bg-background text-text-secondary'
@@ -164,7 +164,7 @@ export function RankingPage() {
                 </div>
               </div>
               {!isAuthenticated ? (
-                <div className="rounded-xl border border-card-border bg-background px-3 py-3 text-sm text-text-secondary">
+                <div className="neo-brutal-sm bg-background px-3 py-3 text-sm text-text-secondary">
                   <p className="font-semibold text-text-primary">Top 10 público</p>
                   <p className="mt-1">
                     A consulta do ranking público não exige login e não bloqueia mapa, linhas,
@@ -195,7 +195,7 @@ export function RankingPage() {
                 entries.map((entry, index) => (
                   <div
                     key={entry.displayName}
-                    className="flex items-center justify-between rounded-xl border border-card-border bg-background px-3 py-3"
+                    className="neo-brutal-sm flex items-center justify-between bg-background px-3 py-3"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex size-9 items-center justify-center rounded-full border border-card-border bg-card">
@@ -218,7 +218,7 @@ export function RankingPage() {
               )}
 
               {isAuthenticated && privateRanking?.currentUser ? (
-                <div className="rounded-xl border border-info-border bg-info-bg px-4 py-3 text-sm text-info-text">
+                <div className="neo-brutal-sm bg-info-bg px-4 py-3 text-sm text-info-text">
                   <div className="flex items-center gap-2 font-semibold">
                     <Shield size={16} aria-hidden="true" />
                     Sua posição atual

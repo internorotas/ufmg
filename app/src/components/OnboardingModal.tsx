@@ -85,7 +85,7 @@ export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
         <Dialog.Backdrop />
         <Dialog.Popup size="sm">
           <div className="flex flex-col items-center py-6 px-4">
-            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/10">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center neo-brutal-sm bg-brand-primary/10">
               <CurrentIcon className="h-8 w-8 text-brand-primary" />
             </div>
 
@@ -116,7 +116,7 @@ export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
               <button
                 type="button"
                 key={slide.title}
-                className={`h-2 rounded-full transition-colors ${
+                className={`h-2 rounded-sm transition-colors ${
                   index === currentSlide ? 'w-6 bg-brand-primary' : 'w-2 bg-card-border'
                 }`}
                 aria-label={`Slide ${index + 1}`}

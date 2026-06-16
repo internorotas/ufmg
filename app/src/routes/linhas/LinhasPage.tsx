@@ -135,7 +135,7 @@ export function LinhasPage() {
   return (
     <div className="flex flex-1 min-h-0 flex-col overflow-hidden text-text-primary">
       {/* Header */}
-      <header className="shrink-0 border-b border-card-border bg-brand-primary px-3 py-2 shadow-sm">
+      <header className="shrink-0 neo-brutal-sm bg-brand-primary px-3 py-2">
         <div className="flex items-center gap-3">
           <Link
             to="/"
@@ -149,7 +149,7 @@ export function LinhasPage() {
       </header>
 
       {/* Search */}
-      <div className="shrink-0 border-b border-card-border bg-background-secondary p-2 lg:p-3">
+      <div className="shrink-0 neo-brutal-sm bg-background-secondary p-2 lg:p-3">
         <SearchInput
           value={searchTerm}
           onValueChange={setSearchTerm}
@@ -234,7 +234,7 @@ export function LinhasPage() {
                 />
               </div>
             ))}
-            <div className="mb-3 mt-1 border-b border-card-border" aria-hidden="true" />
+            <div className="mb-3 mt-1 border-b-2 border-card-border" aria-hidden="true" />
           </section>
         )}
 

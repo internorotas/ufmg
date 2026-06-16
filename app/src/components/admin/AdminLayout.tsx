@@ -99,16 +99,16 @@ export function AdminLayout() {
   }, [linhasState]);
 
   const btnBase =
-    'px-2.5 py-1.5 text-xs rounded border transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
+    'px-2.5 py-1.5 text-xs rounded-(--neo-radius) border transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-text-primary">
       {/* Barra de topo fixa */}
-      <header className="flex items-center gap-2 px-3 py-2 bg-card border-b border-card-border shrink-0 flex-wrap">
+      <header className="flex items-center gap-2 px-3 py-2 bg-card border-b-2 border-(--neo-border-color) shrink-0 flex-wrap">
         <span className="font-bold text-sm text-text-primary whitespace-nowrap">⚙️ Admin Panel</span>
 
         {/* Seletor de aba */}
-        <div className="flex rounded-md overflow-hidden border border-card-border text-xs font-medium">
+        <div className="flex neo-brutal-sm overflow-hidden text-xs font-medium">
           <button
             type="button"
             onClick={() => setActiveTab('paradas')}
@@ -135,7 +135,7 @@ export function AdminLayout() {
 
         {/* Indicador de alterações */}
         {changesCount > 0 && (
-          <span className="px-2 py-0.5 text-xs bg-warning-bg text-warning-text border border-warning-border rounded-full">
+          <span className="px-2 py-0.5 text-xs bg-warning-bg text-warning-text border border-warning-border rounded">
             {changesCount} {changesCount === 1 ? 'alteração' : 'alterações'}
           </span>
         )}
@@ -188,7 +188,7 @@ export function AdminLayout() {
               exportParadas();
               exportLinhas();
             }}
-            className="px-3 py-1.5 text-xs rounded font-semibold bg-brand-primary text-text-inverse hover:opacity-90 transition-opacity"
+            className="px-3 py-1.5 text-xs neo-brutal-sm font-semibold bg-brand-primary text-text-inverse hover:opacity-90 transition-opacity"
           >
             ↓ Exportar Tudo
           </button>

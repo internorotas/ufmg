@@ -33,7 +33,10 @@ export const emptyStateVariants = tv({
  * Variantes do ícone
  */
 export const emptyStateIconVariants = tv({
-  base: ['flex items-center justify-center rounded-full', 'bg-card-hover text-text-tertiary'],
+  base: [
+    'neo-brutal-sm flex items-center justify-center rounded',
+    'bg-brand-secondary text-text-tertiary',
+  ],
   variants: {
     size: {
       sm: 'size-12',

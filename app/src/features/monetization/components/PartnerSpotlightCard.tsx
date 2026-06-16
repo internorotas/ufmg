@@ -33,17 +33,17 @@ export function PartnerSpotlightCard({ partner, onClick }: PartnerSpotlightCardP
             target="_blank"
             rel="noopener noreferrer"
             onClick={onClick}
-            className="block rounded-lg border border-card-border bg-background px-3 py-3 transition-colors hover:bg-card-hover"
+            className="block neo-brutal-interactive bg-background px-3 py-3"
           >
             <div className="flex items-start gap-3">
               {partner.logoUrl ? (
                 <img
                   src={partner.logoUrl}
                   alt={`Logo de ${partner.nome}`}
-                  className="size-12 rounded-lg border border-card-border bg-card object-cover"
+                  className="size-12 neo-brutal-sm bg-card object-cover"
                 />
               ) : (
-                <div className="flex size-12 items-center justify-center rounded-lg border border-card-border bg-card text-brand-primary">
+                <div className="flex size-12 items-center justify-center neo-brutal-sm bg-card text-brand-primary">
                   <Building2 size={18} aria-hidden="true" />
                 </div>
               )}

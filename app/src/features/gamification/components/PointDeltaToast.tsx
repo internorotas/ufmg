@@ -14,9 +14,9 @@ export function PointDeltaToast({ event }: PointDeltaToastProps) {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none animate-gamification-toast fixed bottom-6 right-4 z-[1500] flex max-w-80 items-start gap-3 rounded-xl border border-card-border bg-card px-4 py-3 text-sm shadow-lg"
+      className="pointer-events-none animate-gamification-toast fixed bottom-6 right-4 z-[1500] flex max-w-80 items-start gap-3 neo-brutal-lg bg-card px-4 py-3 text-sm"
     >
-      <div className="rounded-full border border-card-border bg-background p-2 text-brand-primary">
+      <div className="neo-brutal-sm bg-background p-2 text-brand-primary">
         <Trophy size={16} aria-hidden="true" />
       </div>
       <div className="min-w-0">

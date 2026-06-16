@@ -19,7 +19,7 @@ import { PlannerResults } from './PlannerResults';
 // ---------------------------------------------------------------------------
 
 const panelVariants = tv({
-  base: 'flex flex-col gap-3 border-b border-card-border bg-background-secondary p-3 lg:p-4',
+  base: 'flex flex-col gap-3 border-b-2 border-(--neo-border-color) bg-background-secondary p-3 lg:p-4',
 });
 
 const fieldContainerVariants = tv({
@@ -32,14 +32,14 @@ const fieldLabelVariants = tv({
 
 const tokenRowVariants = tv({
   base: [
-    'flex min-h-11 items-center gap-2 rounded-lg border',
-    'border-card-border bg-card px-3 py-2',
+    'flex min-h-11 items-center gap-2 neo-brutal-sm',
+    'bg-card px-3 py-2',
     'text-sm font-semibold text-text-primary',
   ],
 });
 
 const suggestionsListVariants = tv({
-  base: ['mt-1 max-h-48 overflow-y-auto rounded-lg border border-card-border', 'bg-card shadow-md'],
+  base: ['mt-1 max-h-48 overflow-y-auto neo-brutal', 'bg-card'],
 });
 
 const suggestionItemVariants = tv({
@@ -52,14 +52,14 @@ const suggestionItemVariants = tv({
 
 const searchInputVariants = tv({
   base: [
-    'min-h-11 w-full rounded-lg border border-input-border bg-input px-3',
+    'min-h-11 w-full rounded border border-input-border bg-input px-3',
     'text-sm text-text-primary placeholder:text-text-tertiary',
     'focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary',
   ],
 });
 
 const inlineErrorVariants = tv({
-  base: 'rounded-md bg-warning-bg px-3 py-2 text-xs font-medium text-warning-text',
+  base: 'rounded bg-warning-bg px-3 py-2 text-xs font-medium text-warning-text',
 });
 
 const normalizeQuery = (q: string) => q.toLowerCase().trim();
@@ -115,7 +115,7 @@ function EndpointField({
           <button
             type="button"
             onClick={onClear}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-label={`Remover ${label}`}
           >
             <X size={14} aria-hidden="true" />
@@ -342,7 +342,7 @@ export function PlannerPanel() {
               swap();
               resetMutation();
             }}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-card-border bg-background hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="flex h-8 w-8 items-center justify-center rounded border border-card-border bg-background hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-label="Trocar origem e destino"
             title="Trocar origem e destino"
           >

@@ -22,7 +22,7 @@ export function LgpdConsentDialog({ isOpen, onClose, onAccept, onRefuse }: LgpdC
       size="sm"
     >
       <div className="flex flex-col items-center gap-4 py-2 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/12">
+        <div className="flex h-16 w-16 items-center justify-center neo-brutal-sm bg-brand-primary/10">
           <ShieldCheck size={30} className="text-brand-primary" aria-hidden="true" />
         </div>
 

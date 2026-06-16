@@ -22,7 +22,7 @@ export function Switch({ checked, disabled, className }: SwitchProps) {
     <span
       aria-hidden="true"
       className={cn(
-        'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full',
+        'relative inline-flex h-6 w-11 shrink-0 items-center rounded border-2 border-brand-dark',
         'transition-colors duration-150 ease-in-out',
         checked
           ? 'bg-success-border dark:bg-success-border'
@@ -33,7 +33,7 @@ export function Switch({ checked, disabled, className }: SwitchProps) {
     >
       <span
         className={cn(
-          'pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm ring-0',
+          'pointer-events-none inline-block size-5 rounded bg-white shadow-sm ring-0',
           'transform transition-transform duration-150 ease-in-out',
           checked ? 'translate-x-[22px]' : 'translate-x-[2px]',
         )}

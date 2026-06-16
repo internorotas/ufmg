@@ -3,7 +3,7 @@ import { Info } from 'lucide-react';
 export function DisclaimerEstimativa() {
   return (
     <section
-      className="rounded-lg border border-info-border/60 bg-info-bg/80 p-2.5"
+      className="rounded border border-info-border/60 bg-info-bg/80 p-2.5"
       aria-label="Aviso sobre estimativas de chegada"
     >
       <div className="flex items-center gap-1.5">

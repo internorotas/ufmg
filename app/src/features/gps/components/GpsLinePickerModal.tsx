@@ -20,7 +20,7 @@ interface LinhaGroup {
 function LineNumberBadge({ numero, corHex }: { numero: number; corHex: string }) {
   return (
     <div
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold tabular-nums"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded text-sm font-bold tabular-nums"
       style={{ backgroundColor: `${corHex}22`, color: corHex }}
       aria-hidden="true"
     >
@@ -34,7 +34,7 @@ function SublinhaRow({ linha, onSelect }: { linha: Linha; onSelect: (l: Linha) =
     <button
       type="button"
       onClick={() => onSelect(linha)}
-      className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary"
+      className="flex w-full items-center gap-3 rounded px-2 py-2.5 text-left hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary"
       aria-label={`Selecionar linha ${linha.linha}${linha.sublinha ? ` — ${linha.sublinha}` : ''}: ${linha.nome}`}
     >
       <LineNumberBadge numero={linha.linha} corHex={linha.corHex} />
@@ -199,7 +199,7 @@ export function GpsLinePickerModal({
           className="fixed inset-x-0 bottom-0 top-auto flex max-h-[88dvh] w-full max-w-none flex-col rounded-b-none rounded-t-2xl sm:static sm:max-h-[85vh] sm:max-w-md sm:rounded-xl"
         >
           {/* Header */}
-          <header className="flex shrink-0 items-center justify-between border-b border-card-border bg-background-secondary px-4 py-3">
+          <header className="flex shrink-0 items-center justify-between border-b-2 border-card-border bg-background-secondary px-4 py-3">
             <div className="flex items-center gap-2">
               <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
                 <Radio size={15} aria-hidden="true" />
@@ -233,7 +233,7 @@ export function GpsLinePickerModal({
                 placeholder="Buscar por nome, número ou destino…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full rounded-lg border border-input-border bg-input py-2.5 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                className="w-full rounded border border-input-border bg-input py-2.5 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary"
                 aria-label="Buscar linha de ônibus"
               />
             </div>

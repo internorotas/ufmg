@@ -15,7 +15,7 @@ import { cn } from '../lib/utils';
  */
 export const themeToggleVariants = tv({
   base: [
-    'inline-flex items-center justify-center rounded-lg p-1 cursor-pointer',
+    'inline-flex items-center justify-center rounded p-1 cursor-pointer',
     'transition-all duration-150 ease-out',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
     'active:scale-90 hover:scale-105',

@@ -176,11 +176,11 @@ export function ControlesUsuarioMapa({
             }
             title={`${rastreioColaborativo.label} · ${textoRastreio}`}
             className={cn(
-              'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-200 active:scale-95',
+              'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
               rastreioAtivo
-                ? 'bg-success-border text-white hover:bg-success-border/90'
-                : 'bg-card text-text-primary ring-1 ring-card-border hover:bg-card-hover',
+                ? 'border-success-border bg-success-border text-white'
+                : 'bg-card text-text-primary hover:bg-card-hover',
             )}
           >
             {rastreioAtivo ? (
@@ -195,8 +195,8 @@ export function ControlesUsuarioMapa({
           type="button"
           onClick={handleCentralizarCampus}
           className={cn(
-            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-200 active:scale-95',
-            'bg-card text-text-primary ring-1 ring-card-border hover:bg-card-hover',
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+            'bg-card text-text-primary hover:bg-card-hover',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
           )}
           aria-label={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
@@ -211,10 +211,10 @@ export function ControlesUsuarioMapa({
           disabled={carregandoLocalizacao}
           aria-busy={carregandoLocalizacao}
           className={cn(
-            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-200 active:scale-95',
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
             'bg-brand-primary text-white hover:bg-brand-primary/90',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
-            'disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100',
+            'disabled:opacity-70 disabled:cursor-not-allowed',
           )}
           aria-label={
             carregandoLocalizacao

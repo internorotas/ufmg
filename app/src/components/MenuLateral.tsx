@@ -48,9 +48,9 @@ export const sidebarVariants = tv({
     'fixed inset-y-0 left-0 z-[1003] flex flex-col',
     'h-[calc(100dvh-3.5rem-env(safe-area-inset-bottom))] md:h-full',
     'w-screen max-w-none md:relative md:w-1/2 md:max-w-md',
-    'border-r border-card-border/50 text-text-primary',
+    'border-r-2 border-[var(--neo-border-color)] text-text-primary',
     'bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150',
-    'shadow-2xl md:shadow-none',
+    'shadow-none',
     'overflow-hidden',
     'transform transition-transform duration-300',
   ],
@@ -70,14 +70,14 @@ export const sidebarVariants = tv({
  */
 export const categoryTabVariants = tv({
   base: [
-    'flex-1 min-h-11 rounded-md px-2 py-1.5 lg:py-2.5',
+    'flex-1 min-h-11 rounded px-2 py-1.5 lg:py-2.5',
     'text-[0.75rem] sm:text-xs lg:text-sm font-medium leading-tight text-center',
     'whitespace-normal break-words overflow-visible text-clip',
     'cursor-pointer transition-all duration-150 ease-out',
     'active:scale-[0.97]',
-    'data-[state=active]:bg-brand-primary data-[state=active]:text-white data-[state=active]:shadow-sm',
+    'data-[state=active]:bg-brand-primary data-[state=active]:text-white',
     'data-[state=inactive]:bg-background-secondary data-[state=inactive]:text-text-secondary',
-    'data-[state=inactive]:border data-[state=inactive]:border-card-border data-[state=inactive]:shadow-sm',
+    'data-[state=inactive]:border data-[state=inactive]:border-card-border',
     'data-[state=inactive]:hover:bg-card-hover data-[state=inactive]:hover:text-text-primary',
     'data-[state=inactive]:hover:border-card-border',
   ],
@@ -546,7 +546,7 @@ export const MenuLateral = React.memo(function MenuLateral({
               }}
               variant="ghost"
               size="sm"
-              className="rounded-lg p-2 text-white hover:bg-white/20 md:hidden"
+              className="rounded p-2 text-white hover:bg-white/20 md:hidden"
               aria-label={t('header.closeMenu')}
               title={t('header.closeMenu')}
             >

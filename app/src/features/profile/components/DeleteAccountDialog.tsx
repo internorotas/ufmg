@@ -52,7 +52,7 @@ export function DeleteAccountDialog({
       size="sm"
     >
       <div className="flex flex-col gap-4">
-        <div className="rounded-xl border border-warning-border bg-warning-bg/60 p-4">
+        <div className="rounded border border-warning-border bg-warning-bg/60 p-4">
           <div className="mb-2 flex items-center gap-2 text-warning-text">
             <AlertTriangle size={18} aria-hidden="true" />
             <strong className="text-sm">Ação irreversível</strong>

@@ -29,7 +29,7 @@ export function GpsPositionWarningDialog({
           <div className="flex flex-col gap-4 p-5">
             {/* Ícone */}
             <div className="flex items-center gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-warning-bg text-warning-text">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded bg-warning-bg text-warning-text">
                 <AlertTriangle size={20} aria-hidden="true" />
               </span>
               <Dialog.Title className="text-base font-semibold leading-snug">
@@ -42,7 +42,7 @@ export function GpsPositionWarningDialog({
             </Dialog.Description>
 
             {/* Detalhes */}
-            <div className="rounded-xl border border-card-border bg-card p-3">
+            <div className="neo-brutal bg-card p-3">
               <div className="flex items-center gap-2.5">
                 <span
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold tabular-nums"

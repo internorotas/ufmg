@@ -53,9 +53,9 @@ export function IosInstallModal({ isOpen, onClose }: IosInstallModalProps) {
             return (
               <li
                 key={passo.id}
-                className="flex items-start gap-3 rounded-lg border border-card-border bg-background-secondary p-3"
+                className="flex items-start gap-3 neo-brutal-sm bg-background-secondary p-3"
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-text-inverse">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-brand-primary text-xs font-bold text-text-inverse">
                   {idx + 1}
                 </div>
                 <div className="flex items-start gap-2">
