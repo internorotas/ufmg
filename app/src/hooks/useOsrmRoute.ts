@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { routingService } from '@/services/routing';
 
 // v2: invalida cache v1 que continha rotas incorretas do OSRM
 const CACHE_KEY_PREFIX = 'osrm_route_v2_';
@@ -11,28 +12,6 @@ const MIN_POINTS_FOR_REAL_ROUTE = 30;
 interface OsrmCacheEntry {
   ts: number;
   data: [number, number][];
-}
-
-async function fetchOsrmRoute(stops: [number, number][]): Promise<[number, number][]> {
-  // OSRM espera lng,lat na URL; Leaflet usa [lat, lng]
-  const coordStr = stops.map(([lat, lng]) => `${lng},${lat}`).join(';');
-  const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`;
-
-  const res = await fetch(url, {
-    signal: AbortSignal.timeout(8000),
-    headers: { Accept: 'application/json' },
-  });
-  if (!res.ok) throw new Error(`OSRM ${res.status}`);
-
-  const json = (await res.json()) as {
-    routes?: Array<{ geometry: { coordinates: [number, number][] } }>;
-  };
-
-  const coords = json.routes?.[0]?.geometry?.coordinates;
-  if (!coords?.length) throw new Error('OSRM sem coordenadas');
-
-  // GeoJSON retorna [lng, lat] — converter para [lat, lng] do Leaflet
-  return coords.map(([lng, lat]) => [lat, lng]);
 }
 
 /**
@@ -82,7 +61,8 @@ export function useOsrmRoute(
       // cache corrompido — ignora e busca novamente
     }
 
-    fetchOsrmRoute(fallbackCoords)
+    routingService
+      .getRoute(fallbackCoords)
       .then((snapped) => {
         setCoords(snapped);
         localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: snapped }));

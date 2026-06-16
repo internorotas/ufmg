@@ -5,30 +5,13 @@
  * Gerencia a renderização de todos os marcadores de paradas.
  */
 
-import L from 'leaflet';
+import type L from 'leaflet';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Marker } from 'react-leaflet';
-import icon from '../../assets/marker.svg';
 import { useAnalytics } from '../../hooks/useAnalytics';
+import { highlightedIcon, stationIcon } from '../../lib/mapIcons';
 import type { Parada } from '../../types/data.types';
 import { PopupCustomizado } from '../PopupCustomizado';
-
-// Ícone padrão para paradas
-const stationIcon = L.icon({
-  iconUrl: icon,
-  iconSize: [30, 30],
-  iconAnchor: [15, 30],
-  popupAnchor: [0, -30],
-});
-
-// Ícone destacado (quando parada é selecionada)
-const highlightedIcon = L.icon({
-  iconUrl: icon,
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
-  className: 'marker-highlighted',
-});
 
 interface MapMarkersProps {
   paradas: Parada[];
