@@ -8,6 +8,7 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { Button } from '@/components/ui/Button';
 import { useRotasData } from '@/contexts/RotasDataContext';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import type { Parada } from '@/types/data.types';
 import { usePlannerRoutes } from '../api/usePlannerRoutes';
 import { type PlannerEndpoint, type PlannerStop, usePlannerStore } from '../store/plannerStore';
@@ -268,8 +269,10 @@ export function PlannerPanel() {
           const { latitude: lat, longitude: lng } = pos.coords;
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 6000);
-          const res = await fetch(`/v1/transit/stops/nearest?lat=${lat}&lng=${lng}&limit=1`, {
+          const url = resolveApiEndpoint(`/v1/transit/stops/nearest?lat=${lat}&lng=${lng}&limit=1`);
+          const res = await fetch(url, {
             signal: controller.signal,
+            headers: withTenantHeaders(),
           });
           clearTimeout(timeoutId);
           if (!res.ok) return;
