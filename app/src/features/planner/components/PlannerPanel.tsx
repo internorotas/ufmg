@@ -444,7 +444,34 @@ export function PlannerPanel() {
         </p>
       )}
 
-      {results && !isError && <PlannerResults results={results as PlannerRoutesResponse} />}
+      {isPending && (
+        <div className="flex flex-col gap-2" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="animate-pulse rounded-(--shape-sm) border border-card-border bg-card p-4"
+            >
+              <div className="mb-3 flex items-start justify-between">
+                <div className="flex flex-col gap-1.5">
+                  <div className="h-7 w-14 rounded bg-background-secondary" />
+                  <div className="h-3 w-24 rounded bg-background-secondary" />
+                </div>
+                <div className="h-5 w-16 rounded-full bg-background-secondary" />
+              </div>
+              <div className="mb-3 h-2 w-full rounded-full bg-background-secondary" />
+              <div className="flex gap-3">
+                <div className="h-3 w-16 rounded bg-background-secondary" />
+                <div className="h-3 w-14 rounded bg-background-secondary" />
+                <div className="h-3 w-10 rounded bg-background-secondary" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!isPending && results && !isError && (
+        <PlannerResults results={results as PlannerRoutesResponse} />
+      )}
     </section>
   );
 }

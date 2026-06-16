@@ -1,9 +1,4 @@
-/**
- * PlannerResults — lista de itinerários multimodais calculados pelo backend.
- * Até 3 alternativas, com caminhada explícita em minutos/metros.
- */
-
-import { Bus, Footprints, Map as MapIcon } from 'lucide-react';
+import { ArrowLeftRight, Bus, Footprints, Map as MapIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { tv } from 'tailwind-variants';
 import { formatMinutes, formatTimeSP } from '@/lib/formatters';
@@ -11,6 +6,8 @@ import { usePlannerStore } from '../store/plannerStore';
 import {
   ETA_SOURCE_LABEL,
   type PlannerBusLeg,
+  type PlannerEtaSource,
+  type PlannerRouteLeg,
   type PlannerRoutesResponse,
   type PlannerWalkLeg,
 } from '../types';
@@ -19,38 +16,30 @@ import {
 // Variantes
 // ---------------------------------------------------------------------------
 
-const resultsContainerVariants = tv({
-  base: 'flex flex-col gap-2',
+const etaBadgeVariants = tv({
+  base: 'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold',
+  variants: {
+    source: {
+      live: 'bg-success-bg text-success-text',
+      historical: 'bg-warning-bg text-warning-text',
+      scheduled: 'border border-card-border bg-transparent text-text-tertiary',
+    },
+  },
+  defaultVariants: { source: 'scheduled' },
 });
 
-const alternativeCardVariants = tv({
+const cardVariants = tv({
   base: [
-    'neo-brutal bg-card p-4 transition-all duration-150',
+    'rounded-(--shape-sm) bg-card p-4 transition-all duration-200',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
   ],
   variants: {
     selected: {
-      true: 'border-2 border-internoRotas-azul-eletrico ring-1 ring-internoRotas-azul-eletrico/20',
-      false: 'border-card-border cursor-pointer',
+      true: 'border-2 border-internoRotas-azul-eletrico shadow-[3px_3px_0_var(--color-internoRotas-azul-eletrico)]',
+      false: 'neo-brutal cursor-pointer hover:bg-card-hover',
     },
   },
-  defaultVariants: {
-    selected: false,
-  },
-});
-
-const etaBadgeVariants = tv({
-  base: 'inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold',
-  variants: {
-    source: {
-      live: 'bg-success-bg text-success-text',
-      historical: 'bg-background-secondary text-text-secondary',
-      scheduled: 'border border-card-border bg-transparent text-text-tertiary',
-    },
-  },
-  defaultVariants: {
-    source: 'scheduled',
-  },
+  defaultVariants: { selected: false },
 });
 
 const legConnectorVariants = tv({
@@ -61,10 +50,100 @@ const legConnectorVariants = tv({
       bus: 'border-l-2 border-solid',
     },
   },
-  defaultVariants: {
-    kind: 'walk',
-  },
+  defaultVariants: { kind: 'walk' },
 });
+
+// ---------------------------------------------------------------------------
+// JourneyTimelineBar — barra proporcional que permite comparação visual imediata
+// ---------------------------------------------------------------------------
+
+function JourneyTimelineBar({
+  legs,
+  totalMinutes,
+}: {
+  legs: PlannerRouteLeg[];
+  totalMinutes: number;
+}) {
+  const busLegs = legs.filter((l): l is PlannerBusLeg => l.kind === 'bus');
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex h-2 w-full gap-0.5 overflow-hidden rounded-full bg-background-secondary">
+        {legs.map((leg) => {
+          const pct = Math.max((leg.minutes / totalMinutes) * 100, 3);
+          const segKey = `${leg.kind}-${leg.fromStopId}-${leg.toStopId}`;
+          return (
+            <div
+              key={segKey}
+              className="h-full rounded-full"
+              style={{
+                width: `${pct}%`,
+                backgroundColor:
+                  leg.kind === 'bus'
+                    ? (leg as PlannerBusLeg).lineColorHex
+                    : 'var(--color-text-tertiary)',
+                opacity: leg.kind === 'walk' ? 0.35 : 1,
+              }}
+            />
+          );
+        })}
+      </div>
+      {busLegs.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1">
+          {busLegs.map((leg) => (
+            <span
+              key={`${leg.lineId}-${leg.fromStopId}`}
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold"
+              style={{
+                backgroundColor: `${leg.lineColorHex}18`,
+                color: leg.lineColorHex,
+                border: `1px solid ${leg.lineColorHex}30`,
+              }}
+            >
+              <Bus size={9} aria-hidden="true" />
+              {leg.lineName}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// JourneyStatChips
+// ---------------------------------------------------------------------------
+
+function JourneyStatChips({
+  walkingMinutes,
+  transferCount,
+  busCount,
+}: {
+  walkingMinutes: number;
+  transferCount: number;
+  busCount: number;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-secondary">
+      <span className="flex items-center gap-1">
+        <Footprints size={11} aria-hidden="true" />
+        {walkingMinutes} min a pé
+      </span>
+      <span className="flex items-center gap-1">
+        <Bus size={11} aria-hidden="true" />
+        {busCount} ônibus
+      </span>
+      {transferCount > 0 ? (
+        <span className="flex items-center gap-1">
+          <ArrowLeftRight size={11} aria-hidden="true" />
+          {transferCount} troca{transferCount !== 1 ? 's' : ''}
+        </span>
+      ) : (
+        <span className="font-medium text-success-text">Direto</span>
+      )}
+    </div>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // WalkLegRow
@@ -97,7 +176,6 @@ function BusLegRow({ leg }: { leg: PlannerBusLeg }) {
 
   return (
     <div className="flex items-start gap-3 py-1.5" data-slot="bus-leg">
-      {/* Indicador de cor da linha */}
       <div
         className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
         style={{ backgroundColor: `${leg.lineColorHex}20` }}
@@ -134,8 +212,9 @@ interface AlternativeCardProps {
 
 function AlternativeCard({ alternative, isSelected, onSelect }: AlternativeCardProps) {
   const legList = alternative.legs;
+  const busLegs = legList.filter((l): l is PlannerBusLeg => l.kind === 'bus');
   const hasLive = alternative.etaBadges.some((b) => b.source === 'live');
-  const primaryBadge = hasLive
+  const primaryBadge: PlannerEtaSource = hasLive
     ? 'live'
     : alternative.etaBadges.some((b) => b.source === 'historical')
       ? 'historical'
@@ -144,7 +223,7 @@ function AlternativeCard({ alternative, isSelected, onSelect }: AlternativeCardP
   return (
     <article
       data-slot="card"
-      className={alternativeCardVariants({ selected: isSelected })}
+      className={cardVariants({ selected: isSelected })}
       aria-label={`Itinerário: ${alternative.totalMinutes} min, chegada ${alternative.arrivalTime}`}
       data-selected={isSelected}
       onClick={isSelected ? undefined : onSelect}
@@ -159,42 +238,68 @@ function AlternativeCard({ alternative, isSelected, onSelect }: AlternativeCardP
       {/* Cabeçalho */}
       <header className="mb-3 flex items-start justify-between gap-2">
         <div className="flex flex-col gap-0.5">
-          <span className="text-xl font-bold tabular-nums text-text-primary">
+          <span className="text-2xl font-bold tabular-nums text-text-primary">
             {formatMinutes(alternative.totalMinutes)}
           </span>
           <span className="text-xs tabular-nums text-text-secondary">
-            Chegada {formatTimeSP(alternative.arrivalTime)} · {alternative.transferCount} troca
-            {alternative.transferCount !== 1 ? 's' : ''} · {alternative.walkingMinutes} min a pé
+            Chegada {formatTimeSP(alternative.arrivalTime)}
           </span>
         </div>
         <span className={etaBadgeVariants({ source: primaryBadge })}>
+          {primaryBadge === 'live' && (
+            <span className="size-1.5 rounded-full bg-current" aria-hidden="true" />
+          )}
           {ETA_SOURCE_LABEL[primaryBadge]}
         </span>
       </header>
 
-      {/* Legs */}
-      <ul className="flex flex-col" aria-label="Segmentos do itinerário">
-        {legList.map((leg, idx) => {
-          const legKey = `${alternative.routeId}:${leg.kind}:${leg.fromStopId}:${leg.toStopId}:${leg.pathStopIds.join('>')}`;
+      {/* Barra de timeline proporcional */}
+      <div className="mb-3">
+        <JourneyTimelineBar legs={legList} totalMinutes={alternative.totalMinutes} />
+      </div>
 
-          return (
-            <li key={legKey}>
-              {leg.kind === 'walk' ? <WalkLegRow leg={leg} /> : <BusLegRow leg={leg} />}
-              {idx < legList.length - 1 && (
-                <div
-                  className={legConnectorVariants({ kind: leg.kind })}
-                  style={
-                    leg.kind === 'bus'
-                      ? { borderColor: (leg as PlannerBusLeg).lineColorHex }
-                      : undefined
-                  }
-                  aria-hidden="true"
-                />
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {/* Chips de resumo */}
+      <div className="mb-1">
+        <JourneyStatChips
+          walkingMinutes={alternative.walkingMinutes}
+          transferCount={alternative.transferCount}
+          busCount={busLegs.length}
+        />
+      </div>
+
+      {/* Detalhes das legs — sempre no DOM, expandidas apenas quando selecionado */}
+      <div
+        className={`grid transition-[grid-template-rows] duration-200 ease-in-out ${
+          isSelected ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="border-t border-card-border pt-3 mt-3">
+            <ul className="flex flex-col" aria-label="Segmentos do itinerário">
+              {legList.map((leg, idx) => {
+                const legKey = `${alternative.routeId}:${leg.kind}:${leg.fromStopId}:${leg.toStopId}:${leg.pathStopIds.join('>')}`;
+
+                return (
+                  <li key={legKey}>
+                    {leg.kind === 'walk' ? <WalkLegRow leg={leg} /> : <BusLegRow leg={leg} />}
+                    {idx < legList.length - 1 && (
+                      <div
+                        className={legConnectorVariants({ kind: leg.kind })}
+                        style={
+                          leg.kind === 'bus'
+                            ? { borderColor: (leg as PlannerBusLeg).lineColorHex }
+                            : undefined
+                        }
+                        aria-hidden="true"
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      </div>
 
       {/* Footer */}
       <footer className="mt-3 flex gap-2 border-t border-card-border pt-3">
@@ -245,11 +350,12 @@ export function PlannerResults({ results }: PlannerResultsProps) {
 
   if (alternatives.length === 0) {
     return (
-      <div className="neo-brutal-sm bg-card p-4 text-sm text-text-secondary">
+      <div className="flex flex-col items-center gap-2 rounded-(--shape-sm) border border-card-border bg-card px-4 py-8 text-center">
+        <MapIcon size={32} className="text-text-tertiary" aria-hidden="true" />
         <p className="font-semibold text-text-primary">Nenhuma rota encontrada</p>
-        <p className="mt-1">
-          Não encontramos uma combinação viável entre essas paradas no tenant ativo. Tente outra
-          origem, destino ou uma parada intermediária próxima.
+        <p className="max-w-xs text-sm text-text-secondary">
+          Não encontramos combinação viável entre essas paradas. Tente outra origem, destino ou uma
+          parada próxima.
         </p>
       </div>
     );
@@ -257,7 +363,7 @@ export function PlannerResults({ results }: PlannerResultsProps) {
 
   return (
     <div
-      className={resultsContainerVariants()}
+      className="flex flex-col gap-2"
       role="listbox"
       aria-label="Alternativas de rota"
       aria-live="polite"

@@ -1,24 +1,98 @@
-/**
- * PlannerSummarySheet — resumo mobile do itinerário selecionado.
- */
-
 import { ArrowLeft, Bus, Clock, Footprints, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { tv } from 'tailwind-variants';
 import { formatMinutes, formatTimeSP } from '@/lib/formatters';
 import { usePlannerStore } from '../store/plannerStore';
-import type { PlannerBusLeg } from '../types';
+import type { PlannerBusLeg, PlannerRouteLeg } from '../types';
 import { ETA_SOURCE_LABEL } from '../types';
+
+// ---------------------------------------------------------------------------
+// Variantes
+// ---------------------------------------------------------------------------
 
 const sheetVariants = tv({
   base: [
     'fixed bottom-0 left-0 right-0 z-[1100]',
-    'max-h-[70vh] overflow-y-auto',
-    'rounded-t border-t border-card-border bg-modal',
+    'max-h-[75vh] overflow-y-auto',
+    'rounded-t-xl border-t border-card-border bg-modal',
     'focus-visible:outline-none',
+    'shadow-[0_-4px_24px_rgba(0,0,0,0.12)]',
   ],
 });
+
+const etaBadgeVariants = tv({
+  base: 'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold',
+  variants: {
+    source: {
+      live: 'bg-success-bg text-success-text',
+      historical: 'bg-warning-bg text-warning-text',
+      scheduled: 'border border-card-border bg-transparent text-text-tertiary',
+    },
+  },
+  defaultVariants: { source: 'scheduled' },
+});
+
+// ---------------------------------------------------------------------------
+// JourneyTimelineBar (local — evita dependência circular com PlannerResults)
+// ---------------------------------------------------------------------------
+
+function JourneyTimelineBar({
+  legs,
+  totalMinutes,
+}: {
+  legs: PlannerRouteLeg[];
+  totalMinutes: number;
+}) {
+  const busLegs = legs.filter((l): l is PlannerBusLeg => l.kind === 'bus');
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex h-2 w-full gap-0.5 overflow-hidden rounded-full bg-background-secondary">
+        {legs.map((leg) => {
+          const pct = Math.max((leg.minutes / totalMinutes) * 100, 3);
+          const segKey = `${leg.kind}-${leg.fromStopId}-${leg.toStopId}`;
+          return (
+            <div
+              key={segKey}
+              className="h-full rounded-full"
+              style={{
+                width: `${pct}%`,
+                backgroundColor:
+                  leg.kind === 'bus'
+                    ? (leg as PlannerBusLeg).lineColorHex
+                    : 'var(--color-text-tertiary)',
+                opacity: leg.kind === 'walk' ? 0.35 : 1,
+              }}
+            />
+          );
+        })}
+      </div>
+      {busLegs.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1">
+          {busLegs.map((leg) => (
+            <span
+              key={`${leg.lineId}-${leg.fromStopId}`}
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold"
+              style={{
+                backgroundColor: `${leg.lineColorHex}18`,
+                color: leg.lineColorHex,
+                border: `1px solid ${leg.lineColorHex}30`,
+              }}
+            >
+              <Bus size={9} aria-hidden="true" />
+              {leg.lineName}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Props e helpers
+// ---------------------------------------------------------------------------
 
 export interface PlannerSummarySheetProps {
   isOpen: boolean;
@@ -30,6 +104,10 @@ function formatarDistancia(m: number): string {
   if (m >= 1000) return `${(m / 1000).toFixed(1)} km`;
   return `${Math.round(m)} m`;
 }
+
+// ---------------------------------------------------------------------------
+// PlannerSummarySheet
+// ---------------------------------------------------------------------------
 
 export function PlannerSummarySheet({
   isOpen,
@@ -138,10 +216,12 @@ export function PlannerSummarySheet({
       tabIndex={-1}
       className={sheetVariants()}
     >
+      {/* Handle */}
       <div className="flex justify-center pb-1 pt-3" aria-hidden="true">
         <div className="h-1 w-10 rounded-full bg-card-border" />
       </div>
 
+      {/* Header */}
       <header className="flex items-center justify-between gap-2 px-4 pb-3 pt-1">
         <button
           type="button"
@@ -163,10 +243,11 @@ export function PlannerSummarySheet({
         </button>
       </header>
 
-      <div className="border-t border-card-border px-4 py-4">
+      {/* Resumo da rota */}
+      <div className="border-t border-card-border px-4 pt-4 pb-2">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex flex-col gap-0.5">
-            <span className="text-2xl font-bold tabular-nums text-text-primary">
+            <span className="text-3xl font-bold tabular-nums text-text-primary">
               {formatMinutes(route.totalMinutes)}
             </span>
             <span className="text-xs tabular-nums text-text-secondary">
@@ -174,45 +255,65 @@ export function PlannerSummarySheet({
               {route.transferCount !== 1 ? 's' : ''} · {route.walkingMinutes} min a pé
             </span>
           </div>
-          <span className="neo-brutal-sm mt-1 inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold text-text-secondary">
+          <span className={etaBadgeVariants({ source: primarySource })}>
             <Clock size={11} aria-hidden="true" />
             {ETA_SOURCE_LABEL[primarySource]}
           </span>
         </div>
 
-        <ul className="flex flex-col gap-2" aria-label="Segmentos da rota">
-          {route.legs.map((leg) => {
+        {/* Timeline bar */}
+        <JourneyTimelineBar legs={route.legs} totalMinutes={route.totalMinutes} />
+      </div>
+
+      {/* Legs com trilho vertical */}
+      <div className="px-4 py-4">
+        <ul className="relative flex flex-col" aria-label="Segmentos da rota">
+          {/* Linha vertical de fundo */}
+          <li
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-0 left-3.5 top-3.5 w-px bg-card-border"
+          />
+
+          {route.legs.map((leg, idx) => {
             const legKey = `${route.routeId}:${leg.kind}:${leg.fromStopId}:${leg.toStopId}:${leg.pathStopIds.join('>')}`;
+            const isLast = idx === route.legs.length - 1;
 
             return (
-              <li key={legKey} className="flex items-start gap-3">
+              <li
+                key={legKey}
+                className={`relative flex items-start gap-3 ${isLast ? '' : 'pb-4'}`}
+              >
+                {/* Ícone / dot */}
                 {leg.kind === 'walk' ? (
-                  <>
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background-secondary">
-                      <Footprints size={13} className="text-text-secondary" aria-hidden="true" />
-                    </div>
-                    <div className="flex flex-col gap-0.5 pt-0.5">
+                  <div className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background-secondary ring-2 ring-background">
+                    <Footprints size={13} className="text-text-secondary" aria-hidden="true" />
+                  </div>
+                ) : (
+                  <div
+                    className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ring-2 ring-background"
+                    style={{ backgroundColor: `${(leg as PlannerBusLeg).lineColorHex}20` }}
+                  >
+                    <Bus
+                      size={13}
+                      style={{ color: (leg as PlannerBusLeg).lineColorHex }}
+                      aria-hidden="true"
+                    />
+                  </div>
+                )}
+
+                {/* Conteúdo */}
+                <div className="flex flex-col gap-0.5 pt-0.5">
+                  {leg.kind === 'walk' ? (
+                    <>
                       <span className="text-sm font-semibold text-text-primary">
                         Caminhe {leg.minutes} min · {formatarDistancia(leg.distanceMeters)}
                       </span>
                       <span className="text-xs text-text-secondary">
                         {leg.fromStopName} → {leg.toStopName}
                       </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-                      style={{ backgroundColor: `${(leg as PlannerBusLeg).lineColorHex}20` }}
-                    >
-                      <Bus
-                        size={13}
-                        style={{ color: (leg as PlannerBusLeg).lineColorHex }}
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-0.5 pt-0.5">
+                    </>
+                  ) : (
+                    <>
                       <span
                         className="text-sm font-bold"
                         style={{ color: (leg as PlannerBusLeg).lineColorHex }}
@@ -229,9 +330,9 @@ export function PlannerSummarySheet({
                         {' · '}
                         {formatTimeSP((leg as PlannerBusLeg).arrivalTime)}
                       </span>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
+                </div>
               </li>
             );
           })}
