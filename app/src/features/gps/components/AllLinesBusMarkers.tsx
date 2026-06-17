@@ -40,7 +40,7 @@ interface BusMarkerPopupProps {
 
 function BusMarkerPopup({ linha, pos }: BusMarkerPopupProps) {
   const num = numLinha(linha);
-  const { limparSelecao } = useRotasSelection();
+  const { selecionarLinha } = useRotasSelection();
 
   return (
     <div className="flex flex-col gap-2 font-sans text-sm">
@@ -73,10 +73,10 @@ function BusMarkerPopup({ linha, pos }: BusMarkerPopupProps) {
 
       <button
         type="button"
-        onClick={limparSelecao}
-        className="mt-1 w-full rounded border border-card-border bg-background px-2 py-1.5 text-center text-xs font-semibold text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        onClick={() => selecionarLinha(linha)}
+        className="mt-1 w-full rounded bg-brand-primary px-2 py-1.5 text-center text-xs font-semibold text-white transition-colors hover:bg-brand-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
       >
-        Remover seleção
+        Ver esta linha
       </button>
     </div>
   );

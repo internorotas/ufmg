@@ -10,9 +10,11 @@
  * Atualizado para React 19: ref como prop (sem forwardRef)
  */
 
+import { X } from 'lucide-react';
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { useRotasSelection } from '@/contexts/RotasContext';
 import { AllLinesBusMarkers } from '@/features/gps/components/AllLinesBusMarkers';
 import { GpsLiveBusMarker } from '@/features/gps/components/GpsLiveBusMarker';
 import { GpsRouteOverlay } from '@/features/gps/components/GpsRouteOverlay';
@@ -113,6 +115,7 @@ export function Mapa({
   ref,
 }: MapaProps) {
   const { trackTiming } = useAnalytics();
+  const { limparSelecao } = useRotasSelection();
   const mapLoadStartRef = useRef<number>(0);
 
   const { paradaDestacadaId, handleMarkerRef, destacarParada } = useMapMarkers();
@@ -133,59 +136,85 @@ export function Mapa({
   }, [trackTiming]);
 
   return (
-    <MapContainer
-      center={MAP_CONFIG.center}
-      zoom={MAP_CONFIG.zoom}
-      className="h-full w-full"
-      zoomControl={true}
-      whenReady={() => {}}
-    >
-      <TileLayer url={MAP_CONFIG.tileUrl} attribution={MAP_CONFIG.attribution} />
-
-      <ChangeView bounds={bounds} />
-      <CenterOnParada parada={paradaSelecionada} />
-
-      <MapRoute linha={linhaSelecionada} />
-
-      {rastreioColaborativo?.isActive && linhaSelecionada && (
-        <GpsRouteOverlay linha={linhaSelecionada} />
-      )}
-
-      <AllLinesBusMarkers
-        linhas={linhasAtivas}
-        todasParadas={todasParadas}
-        linhaNumeroExcluido={linhaSelecionada?.linha ?? null}
-      />
-
+    <div className="relative h-full w-full">
       {linhaSelecionada && (
-        <GpsLiveBusMarker
-          key={linhaSelecionada.idRota}
-          linha={linhaSelecionada}
+        <div className="pointer-events-none absolute inset-x-0 top-3 z-1000 flex justify-center px-3">
+          <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full bg-card/95 py-1.5 pl-2 pr-1.5 shadow-(--elevation-2) ring-1 ring-card-border backdrop-blur">
+            <span
+              className="shrink-0 rounded-full px-2 py-0.5 text-xs font-extrabold text-white"
+              style={{ background: linhaSelecionada.corHex }}
+            >
+              {linhaSelecionada.linha}
+            </span>
+            <span className="min-w-0 truncate text-xs font-semibold text-text-primary">
+              {linhaSelecionada.nome}
+            </span>
+            <button
+              type="button"
+              onClick={limparSelecao}
+              aria-label="Limpar seleção da linha"
+              className="flex size-6 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            >
+              <X size={15} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <MapContainer
+        center={MAP_CONFIG.center}
+        zoom={MAP_CONFIG.zoom}
+        className="h-full w-full"
+        zoomControl={true}
+        whenReady={() => {}}
+      >
+        <TileLayer url={MAP_CONFIG.tileUrl} attribution={MAP_CONFIG.attribution} />
+
+        <ChangeView bounds={bounds} />
+        <CenterOnParada parada={paradaSelecionada} />
+
+        <MapRoute linha={linhaSelecionada} />
+
+        {rastreioColaborativo?.isActive && linhaSelecionada && (
+          <GpsRouteOverlay linha={linhaSelecionada} />
+        )}
+
+        <AllLinesBusMarkers
+          linhas={linhasAtivas}
           todasParadas={todasParadas}
+          linhaNumeroExcluido={linhaSelecionada?.linha ?? null}
         />
-      )}
 
-      <PlannerMapOverlay />
+        {linhaSelecionada && (
+          <GpsLiveBusMarker
+            key={linhaSelecionada.idRota}
+            linha={linhaSelecionada}
+            todasParadas={todasParadas}
+          />
+        )}
 
-      <MapMarkers
-        paradas={todasParadas}
-        paradaDestacadaId={paradaDestacadaId}
-        onMarkerRef={handleMarkerRef}
-      />
+        <PlannerMapOverlay />
 
-      {onPedirLocalizacao && (
-        <ControlesUsuarioMapa
-          localizacao={localizacaoUsuario ?? null}
-          heading={headingUsuario ?? null}
-          permissaoConcedida={permissaoLocalizacao}
-          onPedirLocalizacao={onPedirLocalizacao}
-          carregandoLocalizacao={carregandoLocalizacao}
-          rastreioColaborativo={rastreioColaborativo}
-          onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
+        <MapMarkers
+          paradas={todasParadas}
+          paradaDestacadaId={paradaDestacadaId}
+          onMarkerRef={handleMarkerRef}
         />
-      )}
 
-      <MapImperativeHandler mapaRef={ref} destacarParada={destacarParada} />
-    </MapContainer>
+        {onPedirLocalizacao && (
+          <ControlesUsuarioMapa
+            localizacao={localizacaoUsuario ?? null}
+            heading={headingUsuario ?? null}
+            permissaoConcedida={permissaoLocalizacao}
+            onPedirLocalizacao={onPedirLocalizacao}
+            carregandoLocalizacao={carregandoLocalizacao}
+            rastreioColaborativo={rastreioColaborativo}
+            onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
+          />
+        )}
+
+        <MapImperativeHandler mapaRef={ref} destacarParada={destacarParada} />
+      </MapContainer>
+    </div>
   );
 }
