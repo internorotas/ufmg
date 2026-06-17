@@ -2,12 +2,20 @@
   var isLocalhost =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-  if (isLocalhost) {
-    return;
+  // Remove parâmetros legados de recovery da barra de endereço (poluição de URL).
+  // O controle de "já rodou" é feito por sessionStorage, não pela query string.
+  try {
+    var current = new URL(window.location.href);
+    if (current.searchParams.has('cache-recovery') || current.searchParams.has('v')) {
+      current.searchParams.delete('cache-recovery');
+      current.searchParams.delete('v');
+      window.history.replaceState(null, '', current.toString());
+    }
+  } catch (_cleanupError) {
+    // Ignora: limpeza de URL é best-effort.
   }
 
-  var url = new URL(window.location.href);
-  if (url.searchParams.get('cache-recovery') === 'done') {
+  if (isLocalhost) {
     return;
   }
 
@@ -68,8 +76,8 @@
     })
     .catch(() => undefined)
     .finally(() => {
-      url.searchParams.set('cache-recovery', 'done');
-      url.searchParams.set('v', String(Date.now()));
-      window.location.replace(url.toString());
+      // Recarrega para buscar assets frescos após limpar SW + caches.
+      // sessionStorage (recoveryKey) impede loop; sem parâmetros na URL.
+      window.location.reload();
     });
 })();

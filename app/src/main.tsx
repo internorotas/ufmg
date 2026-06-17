@@ -155,11 +155,16 @@ function registerAppServiceWorker(): void {
     return;
   }
 
-  let hadControllerAtStartup = Boolean(navigator.serviceWorker.controller);
+  // Valor imutável: a aba já estava sob controle de um SW ao iniciar?
+  // Distingue "atualização genuína de página em uso" de "primeiro install".
+  const pageWasControlledAtStartup = Boolean(navigator.serviceWorker.controller);
+  let suppressedFirstControllerChange = false;
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!hadControllerAtStartup) {
-      hadControllerAtStartup = true;
+    if (!pageWasControlledAtStartup && !suppressedFirstControllerChange) {
+      // Primeiro controllerchange de uma aba que iniciou sem SW: é o install
+      // inicial assumindo controle, não uma atualização. Não recarrega.
+      suppressedFirstControllerChange = true;
       return;
     }
 
@@ -168,9 +173,12 @@ function registerAppServiceWorker(): void {
 
   navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data?.type === 'sw-activated') {
-      // Fallback para controllerchange: garante reload mesmo que o evento
-      // controllerchange tenha sido perdido (ex: aba aberta antes do claim).
-      triggerSingleReloadForUpdatedServiceWorker();
+      // Só recarrega se a aba já estava sob controle de um SW no início (atualização
+      // genuína de uma página em uso). No primeiro install (ex: logo após o
+      // cache-recovery limpar tudo) NÃO recarrega — era a causa do "reload sozinho".
+      if (pageWasControlledAtStartup) {
+        triggerSingleReloadForUpdatedServiceWorker();
+      }
       return;
     }
 
