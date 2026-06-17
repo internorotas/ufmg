@@ -199,16 +199,17 @@ function EndpointField({
 
 export function PlannerPanel() {
   const { todasParadas } = useRotasData();
-  const {
-    origin,
-    destination,
-    swap,
-    setOrigin,
-    setDestination,
-    setResults,
-    canPlan,
-    isSameEndpoint,
-  } = usePlannerStore();
+  // Selectors individuais: só re-renderiza quando origin/destination mudam. Subscrever
+  // a store inteira (usePlannerStore()) re-renderizava o painel a cada mudanca de
+  // plannerResults/selectedRouteId/openMenuFn — campos nao usados aqui.
+  const origin = usePlannerStore((s) => s.origin);
+  const destination = usePlannerStore((s) => s.destination);
+  const swap = usePlannerStore((s) => s.swap);
+  const setOrigin = usePlannerStore((s) => s.setOrigin);
+  const setDestination = usePlannerStore((s) => s.setDestination);
+  const setResults = usePlannerStore((s) => s.setResults);
+  const canPlan = usePlannerStore((s) => s.canPlan);
+  const isSameEndpoint = usePlannerStore((s) => s.isSameEndpoint);
 
   const [originSearch, setOriginSearch] = useState('');
   const [destSearch, setDestSearch] = useState('');
