@@ -2,7 +2,7 @@ import { fetchAuthenticatedApi } from '@/features/auth/api/fetchAuthenticatedApi
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 
 export type RankingPeriod = 'semanal' | 'mensal' | 'all_time';
-export type RankingScope = 'geral' | 'campus' | `linha:${string}`;
+export type RankingScope = 'geral' | 'campus' | 'viagens' | 'correcoes' | `linha:${string}`;
 
 export interface RankingEntry {
   displayName: string;
