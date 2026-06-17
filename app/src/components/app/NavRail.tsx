@@ -34,7 +34,7 @@ export function NavRail() {
       )}
     >
       <nav aria-label="Páginas principais" className="mt-4 flex flex-1 flex-col gap-1 px-2">
-        {NAV_ITEMS.map((item) => {
+        {NAV_ITEMS.filter((item) => !item.hideOnDesktop).map((item) => {
           const Icon = item.icon;
           const resolvedTo = !isAuthenticated && item.anonymousTo ? item.anonymousTo : item.to;
           const active = isItemActive(location.pathname, item, resolvedTo);

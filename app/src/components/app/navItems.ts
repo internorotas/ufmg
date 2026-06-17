@@ -7,11 +7,13 @@ export interface NavItem {
   label: string;
   matchPrefix?: string;
   anonymousTo?: string;
+  /** Ocultar no NavRail (desktop) — ex: itens já acessíveis via sidebar lateral */
+  hideOnDesktop?: boolean;
 }
 
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', icon: MapIcon, label: 'Mapa' },
-  { to: '/linhas', icon: Bus, label: 'Linhas', matchPrefix: '/linhas' },
+  { to: '/linhas', icon: Bus, label: 'Linhas', matchPrefix: '/linhas', hideOnDesktop: true },
   { to: '/ranking', icon: Trophy, label: 'Ranking', matchPrefix: '/ranking' },
   {
     to: '/perfil',
