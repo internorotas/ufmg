@@ -12,6 +12,7 @@ vi.mock('../lib/time', async (importOriginal) => {
 });
 
 import * as timeMod from '../lib/time';
+import { CategoriaDia } from '../types/data.types';
 import {
   getCurrentSpecialPeriod,
   getLinhaNotRunningMessage,
@@ -146,28 +147,28 @@ describe('shouldDisableRegularSchedules', () => {
 describe('obterCategoriaDiaAtual', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('retorna "feriasRecessos" em dia útil dentro do recesso', () => {
+  it('retorna FeriasERecessos em dia útil dentro do recesso', () => {
     // 2026-07-06 segunda
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 7, 6));
-    expect(obterCategoriaDiaAtual()).toBe('feriasRecessos');
+    expect(obterCategoriaDiaAtual()).toBe(CategoriaDia.FeriasERecessos);
   });
 
-  it('retorna "sabado" em sábado fora do recesso', () => {
+  it('retorna Sabado em sábado fora do recesso', () => {
     // 2026-09-05 sábado
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 5));
-    expect(obterCategoriaDiaAtual()).toBe('sabado');
+    expect(obterCategoriaDiaAtual()).toBe(CategoriaDia.Sabado);
   });
 
-  it('retorna "diasUteis" em dia útil fora do recesso', () => {
+  it('retorna DiasUteis em dia útil fora do recesso', () => {
     // 2026-09-07 segunda
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 7));
-    expect(obterCategoriaDiaAtual()).toBe('diasUteis');
+    expect(obterCategoriaDiaAtual()).toBe(CategoriaDia.DiasUteis);
   });
 
-  it('retorna "diasUteis" em domingo (não é sabado nem recesso em dia útil)', () => {
+  it('retorna DiasUteis em domingo (não é sábado nem recesso em dia útil)', () => {
     // 2026-09-06 domingo
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 6));
-    expect(obterCategoriaDiaAtual()).toBe('diasUteis');
+    expect(obterCategoriaDiaAtual()).toBe(CategoriaDia.DiasUteis);
   });
 });
 
@@ -178,54 +179,54 @@ describe('obterCategoriaDiaAtual', () => {
 describe('isLineAvailableToday', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  describe('linha "diasUteis"', () => {
+  describe(`linha "${CategoriaDia.DiasUteis}"`, () => {
     it('disponível em dia útil fora do recesso', () => {
       vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 7)); // segunda
-      expect(isLineAvailableToday('diasUteis')).toBe(true);
+      expect(isLineAvailableToday(CategoriaDia.DiasUteis)).toBe(true);
     });
 
     it('indisponível em dia útil durante recesso', () => {
       vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 7, 6)); // segunda no recesso
-      expect(isLineAvailableToday('diasUteis')).toBe(false);
+      expect(isLineAvailableToday(CategoriaDia.DiasUteis)).toBe(false);
     });
 
     it('indisponível no sábado fora do recesso', () => {
       vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 5)); // sábado
-      expect(isLineAvailableToday('diasUteis')).toBe(false);
+      expect(isLineAvailableToday(CategoriaDia.DiasUteis)).toBe(false);
     });
   });
 
-  describe('linha "sabado"', () => {
+  describe(`linha "${CategoriaDia.Sabado}"`, () => {
     it('disponível no sábado fora do recesso', () => {
       vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 5)); // sábado
-      expect(isLineAvailableToday('sabado')).toBe(true);
+      expect(isLineAvailableToday(CategoriaDia.Sabado)).toBe(true);
     });
 
     it('indisponível no sábado durante recesso', () => {
       vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 7, 11)); // sábado no recesso
-      expect(isLineAvailableToday('sabado')).toBe(false);
+      expect(isLineAvailableToday(CategoriaDia.Sabado)).toBe(false);
     });
 
     it('indisponível em dia útil fora do recesso', () => {
       vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 7)); // segunda
-      expect(isLineAvailableToday('sabado')).toBe(false);
+      expect(isLineAvailableToday(CategoriaDia.Sabado)).toBe(false);
     });
   });
 
-  describe('linha "feriasRecessos"', () => {
+  describe(`linha "${CategoriaDia.FeriasERecessos}"`, () => {
     it('disponível em dia útil durante recesso', () => {
       vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 7, 6)); // segunda no recesso
-      expect(isLineAvailableToday('feriasRecessos')).toBe(true);
+      expect(isLineAvailableToday(CategoriaDia.FeriasERecessos)).toBe(true);
     });
 
     it('indisponível no sábado durante recesso', () => {
       vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 7, 11)); // sábado no recesso
-      expect(isLineAvailableToday('feriasRecessos')).toBe(false);
+      expect(isLineAvailableToday(CategoriaDia.FeriasERecessos)).toBe(false);
     });
 
     it('indisponível em dia útil fora do recesso', () => {
       vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 7)); // segunda
-      expect(isLineAvailableToday('feriasRecessos')).toBe(false);
+      expect(isLineAvailableToday(CategoriaDia.FeriasERecessos)).toBe(false);
     });
   });
 });
@@ -237,43 +238,44 @@ describe('isLineAvailableToday', () => {
 describe('getLinhaNotRunningMessage', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('linha diasUteis — suspensa durante férias (dia útil no recesso)', () => {
+  it('linha DiasUteis — suspensa durante férias (dia útil no recesso)', () => {
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 7, 6));
-    expect(getLinhaNotRunningMessage('diasUteis')).toBe('Linha suspensa durante férias');
+    expect(getLinhaNotRunningMessage(CategoriaDia.DiasUteis)).toBe('Linha suspensa durante férias');
   });
 
-  it('linha diasUteis — não circula aos sábados', () => {
+  it('linha DiasUteis — não circula aos sábados', () => {
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 5)); // sábado fora recesso
-    expect(getLinhaNotRunningMessage('diasUteis')).toBe('Linha não circula aos sábados');
+    expect(getLinhaNotRunningMessage(CategoriaDia.DiasUteis)).toBe('Linha não circula aos sábados');
   });
 
-  it('linha diasUteis — não circula aos domingos', () => {
+  it('linha DiasUteis — não circula aos domingos', () => {
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 6)); // domingo
-    expect(getLinhaNotRunningMessage('diasUteis')).toBe('Linha não circula aos domingos');
+    expect(getLinhaNotRunningMessage(CategoriaDia.DiasUteis)).toBe(
+      'Linha não circula aos domingos',
+    );
   });
 
-  it('linha sabado — suspensa durante férias', () => {
+  it('linha Sabado — suspensa durante férias', () => {
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 7, 11)); // sábado no recesso
-    expect(getLinhaNotRunningMessage('sabado')).toBe('Linha suspensa durante férias');
+    expect(getLinhaNotRunningMessage(CategoriaDia.Sabado)).toBe('Linha suspensa durante férias');
   });
 
-  it('linha sabado — circula apenas aos sábados (dia útil fora recesso)', () => {
+  it('linha Sabado — circula apenas aos sábados (dia útil fora recesso)', () => {
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 7)); // segunda
-    expect(getLinhaNotRunningMessage('sabado')).toBe('Linha circula apenas aos sábados');
+    expect(getLinhaNotRunningMessage(CategoriaDia.Sabado)).toBe('Linha circula apenas aos sábados');
   });
 
-  it('linha feriasRecessos — circula apenas durante férias (fora do recesso)', () => {
+  it('linha FeriasERecessos — circula apenas durante férias (fora do recesso)', () => {
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 7)); // segunda
-    expect(getLinhaNotRunningMessage('feriasRecessos')).toBe('Linha circula apenas durante férias');
+    expect(getLinhaNotRunningMessage(CategoriaDia.FeriasERecessos)).toBe(
+      'Linha circula apenas durante férias',
+    );
   });
 
-  it('linha feriasRecessos — não circula em fins de semana (sábado no recesso)', () => {
+  it('linha FeriasERecessos — não circula em fins de semana (sábado no recesso)', () => {
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 7, 11)); // sábado no recesso
-    expect(getLinhaNotRunningMessage('feriasRecessos')).toBe('Linha não circula em fins de semana');
-  });
-
-  it('retorna mensagem genérica para categoria desconhecida', () => {
-    vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 7));
-    expect(getLinhaNotRunningMessage('inexistente')).toBe('Linha não está circulando');
+    expect(getLinhaNotRunningMessage(CategoriaDia.FeriasERecessos)).toBe(
+      'Linha não circula em fins de semana',
+    );
   });
 });

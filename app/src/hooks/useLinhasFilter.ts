@@ -10,7 +10,12 @@ import { useDebounce } from 'use-debounce';
 import { getCurrentSpecialPeriod } from '../config/specialPeriods';
 import { getSaoPauloDayOfWeek, getSaoPauloNow } from '../lib/time';
 import { converterHoraParaMinutos, obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
-import type { CategoriaLinhas, DadosLinhas, Linha } from '../types/data.types';
+import {
+  CategoriaDia,
+  type CategoriaLinhas,
+  type DadosLinhas,
+  type Linha,
+} from '../types/data.types';
 import { useAnalytics } from './useAnalytics';
 import { useCurrentTime } from './useCurrentTime';
 
@@ -38,9 +43,9 @@ interface UseLinhasFilterReturn {
  * Determina a categoria inicial baseado no período atual e dia da semana.
  *
  * Regras:
- * - Se está em período de férias → aba "feriasRecessos"
- * - Se é sábado → aba "sabado"
- * - Caso contrário → aba "diasUteis" (padrão)
+ * - Se está em período de férias → aba FeriasERecessos
+ * - Se é sábado → aba Sabado
+ * - Caso contrário → aba DiasUteis (padrão)
  *
  * Prioridade: férias > sábado > dias úteis
  */
@@ -69,11 +74,17 @@ function getInitialCategory(linhasData: CategoriaLinhas): number {
   const isInVacationPeriod = getCurrentSpecialPeriod() !== null;
 
   const vacationIndex = findCategoryIndex(linhasData.categoriasDias, [
-    'feriasRecessos',
+    CategoriaDia.FeriasERecessos,
     'vacation',
   ]);
-  const saturdayIndex = findCategoryIndex(linhasData.categoriasDias, ['sabado', 'saturday']);
-  const weekdaysIndex = findCategoryIndex(linhasData.categoriasDias, ['diasUteis', 'weekdays']);
+  const saturdayIndex = findCategoryIndex(linhasData.categoriasDias, [
+    CategoriaDia.Sabado,
+    'saturday',
+  ]);
+  const weekdaysIndex = findCategoryIndex(linhasData.categoriasDias, [
+    CategoriaDia.DiasUteis,
+    'weekdays',
+  ]);
 
   // Borda: dia inválido/misconfigurado
   if (!Number.isInteger(today) || today < 0 || today > 6) {

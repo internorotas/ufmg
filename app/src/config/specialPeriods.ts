@@ -6,6 +6,7 @@
  */
 
 import { getSaoPauloDayOfWeek, getSaoPauloNow, toSaoPauloDate } from '../lib/time';
+import { CategoriaDia } from '../types/data.types';
 
 export interface SpecialPeriod {
   startDate: Date;
@@ -89,24 +90,21 @@ export function shouldDisableRegularSchedules(): boolean {
 
 /**
  * Retorna a categoria do dia atual para filtrar linhas corretas.
- * - "feriasRecessos": período de férias em dia útil
- * - "sabado": sábado fora de férias
- * - "diasUteis": padrão
  */
-export function obterCategoriaDiaAtual(): string {
+export function obterCategoriaDiaAtual(): CategoriaDia {
   const today = getSaoPauloDayOfWeek(getSaoPauloNow());
   const isSaturday = today === 6;
   const isWeekday = today >= 1 && today <= 5;
   const specialPeriod = getCurrentSpecialPeriod();
-  if (specialPeriod && isWeekday) return 'feriasRecessos';
-  if (isSaturday && !specialPeriod) return 'sabado';
-  return 'diasUteis';
+  if (specialPeriod && isWeekday) return CategoriaDia.FeriasERecessos;
+  if (isSaturday && !specialPeriod) return CategoriaDia.Sabado;
+  return CategoriaDia.DiasUteis;
 }
 
 /**
  * Verifica se uma linha está circulando hoje com base na sua categoria.
  */
-export function isLineAvailableToday(categoriaDia: string): boolean {
+export function isLineAvailableToday(categoriaDia: CategoriaDia): boolean {
   const today = getSaoPauloDayOfWeek(getSaoPauloNow());
   const isSaturday = today === 6;
   const isSunday = today === 0;
@@ -114,33 +112,37 @@ export function isLineAvailableToday(categoriaDia: string): boolean {
   const isInVacationPeriod = shouldDisableRegularSchedules();
 
   return (
-    (categoriaDia === 'diasUteis' && isWeekday && !isInVacationPeriod) ||
-    (categoriaDia === 'sabado' && isSaturday && !isInVacationPeriod) ||
-    (categoriaDia === 'feriasRecessos' && isInVacationPeriod && !isSaturday && !isSunday)
+    (categoriaDia === CategoriaDia.DiasUteis && isWeekday && !isInVacationPeriod) ||
+    (categoriaDia === CategoriaDia.Sabado && isSaturday && !isInVacationPeriod) ||
+    (categoriaDia === CategoriaDia.FeriasERecessos &&
+      isInVacationPeriod &&
+      !isSaturday &&
+      !isSunday)
   );
 }
 
 /**
  * Retorna a mensagem descritiva de por que a linha não está circulando hoje.
  */
-export function getLinhaNotRunningMessage(categoriaDia: string): string {
+export function getLinhaNotRunningMessage(categoriaDia: CategoriaDia): string {
   const today = getSaoPauloDayOfWeek(getSaoPauloNow());
   const isSaturday = today === 6;
   const isSunday = today === 0;
   const isInVacationPeriod = shouldDisableRegularSchedules();
 
-  if (categoriaDia === 'diasUteis') {
-    if (isInVacationPeriod) return 'Linha suspensa durante férias';
-    if (isSaturday) return 'Linha não circula aos sábados';
-    if (isSunday) return 'Linha não circula aos domingos';
-  }
-  if (categoriaDia === 'sabado') {
-    if (isInVacationPeriod) return 'Linha suspensa durante férias';
-    return 'Linha circula apenas aos sábados';
-  }
-  if (categoriaDia === 'feriasRecessos') {
-    if (!isInVacationPeriod) return 'Linha circula apenas durante férias';
-    if (isSaturday || isSunday) return 'Linha não circula em fins de semana';
+  switch (categoriaDia) {
+    case CategoriaDia.DiasUteis:
+      if (isInVacationPeriod) return 'Linha suspensa durante férias';
+      if (isSaturday) return 'Linha não circula aos sábados';
+      if (isSunday) return 'Linha não circula aos domingos';
+      break;
+    case CategoriaDia.Sabado:
+      if (isInVacationPeriod) return 'Linha suspensa durante férias';
+      return 'Linha circula apenas aos sábados';
+    case CategoriaDia.FeriasERecessos:
+      if (!isInVacationPeriod) return 'Linha circula apenas durante férias';
+      if (isSaturday || isSunday) return 'Linha não circula em fins de semana';
+      break;
   }
   return 'Linha não está circulando';
 }

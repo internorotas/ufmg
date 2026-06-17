@@ -1,7 +1,15 @@
+export const CategoriaDia = {
+  DiasUteis: 'diasUteis',
+  Sabado: 'sabado',
+  FeriasERecessos: 'feriasRecessos',
+} as const;
+
+export type CategoriaDia = (typeof CategoriaDia)[keyof typeof CategoriaDia];
+
 // Tipos auxiliares para os dados completos
 export interface DadosLinhas {
   id: number;
-  categoriaDia: string;
+  categoriaDia: CategoriaDia;
   displayName: string;
   exibir?: boolean;
   linhas: Linha[];
@@ -28,7 +36,7 @@ export interface Linha {
   nome: string;
   tipo: string;
   sublinha: string | null;
-  categoriaDia: string;
+  categoriaDia: CategoriaDia;
   corHex: string;
   descricao: string;
   horarios: string[];

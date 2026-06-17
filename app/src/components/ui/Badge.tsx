@@ -9,6 +9,7 @@
 import type { ComponentProps, ReactNode } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../../lib/utils';
+import { CategoriaDia } from '../../types/data.types';
 
 /**
  * Variantes do badge usando tailwind-variants
@@ -220,7 +221,7 @@ export function LineStatusBadge({ status, label, size = 'sm' }: LineStatusBadgeP
 /**
  * Badge de categoria de dia
  */
-export type DayCategoryType = 'diasUteis' | 'sabados' | 'domingosFeriados' | 'feriasRecessos';
+export type DayCategoryType = CategoriaDia;
 
 export interface DayCategoryBadgeProps {
   /** Categoria do dia */
@@ -233,10 +234,9 @@ const dayCategoryConfig: Record<
   DayCategoryType,
   { variant: BadgeProps['variant']; label: string }
 > = {
-  diasUteis: { variant: 'primary', label: 'Dias Úteis' },
-  sabados: { variant: 'secondary', label: 'Sábados' },
-  domingosFeriados: { variant: 'info', label: 'Dom/Feriados' },
-  feriasRecessos: { variant: 'warning', label: 'Férias' },
+  [CategoriaDia.DiasUteis]: { variant: 'primary', label: 'Dias Úteis' },
+  [CategoriaDia.Sabado]: { variant: 'secondary', label: 'Sábado' },
+  [CategoriaDia.FeriasERecessos]: { variant: 'warning', label: 'Férias e Recessos' },
 };
 
 export function DayCategoryBadge({ category, size = 'sm' }: DayCategoryBadgeProps) {

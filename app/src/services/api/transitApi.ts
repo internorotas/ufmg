@@ -4,7 +4,7 @@ import localParadas from '@/data/paradas';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { getTenantStorageKey } from '@/pwa/tenantNamespace';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
-import type { CategoriaLinhas, DadosLinhas, Linha, Parada } from '@/types/data.types';
+import type { CategoriaDia, CategoriaLinhas, DadosLinhas, Linha, Parada } from '@/types/data.types';
 
 export interface ParadasPayload {
   paradas: Parada[];
@@ -272,7 +272,7 @@ function decodeTransitProto(buffer: ArrayBuffer): {
     categoriasDias: (decoded.linhas?.categoriasDias ?? []).map(
       (cat): DadosLinhas => ({
         id: cat.id,
-        categoriaDia: cat.categoriaDia,
+        categoriaDia: cat.categoriaDia as CategoriaDia,
         displayName: cat.displayName,
         exibir: cat.exibir,
         linhas: (cat.linhas ?? []).map(
@@ -282,7 +282,7 @@ function decodeTransitProto(buffer: ArrayBuffer): {
             nome: l.nome,
             tipo: l.tipo,
             sublinha: l.sublinha ?? null,
-            categoriaDia: l.categoriaDia,
+            categoriaDia: l.categoriaDia as CategoriaDia,
             corHex: l.corHex,
             descricao: l.descricao,
             horarios: l.horarios ?? [],
