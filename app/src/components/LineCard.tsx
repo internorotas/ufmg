@@ -124,20 +124,28 @@ interface LineIconProps {
   color: string;
 }
 
-function LineIcon({ color }: LineIconProps) {
+// Memoizado + estilos derivados da cor cacheados: o card re-renderiza a cada tick de
+// 30s (useCurrentTime); sem isto, cada linha realocava 2 strings rgba por render.
+const LineIcon = memo(function LineIcon({ color }: LineIconProps) {
+  const containerStyle = useMemo(
+    () => ({
+      backgroundColor: hexToRgba(color, 0.12),
+      borderColor: hexToRgba(color, 0.24),
+    }),
+    [color],
+  );
+  const iconStyle = useMemo(() => ({ color }), [color]);
+
   return (
     <div
       data-slot="icon"
       className="flex size-12 shrink-0 items-center justify-center rounded-lg border shadow-sm"
-      style={{
-        backgroundColor: hexToRgba(color, 0.12),
-        borderColor: hexToRgba(color, 0.24),
-      }}
+      style={containerStyle}
     >
-      <Bus className="size-6 drop-shadow-sm" style={{ color }} aria-hidden="true" />
+      <Bus className="size-6 drop-shadow-sm" style={iconStyle} aria-hidden="true" />
     </div>
   );
-}
+});
 
 function getLineDescriptionId(idRota: string): string {
   return `line-card-description-${idRota}`;
