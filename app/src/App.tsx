@@ -39,14 +39,6 @@ import { getActiveCategoryLinhas } from './hooks/useLinhasFilter';
 import { COORDENADAS_CAMPUS } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { calcularDistanciaKm } from './lib/utils';
-import { AboutPage } from './routes/about/AboutPage';
-import { FakeAdminLoginPage } from './routes/admin/FakeAdminLoginPage';
-import { LinhasPage } from './routes/linhas/LinhasPage';
-import { LoginPage } from './routes/login/LoginPage';
-import { MorePage } from './routes/more/MorePage';
-import { ProfilePage } from './routes/profile/ProfilePage';
-import { RankingPage } from './routes/ranking/RankingPage';
-import { ResearchDashboardPage } from './routes/research/ResearchDashboardPage';
 import { ga4Analytics } from './services/analytics';
 import type { Linha, Parada } from './types/data.types';
 import type { LegalModalType } from './types/legal.types';
@@ -92,6 +84,50 @@ function resolveLegalModalFromPath(pathname: string): LegalModalType | null {
 
 // Carregamento preguiçoso do Mapa para melhorar a performance inicial
 const Mapa = lazy(() => import('./components/Mapa').then((module) => ({ default: module.Mapa })));
+
+// Rotas carregadas sob demanda — só o Mapa entra no chunk inicial. As demais páginas
+// (e suas dependências transitivas) deixam de pesar no bundle de entrada.
+const AboutPage = lazy(() =>
+  import('./routes/about/AboutPage').then((m) => ({ default: m.AboutPage })),
+);
+const FakeAdminLoginPage = lazy(() =>
+  import('./routes/admin/FakeAdminLoginPage').then((m) => ({ default: m.FakeAdminLoginPage })),
+);
+const LinhasPage = lazy(() =>
+  import('./routes/linhas/LinhasPage').then((m) => ({ default: m.LinhasPage })),
+);
+const LoginPage = lazy(() =>
+  import('./routes/login/LoginPage').then((m) => ({ default: m.LoginPage })),
+);
+const MorePage = lazy(() =>
+  import('./routes/more/MorePage').then((m) => ({ default: m.MorePage })),
+);
+const ProfilePage = lazy(() =>
+  import('./routes/profile/ProfilePage').then((m) => ({ default: m.ProfilePage })),
+);
+const RankingPage = lazy(() =>
+  import('./routes/ranking/RankingPage').then((m) => ({ default: m.RankingPage })),
+);
+const ResearchDashboardPage = lazy(() =>
+  import('./routes/research/ResearchDashboardPage').then((m) => ({
+    default: m.ResearchDashboardPage,
+  })),
+);
+
+// Fallback genérico de carregamento de página (rotas lazy fora do mapa).
+const PageLoading = () => (
+  <div
+    role="status"
+    aria-live="polite"
+    aria-label="Carregando página"
+    className="flex h-full w-full items-center justify-center bg-background"
+  >
+    <div
+      aria-hidden="true"
+      className="h-12 w-12 animate-spin rounded-full border-b-2 border-brand-primary"
+    />
+  </div>
+);
 
 // Componente simples de Loading
 const LoadingMap = () => (
@@ -636,7 +672,7 @@ function AppContent() {
 
         {feedbackMessage ? (
           <div
-            role="alertdialog"
+            role="alert"
             aria-live="polite"
             aria-label="Aviso de login necessário"
             className="pointer-events-auto fixed inset-x-4 bottom-24 z-1400 mx-auto flex max-w-md items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg md:bottom-20"
@@ -668,18 +704,20 @@ function AuthenticatedAppShell() {
               <div className="flex h-dvh bg-background text-text-primary">
                 <NavRail />
                 <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-                  <Routes>
-                    <Route path="/" element={<AppContent />} />
-                    <Route path="/privacidade" element={<AppContent />} />
-                    <Route path="/termos" element={<AppContent />} />
-                    <Route path="/sobre" element={<AboutPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/perfil" element={<ProfilePage />} />
-                    <Route path="/ranking" element={<RankingPage />} />
-                    <Route path="/linhas" element={<LinhasPage />} />
-                    <Route path="/mais" element={<MorePage />} />
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
+                  <Suspense fallback={<PageLoading />}>
+                    <Routes>
+                      <Route path="/" element={<AppContent />} />
+                      <Route path="/privacidade" element={<AppContent />} />
+                      <Route path="/termos" element={<AppContent />} />
+                      <Route path="/sobre" element={<AboutPage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/perfil" element={<ProfilePage />} />
+                      <Route path="/ranking" element={<RankingPage />} />
+                      <Route path="/linhas" element={<LinhasPage />} />
+                      <Route path="/mais" element={<MorePage />} />
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </Suspense>
                 </div>
                 <BottomNav />
               </div>
@@ -709,11 +747,13 @@ export function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <Routes>
-          <Route path="/admin/*" element={<FakeAdminLoginPage />} />
-          <Route path="/pesquisa" element={<ResearchDashboardPage />} />
-          <Route path="/*" element={<AppAuthenticatedRoutes />} />
-        </Routes>
+        <Suspense fallback={<PageLoading />}>
+          <Routes>
+            <Route path="/admin/*" element={<FakeAdminLoginPage />} />
+            <Route path="/pesquisa" element={<ResearchDashboardPage />} />
+            <Route path="/*" element={<AppAuthenticatedRoutes />} />
+          </Routes>
+        </Suspense>
       </ThemeProvider>
     </ErrorBoundary>
   );
