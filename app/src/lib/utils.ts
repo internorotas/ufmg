@@ -168,6 +168,49 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
   return horariosDia.filter((horario) => parseHorarioValido(horario) !== null);
 }
 
+const _horariosCache = new WeakMap<object, number[]>();
+
+/**
+ * Retorna os horários em minutos da linha para o dia atual.
+ * Evita recálculos (N log N) através de memoização.
+ */
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const horariosBrutos = linha.horarios as unknown;
+
+  if (Array.isArray(horariosBrutos)) {
+    return horariosBrutos
+      .map((horario) => converterHoraParaMinutos(horario))
+      .filter((minutos) => Number.isFinite(minutos))
+      .sort((a, b) => a - b);
+  }
+
+  if (!horariosBrutos || typeof horariosBrutos !== 'object') {
+    return [];
+  }
+
+  const horariosPorDia = horariosBrutos as HorariosPorDia;
+  const chaveDia = obterChaveDiaSemana(dataAtual);
+  const horariosDia = horariosPorDia[chaveDia];
+
+  if (!Array.isArray(horariosDia) || horariosDia.length === 0) {
+    return [];
+  }
+
+  let cache = _horariosCache.get(horariosDia);
+  if (!cache) {
+    cache = horariosDia
+      .map((horario) => converterHoraParaMinutos(horario))
+      .filter((minutos) => Number.isFinite(minutos))
+      .sort((a, b) => a - b);
+    _horariosCache.set(horariosDia, cache);
+  }
+  return cache;
+}
+
 /**
  * Calcula status operacional da linha no instante atual.
  *
@@ -187,12 +230,7 @@ export function obterStatusLinha(
     return { id: 'NAO_CIRCULA_HOJE', texto: 'Não circula hoje', cor: 'danger' };
   }
 
-  const horariosHoje =
-    horariosPreCalculados ??
-    obterHorariosLinhaNoDia(linha, dataAtual)
-      .map((horario) => converterHoraParaMinutos(horario))
-      .filter((minutos) => Number.isFinite(minutos))
-      .sort((a, b) => a - b);
+  const horariosHoje = horariosPreCalculados ?? obterHorariosMinutosLinhaNoDia(linha, dataAtual);
 
   if (horariosHoje.length === 0) {
     return {
