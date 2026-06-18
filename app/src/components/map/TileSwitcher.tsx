@@ -36,7 +36,7 @@ export const TILE_PROVIDERS = {
 export type TileProviderKey = keyof typeof TILE_PROVIDERS;
 
 const STORAGE_KEY = 'tile-provider';
-const DEFAULT_PROVIDER: TileProviderKey = 'voyager';
+const DEFAULT_PROVIDER: TileProviderKey = 'osm';
 
 function getStoredProvider(): TileProviderKey {
   try {
