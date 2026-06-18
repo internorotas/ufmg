@@ -55,7 +55,7 @@ const TILES_CACHE_NAME = getTenantCacheName('tiles-v1');
  * Workbox's CacheableResponsePlugin so verifica status HTTP, nao headers de cache.
  */
 const CacheControlRespectPlugin: import('workbox-core').WorkboxPlugin = {
-  cacheWillUpdate: async ({ response }) => {
+  cacheWillUpdate: async ({ response }: { response: Response }) => {
     const cacheControl = response.headers.get('Cache-Control');
     if (cacheControl && (cacheControl.includes('no-cache') || cacheControl.includes('no-store'))) {
       return null;

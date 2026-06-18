@@ -46,6 +46,7 @@
     "tailwind-variants": "^3.2.2",
     "use-debounce": "^10.1.1",
     "workbox-cacheable-response": "^7.4.1",
+    "workbox-core": "^7.4.1",
     "workbox-expiration": "^7.4.1",
     "workbox-precaching": "^7.4.1",
     "workbox-routing": "^7.4.1",
