@@ -49,6 +49,21 @@ const API_CACHE_NAME = getTenantCacheName('api-v1');
 const RUNTIME_CACHE_NAME = getTenantCacheName(`data-${BUILD_SLUG}`);
 const TILES_CACHE_NAME = getTenantCacheName('tiles-v1');
 
+/**
+ * Plugin que respeita Cache-Control do backend.
+ * Se a resposta tem `no-cache` ou `no-store`, nao armazena em cache.
+ * Workbox's CacheableResponsePlugin so verifica status HTTP, nao headers de cache.
+ */
+const CacheControlRespectPlugin: import('workbox-core').WorkboxPlugin = {
+  cacheWillUpdate: async ({ response }) => {
+    const cacheControl = response.headers.get('Cache-Control');
+    if (cacheControl && (cacheControl.includes('no-cache') || cacheControl.includes('no-store'))) {
+      return null;
+    }
+    return response;
+  },
+};
+
 const LEGACY_CACHE_PREFIXES = ['api-cache-v', 'runtime-v', 'data-'];
 
 const API_NETWORK_TIMEOUT_SECONDS = 5;
@@ -111,7 +126,8 @@ registerRoute(
     cacheName: API_CACHE_NAME,
     networkTimeoutSeconds: API_NETWORK_TIMEOUT_SECONDS,
     plugins: [
-      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      CacheControlRespectPlugin,
+      new CacheableResponsePlugin({ statuses: [200] }),
       new ExpirationPlugin({
         maxEntries: API_CACHE_MAX_ENTRIES,
         maxAgeSeconds: API_CACHE_MAX_AGE_SECONDS,
