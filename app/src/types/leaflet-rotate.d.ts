@@ -7,11 +7,19 @@
 // biome-ignore lint/correctness/noUnusedImports: import needed for module augmentation
 // biome-ignore lint/suspicious/noShadowRestrictedNames: import needed for module augmentation
 import type { Map } from 'leaflet';
+// biome-ignore lint/correctness/noUnusedImports: import needed for module augmentation
+import type { MapContainerProps } from 'react-leaflet';
 
 declare module 'leaflet' {
   interface Map {
     setBearing(bearing: number): void;
     getBearing(): number;
     getRotation(): number;
+  }
+}
+
+declare module 'react-leaflet' {
+  interface MapContainerProps {
+    rotation?: boolean;
   }
 }
