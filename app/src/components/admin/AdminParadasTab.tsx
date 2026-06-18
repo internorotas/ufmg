@@ -1,4 +1,5 @@
 import L, { type DragEndEvent } from 'leaflet';
+import { MousePointerClick } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -161,7 +162,14 @@ export function AdminParadasTab({
                 : 'border-card-border text-text-secondary hover:bg-background-secondary'
             }`}
           >
-            {addMode ? '🖱️ Clique no mapa...' : '+ Clicar no mapa'}
+            {addMode ? (
+              <span className="flex items-center gap-1">
+                <MousePointerClick size={14} aria-hidden="true" />
+                Clique no mapa...
+              </span>
+            ) : (
+              '+ Clicar no mapa'
+            )}
           </button>
           <button
             type="button"
@@ -427,8 +435,9 @@ export function AdminParadasTab({
 
         {/* Banner de modo adição */}
         {addMode && (
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-1000 bg-success-bg text-success-text text-sm px-4 py-2 rounded-full border border-success-border font-medium shadow-lg pointer-events-none">
-            🖱️ Clique no mapa para adicionar uma parada
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-1000 bg-success-bg text-success-text text-sm px-4 py-2 rounded-full border border-success-border font-medium shadow-lg pointer-events-none flex items-center gap-1.5">
+            <MousePointerClick size={14} aria-hidden="true" />
+            Clique no mapa para adicionar uma parada
           </div>
         )}
 

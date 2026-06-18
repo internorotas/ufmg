@@ -121,7 +121,8 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }: { url: URL }) => url.hostname === 'tile.openstreetmap.org',
+  ({ url }: { url: URL }) =>
+    url.hostname === 'tile.openstreetmap.org' || url.hostname.endsWith('.basemaps.cartocdn.com'),
   new StaleWhileRevalidate({
     cacheName: TILES_CACHE_NAME,
     plugins: [

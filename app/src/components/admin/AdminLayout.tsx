@@ -1,3 +1,4 @@
+import { Settings } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import dataLinhas from '../../data/linhas';
 import dataParadas from '../../data/paradas';
@@ -105,7 +106,10 @@ export function AdminLayout() {
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-text-primary">
       {/* Barra de topo fixa */}
       <header className="flex items-center gap-2 px-3 py-2 bg-card border-b-2 border-(--neo-border-color) shrink-0 flex-wrap">
-        <span className="font-bold text-sm text-text-primary whitespace-nowrap">⚙️ Admin Panel</span>
+        <span className="font-bold text-sm text-text-primary whitespace-nowrap flex items-center gap-1.5">
+          <Settings size={16} aria-hidden="true" />
+          Admin Panel
+        </span>
 
         {/* Seletor de aba */}
         <div className="flex neo-brutal-sm overflow-hidden text-xs font-medium">

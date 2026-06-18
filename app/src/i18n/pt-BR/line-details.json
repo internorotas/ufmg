@@ -18,7 +18,7 @@
     "arrival": "Chegada",
     "arrivesNow": "Chega agora",
     "lastPassed": "Último passou há {{minutes}} min",
-    "tip": "💡 Clique em uma parada para visualizá-la no mapa",
+    "tip": "Dica: Clique em uma parada para visualizá-la no mapa",
     "empty": "Nenhuma parada encontrada para este itinerário."
   },
   "schedules": {

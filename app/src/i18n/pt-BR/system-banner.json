@@ -5,7 +5,7 @@
   },
   "vacation": {
     "description": "De {{start}} a {{end}}, operam apenas os horários de Férias e Recessos. Não há circulação aos fins de semana e feriados.",
-    "weekendWarning": "⚠️ Hoje não há circulação de ônibus (apenas em dias úteis)."
+    "weekendWarning": "Hoje não há circulação de ônibus (apenas em dias úteis)."
   },
   "disclaimer": {
     "offline": "Conexão perdida. Mapas podem não carregar, mas previsões estáticas continuam funcionando.",

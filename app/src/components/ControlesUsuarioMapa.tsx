@@ -10,7 +10,7 @@
  */
 
 import L from 'leaflet';
-import { CornerUpLeft, LoaderCircle, LocateFixed, Radio, Square } from 'lucide-react';
+import { Compass, CornerUpLeft, LoaderCircle, LocateFixed, Radio, Square } from 'lucide-react';
 import { Marker, useMap } from 'react-leaflet';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
@@ -30,6 +30,10 @@ interface ControlesUsuarioMapaProps {
   carregandoLocalizacao?: boolean;
   rastreioColaborativo?: GpsTrackingState;
   onAlternarRastreioColaborativo?: () => void;
+  /** Se o seguimento de bússola está ativo */
+  compassEnabled?: boolean;
+  /** Callback para alternar o seguimento de bússola */
+  onToggleCompass?: () => void;
 }
 
 /**
@@ -105,6 +109,8 @@ export function ControlesUsuarioMapa({
   carregandoLocalizacao = false,
   rastreioColaborativo,
   onAlternarRastreioColaborativo,
+  compassEnabled = false,
+  onToggleCompass,
 }: ControlesUsuarioMapaProps) {
   const analytics = useAnalytics();
   const map = useMap();
@@ -204,6 +210,27 @@ export function ControlesUsuarioMapa({
         >
           <CornerUpLeft className="h-5 w-5" aria-hidden="true" />
         </button>
+
+        {onToggleCompass && (
+          <button
+            type="button"
+            onClick={onToggleCompass}
+            aria-pressed={compassEnabled}
+            aria-label={
+              compassEnabled ? 'Desativar rotação por bússola' : 'Ativar rotação por bússola'
+            }
+            title={compassEnabled ? 'Bússola ativa' : 'Ativar bússola'}
+            className={cn(
+              'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+              compassEnabled
+                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+                : 'bg-card text-text-primary hover:bg-card-hover',
+            )}
+          >
+            <Compass className="h-5 w-5" aria-hidden="true" />
+          </button>
+        )}
 
         <button
           type="button"

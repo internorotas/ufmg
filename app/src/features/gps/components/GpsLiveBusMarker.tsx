@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import { Bus, Clock, Radar, Target } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import { calcularPosicaoTeorica } from '@/lib/busPosition';
@@ -153,11 +154,11 @@ function BusPopup({ linha, num, isLive, livePos, theoreticalPos }: BusPopupProps
       {isLive && livePos ? (
         <div className="flex flex-col gap-1.5 text-xs text-text-secondary">
           <div className="flex items-center gap-1.5">
-            <span aria-hidden="true">📡</span>
+            <Radar size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
             <span className="font-semibold text-text-primary">Posição em tempo real</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span aria-hidden="true">🎯</span>
+            <Target size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
             <span>
               Confiança:{' '}
               <strong
@@ -175,11 +176,11 @@ function BusPopup({ linha, num, isLive, livePos, theoreticalPos }: BusPopupProps
         theoreticalPos && (
           <div className="flex flex-col gap-1.5 text-xs text-text-secondary">
             <div className="flex items-center gap-1.5">
-              <span aria-hidden="true">🕐</span>
+              <Clock size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
               <span className="font-semibold text-text-primary">Estimativa de posição</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span aria-hidden="true">🚌</span>
+              <Bus size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
               <span>
                 Saída <strong className="text-text-primary">{theoreticalPos.horarioSaida}</strong>
                 {' · '}

@@ -1,3 +1,4 @@
+import { Pencil, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -607,7 +608,17 @@ export function AdminLinhasTab({
                         : 'border-card-border text-text-secondary hover:bg-background-secondary'
                     }`}
                   >
-                    {drawMode ? '✏️ Desenhando...' : '✏️ Desenhar'}
+                    {drawMode ? (
+                      <span className="flex items-center gap-1">
+                        <Pencil size={14} aria-hidden="true" />
+                        Desenhando...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        <Pencil size={14} aria-hidden="true" />
+                        Desenhar
+                      </span>
+                    )}
                   </button>
 
                   {/* Inverter rota */}
@@ -629,7 +640,10 @@ export function AdminLinhasTab({
                     title="Apagar todo o trajeto"
                     className={`${BTN_SMALL} border-warning-border text-warning-text bg-warning-bg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed`}
                   >
-                    🗑 Limpar
+                    <span className="flex items-center gap-1">
+                      <Trash2 size={14} aria-hidden="true" />
+                      Limpar
+                    </span>
                   </button>
                 </div>
 

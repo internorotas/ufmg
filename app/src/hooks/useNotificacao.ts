@@ -67,7 +67,7 @@ function buildNotificationPayload(opts: OpcaoAviso): {
 
   if (opts.tipo === 'chegando') {
     return {
-      titulo: '🚌 Ônibus chegando agora!',
+      titulo: '● Ônibus chegando agora!',
       corpo: `A ${opts.linhaNome} está chegando à parada "${opts.paradaNome}" agora! (±5 min de margem)`,
       tag: `${base}-chegando`,
     };
@@ -75,7 +75,7 @@ function buildNotificationPayload(opts: OpcaoAviso): {
 
   // contagem regressiva — minRestantes é o tempo real calculado no momento do disparo
   return {
-    titulo: `🚌 Ônibus em ~${opts.minRestantes} min`,
+    titulo: `● Ônibus em ~${opts.minRestantes} min`,
     corpo: `A ${opts.linhaNome} chegará à parada "${opts.paradaNome}" em ~${opts.minRestantes} minutos.`,
     tag: `${base}-${opts.minRestantes}min`,
   };

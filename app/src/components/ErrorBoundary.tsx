@@ -1,3 +1,4 @@
+import { Frown } from 'lucide-react';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { ga4Analytics } from '../services/analytics';
@@ -40,7 +41,10 @@ export class ErrorBoundary extends Component<Props, State> {
         this.props.fallback || (
           <div className="flex items-center justify-center h-screen min-h-dvh w-screen bg-background-secondary text-text-primary">
             <div className="text-center p-8 bg-card rounded-lg shadow-xl max-w-md">
-              <h2 className="text-2xl font-bold mb-4 text-warning-text">😔 Ops! Algo deu errado</h2>
+              <h2 className="text-2xl font-bold mb-4 text-warning-text flex items-center gap-2 justify-center">
+                <Frown size={28} aria-hidden="true" />
+                Ops! Algo deu errado
+              </h2>
               <p className="text-text-secondary mb-6">
                 Encontramos um erro inesperado. Por favor, recarregue a página para tentar
                 novamente.
