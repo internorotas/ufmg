@@ -1,17 +1,18 @@
 /**
- * Camada GeoJSON com os prédios da UFMG.
+ * Camada GeoJSON com os predios da UFMG.
  *
- * Polígonos dos edifícios campus Pampulha, visíveis apenas em zoom ≥ 16
- * para não poluir o mapa em níveis de zoom inferiores.
+ * Poligonos dos edificios campus Pampulha, visiveis apenas em zoom >= 16
+ * para nao poluir o mapa em niveis de zoom inferiores.
  *
- * Dados geoespaciais: public/data/ufmg-predios.geojson (gerado via Overpass API).
+ * Dados: backend /v1/map/ufmg-predios (fallback: public/data/ufmg-predios.geojson).
  */
 
 import L from 'leaflet';
 import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
+import { useUfmPrediosQuery } from '@/features/transit-data/queries/useUfmPrediosQuery';
+import type { GeoJsonFeatureCollection } from '@/services/api/mapDataApi';
 
-const GEOJSON_URL = '/data/ufmg-predios.geojson';
 const MIN_ZOOM = 16;
 
 const FILL_COLOR = '#4a90d9';
@@ -27,47 +28,24 @@ interface UfmgPrediosLayerProps {
 export function UfmgPrediosLayer({ visible = true }: UfmgPrediosLayerProps) {
   const map = useMap();
   const layerRef = useRef<L.GeoJSON | null>(null);
-  const dataRef = useRef<GeoJSON.FeatureCollection | null>(null);
+  const { data } = useUfmPrediosQuery();
 
   useEffect(() => {
-    let cancelled = false;
-
-    fetch(GEOJSON_URL)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((data: GeoJSON.FeatureCollection) => {
-        if (cancelled) return;
-        dataRef.current = data;
-        updateLayerVisibility(map, layerRef, data, visible);
-      })
-      .catch(() => {
-        // Dados indisponíveis — camada simplemente não aparece
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [map, visible]);
-
-  useEffect(() => {
-    if (dataRef.current) {
-      updateLayerVisibility(map, layerRef, dataRef.current, visible);
-    }
-  }, [map, visible]);
+    if (!data) return;
+    updateLayerVisibility(map, layerRef, data, visible);
+  }, [map, data, visible]);
 
   useEffect(() => {
     function onZoom() {
-      if (dataRef.current) {
-        updateLayerVisibility(map, layerRef, dataRef.current, visible);
+      if (data) {
+        updateLayerVisibility(map, layerRef, data, visible);
       }
     }
     map.on('zoomend', onZoom);
     return () => {
       map.off('zoomend', onZoom);
     };
-  }, [map, visible]);
+  }, [map, data, visible]);
 
   useEffect(() => {
     return () => {
@@ -84,11 +62,11 @@ export function UfmgPrediosLayer({ visible = true }: UfmgPrediosLayerProps) {
 function updateLayerVisibility(
   map: L.Map,
   layerRef: React.MutableRefObject<L.GeoJSON | null>,
-  data: GeoJSON.FeatureCollection,
+  data: GeoJsonFeatureCollection,
   visible: boolean,
 ) {
   const zoom = map.getZoom();
-  const shouldShow = visible && zoom >= MIN_ZOOM;
+  const shouldShow = visible && zoom >= MIN_ZOOM && data.features.length > 0;
 
   if (shouldShow && !layerRef.current) {
     const layer = L.geoJSON(data, {
