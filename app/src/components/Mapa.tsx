@@ -72,9 +72,9 @@ interface MapaProps {
 const MAP_CONFIG = {
   center: COORDENADAS_CAMPUS,
   zoom: 15,
-  tileUrl: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+  tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/" target="_blank" rel="noopener noreferrer">CARTO</a>',
+    '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
 };
 
 /**
@@ -193,6 +193,7 @@ export function Mapa({
         zoom={MAP_CONFIG.zoom}
         className="h-full w-full"
         zoomControl={true}
+        rotation={true}
         whenReady={() => {}}
       >
         <TileLayer url={MAP_CONFIG.tileUrl} attribution={MAP_CONFIG.attribution} />
