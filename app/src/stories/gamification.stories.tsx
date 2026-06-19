@@ -455,4 +455,3 @@ export const PointDeltaToastShortMessage: Story = () => (
 
 // ---------------------------------------------------------------------------
 // Named exports order
-
