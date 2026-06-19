@@ -76,13 +76,13 @@ export function GpsPositionWarningDialog({
             </div>
 
             {/* Ações */}
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2">
               <Button
                 type="button"
                 variant="primary"
                 fullWidth
                 onClick={onConfirm}
-                className="gap-2"
+                className="gap-2 flex"
               >
                 <Radio size={15} aria-hidden="true" />
                 Contribuir mesmo assim
