@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
   Bell,
@@ -11,7 +12,6 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { AppShell } from '@/components/app/AppShell';
 import { DataStatusScreen } from '@/components/app/DataStatusScreen';
 import { Badge } from '@/components/ui/Badge';
@@ -36,8 +36,8 @@ import {
   type UserProfile,
   updateProfile,
 } from '@/features/profile/api/profileClient';
-import { PROFILE_QUERY_KEY, useProfileQuery } from '@/features/profile/queries/useProfileQuery';
 import { DeleteAccountDialog } from '@/features/profile/components/DeleteAccountDialog';
+import { PROFILE_QUERY_KEY, useProfileQuery } from '@/features/profile/queries/useProfileQuery';
 import { formatDateTimePtBr } from '@/lib/formatters';
 
 interface ProfileFeedbackState {
@@ -53,7 +53,8 @@ export function ProfilePage() {
   const queryClient = useQueryClient();
 
   const { data: profile, isPending: isLoadingProfile, error } = useProfileQuery();
-  const profileError = error instanceof Error ? error.message : error ? 'Falha ao carregar perfil.' : null;
+  const profileError =
+    error instanceof Error ? error.message : error ? 'Falha ao carregar perfil.' : null;
 
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);

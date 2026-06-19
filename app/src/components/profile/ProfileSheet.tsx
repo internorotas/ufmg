@@ -1,7 +1,7 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { Bell, ChevronRight, LogOut, ShieldAlert, UserCircle2 } from 'lucide-react';
 import { useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
