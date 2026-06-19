@@ -6,7 +6,7 @@
  */
 
 import { normalizarNomeLinha } from '@/lib/utils';
-import { fetchLinhas, fetchParadas } from '@/services/api/transitApi';
+import { fetchTransitDataBinary } from '@/services/api/transitApi';
 import type { CategoriaLinhas, DadosLinhas, Linha, Parada } from '@/types/data.types';
 
 const DATA_BUILD_ID = import.meta.env.VITE_BUILD_ID;
@@ -175,8 +175,8 @@ async function loadFromPublic(): Promise<{ linhas: CategoriaLinhas; paradas: Par
 }
 
 async function loadFromApi(): Promise<{ linhas: CategoriaLinhas; paradas: ParadasPayload }> {
-  const [linhas, paradas] = await Promise.all([fetchLinhas(), fetchParadas()]);
-  return { linhas, paradas };
+  const { linhas, paradas } = await fetchTransitDataBinary();
+  return { linhas, paradas: { paradas } };
 }
 
 async function loadFromSourceFallback(): Promise<{

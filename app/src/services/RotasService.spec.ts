@@ -18,8 +18,9 @@ describe('RotasService fallback chain', () => {
 
   it('com API respondendo, loadRotasData usa dados da API', async () => {
     vi.doMock('@/services/api/transitApi', () => ({
-      fetchLinhas: vi.fn().mockResolvedValue({ categoriasDias: [] }),
-      fetchParadas: vi.fn().mockResolvedValue({ paradas: [] }),
+      fetchTransitDataBinary: vi
+        .fn()
+        .mockResolvedValue({ linhas: { categoriasDias: [] }, paradas: [] }),
     }));
 
     const { loadRotasData } = await import('./RotasService');
@@ -31,8 +32,7 @@ describe('RotasService fallback chain', () => {
 
   it('com API indisponível, fallback para /public/data funciona', async () => {
     vi.doMock('@/services/api/transitApi', () => ({
-      fetchLinhas: vi.fn().mockRejectedValue(new Error('api off')),
-      fetchParadas: vi.fn().mockRejectedValue(new Error('api off')),
+      fetchTransitDataBinary: vi.fn().mockRejectedValue(new Error('api off')),
     }));
 
     vi.stubGlobal(
@@ -51,8 +51,7 @@ describe('RotasService fallback chain', () => {
 
   it('em DEV sem /public/data, fallback TS source continua funcional', async () => {
     vi.doMock('@/services/api/transitApi', () => ({
-      fetchLinhas: vi.fn().mockRejectedValue(new Error('api off')),
-      fetchParadas: vi.fn().mockRejectedValue(new Error('api off')),
+      fetchTransitDataBinary: vi.fn().mockRejectedValue(new Error('api off')),
     }));
 
     vi.stubGlobal(
@@ -69,8 +68,9 @@ describe('RotasService fallback chain', () => {
 
   it('loadRotasService expõe apenas o service do fluxo consolidado', async () => {
     vi.doMock('@/services/api/transitApi', () => ({
-      fetchLinhas: vi.fn().mockResolvedValue({ categoriasDias: [] }),
-      fetchParadas: vi.fn().mockResolvedValue({ paradas: [] }),
+      fetchTransitDataBinary: vi
+        .fn()
+        .mockResolvedValue({ linhas: { categoriasDias: [] }, paradas: [] }),
     }));
 
     const { loadRotasService } = await import('./RotasService');
