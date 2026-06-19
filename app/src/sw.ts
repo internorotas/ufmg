@@ -41,7 +41,7 @@ const NAVIGATION_DENYLIST = [
 
 // BUILD_SLUG muda a cada build (primeiros 13 chars do ISO timestamp, ex: "2026-06-11T15").
 // Isso faz o RUNTIME_CACHE_NAME mudar a cada deploy, forçando cache miss nos arquivos de
-// dados (linhas.json, paradas.json) na primeira carga pós-deploy. O activate limpa o cache
+// dados estaticos na primeira carga pós-deploy. O activate limpa o cache
 // anterior automaticamente pois o nome antigo começa com TENANT_CACHE_PREFIX.
 const BUILD_SLUG = (import.meta.env.VITE_BUILD_ID as string | undefined)?.slice(0, 13) ?? 'dev';
 

@@ -255,7 +255,7 @@ export const DataSourceBannerHidden: Story = () => (
     <p className="text-text-secondary text-sm">
       Banner não visível (isVisible=false). Nenhum banner deve aparecer acima deste texto.
     </p>
-    <DataSourceBanner isVisible={false} source="public-data" />
+    <DataSourceBanner isVisible={false} source="source-fallback" />
   </div>
 );
 
@@ -265,20 +265,6 @@ export const DataSourceBannerApiSource: Story = () => (
       Fonte é 'api' — banner nunca é exibido independente de isVisible.
     </p>
     <DataSourceBanner isVisible={true} source="api" />
-  </div>
-);
-
-export const DataSourceBannerPublicData: Story = () => (
-  <div className="relative pt-24 p-4 bg-background-secondary min-h-48">
-    <p className="text-text-secondary text-sm">Fonte: dados públicos em cache (sem data).</p>
-    <DataSourceBanner isVisible={true} source="public-data" />
-  </div>
-);
-
-export const DataSourceBannerPublicDataWithTimestamp: Story = () => (
-  <div className="relative pt-24 p-4 bg-background-secondary min-h-48">
-    <p className="text-text-secondary text-sm">Fonte: dados públicos em cache (com timestamp).</p>
-    <DataSourceBanner isVisible={true} source="public-data" updatedAt="2024-08-15T14:32:00.000Z" />
   </div>
 );
 
@@ -674,7 +660,7 @@ export const ComposedOfflineScenario: Story = () => (
           />
           <DataSourceBanner
             isVisible={true}
-            source="public-data"
+            source="source-fallback"
             updatedAt="2024-08-15T11:45:00.000Z"
           />
           <div className="neo-brutal bg-card p-4 rounded">
@@ -722,4 +708,3 @@ export const ComposedErrorScenario: Story = () => (
 
 // ---------------------------------------------------------------------------
 // Export order
-

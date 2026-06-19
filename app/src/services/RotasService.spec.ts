@@ -30,34 +30,21 @@ describe('RotasService fallback chain', () => {
     expect(result.service.getTodasLinhas()).toEqual({ categoriasDias: [] });
   });
 
-  it('com API indisponível, fallback para /public/data funciona', async () => {
+  it('com API indisponível, fallback para source-fallback funciona', async () => {
     vi.doMock('@/services/api/transitApi', () => ({
       fetchTransitDataBinary: vi.fn().mockRejectedValue(new Error('api off')),
     }));
-
-    vi.stubGlobal(
-      'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ categoriasDias: [] }) })
-        .mockResolvedValueOnce({ ok: true, json: async () => ({ paradas: [] }) }),
-    );
 
     const { loadRotasData } = await import('./RotasService');
     const result = await loadRotasData();
 
-    expect(result.source).toBe('public-data');
+    expect(result.source).toBe('source-fallback');
   });
 
-  it('em DEV sem /public/data, fallback TS source continua funcional', async () => {
+  it('em DEV, fallback TS source continua funcional', async () => {
     vi.doMock('@/services/api/transitApi', () => ({
       fetchTransitDataBinary: vi.fn().mockRejectedValue(new Error('api off')),
     }));
-
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValueOnce({ ok: false }).mockResolvedValueOnce({ ok: false }),
-    );
 
     const { loadRotasData } = await import('./RotasService');
     const result = await loadRotasData();
