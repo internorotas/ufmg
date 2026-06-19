@@ -19,6 +19,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "generate:og": "node scripts/generate-og-image.mjs",
+    "encode-data": "node scripts/encode-data.mjs",
+    "encode-data:verify": "node scripts/encode-data.mjs --decode",
     "env:pull": "node scripts/load-env.mjs",
     "prepare": "husky"
   },
