@@ -1,3 +1,5 @@
 onlyBuiltDependencies:
-  - "@tailwindcss/oxide"
+  - '@swc/core'
+  - '@tailwindcss/oxide'
   - esbuild
+  - msw
