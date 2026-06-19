@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchLinhas } from '@/services/api/transitApi';
+import localLinhas from '@/data/linhas';
+import { fetchTransitDataBinary } from '@/services/api/transitApi';
 import type { CategoriaLinhas } from '@/types/data.types';
-import { useTransitSessionStore } from '../store/transitSessionStore';
 import { transitQueryKeys } from './queryKeys';
 
 const TRANSIT_STALE_TIME_MS = 10 * 60 * 1000;
@@ -11,11 +11,19 @@ function getTransitRetryDelay(attemptIndex: number) {
   return Math.min(1000 * 2 ** attemptIndex, 5000);
 }
 
+async function fetchLinhasBinary(): Promise<CategoriaLinhas> {
+  try {
+    const { linhas } = await fetchTransitDataBinary();
+    return linhas;
+  } catch {
+    return localLinhas;
+  }
+}
+
 export function useLinhasQuery(enabled: boolean) {
-  const transitToken = useTransitSessionStore((s) => s.transitToken);
   return useQuery<CategoriaLinhas>({
-    queryKey: [...transitQueryKeys.linhas, transitToken],
-    queryFn: fetchLinhas,
+    queryKey: transitQueryKeys.linhas,
+    queryFn: fetchLinhasBinary,
     enabled,
     staleTime: TRANSIT_STALE_TIME_MS,
     gcTime: TRANSIT_GC_TIME_MS,

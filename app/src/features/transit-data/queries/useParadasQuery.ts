@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchParadas } from '@/services/api/transitApi';
+import localParadas from '@/data/paradas';
+import { fetchTransitDataBinary } from '@/services/api/transitApi';
 import type { Parada } from '@/types/data.types';
-import { useTransitSessionStore } from '../store/transitSessionStore';
 import { transitQueryKeys } from './queryKeys';
 
 const TRANSIT_STALE_TIME_MS = 10 * 60 * 1000;
@@ -15,11 +15,19 @@ interface ParadasPayload {
   paradas: Parada[];
 }
 
+async function fetchParadasBinary(): Promise<ParadasPayload> {
+  try {
+    const { paradas } = await fetchTransitDataBinary();
+    return { paradas };
+  } catch {
+    return localParadas as ParadasPayload;
+  }
+}
+
 export function useParadasQuery(enabled: boolean) {
-  const transitToken = useTransitSessionStore((s) => s.transitToken);
   return useQuery<ParadasPayload>({
-    queryKey: [...transitQueryKeys.paradas, transitToken],
-    queryFn: fetchParadas,
+    queryKey: transitQueryKeys.paradas,
+    queryFn: fetchParadasBinary,
     enabled,
     staleTime: TRANSIT_STALE_TIME_MS,
     gcTime: TRANSIT_GC_TIME_MS,

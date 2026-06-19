@@ -2,7 +2,6 @@ import { parse as parseProto } from 'protobufjs';
 import localLinhas from '@/data/linhas';
 import localParadas from '@/data/paradas';
 import { useAuthStore } from '@/features/auth/store/authStore';
-import { getTransitToken } from '@/features/transit-data/store/transitSessionStore';
 import { getTenantStorageKey } from '@/pwa/tenantNamespace';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import type { CategoriaDia, CategoriaLinhas, DadosLinhas, Linha, Parada } from '@/types/data.types';
@@ -23,10 +22,6 @@ function resolveTransitEndpoint(pathname: '/v1/linhas' | '/v1/paradas'): string 
 
 function getInMemoryAuthToken(): string | null {
   return useAuthStore.getState().accessToken;
-}
-
-function getInMemoryTransitToken(): string | null {
-  return getTransitToken();
 }
 
 function getStoredApiVersion(): string | null {
@@ -136,10 +131,8 @@ async function fetchTransit<T>(
 ): Promise<T> {
   const endpoint = resolveTransitEndpoint(pathname);
   const authToken = getInMemoryAuthToken();
-  const transitToken = getInMemoryTransitToken();
   const headers = withTenantHeaders({
     Accept: 'application/json',
-    ...(transitToken ? { 'X-Transit-Token': transitToken } : {}),
     ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
   });
 
@@ -320,13 +313,13 @@ function decodeTransitProto(buffer: ArrayBuffer): {
 }
 
 export async function fetchTransitDataBinary(
-  transitToken: string,
+  transitToken?: string,
 ): Promise<{ linhas: CategoriaLinhas; paradas: Parada[] }> {
   const endpoint = resolveApiEndpoint('/v1/transit/data');
   const authToken = getInMemoryAuthToken();
   const headers = withTenantHeaders({
     Accept: 'application/x-protobuf',
-    'X-Transit-Token': transitToken,
+    ...(transitToken ? { 'X-Transit-Token': transitToken } : {}),
     ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
   });
 
