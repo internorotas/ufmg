@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { AppShell } from '@/components/app/AppShell';
 import { DataStatusScreen } from '@/components/app/DataStatusScreen';
 import { Badge } from '@/components/ui/Badge';
@@ -30,14 +31,13 @@ import { ContributionHeatmap } from '@/features/gamification/components/Contribu
 import { SupportActionsCard } from '@/features/monetization/components/SupportActionsCard';
 import {
   deleteAccount,
-  getProfile,
   type ProfileUpdatePayload,
   toAuthenticatedUser,
   type UserProfile,
   updateProfile,
 } from '@/features/profile/api/profileClient';
+import { PROFILE_QUERY_KEY, useProfileQuery } from '@/features/profile/queries/useProfileQuery';
 import { DeleteAccountDialog } from '@/features/profile/components/DeleteAccountDialog';
-import { useMounted } from '@/hooks/useMounted';
 import { formatDateTimePtBr } from '@/lib/formatters';
 
 interface ProfileFeedbackState {
@@ -50,17 +50,18 @@ export function ProfilePage() {
   const { authStatus, isAuthenticated, updateUser, resetSession } = useAuthContext();
   const { logout, isPending: isLogoutPending } = useLogout();
   const { publishPointEvent } = useNotificacaoContext();
+  const queryClient = useQueryClient();
 
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const { data: profile, isPending: isLoadingProfile, error } = useProfileQuery();
+  const profileError = error instanceof Error ? error.message : error ? 'Falha ao carregar perfil.' : null;
+
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-  const [profileError, setProfileError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<ProfileFeedbackState | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const isMounted = useMounted();
+
   // Refs estáveis para evitar que funções de contexto com referência instável
-  // disparem re-execuções desnecessárias do efeito de carregamento de perfil.
+  // disparem re-execuções desnecessárias do efeito de sincronização de perfil.
   const publishPointEventRef = useRef(publishPointEvent);
   const updateUserRef = useRef(updateUser);
   useEffect(() => {
@@ -70,38 +71,12 @@ export function ProfilePage() {
     updateUserRef.current = updateUser;
   });
 
+  // Sincroniza auth context e notificação de pontos quando o dado do perfil chega ou atualiza.
   useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-
-    const loadProfile = async () => {
-      setIsLoadingProfile(true);
-      setProfileError(null);
-
-      try {
-        const response = await getProfile();
-        if (!isMounted()) return;
-
-        setProfile(response);
-        updateUserRef.current(toAuthenticatedUser(response));
-        publishPointEventRef.current(response.gamification.recentPointEvents[0] ?? null);
-      } catch (error) {
-        if (!isMounted()) return;
-
-        const message = error instanceof Error ? error.message : 'Falha ao carregar perfil.';
-        setProfileError(message);
-      } finally {
-        if (isMounted()) setIsLoadingProfile(false);
-      }
-    };
-
-    void loadProfile();
-    // Somente re-executa quando a autenticação mudar. publishPointEvent e
-    // updateUser são capturados via ref para evitar loops causados por
-    // referências instáveis vindas dos providers de contexto.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, isMounted]);
+    if (!profile) return;
+    updateUserRef.current(toAuthenticatedUser(profile));
+    publishPointEventRef.current(profile.gamification.recentPointEvents[0] ?? null);
+  }, [profile]);
 
   const handleProfileUpdate = useCallback(
     async (payload: ProfileUpdatePayload) => {
@@ -114,7 +89,7 @@ export function ProfilePage() {
 
       try {
         const updated = await updateProfile(payload);
-        setProfile(updated);
+        queryClient.setQueryData<UserProfile>(PROFILE_QUERY_KEY, updated);
         updateUser(toAuthenticatedUser(updated));
         setFeedback({ type: 'success', message: 'Preferências de perfil atualizadas.' });
       } catch (error) {
@@ -124,7 +99,7 @@ export function ProfilePage() {
         setIsUpdatingProfile(false);
       }
     },
-    [isUpdatingProfile, profile, updateUser],
+    [isUpdatingProfile, profile, queryClient, updateUser],
   );
 
   const handleToggleProfilePublic = useCallback(() => {
@@ -163,7 +138,9 @@ export function ProfilePage() {
       });
       // Usa o timestamp retornado pelo servidor (não um timestamp local) para
       // garantir que o estado local reflita exatamente o que foi persistido.
-      setProfile((prev) => (prev ? { ...prev, consentGpsAt: result.consentGpsAt } : prev));
+      queryClient.setQueryData<UserProfile>(PROFILE_QUERY_KEY, (prev) =>
+        prev ? { ...prev, consentGpsAt: result.consentGpsAt } : prev,
+      );
       setFeedback({ type: 'success', message: 'Consentimento GPS atualizado.' });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Falha ao atualizar consentimento.';
@@ -171,7 +148,7 @@ export function ProfilePage() {
     } finally {
       setIsUpdatingProfile(false);
     }
-  }, [isUpdatingProfile, profile]);
+  }, [isUpdatingProfile, profile, queryClient]);
 
   const handleToggleConsentResearch = useCallback(async () => {
     if (!profile || isUpdatingProfile) return;
@@ -182,7 +159,7 @@ export function ProfilePage() {
         consentGps: !!profile.consentGpsAt,
         consentResearch: !profile.consentResearchAt,
       });
-      setProfile((prev) =>
+      queryClient.setQueryData<UserProfile>(PROFILE_QUERY_KEY, (prev) =>
         prev ? { ...prev, consentResearchAt: result.consentResearchAt } : prev,
       );
       setFeedback({ type: 'success', message: 'Consentimento de pesquisa atualizado.' });
@@ -192,7 +169,7 @@ export function ProfilePage() {
     } finally {
       setIsUpdatingProfile(false);
     }
-  }, [isUpdatingProfile, profile]);
+  }, [isUpdatingProfile, profile, queryClient]);
 
   const handleLogout = useCallback(async () => {
     setFeedback(null);

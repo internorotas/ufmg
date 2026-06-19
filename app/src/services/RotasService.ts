@@ -150,16 +150,12 @@ class RotasServiceImpl implements IRotasService {
 }
 
 async function loadFromPublic(): Promise<{ linhas: CategoriaLinhas; paradas: ParadasPayload }> {
-  const publicBaseUrl = new URL(import.meta.env.BASE_URL || '/', window.location.origin);
-  const linhasUrl = new URL('data/linhas.json', publicBaseUrl);
-  const paradasUrl = new URL('data/paradas.json', publicBaseUrl);
-
-  linhasUrl.searchParams.set('v', DATA_BUILD_ID);
-  paradasUrl.searchParams.set('v', DATA_BUILD_ID);
+  const base = import.meta.env.BASE_URL ?? '/';
+  const v = DATA_BUILD_ID ?? 'dev';
 
   const [linhasResponse, paradasResponse] = await Promise.all([
-    fetch(linhasUrl, { cache: 'no-store' }),
-    fetch(paradasUrl, { cache: 'no-store' }),
+    fetch(`${base}data/linhas.json?v=${v}`, { cache: 'no-store' }),
+    fetch(`${base}data/paradas.json?v=${v}`, { cache: 'no-store' }),
   ]);
 
   if (!linhasResponse.ok || !paradasResponse.ok) {

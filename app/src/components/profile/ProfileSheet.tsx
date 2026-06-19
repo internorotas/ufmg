@@ -1,6 +1,7 @@
 import { Bell, ChevronRight, LogOut, ShieldAlert, UserCircle2 } from 'lucide-react';
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
@@ -9,12 +10,11 @@ import { ToggleRow } from '@/components/ui/ToggleRow';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import {
-  getProfile,
   toAuthenticatedUser,
   type UserProfile,
   updateProfile,
 } from '@/features/profile/api/profileClient';
-import { useMounted } from '@/hooks/useMounted';
+import { PROFILE_QUERY_KEY, useProfileQuery } from '@/features/profile/queries/useProfileQuery';
 import { formatConsent } from '@/lib/formatters';
 
 interface ProfileSheetProps {
@@ -23,43 +23,15 @@ interface ProfileSheetProps {
 }
 
 export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
-  const { user, isAuthenticated, updateUser } = useAuthContext();
+  const { user, updateUser } = useAuthContext();
   const { logout, isPending: isLogoutPending } = useLogout();
+  const queryClient = useQueryClient();
 
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data: profile, isPending: isLoading } = useProfileQuery();
+
   const [isTogglingPublic, setIsTogglingPublic] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const headingId = useId();
-  const isMounted = useMounted();
-
-  useEffect(() => {
-    if (!isOpen || !isAuthenticated) {
-      return;
-    }
-
-    const loadProfile = async () => {
-      setIsLoading(true);
-      setErrorMessage(null);
-
-      try {
-        const data = await getProfile();
-        if (!isMounted()) return;
-
-        setProfile(data);
-        updateUser(toAuthenticatedUser(data));
-      } catch (error) {
-        if (!isMounted()) return;
-
-        const message = error instanceof Error ? error.message : 'Falha ao carregar perfil rápido.';
-        setErrorMessage(message);
-      } finally {
-        if (isMounted()) setIsLoading(false);
-      }
-    };
-
-    void loadProfile();
-  }, [isAuthenticated, isMounted, isOpen, updateUser]);
 
   const userDisplay = useMemo(() => {
     if (profile) {
@@ -87,7 +59,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
 
     try {
       const updated = await updateProfile({ profilePublic: !profile.profilePublic });
-      setProfile(updated);
+      queryClient.setQueryData<UserProfile>(PROFILE_QUERY_KEY, updated);
       updateUser(toAuthenticatedUser(updated));
     } catch (error) {
       const message =
