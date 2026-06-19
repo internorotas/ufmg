@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+import { useTransitSessionStore } from '../store/transitSessionStore';
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
 const TTL_MS = 120_000;
@@ -33,6 +34,8 @@ async function exchangeForTransitToken(turnstileToken: string): Promise<string |
 }
 
 export function useTransitSession(): TransitSession {
+  const setTransitToken = useTransitSessionStore((s) => s.setTransitToken);
+
   const [state, setState] = useState<TransitSessionState>({
     transitToken: null,
     turnstileReady: false,
@@ -42,12 +45,16 @@ export function useTransitSession(): TransitSession {
   const expiresAtRef = useRef<number>(0);
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const scheduleRefresh = useCallback((delayMs: number) => {
-    if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
-    refreshTimerRef.current = setTimeout(() => {
-      setState((prev) => ({ ...prev, turnstileReady: false, transitToken: null }));
-    }, delayMs);
-  }, []);
+  const scheduleRefresh = useCallback(
+    (delayMs: number) => {
+      if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = setTimeout(() => {
+        setState((prev) => ({ ...prev, turnstileReady: false, transitToken: null }));
+        setTransitToken(null);
+      }, delayMs);
+    },
+    [setTransitToken],
+  );
 
   const onTurnstileSuccess = useCallback(
     async (turnstileToken: string) => {
@@ -55,14 +62,16 @@ export function useTransitSession(): TransitSession {
       if (!token) return;
       expiresAtRef.current = Date.now() + TTL_MS;
       setState({ transitToken: token, turnstileReady: true, disabled: false });
+      setTransitToken(token);
       scheduleRefresh(TTL_MS - REFRESH_BEFORE_EXPIRY_MS);
     },
-    [scheduleRefresh],
+    [scheduleRefresh, setTransitToken],
   );
 
   const onTurnstileError = useCallback(() => {
     setState((prev) => ({ ...prev, turnstileReady: false, transitToken: null }));
-  }, []);
+    setTransitToken(null);
+  }, [setTransitToken]);
 
   useEffect(() => {
     return () => {

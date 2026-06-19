@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchParadas } from '@/services/api/transitApi';
 import type { Parada } from '@/types/data.types';
+import { useTransitSessionStore } from '../store/transitSessionStore';
 import { transitQueryKeys } from './queryKeys';
 
 const TRANSIT_STALE_TIME_MS = 10 * 60 * 1000;
@@ -15,8 +16,9 @@ interface ParadasPayload {
 }
 
 export function useParadasQuery(enabled: boolean) {
+  const transitToken = useTransitSessionStore((s) => s.transitToken);
   return useQuery<ParadasPayload>({
-    queryKey: transitQueryKeys.paradas,
+    queryKey: [...transitQueryKeys.paradas, transitToken],
     queryFn: fetchParadas,
     enabled,
     staleTime: TRANSIT_STALE_TIME_MS,

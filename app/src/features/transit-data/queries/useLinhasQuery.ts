@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchLinhas } from '@/services/api/transitApi';
 import type { CategoriaLinhas } from '@/types/data.types';
+import { useTransitSessionStore } from '../store/transitSessionStore';
 import { transitQueryKeys } from './queryKeys';
 
 const TRANSIT_STALE_TIME_MS = 10 * 60 * 1000;
@@ -11,8 +12,9 @@ function getTransitRetryDelay(attemptIndex: number) {
 }
 
 export function useLinhasQuery(enabled: boolean) {
+  const transitToken = useTransitSessionStore((s) => s.transitToken);
   return useQuery<CategoriaLinhas>({
-    queryKey: transitQueryKeys.linhas,
+    queryKey: [...transitQueryKeys.linhas, transitToken],
     queryFn: fetchLinhas,
     enabled,
     staleTime: TRANSIT_STALE_TIME_MS,
