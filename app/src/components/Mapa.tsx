@@ -34,7 +34,6 @@ import {
   MapMarkers,
   MapRotationHandler,
   MapRoute,
-  ObliqueToggle,
   TileSwitcher,
   UfmgPrediosLayer,
   useMapMarkers,
@@ -134,26 +133,6 @@ export function Mapa({
       return false;
     }
   });
-
-  const [obliqueEnabled, setObliqueEnabled] = useState(() => {
-    try {
-      return localStorage.getItem('oblique-view') === 'true';
-    } catch {
-      return false;
-    }
-  });
-
-  const toggleOblique = useCallback(() => {
-    setObliqueEnabled((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('oblique-view', String(next));
-      } catch {
-        // localStorage indisponível
-      }
-      return next;
-    });
-  }, []);
 
   const toggleCompass = useCallback(() => {
     setCompassEnabled((prev) => {
@@ -265,11 +244,6 @@ export function Mapa({
 
         <MapImperativeHandler mapaRef={ref} destacarParada={destacarParada} />
       </MapContainer>
-
-      <ObliqueToggle
-        enabled={obliqueEnabled}
-        onToggle={toggleOblique}
-      />
     </div>
   );
 }

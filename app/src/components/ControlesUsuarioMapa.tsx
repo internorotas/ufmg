@@ -217,9 +217,9 @@ export function ControlesUsuarioMapa({
             onClick={onToggleCompass}
             aria-pressed={compassEnabled}
             aria-label={
-              compassEnabled ? 'Desativar rotação por bússola' : 'Ativar rotação por bússola'
+              compassEnabled ? 'Desativar rotação e inclinação' : 'Ativar rotação e inclinação do mapa'
             }
-            title={compassEnabled ? 'Bússola ativa' : 'Ativar bússola'}
+            title={compassEnabled ? 'Bússola e inclinação ativas' : 'Ativar bússola e inclinação'}
             className={cn(
               'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
