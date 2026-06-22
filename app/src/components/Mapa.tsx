@@ -209,7 +209,7 @@ export function Mapa({
       <MapContainer
         center={MAP_CONFIG.center}
         zoom={MAP_CONFIG.zoom}
-        className="relative h-full w-full"
+        className="h-full w-full"
         zoomControl={true}
         rotate={true}
         whenReady={() => {}}
@@ -243,11 +243,6 @@ export function Mapa({
 
         <PlannerMapOverlay />
 
-        <ObliqueToggle
-          enabled={obliqueEnabled}
-          onToggle={toggleOblique}
-        />
-
         <MapMarkers
           paradas={todasParadas}
           paradaDestacadaId={paradaDestacadaId}
@@ -270,6 +265,11 @@ export function Mapa({
 
         <MapImperativeHandler mapaRef={ref} destacarParada={destacarParada} />
       </MapContainer>
+
+      <ObliqueToggle
+        enabled={obliqueEnabled}
+        onToggle={toggleOblique}
+      />
     </div>
   );
 }
