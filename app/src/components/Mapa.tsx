@@ -16,8 +16,8 @@
 import { X } from 'lucide-react';
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-rotate';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import '@/lib/leafletSetup';
+import { MapContainer, useMap } from 'react-leaflet';
 import { useRotasSelection } from '@/contexts/RotasContext';
 import { AllLinesBusMarkers } from '@/features/gps/components/AllLinesBusMarkers';
 import { GpsLiveBusMarker } from '@/features/gps/components/GpsLiveBusMarker';
@@ -72,9 +72,6 @@ interface MapaProps {
 const MAP_CONFIG = {
   center: COORDENADAS_CAMPUS,
   zoom: 15,
-  tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
 };
 
 /**
@@ -193,10 +190,9 @@ export function Mapa({
         zoom={MAP_CONFIG.zoom}
         className="h-full w-full"
         zoomControl={true}
-        rotation={true}
+        rotate={true}
         whenReady={() => {}}
       >
-        <TileLayer url={MAP_CONFIG.tileUrl} attribution={MAP_CONFIG.attribution} />
         <TileSwitcher />
         <UfmgPrediosLayer />
         <MapRotationHandler heading={headingUsuario ?? null} enabled={compassEnabled} />

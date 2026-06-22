@@ -2,7 +2,8 @@
  * Handler de rotação do mapa via bússola do dispositivo.
  *
  * Usa o heading (0-360°) do DeviceOrientationEvent para rotacionar
- * o mapa via leaflet-rotate. Só funciona quando a rotação está habilitada.
+ * o mapa via leaflet-rotate. Quando a bússola está desabilitada,
+ * NÃO reseta o bearing — permite rotação manual via shift+scroll.
  */
 
 import { useEffect } from 'react';
@@ -18,17 +19,10 @@ export function MapRotationHandler({ heading, enabled }: MapRotationHandlerProps
 
   useEffect(() => {
     if (!enabled || heading === null) {
-      map.setBearing(0);
       return;
     }
     map.setBearing(heading);
   }, [map, heading, enabled]);
-
-  useEffect(() => {
-    if (!enabled) {
-      map.setBearing(0);
-    }
-  }, [map, enabled]);
 
   return null;
 }
