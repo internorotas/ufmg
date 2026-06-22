@@ -209,7 +209,7 @@ export function Mapa({
       <MapContainer
         center={MAP_CONFIG.center}
         zoom={MAP_CONFIG.zoom}
-        className="h-full w-full"
+        className="relative h-full w-full"
         zoomControl={true}
         rotate={true}
         whenReady={() => {}}
