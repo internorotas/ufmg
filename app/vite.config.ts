@@ -68,6 +68,20 @@ export default defineConfig({
       // e retornam 403 no ambiente local.
       allow: ['..', '../..'],
     },
+    headers: {
+      'Content-Security-Policy':
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com; connect-src 'self' ws: wss: https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com;",
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
+  },
+  preview: {
+    headers: {
+      'Content-Security-Policy':
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com; connect-src 'self' ws: wss: https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com;",
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
   },
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version),
