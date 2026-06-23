@@ -49,6 +49,10 @@ export interface MapLibreViewProps {
   paradaSelecionada: Parada | null;
   localizacaoUsuario?: [number, number] | null;
   headingUsuario?: number | null;
+  /** Se o modo bússola (rotação automática por heading) está ativo */
+  compassEnabled?: boolean;
+  /** Callback para desativar o modo bússola e voltar ao 2D */
+  onDesativarCompass?: () => void;
   permissaoLocalizacao?: boolean;
   onPedirLocalizacao?: () => void;
   carregandoLocalizacao?: boolean;
@@ -63,6 +67,8 @@ export function MapLibreView({
   paradaSelecionada,
   localizacaoUsuario,
   headingUsuario,
+  compassEnabled = false,
+  onDesativarCompass,
   permissaoLocalizacao = false,
   onPedirLocalizacao,
   carregandoLocalizacao = false,
@@ -144,6 +150,13 @@ export function MapLibreView({
       { padding: 40, duration: 800 },
     );
   }, [linhaSelecionada]);
+
+  // Rotaciona o mapa conforme o heading do dispositivo quando bússola está ativa
+  useEffect(() => {
+    if (!compassEnabled || headingUsuario === null || headingUsuario === undefined) return;
+    mapRef.current?.easeTo({ bearing: headingUsuario, duration: 200 });
+    setBearing(headingUsuario);
+  }, [compassEnabled, headingUsuario]);
 
   const isNorth = Math.abs(bearing) < 1 && Math.abs(pitch) < 1;
   const statusRastreio = rastreioColaborativo?.status ?? 'idle';
@@ -254,18 +267,27 @@ export function MapLibreView({
           <CornerUpLeft className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        {/* Bússola — reseta bearing E pitch */}
+        {/* Bússola — ativa: desativa modo 3D; inativa: reseta bearing e pitch */}
         <button
           type="button"
-          onClick={handleResetNorth}
-          aria-label={isNorth ? 'Mapa alinhado ao Norte' : 'Resetar orientação e inclinação'}
-          title="Resetar orientação e inclinação"
+          onClick={compassEnabled ? onDesativarCompass : handleResetNorth}
+          aria-pressed={compassEnabled}
+          aria-label={
+            compassEnabled
+              ? 'Desativar bússola e voltar ao modo 2D'
+              : isNorth
+                ? 'Mapa alinhado ao Norte'
+                : 'Resetar orientação e inclinação'
+          }
+          title={compassEnabled ? 'Desativar bússola' : 'Resetar orientação e inclinação'}
           className={cn(
             'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
-            isNorth
-              ? 'bg-card text-text-secondary'
-              : 'border-brand-primary bg-brand-primary/10 text-brand-primary',
+            compassEnabled
+              ? 'border-brand-primary bg-brand-primary text-white'
+              : isNorth
+                ? 'bg-card text-text-secondary'
+                : 'border-brand-primary bg-brand-primary/10 text-brand-primary',
           )}
           style={{ transition: 'transform 0.3s ease' }}
         >

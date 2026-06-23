@@ -13,7 +13,7 @@
  * Atualizado para React 19: ref como prop (sem forwardRef)
  */
 
-import { Box, Layers, X } from 'lucide-react';
+import { Layers, X } from 'lucide-react';
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletSetup';
@@ -136,34 +136,28 @@ export function Mapa({
     }
   });
 
-  const toggleModo3d = useCallback(() => {
-    setModo3d((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('map-modo-3d', String(next));
-      } catch {}
-      return next;
-    });
+  const [compassEnabled, setCompassEnabled] = useState(false);
+
+  // Ativa o modo 3D (MapLibre) com rastreamento de heading do dispositivo.
+  // Chamado pelo botão bússola no modo 2D.
+  const ativarCompass3d = useCallback(() => {
+    setCompassEnabled(true);
+    setModo3d(true);
+    try {
+      localStorage.setItem('compass-follow', 'true');
+      localStorage.setItem('map-modo-3d', 'true');
+    } catch {}
   }, []);
 
-  const [compassEnabled, setCompassEnabled] = useState(() => {
+  // Volta para o modo 2D (Leaflet) e desabilita o rastreamento de heading.
+  // Chamado pelo botão <Layers> no modo 3D e pelo botão bússola em MapLibreView.
+  const sairModo3d = useCallback(() => {
+    setCompassEnabled(false);
+    setModo3d(false);
     try {
-      return localStorage.getItem('compass-follow') === 'true';
-    } catch {
-      return false;
-    }
-  });
-
-  const toggleCompass = useCallback(() => {
-    setCompassEnabled((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('compass-follow', String(next));
-      } catch {
-        // localStorage indisponível
-      }
-      return next;
-    });
+      localStorage.setItem('compass-follow', 'false');
+      localStorage.setItem('map-modo-3d', 'false');
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -207,8 +201,7 @@ export function Mapa({
         )}
         <button
           type="button"
-          onClick={toggleModo3d}
-          aria-pressed={modo3d}
+          onClick={sairModo3d}
           aria-label="Voltar ao modo 2D"
           title="Modo 2D"
           className={cn(
@@ -226,6 +219,8 @@ export function Mapa({
           paradaSelecionada={paradaSelecionada}
           localizacaoUsuario={localizacaoUsuario}
           headingUsuario={headingUsuario}
+          compassEnabled={compassEnabled}
+          onDesativarCompass={sairModo3d}
           permissaoLocalizacao={permissaoLocalizacao}
           onPedirLocalizacao={onPedirLocalizacao}
           carregandoLocalizacao={carregandoLocalizacao}
@@ -261,21 +256,6 @@ export function Mapa({
           </div>
         </div>
       )}
-
-      <button
-        type="button"
-        onClick={toggleModo3d}
-        aria-pressed={modo3d}
-        aria-label="Ativar modo 3D"
-        title="Modo 3D"
-        className={cn(
-          'pointer-events-auto absolute left-2 top-2 z-1000 flex h-10 w-10 items-center justify-center rounded-sm neo-brutal transition-all duration-200',
-          'bg-card text-text-primary hover:bg-card-hover',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
-        )}
-      >
-        <Box className="h-5 w-5" aria-hidden="true" />
-      </button>
 
       <MapContainer
         center={MAP_CONFIG.center}
@@ -333,7 +313,7 @@ export function Mapa({
             rastreioColaborativo={rastreioColaborativo}
             onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
             compassEnabled={compassEnabled}
-            onToggleCompass={toggleCompass}
+            onToggleCompass={ativarCompass3d}
           />
         )}
 

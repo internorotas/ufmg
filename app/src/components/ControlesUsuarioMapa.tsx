@@ -215,17 +215,12 @@ export function ControlesUsuarioMapa({
           <button
             type="button"
             onClick={onToggleCompass}
-            aria-pressed={compassEnabled}
-            aria-label={
-              compassEnabled ? 'Desativar rotação e inclinação' : 'Ativar rotação e inclinação do mapa'
-            }
-            title={compassEnabled ? 'Bússola e inclinação ativas' : 'Ativar bússola e inclinação'}
+            aria-label="Ativar modo 3D com bússola"
+            title="Ativar modo 3D — o mapa girará de acordo com a direção do dispositivo"
             className={cn(
               'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+              'bg-card text-text-primary hover:bg-card-hover',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
-              compassEnabled
-                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
-                : 'bg-card text-text-primary hover:bg-card-hover',
             )}
           >
             <Compass className="h-5 w-5" aria-hidden="true" />
