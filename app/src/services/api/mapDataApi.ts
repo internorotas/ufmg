@@ -14,7 +14,8 @@ export interface GeoJsonFeature {
   };
 }
 
-const LOCAL_FALLBACK_URL = '/data/ufmg-predios.geojson';
+// BASE_URL inclui o basePath do tenant (ex: '/ufmg/') — necessário para Vite public assets
+const LOCAL_FALLBACK_URL = `${import.meta.env.BASE_URL}data/ufmg-predios.geojson`;
 
 function ensureFeatureCollection(value: unknown): GeoJsonFeatureCollection {
   if (

@@ -1,11 +1,12 @@
-import type { FeatureCollection } from 'geojson';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Layer, Popup, Source, useMap } from 'react-map-gl/maplibre';
-import { useUfmPrediosQuery } from '@/features/transit-data/queries/useUfmPrediosQuery';
 
 const MIN_ZOOM = 14;
 const PITCH_EXTRUDE_THRESHOLD = 20;
+
+// BASE_URL garante caminho correto independente do basePath do tenant (ex: '/ufmg/')
+const PREDIOS_URL = `${import.meta.env.BASE_URL}data/ufmg-predios.geojson`;
 
 const LAYER_IDS = ['predios-3d', 'predios-flat'] as const;
 
@@ -23,7 +24,6 @@ interface MapLibrePrediosLayerProps {
 export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
   pitch,
 }: MapLibrePrediosLayerProps) {
-  const { data } = useUfmPrediosQuery();
   const { current: mapRef } = useMap();
   const [predioClicado, setPredioClicado] = useState<PredioClicado | null>(null);
 
@@ -38,9 +38,10 @@ export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
     setPredioClicado({ nome, amenity: amenity || undefined, longitude: e.lngLat.lng, latitude: e.lngLat.lat });
   }, []);
 
+  // Registra handlers de click/cursor nas layers
   useEffect(() => {
     const map = mapRef?.getMap();
-    if (!map || !data) return;
+    if (!map) return;
 
     const onEnter = () => { map.getCanvas().style.cursor = 'pointer'; };
     const onLeave = () => { map.getCanvas().style.cursor = ''; };
@@ -58,13 +59,28 @@ export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
         map.off('mouseleave', id, onLeave);
       });
     };
-  }, [mapRef, handleClick, data]);
+  }, [mapRef, handleClick]);
 
-  if (!data || data.features.length === 0) return null;
+  // Atualiza visibilidade diretamente via API do MapLibre (garantia além do layout prop)
+  useEffect(() => {
+    const map = mapRef?.getMap();
+    if (!map) return;
+    try {
+      if (map.getLayer('predios-3d')) {
+        map.setLayoutProperty('predios-3d', 'visibility', extruding ? 'visible' : 'none');
+      }
+      if (map.getLayer('predios-flat')) {
+        map.setLayoutProperty('predios-flat', 'visibility', extruding ? 'none' : 'visible');
+      }
+    } catch {
+      // layers ainda não prontas — o layout prop declarativo já cuida disso
+    }
+  }, [mapRef, extruding]);
 
   return (
     <>
-      <Source id="predios" type="geojson" data={data as unknown as FeatureCollection}>
+      {/* Source com URL direta — MapLibre faz o fetch internamente, sem React Query */}
+      <Source id="predios" type="geojson" data={PREDIOS_URL}>
         <Layer
           id="predios-3d"
           type="fill-extrusion"
