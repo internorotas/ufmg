@@ -1,12 +1,3 @@
-/**
- * Visualização 3D com MapLibre GL JS.
- *
- * Espelha a interface de Mapa.tsx mas usa WebGL nativo:
- * - Pitch/bearing via gesto de dois dedos (mobile) ou Ctrl+arrastar (desktop)
- * - Prédios com fill-extrusion em pitch > 20°
- * - Paradas e rota via GeoJSON layers
- */
-
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Compass, CornerUpLeft, LoaderCircle, LocateFixed, Radio, Square } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -18,9 +9,14 @@ import { cn } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
 import { MapPitchHint } from '../MapPitchHint';
 import { TILE_PROVIDERS, type TileProviderKey } from '../TileSwitcher';
+import { MapLibreAllBusMarkers } from './MapLibreAllBusMarkers';
+import { MapLibreGpsLiveBusMarker } from './MapLibreGpsLiveBusMarker';
+import { MapLibreGpsRouteOverlay } from './MapLibreGpsRouteOverlay';
 import { MapLibreParadasLayer } from './MapLibreParadasLayer';
+import { MapLibrePlannerOverlay } from './MapLibrePlannerOverlay';
 import { MapLibrePrediosLayer } from './MapLibrePrediosLayer';
 import { MapLibreRotasLayer } from './MapLibreRotasLayer';
+import { MapLibreUserMarker } from './MapLibreUserMarker';
 
 // COORDENADAS_CAMPUS é [lat, lng]; MapLibre usa [lng, lat]
 const CAMPUS_LNG = COORDENADAS_CAMPUS[1];
@@ -38,10 +34,9 @@ function getStoredProvider(): TileProviderKey {
 }
 
 function toMaplibreTiles(leafletUrl: string): string[] {
-  const base = leafletUrl.replace('{r}', ''); // remove sufixo retina Leaflet
+  const base = leafletUrl.replace('{r}', '');
 
   if (base.includes('{s}')) {
-    // CartoDB usa subdomínios a,b,c,d
     return ['a', 'b', 'c', 'd'].map((s) => base.replace('{s}.', `${s}.`).replace('{s}', s));
   }
   return [base];
@@ -49,6 +44,7 @@ function toMaplibreTiles(leafletUrl: string): string[] {
 
 export interface MapLibreViewProps {
   todasParadas: Parada[];
+  linhasAtivas: Linha[];
   linhaSelecionada: Linha | null;
   paradaSelecionada: Parada | null;
   localizacaoUsuario?: [number, number] | null;
@@ -62,10 +58,11 @@ export interface MapLibreViewProps {
 
 export function MapLibreView({
   todasParadas,
+  linhasAtivas,
   linhaSelecionada,
   paradaSelecionada,
   localizacaoUsuario,
-  headingUsuario: _headingUsuario,
+  headingUsuario,
   permissaoLocalizacao = false,
   onPedirLocalizacao,
   carregandoLocalizacao = false,
@@ -173,13 +170,50 @@ export function MapLibreView({
         onRotate={(e) => setBearing(e.target.getBearing())}
         attributionControl={false}
       >
-        <MapLibreParadasLayer paradas={todasParadas} paradaDestacadaId={paradaDestacadaId} />
-        <MapLibreRotasLayer linha={linhaSelecionada} />
+        {/* Overlay do planner (abaixo dos marcadores) */}
+        <MapLibrePlannerOverlay />
+
+        {/* Rota GPS colaborativo */}
+        {rastreioColaborativo?.isActive && linhaSelecionada && (
+          <MapLibreGpsRouteOverlay linha={linhaSelecionada} />
+        )}
+
+        {/* Prédios UFMG com extrusão 3D */}
         <MapLibrePrediosLayer pitch={pitch} />
+
+        {/* Rota selecionada com animação de formiga */}
+        <MapLibreRotasLayer linha={linhaSelecionada} />
+
+        {/* Marcadores de paradas */}
+        <MapLibreParadasLayer paradas={todasParadas} paradaDestacadaId={paradaDestacadaId} />
+
+        {/* Ônibus de todas as linhas ativas (exceto linha selecionada) */}
+        <MapLibreAllBusMarkers
+          linhas={linhasAtivas}
+          todasParadas={todasParadas}
+          linhaNumeroExcluido={linhaSelecionada?.linha ?? null}
+        />
+
+        {/* Ônibus ao vivo da linha selecionada com animação RAF */}
+        {linhaSelecionada && (
+          <MapLibreGpsLiveBusMarker
+            key={linhaSelecionada.idRota}
+            linha={linhaSelecionada}
+            todasParadas={todasParadas}
+          />
+        )}
+
+        {/* Marcador de localização do usuário */}
+        {localizacaoUsuario && (
+          <MapLibreUserMarker
+            localizacao={localizacaoUsuario}
+            heading={headingUsuario ?? null}
+          />
+        )}
       </Map>
 
       {/* FABs — fora do <Map> mas dentro do container relativo */}
-      <div className="pointer-events-none fixed bottom-24 right-4 z-1000 flex flex-col items-end gap-2 mb-[env(safe-area-inset-bottom)] md:bottom-6 md:mb-0">
+      <div className="pointer-events-none fixed bottom-24 right-4 z-1000 flex flex-col items-end gap-2 [margin-bottom:env(safe-area-inset-bottom)] md:bottom-6 md:[margin-bottom:0]">
         {rastreioColaborativo && onAlternarRastreioColaborativo ? (
           <button
             type="button"

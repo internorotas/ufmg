@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 import { useOsrmRoute } from '@/hooks/useOsrmRoute';
 import type { Linha } from '@/types/data.types';
+import { useRouteAnimation } from './useRouteAnimation';
 
 interface MapLibreRotasLayerProps {
   linha: Linha | null;
@@ -16,6 +17,9 @@ export const MapLibreRotasLayer = React.memo(function MapLibreRotasLayer({
   );
 
   const snappedCoords = useOsrmRoute(linha?.idRota, fallbackCoords);
+
+  const active = !!linha && snappedCoords.length >= 2;
+  useRouteAnimation('rota-line', active);
 
   // Converte [lat, lng] do projeto para [lng, lat] do GeoJSON
   const geojson = useMemo(
@@ -32,7 +36,7 @@ export const MapLibreRotasLayer = React.memo(function MapLibreRotasLayer({
 
   const corHex = linha?.corHex ?? '#2c0eeb';
 
-  if (!linha || snappedCoords.length < 2) return null;
+  if (!active) return null;
 
   return (
     <Source id="rota" type="geojson" data={geojson}>

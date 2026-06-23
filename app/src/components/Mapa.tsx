@@ -221,6 +221,7 @@ export function Mapa({
         </button>
         <MapLibreView
           todasParadas={todasParadas}
+          linhasAtivas={linhasAtivas}
           linhaSelecionada={linhaSelecionada}
           paradaSelecionada={paradaSelecionada}
           localizacaoUsuario={localizacaoUsuario}
