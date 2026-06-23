@@ -19,7 +19,8 @@ export const MapLibreRotasLayer = React.memo(function MapLibreRotasLayer({
   const snappedCoords = useOsrmRoute(linha?.idRota, fallbackCoords);
 
   const active = !!linha && snappedCoords.length >= 2;
-  useRouteAnimation('rota-line', active);
+  // Anima as dashes brancas (rota-ants) sobre a linha colorida de fundo
+  useRouteAnimation('rota-ants', active);
 
   // Converte [lat, lng] do projeto para [lng, lat] do GeoJSON
   const geojson = useMemo(
@@ -40,26 +41,26 @@ export const MapLibreRotasLayer = React.memo(function MapLibreRotasLayer({
 
   return (
     <Source id="rota" type="geojson" data={geojson}>
-      {/* Sombra / contorno */}
+      {/* Linha colorida sólida — mostra o trajeto completo */}
       <Layer
-        id="rota-casing"
+        id="rota-bg"
         type="line"
-        layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-        paint={{
-          'line-color': 'white',
-          'line-width': 10,
-          'line-opacity': 0.6,
-        }}
-      />
-      {/* Linha principal */}
-      <Layer
-        id="rota-line"
-        type="line"
-        layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+        layout={{ 'line-cap': 'butt', 'line-join': 'round' }}
         paint={{
           'line-color': corHex,
           'line-width': 6,
-          'line-dasharray': [1, 0],
+          'line-opacity': 0.8,
+        }}
+      />
+      {/* Dashes brancas marchando sobre a linha colorida — efeito ant-path */}
+      <Layer
+        id="rota-ants"
+        type="line"
+        layout={{ 'line-cap': 'butt', 'line-join': 'round' }}
+        paint={{
+          'line-color': 'rgba(255,255,255,0.85)',
+          'line-width': 3,
+          'line-dasharray': [0, 4, 3],
         }}
       />
     </Source>

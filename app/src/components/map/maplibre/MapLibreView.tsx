@@ -1,7 +1,16 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Compass, CornerUpLeft, LoaderCircle, LocateFixed, Radio, Square } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type Ref,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Map, { type MapRef } from 'react-map-gl/maplibre';
+import type { MapaRef } from '@/contexts/RotasSelectionContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -17,6 +26,8 @@ import { MapLibrePlannerOverlay } from './MapLibrePlannerOverlay';
 import { MapLibrePrediosLayer } from './MapLibrePrediosLayer';
 import { MapLibreRotasLayer } from './MapLibreRotasLayer';
 import { MapLibreUserMarker } from './MapLibreUserMarker';
+
+export type { MapaRef };
 
 // COORDENADAS_CAMPUS é [lat, lng]; MapLibre usa [lng, lat]
 const CAMPUS_LNG = COORDENADAS_CAMPUS[1];
@@ -49,15 +60,16 @@ export interface MapLibreViewProps {
   paradaSelecionada: Parada | null;
   localizacaoUsuario?: [number, number] | null;
   headingUsuario?: number | null;
-  /** Se o modo bússola (rotação automática por heading) está ativo */
+  /** Se o modo bússola (rotação automática por heading do dispositivo) está ativo */
   compassEnabled?: boolean;
-  /** Callback para desativar o modo bússola e voltar ao 2D */
-  onDesativarCompass?: () => void;
+  /** Callback para alternar o modo bússola */
+  onToggleCompass?: () => void;
   permissaoLocalizacao?: boolean;
   onPedirLocalizacao?: () => void;
   carregandoLocalizacao?: boolean;
   rastreioColaborativo?: GpsTrackingState;
   onAlternarRastreioColaborativo?: () => void;
+  ref?: Ref<MapaRef>;
 }
 
 export function MapLibreView({
@@ -68,12 +80,13 @@ export function MapLibreView({
   localizacaoUsuario,
   headingUsuario,
   compassEnabled = false,
-  onDesativarCompass,
+  onToggleCompass,
   permissaoLocalizacao = false,
   onPedirLocalizacao,
   carregandoLocalizacao = false,
   rastreioColaborativo,
   onAlternarRastreioColaborativo,
+  ref,
 }: MapLibreViewProps) {
   const analytics = useAnalytics();
   const mapRef = useRef<MapRef>(null);
@@ -104,11 +117,39 @@ export function MapLibreView({
     };
   }, [tileProvider]);
 
+  // Expõe API imperativa para centralizar paradas/coordenadas programaticamente
+  useImperativeHandle(
+    ref,
+    () => ({
+      centralizarParada: (parada: Parada) => {
+        const [lat, lng] = parada.coordenadas;
+        mapRef.current?.flyTo({ center: [lng, lat], zoom: 17, duration: 800 });
+      },
+      centralizarCoordenada: (coords: [number, number], zoom = 15) => {
+        const [lat, lng] = coords;
+        mapRef.current?.flyTo({ center: [lng, lat], zoom, duration: 1000 });
+      },
+    }),
+    [],
+  );
+
   const handleResetNorth = useCallback(() => {
     mapRef.current?.easeTo({ bearing: 0, pitch: 0, duration: 500 });
     setBearing(0);
     setPitch(0);
   }, []);
+
+  // Bússola: ativa → desativa e reseta norte; inativa → ativa heading follow
+  const handleCompass = useCallback(() => {
+    if (compassEnabled) {
+      onToggleCompass?.();
+      mapRef.current?.easeTo({ bearing: 0, pitch: 0, duration: 500 });
+      setBearing(0);
+      setPitch(0);
+    } else {
+      onToggleCompass?.();
+    }
+  }, [compassEnabled, onToggleCompass]);
 
   const handleCentroCampus = useCallback(() => {
     mapRef.current?.flyTo({ center: [CAMPUS_LNG, CAMPUS_LAT], zoom: 15 });
@@ -183,31 +224,24 @@ export function MapLibreView({
         onRotate={(e) => setBearing(e.target.getBearing())}
         attributionControl={false}
       >
-        {/* Overlay do planner (abaixo dos marcadores) */}
         <MapLibrePlannerOverlay />
 
-        {/* Rota GPS colaborativo */}
         {rastreioColaborativo?.isActive && linhaSelecionada && (
           <MapLibreGpsRouteOverlay linha={linhaSelecionada} />
         )}
 
-        {/* Prédios UFMG com extrusão 3D */}
         <MapLibrePrediosLayer pitch={pitch} />
 
-        {/* Rota selecionada com animação de formiga */}
         <MapLibreRotasLayer linha={linhaSelecionada} />
 
-        {/* Marcadores de paradas */}
         <MapLibreParadasLayer paradas={todasParadas} paradaDestacadaId={paradaDestacadaId} />
 
-        {/* Ônibus de todas as linhas ativas (exceto linha selecionada) */}
         <MapLibreAllBusMarkers
           linhas={linhasAtivas}
           todasParadas={todasParadas}
           linhaNumeroExcluido={linhaSelecionada?.linha ?? null}
         />
 
-        {/* Ônibus ao vivo da linha selecionada com animação RAF */}
         {linhaSelecionada && (
           <MapLibreGpsLiveBusMarker
             key={linhaSelecionada.idRota}
@@ -216,7 +250,6 @@ export function MapLibreView({
           />
         )}
 
-        {/* Marcador de localização do usuário */}
         {localizacaoUsuario && (
           <MapLibreUserMarker
             localizacao={localizacaoUsuario}
@@ -267,19 +300,19 @@ export function MapLibreView({
           <CornerUpLeft className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        {/* Bússola — ativa: desativa modo 3D; inativa: reseta bearing e pitch */}
+        {/* Bússola — ativa heading follow; quando ativo, fica destacado e clicar desativa + reseta norte */}
         <button
           type="button"
-          onClick={compassEnabled ? onDesativarCompass : handleResetNorth}
+          onClick={handleCompass}
           aria-pressed={compassEnabled}
           aria-label={
             compassEnabled
-              ? 'Desativar bússola e voltar ao modo 2D'
+              ? 'Desativar bússola'
               : isNorth
-                ? 'Mapa alinhado ao Norte'
-                : 'Resetar orientação e inclinação'
+                ? 'Ativar bússola — mapa girará com o dispositivo'
+                : 'Resetar orientação ao norte ou ativar bússola'
           }
-          title={compassEnabled ? 'Desativar bússola' : 'Resetar orientação e inclinação'}
+          title={compassEnabled ? 'Desativar bússola' : 'Ativar bússola'}
           className={cn(
             'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
@@ -289,12 +322,11 @@ export function MapLibreView({
                 ? 'bg-card text-text-secondary'
                 : 'border-brand-primary bg-brand-primary/10 text-brand-primary',
           )}
-          style={{ transition: 'transform 0.3s ease' }}
         >
           <Compass
             className="h-5 w-5"
             aria-hidden="true"
-            style={{ transform: `rotate(${-bearing}deg)` }}
+            style={{ transform: `rotate(${-bearing}deg)`, transition: 'transform 0.2s ease' }}
           />
         </button>
 

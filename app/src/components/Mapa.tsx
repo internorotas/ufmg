@@ -1,53 +1,25 @@
 /**
- * Componente principal do Mapa - Container limpo usando Composition Pattern.
+ * Componente principal do Mapa.
  *
- * Este componente foi refatorado para delegar responsabilidades:
- * - MapMarkers: Renderização dos marcadores de paradas
- * - MapRoute: Renderização da rota animada
- * - MapControls: Controles de visualização (zoom, centralização)
- * - ControlesUsuarioMapa: Localização do usuário e FAB
- * - TileSwitcher: Seleção de camada de tiles
- * - UfmgPrediosLayer: Prédios da UFMG em GeoJSON
- * - MapRotationHandler: Rotação via bússola
+ * Usa exclusivamente MapLibre GL JS (via react-map-gl) para renderização 2D/3D.
+ * O mapa começa plano (pitch=0) e pode ser inclinado por gestos ou pelo botão bússola.
  *
- * Atualizado para React 19: ref como prop (sem forwardRef)
+ * Atualizado para React 19: ref como prop (sem forwardRef).
  */
 
-import { Layers, X } from 'lucide-react';
-import { type Ref, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import 'leaflet/dist/leaflet.css';
-import '@/lib/leafletSetup';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { X } from 'lucide-react';
+import { type Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { useRotasSelection } from '@/contexts/RotasContext';
-import { AllLinesBusMarkers } from '@/features/gps/components/AllLinesBusMarkers';
-import { GpsLiveBusMarker } from '@/features/gps/components/GpsLiveBusMarker';
-import { GpsRouteOverlay } from '@/features/gps/components/GpsRouteOverlay';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
-import { PlannerMapOverlay } from '@/features/planner/components/PlannerMapOverlay';
-import { COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '../hooks/useAnalytics';
-import { cn } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
-import { ControlesUsuarioMapa } from './ControlesUsuarioMapa';
-import {
-  CenterOnParada,
-  ChangeView,
-  MapMarkers,
-  MapRotationHandler,
-  MapRoute,
-  TileSwitcher,
-  UfmgPrediosLayer,
-  useMapMarkers,
-  useRouteBounds,
-} from './map';
+import { type MapaRef } from '@/contexts/RotasSelectionContext';
 import { MapLibreView } from './map/maplibre';
 
-export interface MapaRef {
-  centralizarParada: (parada: Parada) => void;
-  centralizarCoordenada: (coords: [number, number], zoom?: number) => void;
-}
+// Re-exporta para callers que importam MapaRef de Mapa.tsx
+export type { MapaRef };
 
-interface MapaProps {
+export interface MapaProps {
   todasParadas: Parada[];
   linhasAtivas: Linha[];
   linhaSelecionada: Linha | null;
@@ -68,44 +40,6 @@ interface MapaProps {
   ref?: Ref<MapaRef>;
 }
 
-/**
- * Configurações padrão do mapa
- */
-const MAP_CONFIG = {
-  center: COORDENADAS_CAMPUS,
-  zoom: 15,
-};
-
-/**
- * Renderiza um mapa interativo com as paradas e rotas de ônibus.
- * Componente container que orquestra os sub-componentes do mapa.
- *
- * React 19: ref é recebida diretamente como prop, sem necessidade de forwardRef.
- */
-function MapImperativeHandler({
-  mapaRef,
-  destacarParada,
-}: {
-  mapaRef: Ref<MapaRef> | undefined;
-  destacarParada: (parada: Parada) => void;
-}) {
-  const map = useMap();
-
-  const centralizarCoordenada = useCallback(
-    (coords: [number, number], zoom = 15) => {
-      map.flyTo(coords, zoom, { duration: 1 });
-    },
-    [map],
-  );
-
-  useImperativeHandle(mapaRef, () => ({
-    centralizarParada: destacarParada,
-    centralizarCoordenada,
-  }));
-
-  return null;
-}
-
 export function Mapa({
   todasParadas,
   linhasAtivas,
@@ -124,40 +58,10 @@ export function Mapa({
   const { limparSelecao } = useRotasSelection();
   const mapLoadStartRef = useRef<number>(0);
 
-  const { paradaDestacadaId, handleMarkerRef, destacarParada } = useMapMarkers();
-
-  const bounds = useRouteBounds(linhaSelecionada);
-
-  const [modo3d, setModo3d] = useState(() => {
-    try {
-      return localStorage.getItem('map-modo-3d') === 'true';
-    } catch {
-      return false;
-    }
-  });
-
   const [compassEnabled, setCompassEnabled] = useState(false);
 
-  // Ativa o modo 3D (MapLibre) com rastreamento de heading do dispositivo.
-  // Chamado pelo botão bússola no modo 2D.
-  const ativarCompass3d = useCallback(() => {
-    setCompassEnabled(true);
-    setModo3d(true);
-    try {
-      localStorage.setItem('compass-follow', 'true');
-      localStorage.setItem('map-modo-3d', 'true');
-    } catch {}
-  }, []);
-
-  // Volta para o modo 2D (Leaflet) e desabilita o rastreamento de heading.
-  // Chamado pelo botão <Layers> no modo 3D e pelo botão bússola em MapLibreView.
-  const sairModo3d = useCallback(() => {
-    setCompassEnabled(false);
-    setModo3d(false);
-    try {
-      localStorage.setItem('compass-follow', 'false');
-      localStorage.setItem('map-modo-3d', 'false');
-    } catch {}
+  const toggleCompass = useCallback(() => {
+    setCompassEnabled((v) => !v);
   }, []);
 
   useEffect(() => {
@@ -173,66 +77,9 @@ export function Mapa({
     });
   }, [trackTiming]);
 
-  if (modo3d) {
-    return (
-      <div className="relative h-full w-full">
-        {linhaSelecionada && (
-          <div className="pointer-events-none absolute inset-x-0 top-3 z-1000 flex justify-center px-3">
-            <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full bg-card/95 py-1.5 pl-2 pr-1.5 shadow-(--elevation-2) ring-1 ring-card-border backdrop-blur">
-              <span
-                className="shrink-0 rounded-full px-2 py-0.5 text-xs font-extrabold text-white"
-                style={{ background: linhaSelecionada.corHex }}
-              >
-                {linhaSelecionada.linha}
-              </span>
-              <span className="min-w-0 truncate text-xs font-semibold text-text-primary">
-                {linhaSelecionada.nome}
-              </span>
-              <button
-                type="button"
-                onClick={limparSelecao}
-                aria-label="Limpar seleção da linha"
-                className="flex size-6 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-              >
-                <X size={15} aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={sairModo3d}
-          aria-label="Voltar ao modo 2D"
-          title="Modo 2D"
-          className={cn(
-            'pointer-events-auto absolute left-2 top-2 z-1000 flex h-10 w-10 items-center justify-center rounded-sm neo-brutal transition-all duration-200',
-            'border-brand-primary bg-brand-primary/10 text-brand-primary',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
-          )}
-        >
-          <Layers className="h-5 w-5" aria-hidden="true" />
-        </button>
-        <MapLibreView
-          todasParadas={todasParadas}
-          linhasAtivas={linhasAtivas}
-          linhaSelecionada={linhaSelecionada}
-          paradaSelecionada={paradaSelecionada}
-          localizacaoUsuario={localizacaoUsuario}
-          headingUsuario={headingUsuario}
-          compassEnabled={compassEnabled}
-          onDesativarCompass={sairModo3d}
-          permissaoLocalizacao={permissaoLocalizacao}
-          onPedirLocalizacao={onPedirLocalizacao}
-          carregandoLocalizacao={carregandoLocalizacao}
-          rastreioColaborativo={rastreioColaborativo}
-          onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="relative h-full w-full">
+      {/* Chip da linha selecionada — aparece no topo centralizado */}
       {linhaSelecionada && (
         <div className="pointer-events-none absolute inset-x-0 top-3 z-1000 flex justify-center px-3">
           <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full bg-card/95 py-1.5 pl-2 pr-1.5 shadow-(--elevation-2) ring-1 ring-card-border backdrop-blur">
@@ -257,68 +104,22 @@ export function Mapa({
         </div>
       )}
 
-      <MapContainer
-        center={MAP_CONFIG.center}
-        zoom={MAP_CONFIG.zoom}
-        className="h-full w-full"
-        zoomControl={true}
-        whenReady={() => {}}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
-        />
-        <TileSwitcher />
-        <UfmgPrediosLayer />
-        <MapRotationHandler heading={headingUsuario ?? null} enabled={compassEnabled} />
-
-        <ChangeView bounds={bounds} />
-        <CenterOnParada parada={paradaSelecionada} />
-
-        <MapRoute linha={linhaSelecionada} />
-
-        {rastreioColaborativo?.isActive && linhaSelecionada && (
-          <GpsRouteOverlay linha={linhaSelecionada} />
-        )}
-
-        <AllLinesBusMarkers
-          linhas={linhasAtivas}
-          todasParadas={todasParadas}
-          linhaNumeroExcluido={linhaSelecionada?.linha ?? null}
-        />
-
-        {linhaSelecionada && (
-          <GpsLiveBusMarker
-            key={linhaSelecionada.idRota}
-            linha={linhaSelecionada}
-            todasParadas={todasParadas}
-          />
-        )}
-
-        <PlannerMapOverlay />
-
-        <MapMarkers
-          paradas={todasParadas}
-          paradaDestacadaId={paradaDestacadaId}
-          onMarkerRef={handleMarkerRef}
-        />
-
-        {onPedirLocalizacao && (
-          <ControlesUsuarioMapa
-            localizacao={localizacaoUsuario ?? null}
-            heading={headingUsuario ?? null}
-            permissaoConcedida={permissaoLocalizacao}
-            onPedirLocalizacao={onPedirLocalizacao}
-            carregandoLocalizacao={carregandoLocalizacao}
-            rastreioColaborativo={rastreioColaborativo}
-            onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
-            compassEnabled={compassEnabled}
-            onToggleCompass={ativarCompass3d}
-          />
-        )}
-
-        <MapImperativeHandler mapaRef={ref} destacarParada={destacarParada} />
-      </MapContainer>
+      <MapLibreView
+        ref={ref}
+        todasParadas={todasParadas}
+        linhasAtivas={linhasAtivas}
+        linhaSelecionada={linhaSelecionada}
+        paradaSelecionada={paradaSelecionada}
+        localizacaoUsuario={localizacaoUsuario}
+        headingUsuario={headingUsuario}
+        compassEnabled={compassEnabled}
+        onToggleCompass={toggleCompass}
+        permissaoLocalizacao={permissaoLocalizacao}
+        onPedirLocalizacao={onPedirLocalizacao}
+        carregandoLocalizacao={carregandoLocalizacao}
+        rastreioColaborativo={rastreioColaborativo}
+        onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
+      />
     </div>
   );
 }
