@@ -55,6 +55,11 @@ export default defineConfig(({ mode }) => {
       alias: {
         // Deve corresponder ao paths em tsconfig.json e tsconfig.app.json
         '@': fileURLToPath(new URL('./src', import.meta.url)),
+        // Alias explícito necessário no Windows com pnpm junctions:
+        // Vite 8 falha ao resolver subpath exports via junction em alguns casos.
+        'react-map-gl/maplibre': fileURLToPath(
+          new URL('./node_modules/react-map-gl/dist/maplibre.js', import.meta.url),
+        ),
       },
       // Garante uma única instância de React em ambientes monorepo/pnpm
       // onde pacotes aninhados poderiam resolver versões distintas.
