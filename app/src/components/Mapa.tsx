@@ -17,7 +17,7 @@ import { Box, Layers, X } from 'lucide-react';
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletSetup';
-import { MapContainer, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import { useRotasSelection } from '@/contexts/RotasContext';
 import { AllLinesBusMarkers } from '@/features/gps/components/AllLinesBusMarkers';
 import { GpsLiveBusMarker } from '@/features/gps/components/GpsLiveBusMarker';
@@ -284,6 +284,10 @@ export function Mapa({
         zoomControl={true}
         whenReady={() => {}}
       >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
+        />
         <TileSwitcher />
         <UfmgPrediosLayer />
         <MapRotationHandler heading={headingUsuario ?? null} enabled={compassEnabled} />

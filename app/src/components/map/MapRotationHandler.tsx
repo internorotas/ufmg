@@ -20,34 +20,21 @@ interface MapRotationHandlerProps {
   enabled: boolean;
 }
 
-const OBLIQUE_ANGLE = 45;
-const OBLIQUE_PERSPECTIVE = 800;
-
 export function MapRotationHandler({ heading, enabled }: MapRotationHandlerProps) {
   const map = useMap();
 
+  // Garante que não há perspectiva CSS residual de sessões anteriores
   useEffect(() => {
     const container = map.getContainer();
+    container.style.transform = '';
+    container.style.transformOrigin = '';
+    container.style.transition = '';
+  }, [map]);
 
-    if (enabled) {
-      container.style.transform = `perspective(${OBLIQUE_PERSPECTIVE}px) rotateX(${OBLIQUE_ANGLE}deg)`;
-      container.style.transformOrigin = 'center bottom';
-      container.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-    } else {
-      container.style.transform = '';
-      container.style.transformOrigin = '';
-      container.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-    }
-
-    return () => {
-      container.style.transform = '';
-      container.style.transformOrigin = '';
-      container.style.transition = '';
-    };
-  }, [enabled, map]);
-
+  // Rotaciona o mapa conforme o heading do dispositivo (leaflet-rotate)
   useEffect(() => {
     if (!enabled || heading === null) {
+      if (!enabled) map.setBearing(0);
       return;
     }
     map.setBearing(heading);
