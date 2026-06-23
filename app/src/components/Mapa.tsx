@@ -13,7 +13,7 @@
  * Atualizado para React 19: ref como prop (sem forwardRef)
  */
 
-import { X } from 'lucide-react';
+import { Box, Layers, X } from 'lucide-react';
 import { type Ref, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import '@/lib/leafletSetup';
@@ -26,6 +26,7 @@ import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSessio
 import { PlannerMapOverlay } from '@/features/planner/components/PlannerMapOverlay';
 import { COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { cn } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { ControlesUsuarioMapa } from './ControlesUsuarioMapa';
 import {
@@ -39,6 +40,7 @@ import {
   useMapMarkers,
   useRouteBounds,
 } from './map';
+import { MapLibreView } from './map/maplibre';
 
 export interface MapaRef {
   centralizarParada: (parada: Parada) => void;
@@ -126,6 +128,24 @@ export function Mapa({
 
   const bounds = useRouteBounds(linhaSelecionada);
 
+  const [modo3d, setModo3d] = useState(() => {
+    try {
+      return localStorage.getItem('map-modo-3d') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleModo3d = useCallback(() => {
+    setModo3d((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('map-modo-3d', String(next));
+      } catch {}
+      return next;
+    });
+  }, []);
+
   const [compassEnabled, setCompassEnabled] = useState(() => {
     try {
       return localStorage.getItem('compass-follow') === 'true';
@@ -159,6 +179,62 @@ export function Mapa({
     });
   }, [trackTiming]);
 
+  if (modo3d) {
+    return (
+      <div className="relative h-full w-full">
+        {linhaSelecionada && (
+          <div className="pointer-events-none absolute inset-x-0 top-3 z-1000 flex justify-center px-3">
+            <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full bg-card/95 py-1.5 pl-2 pr-1.5 shadow-(--elevation-2) ring-1 ring-card-border backdrop-blur">
+              <span
+                className="shrink-0 rounded-full px-2 py-0.5 text-xs font-extrabold text-white"
+                style={{ background: linhaSelecionada.corHex }}
+              >
+                {linhaSelecionada.linha}
+              </span>
+              <span className="min-w-0 truncate text-xs font-semibold text-text-primary">
+                {linhaSelecionada.nome}
+              </span>
+              <button
+                type="button"
+                onClick={limparSelecao}
+                aria-label="Limpar seleção da linha"
+                className="flex size-6 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              >
+                <X size={15} aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={toggleModo3d}
+          aria-pressed={modo3d}
+          aria-label="Voltar ao modo 2D"
+          title="Modo 2D"
+          className={cn(
+            'pointer-events-auto absolute left-2 top-2 z-1000 flex h-10 w-10 items-center justify-center rounded-sm neo-brutal transition-all duration-200',
+            'border-brand-primary bg-brand-primary/10 text-brand-primary',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+          )}
+        >
+          <Layers className="h-5 w-5" aria-hidden="true" />
+        </button>
+        <MapLibreView
+          todasParadas={todasParadas}
+          linhaSelecionada={linhaSelecionada}
+          paradaSelecionada={paradaSelecionada}
+          localizacaoUsuario={localizacaoUsuario}
+          headingUsuario={headingUsuario}
+          permissaoLocalizacao={permissaoLocalizacao}
+          onPedirLocalizacao={onPedirLocalizacao}
+          carregandoLocalizacao={carregandoLocalizacao}
+          rastreioColaborativo={rastreioColaborativo}
+          onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="relative h-full w-full">
       {linhaSelecionada && (
@@ -185,12 +261,26 @@ export function Mapa({
         </div>
       )}
 
+      <button
+        type="button"
+        onClick={toggleModo3d}
+        aria-pressed={modo3d}
+        aria-label="Ativar modo 3D"
+        title="Modo 3D"
+        className={cn(
+          'pointer-events-auto absolute left-2 top-2 z-1000 flex h-10 w-10 items-center justify-center rounded-sm neo-brutal transition-all duration-200',
+          'bg-card text-text-primary hover:bg-card-hover',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+        )}
+      >
+        <Box className="h-5 w-5" aria-hidden="true" />
+      </button>
+
       <MapContainer
         center={MAP_CONFIG.center}
         zoom={MAP_CONFIG.zoom}
         className="h-full w-full"
         zoomControl={true}
-        rotate={true}
         whenReady={() => {}}
       >
         <TileSwitcher />

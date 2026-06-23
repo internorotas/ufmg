@@ -1,0 +1,273 @@
+/**
+ * Visualização 3D com MapLibre GL JS.
+ *
+ * Espelha a interface de Mapa.tsx mas usa WebGL nativo:
+ * - Pitch/bearing via gesto de dois dedos (mobile) ou Ctrl+arrastar (desktop)
+ * - Prédios com fill-extrusion em pitch > 20°
+ * - Paradas e rota via GeoJSON layers
+ */
+
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { Compass, CornerUpLeft, LoaderCircle, LocateFixed, Radio, Square } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Map, { type MapRef } from 'react-map-gl/maplibre';
+import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
+import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { cn } from '@/lib/utils';
+import type { Linha, Parada } from '@/types/data.types';
+import { MapPitchHint } from '../MapPitchHint';
+import { TILE_PROVIDERS, type TileProviderKey } from '../TileSwitcher';
+import { MapLibreParadasLayer } from './MapLibreParadasLayer';
+import { MapLibrePrediosLayer } from './MapLibrePrediosLayer';
+import { MapLibreRotasLayer } from './MapLibreRotasLayer';
+
+// COORDENADAS_CAMPUS é [lat, lng]; MapLibre usa [lng, lat]
+const CAMPUS_LNG = COORDENADAS_CAMPUS[1];
+const CAMPUS_LAT = COORDENADAS_CAMPUS[0];
+
+const TILE_KEY = 'tile-provider';
+const DEFAULT_PROVIDER: TileProviderKey = 'osm';
+
+function getStoredProvider(): TileProviderKey {
+  try {
+    const v = localStorage.getItem(TILE_KEY);
+    if (v && v in TILE_PROVIDERS) return v as TileProviderKey;
+  } catch {}
+  return DEFAULT_PROVIDER;
+}
+
+function toMaplibreTiles(leafletUrl: string): string[] {
+  const base = leafletUrl.replace('{r}', ''); // remove sufixo retina Leaflet
+
+  if (base.includes('{s}')) {
+    // CartoDB usa subdomínios a,b,c,d
+    return ['a', 'b', 'c', 'd'].map((s) => base.replace('{s}.', `${s}.`).replace('{s}', s));
+  }
+  return [base];
+}
+
+export interface MapLibreViewProps {
+  todasParadas: Parada[];
+  linhaSelecionada: Linha | null;
+  paradaSelecionada: Parada | null;
+  localizacaoUsuario?: [number, number] | null;
+  headingUsuario?: number | null;
+  permissaoLocalizacao?: boolean;
+  onPedirLocalizacao?: () => void;
+  carregandoLocalizacao?: boolean;
+  rastreioColaborativo?: GpsTrackingState;
+  onAlternarRastreioColaborativo?: () => void;
+}
+
+export function MapLibreView({
+  todasParadas,
+  linhaSelecionada,
+  paradaSelecionada,
+  localizacaoUsuario,
+  headingUsuario: _headingUsuario,
+  permissaoLocalizacao = false,
+  onPedirLocalizacao,
+  carregandoLocalizacao = false,
+  rastreioColaborativo,
+  onAlternarRastreioColaborativo,
+}: MapLibreViewProps) {
+  const analytics = useAnalytics();
+  const mapRef = useRef<MapRef>(null);
+  const [pitch, setPitch] = useState(0);
+  const [bearing, setBearing] = useState(0);
+  const [tileProvider] = useState<TileProviderKey>(getStoredProvider);
+
+  const mapStyle = useMemo(() => {
+    const provider = TILE_PROVIDERS[tileProvider];
+    const tiles = toMaplibreTiles(provider.url);
+    return {
+      version: 8 as const,
+      sources: {
+        'raster-tiles': {
+          type: 'raster' as const,
+          tiles,
+          tileSize: 256,
+          attribution: provider.attribution,
+        },
+      },
+      layers: [
+        {
+          id: 'raster-tiles',
+          type: 'raster' as const,
+          source: 'raster-tiles',
+        },
+      ],
+    };
+  }, [tileProvider]);
+
+  const handleResetNorth = useCallback(() => {
+    mapRef.current?.easeTo({ bearing: 0, pitch: 0, duration: 500 });
+    setBearing(0);
+    setPitch(0);
+  }, []);
+
+  const handleCentroCampus = useCallback(() => {
+    mapRef.current?.flyTo({ center: [CAMPUS_LNG, CAMPUS_LAT], zoom: 15 });
+    analytics.trackEvent({ category: 'map_interaction', action: 'center_campus_3d' });
+  }, [analytics]);
+
+  const handleCentralizar = useCallback(() => {
+    analytics.trackEvent({ category: 'map_interaction', action: 'click_gps_3d' });
+    if (!permissaoLocalizacao) {
+      onPedirLocalizacao?.();
+      return;
+    }
+    if (localizacaoUsuario) {
+      const [lat, lng] = localizacaoUsuario;
+      mapRef.current?.flyTo({ center: [lng, lat], zoom: 17 });
+    }
+  }, [permissaoLocalizacao, onPedirLocalizacao, localizacaoUsuario, analytics]);
+
+  const paradaDestacadaId = paradaSelecionada?.idParada ?? null;
+
+  // Centraliza na parada selecionada
+  useEffect(() => {
+    if (!paradaSelecionada) return;
+    const [lat, lng] = paradaSelecionada.coordenadas;
+    mapRef.current?.flyTo({ center: [lng, lat], zoom: 17, duration: 800 });
+  }, [paradaSelecionada]);
+
+  // Ajusta bounds para linha selecionada
+  useEffect(() => {
+    if (!linhaSelecionada?.coordenadasTrajeto?.length) return;
+    const coords = linhaSelecionada.coordenadasTrajeto;
+    const lngs = coords.map(([, lng]) => lng);
+    const lats = coords.map(([lat]) => lat);
+    mapRef.current?.fitBounds(
+      [
+        [Math.min(...lngs), Math.min(...lats)],
+        [Math.max(...lngs), Math.max(...lats)],
+      ],
+      { padding: 40, duration: 800 },
+    );
+  }, [linhaSelecionada]);
+
+  const isNorth = Math.abs(bearing) < 1 && Math.abs(pitch) < 1;
+  const statusRastreio = rastreioColaborativo?.status ?? 'idle';
+  const rastreioAtivo = Boolean(rastreioColaborativo?.isActive);
+
+  return (
+    <div className="relative h-full w-full">
+      <MapPitchHint visible={true} />
+
+      <Map
+        ref={mapRef}
+        initialViewState={{
+          longitude: CAMPUS_LNG,
+          latitude: CAMPUS_LAT,
+          zoom: 15,
+          pitch: 0,
+          bearing: 0,
+        }}
+        style={{ width: '100%', height: '100%' }}
+        mapStyle={mapStyle}
+        pitchWithRotate
+        touchPitch
+        onPitch={(e) => setPitch(e.target.getPitch())}
+        onRotate={(e) => setBearing(e.target.getBearing())}
+        attributionControl={false}
+      >
+        <MapLibreParadasLayer paradas={todasParadas} paradaDestacadaId={paradaDestacadaId} />
+        <MapLibreRotasLayer linha={linhaSelecionada} />
+        <MapLibrePrediosLayer pitch={pitch} />
+      </Map>
+
+      {/* FABs — fora do <Map> mas dentro do container relativo */}
+      <div className="pointer-events-none fixed bottom-24 right-4 z-1000 flex flex-col items-end gap-2 mb-[env(safe-area-inset-bottom)] md:bottom-6 md:mb-0">
+        {rastreioColaborativo && onAlternarRastreioColaborativo ? (
+          <button
+            type="button"
+            onClick={onAlternarRastreioColaborativo}
+            aria-pressed={rastreioAtivo}
+            aria-label={
+              rastreioAtivo
+                ? `Encerrar ${rastreioColaborativo.label}. Status: ${statusRastreio}`
+                : `Iniciar ${rastreioColaborativo.label}`
+            }
+            className={cn(
+              'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+              rastreioAtivo
+                ? 'border-success-border bg-success-border text-white'
+                : 'bg-card text-text-primary hover:bg-card-hover',
+            )}
+          >
+            {rastreioAtivo ? (
+              <Square className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Radio className="h-5 w-5" aria-hidden="true" />
+            )}
+          </button>
+        ) : null}
+
+        <button
+          type="button"
+          onClick={handleCentroCampus}
+          aria-label={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
+          title={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
+          className={cn(
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+            'bg-card text-text-primary hover:bg-card-hover',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+          )}
+        >
+          <CornerUpLeft className="h-5 w-5" aria-hidden="true" />
+        </button>
+
+        {/* Bússola — reseta bearing E pitch */}
+        <button
+          type="button"
+          onClick={handleResetNorth}
+          aria-label={isNorth ? 'Mapa alinhado ao Norte' : 'Resetar orientação e inclinação'}
+          title="Resetar orientação e inclinação"
+          className={cn(
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+            isNorth
+              ? 'bg-card text-text-secondary'
+              : 'border-brand-primary bg-brand-primary/10 text-brand-primary',
+          )}
+          style={{ transition: 'transform 0.3s ease' }}
+        >
+          <Compass
+            className="h-5 w-5"
+            aria-hidden="true"
+            style={{ transform: `rotate(${-bearing}deg)` }}
+          />
+        </button>
+
+        <button
+          type="button"
+          onClick={handleCentralizar}
+          disabled={carregandoLocalizacao}
+          aria-busy={carregandoLocalizacao}
+          aria-label={
+            carregandoLocalizacao
+              ? 'Buscando localização...'
+              : permissaoLocalizacao
+                ? 'Centralizar mapa na minha localização'
+                : 'Ativar localização'
+          }
+          className={cn(
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+            'bg-brand-primary text-white hover:bg-brand-primary/90',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+            'disabled:cursor-not-allowed disabled:opacity-70',
+          )}
+        >
+          {carregandoLocalizacao ? (
+            <LoaderCircle className="h-5 w-5 animate-spin" aria-hidden="true" />
+          ) : (
+            <LocateFixed className="h-5 w-5" aria-hidden="true" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -95,6 +95,11 @@ export default defineConfig(({ mode }) => {
           manualChunks(id) {
             if (!id.includes('node_modules')) return;
 
+            // MapLibre GL JS — chunk separado (WebGL, maior que Leaflet)
+            if (id.includes('maplibre-gl') || id.includes('react-map-gl')) {
+              return 'vendor-maplibre';
+            }
+
             // Leaflet e dependências de mapa — chunk separado, muda raramente
             if (id.includes('leaflet')) {
               return 'vendor-leaflet';
