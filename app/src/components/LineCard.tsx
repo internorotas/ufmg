@@ -314,7 +314,7 @@ function LineCardComponent({
                   <h3 className="min-w-0 flex-1 text-base font-bold leading-snug text-text-primary md:text-lg">
                     {linha.nome}
                   </h3>
-                  <div className="flex shrink-0 items-center gap-1.5">
+                  <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
                     {favoritado && (
                       <span
                         className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[11px] font-semibold"

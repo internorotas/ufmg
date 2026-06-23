@@ -1,5 +1,5 @@
 import { Bus, Clock } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Marker, Popup } from 'react-map-gl/maplibre';
 import { useRotasSelection } from '@/contexts/RotasContext';
 import type { PosicaoTeorica } from '@/lib/busPosition';
@@ -12,13 +12,6 @@ interface MapLibreAllBusMarkersProps {
   linhas: Linha[];
   todasParadas: Parada[];
   linhaNumeroExcluido?: number | null;
-}
-
-interface BusPopupState {
-  linha: Linha;
-  pos: PosicaoTeorica;
-  lng: number;
-  lat: number;
 }
 
 function BusIconMini({ corHex }: { corHex: string }) {
@@ -51,7 +44,7 @@ function BusMarkerPopup({ linha, pos }: { linha: Linha; pos: PosicaoTeorica }) {
   const { selecionarLinha } = useRotasSelection();
 
   return (
-    <div className="flex flex-col gap-2 font-sans text-sm">
+    <div className="flex flex-col gap-2 p-3 font-sans text-sm">
       <div className="flex items-center gap-2">
         <span
           className="shrink-0 rounded px-1.5 py-0.5 text-xs font-extrabold text-white"
@@ -61,7 +54,6 @@ function BusMarkerPopup({ linha, pos }: { linha: Linha; pos: PosicaoTeorica }) {
         </span>
         <span className="min-w-0 flex-1 truncate font-bold text-text-primary">{linha.nome}</span>
       </div>
-      <div className="border-t border-card-border" />
       <div className="flex flex-col gap-1 text-xs text-text-secondary">
         <div className="flex items-center gap-1.5">
           <Clock size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
@@ -93,8 +85,18 @@ export function MapLibreAllBusMarkers({
   linhaNumeroExcluido,
 }: MapLibreAllBusMarkersProps) {
   const posicoes = useAllBusPositions(linhas, todasParadas);
-  const [selected, setSelected] = useState<BusPopupState | null>(null);
+  const [selectedIdRota, setSelectedIdRota] = useState<string | null>(null);
   const linhaMap = useMemo(() => new Map(linhas.map((l) => [l.idRota, l])), [linhas]);
+
+  // Fecha popup se o ônibus selecionado não está mais na lista de posições
+  useEffect(() => {
+    if (selectedIdRota && !posicoes.has(selectedIdRota)) {
+      setSelectedIdRota(null);
+    }
+  }, [posicoes, selectedIdRota]);
+
+  const selectedPos = selectedIdRota ? (posicoes.get(selectedIdRota) ?? null) : null;
+  const selectedLinha = selectedIdRota ? (linhaMap.get(selectedIdRota) ?? null) : null;
 
   return (
     <>
@@ -112,23 +114,23 @@ export function MapLibreAllBusMarkers({
               longitude={pos.lng}
               latitude={pos.lat}
               anchor="center"
-              onClick={() => setSelected({ linha, pos, lng: pos.lng, lat: pos.lat })}
+              onClick={() => setSelectedIdRota(idRota)}
             >
               <BusIconMini corHex={linha.corHex} />
             </Marker>
           );
         })}
 
-      {selected && (
+      {selectedIdRota && selectedPos && selectedLinha && (
         <Popup
-          longitude={selected.lng}
-          latitude={selected.lat}
-          onClose={() => setSelected(null)}
+          longitude={selectedPos.lng}
+          latitude={selectedPos.lat}
+          onClose={() => setSelectedIdRota(null)}
           closeButton
           closeOnClick={false}
           maxWidth="220px"
         >
-          <BusMarkerPopup linha={selected.linha} pos={selected.pos} />
+          <BusMarkerPopup linha={selectedLinha} pos={selectedPos} />
         </Popup>
       )}
     </>

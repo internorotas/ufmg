@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Layer, Popup, Source, useMap } from 'react-map-gl/maplibre';
 import { useUfmPrediosQuery } from '@/features/transit-data/queries/useUfmPrediosQuery';
 
-const MIN_ZOOM = 16;
+const MIN_ZOOM = 14;
 const PITCH_EXTRUDE_THRESHOLD = 20;
 
 const LAYER_IDS = ['predios-3d', 'predios-flat'] as const;
@@ -65,30 +65,29 @@ export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
   return (
     <>
       <Source id="predios" type="geojson" data={data as unknown as FeatureCollection}>
-        {extruding ? (
-          <Layer
-            id="predios-3d"
-            type="fill-extrusion"
-            minzoom={MIN_ZOOM}
-            paint={{
-              'fill-extrusion-color': '#4a90d9',
-              'fill-extrusion-height': 18,
-              'fill-extrusion-base': 0,
-              'fill-extrusion-opacity': 0.75,
-            }}
-          />
-        ) : (
-          <Layer
-            id="predios-flat"
-            type="fill"
-            minzoom={MIN_ZOOM}
-            paint={{
-              'fill-color': '#4a90d9',
-              'fill-opacity': 0.18,
-              'fill-outline-color': '#4a90d9',
-            }}
-          />
-        )}
+        <Layer
+          id="predios-3d"
+          type="fill-extrusion"
+          minzoom={MIN_ZOOM}
+          layout={{ visibility: extruding ? 'visible' : 'none' }}
+          paint={{
+            'fill-extrusion-color': '#4a90d9',
+            'fill-extrusion-height': 18,
+            'fill-extrusion-base': 0,
+            'fill-extrusion-opacity': 0.75,
+          }}
+        />
+        <Layer
+          id="predios-flat"
+          type="fill"
+          minzoom={MIN_ZOOM}
+          layout={{ visibility: extruding ? 'none' : 'visible' }}
+          paint={{
+            'fill-color': '#4a90d9',
+            'fill-opacity': 0.18,
+            'fill-outline-color': '#4a90d9',
+          }}
+        />
       </Source>
 
       {predioClicado && (
@@ -101,7 +100,7 @@ export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
           maxWidth="220px"
           offset={10}
         >
-          <div className="flex flex-col gap-1 p-1 font-sans text-text-primary">
+          <div className="flex flex-col gap-1 p-2 font-sans text-text-primary">
             <p className="text-sm font-bold leading-snug">{predioClicado.nome}</p>
             {predioClicado.amenity && (
               <p className="text-xs capitalize text-text-secondary">

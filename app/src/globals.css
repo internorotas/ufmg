@@ -814,3 +814,8 @@ body {
   outline: 2px solid var(--color-brand-primary) !important;
   outline-offset: 2px !important;
 }
+
+/* Permite que popups do MapLibre se estendam além dos limites do mapa */
+.maplibregl-map {
+  overflow: visible !important;
+}

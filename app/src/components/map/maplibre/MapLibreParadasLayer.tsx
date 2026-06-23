@@ -33,16 +33,17 @@ interface ParadaClicada {
 interface MapLibreParadasLayerProps {
   paradas: Parada[];
   paradaDestacadaId: string | null;
+  onParadaClicada?: (parada: Parada) => void;
 }
 
-export function MapLibreParadasLayer({ paradas, paradaDestacadaId }: MapLibreParadasLayerProps) {
+export function MapLibreParadasLayer({ paradas, paradaDestacadaId, onParadaClicada }: MapLibreParadasLayerProps) {
   const [paradaClicada, setParadaClicada] = useState<ParadaClicada | null>(null);
 
   return (
     <>
       {paradas.map((p) => {
         const destacada = p.idParada === paradaDestacadaId;
-        const size = destacada ? 40 : 30;
+        const size = destacada ? 28 : 20;
         // marker.svg é 880×1255 — mantém proporção
         const height = Math.round((size / 880) * 1255);
 
@@ -54,7 +55,11 @@ export function MapLibreParadasLayer({ paradas, paradaDestacadaId }: MapLibrePar
             anchor="bottom"
             onClick={(e) => {
               e.originalEvent.stopPropagation();
-              setParadaClicada({ parada: p, longitude: p.coordenadas[1], latitude: p.coordenadas[0] });
+              if (onParadaClicada) {
+                onParadaClicada(p);
+              } else {
+                setParadaClicada({ parada: p, longitude: p.coordenadas[1], latitude: p.coordenadas[0] });
+              }
             }}
           >
             <img
@@ -97,7 +102,7 @@ interface ConteudoPopupParadaProps {
   onClose: () => void;
 }
 
-function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProps) {
+export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProps) {
   const analytics = useAnalytics();
   const { rotasService } = useRotasData();
   const { selecionarLinha } = useRotasSelection();

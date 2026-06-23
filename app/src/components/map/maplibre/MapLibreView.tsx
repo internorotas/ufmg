@@ -1,5 +1,5 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { Box, Compass, CornerUpLeft, LoaderCircle, LocateFixed, Minus, Plus, Radio, Square } from 'lucide-react';
+import { Box, Compass, CornerUpLeft, LoaderCircle, LocateFixed, Minus, Plus, Radio, Square, X } from 'lucide-react';
 import {
   type Ref,
   useCallback,
@@ -21,7 +21,7 @@ import { TILE_PROVIDERS, type TileProviderKey } from '../TileSwitcher';
 import { MapLibreAllBusMarkers } from './MapLibreAllBusMarkers';
 import { MapLibreGpsLiveBusMarker } from './MapLibreGpsLiveBusMarker';
 import { MapLibreGpsRouteOverlay } from './MapLibreGpsRouteOverlay';
-import { MapLibreParadasLayer } from './MapLibreParadasLayer';
+import { ConteudoPopupParada, MapLibreParadasLayer } from './MapLibreParadasLayer';
 import { MapLibrePlannerOverlay } from './MapLibrePlannerOverlay';
 import { MapLibrePrediosLayer } from './MapLibrePrediosLayer';
 import { MapLibreRotasLayer } from './MapLibreRotasLayer';
@@ -48,7 +48,8 @@ function toMaplibreTiles(leafletUrl: string): string[] {
   const base = leafletUrl.replace('{r}', '');
 
   if (base.includes('{s}')) {
-    return ['a', 'b', 'c', 'd'].map((s) => base.replace('{s}.', `${s}.`).replace('{s}', s));
+    // Usar apenas a, b, c — OSM e CartoDB suportam esses três subdomínios
+    return ['a', 'b', 'c'].map((s) => base.replace('{s}.', `${s}.`).replace('{s}', s));
   }
   return [base];
 }
@@ -94,6 +95,7 @@ export function MapLibreView({
   const [bearing, setBearing] = useState(0);
   const [is3d, setIs3d] = useState(false);
   const [tileProvider] = useState<TileProviderKey>(getStoredProvider);
+  const [paradaAberta, setParadaAberta] = useState<Parada | null>(null);
 
   const mapStyle = useMemo(() => {
     const provider = TILE_PROVIDERS[tileProvider];
@@ -134,28 +136,43 @@ export function MapLibreView({
     [],
   );
 
-
+  // Botão 3D: alterna pitch 0↔60. Ao voltar ao 2D, desativa bússola se estiver ativa.
   const handleToggle3d = useCallback(() => {
     const next = !is3d;
     setIs3d(next);
-    mapRef.current?.easeTo({ pitch: next ? 60 : 0, bearing: next ? bearing : 0, duration: 800 });
-    if (!next) {
+    if (next) {
+      mapRef.current?.easeTo({ pitch: 60, bearing, duration: 800 });
+    } else {
+      if (compassEnabled) onToggleCompass?.();
+      mapRef.current?.easeTo({ pitch: 0, bearing: 0, duration: 800 });
       setBearing(0);
       setPitch(0);
     }
-  }, [is3d, bearing]);
+  }, [is3d, bearing, compassEnabled, onToggleCompass]);
 
-  // Bússola: ativa → desativa e reseta norte; inativa → ativa heading follow
+  // Bússola: ativar → vai para 3D + centraliza no usuário + inicia heading follow
+  //          desativar → volta para 2D + reseta orientação ao norte
   const handleCompass = useCallback(() => {
     if (compassEnabled) {
+      // Desativar bússola → voltar para 2D
       onToggleCompass?.();
+      setIs3d(false);
       mapRef.current?.easeTo({ bearing: 0, pitch: 0, duration: 500 });
       setBearing(0);
       setPitch(0);
     } else {
+      // Ativar bússola → ir para 3D + centralizar no usuário
       onToggleCompass?.();
+      setIs3d(true);
+      const easeOpts: Parameters<MapRef['easeTo']>[0] = { pitch: 60, duration: 800 };
+      if (localizacaoUsuario) {
+        const [lat, lng] = localizacaoUsuario;
+        easeOpts.center = [lng, lat];
+        easeOpts.zoom = 17;
+      }
+      mapRef.current?.easeTo(easeOpts);
     }
-  }, [compassEnabled, onToggleCompass]);
+  }, [compassEnabled, onToggleCompass, localizacaoUsuario]);
 
   const handleCentroCampus = useCallback(() => {
     mapRef.current?.flyTo({ center: [CAMPUS_LNG, CAMPUS_LAT], zoom: 15 });
@@ -240,7 +257,11 @@ export function MapLibreView({
 
         <MapLibreRotasLayer linha={linhaSelecionada} />
 
-        <MapLibreParadasLayer paradas={todasParadas} paradaDestacadaId={paradaDestacadaId} />
+        <MapLibreParadasLayer
+          paradas={todasParadas}
+          paradaDestacadaId={paradaDestacadaId}
+          onParadaClicada={setParadaAberta}
+        />
 
         <MapLibreAllBusMarkers
           linhas={linhasAtivas}
@@ -302,7 +323,7 @@ export function MapLibreView({
           className={cn(
             'pointer-events-auto flex h-10 w-10 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
-            is3d
+            is3d || compassEnabled
               ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
               : 'bg-card text-text-primary hover:bg-card-hover',
           )}
@@ -311,8 +332,31 @@ export function MapLibreView({
         </button>
       </div>
 
+      {/* Card da parada — renderizado fora do <Map> para não ser clipado */}
+      {paradaAberta && (
+        <div
+          className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex flex-col rounded-t-2xl bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.18)] ring-1 ring-card-border"
+          style={{ maxHeight: 'min(75vh, 520px)' }}
+        >
+          <div className="flex items-center justify-between border-b border-card-border px-4 py-2">
+            <div className="h-1 w-10 rounded-full bg-card-border mx-auto" />
+            <button
+              type="button"
+              onClick={() => setParadaAberta(null)}
+              aria-label="Fechar card da parada"
+              className="ml-auto flex size-8 items-center justify-center rounded-full text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            >
+              <X size={16} aria-hidden="true" />
+            </button>
+          </div>
+          <div className="overflow-y-auto">
+            <ConteudoPopupParada parada={paradaAberta} onClose={() => setParadaAberta(null)} />
+          </div>
+        </div>
+      )}
+
       {/* FABs — fora do <Map> mas dentro do container relativo */}
-      <div className="pointer-events-none fixed bottom-24 right-4 z-1000 flex flex-col items-end gap-2 [margin-bottom:env(safe-area-inset-bottom)] md:bottom-6 md:[margin-bottom:0]">
+      <div className="pointer-events-none fixed bottom-24 right-4 z-1000 flex flex-col items-end gap-2 mb-[env(safe-area-inset-bottom)] md:bottom-6 md:mb-0">
         {rastreioColaborativo && onAlternarRastreioColaborativo ? (
           <button
             type="button"
@@ -353,19 +397,17 @@ export function MapLibreView({
           <CornerUpLeft className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        {/* Bússola — ativa heading follow; quando ativo, fica destacado e clicar desativa + reseta norte */}
+        {/* Bússola: ativa → 3D + heading follow; desativa → volta 2D + norte */}
         <button
           type="button"
           onClick={handleCompass}
           aria-pressed={compassEnabled}
           aria-label={
             compassEnabled
-              ? 'Desativar bússola'
-              : isNorth
-                ? 'Ativar bússola — mapa girará com o dispositivo'
-                : 'Resetar orientação ao norte ou ativar bússola'
+              ? 'Desativar bússola e voltar para 2D'
+              : 'Ativar bússola — ir para 3D e girar com o dispositivo'
           }
-          title={compassEnabled ? 'Desativar bússola' : 'Ativar bússola'}
+          title={compassEnabled ? 'Desativar bússola' : 'Ativar bússola (3D)'}
           className={cn(
             'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
