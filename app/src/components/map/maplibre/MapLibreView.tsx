@@ -1,5 +1,5 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { Compass, CornerUpLeft, LoaderCircle, LocateFixed, Radio, Square } from 'lucide-react';
+import { Box, Compass, CornerUpLeft, LoaderCircle, LocateFixed, Minus, Plus, Radio, Square } from 'lucide-react';
 import {
   type Ref,
   useCallback,
@@ -92,6 +92,7 @@ export function MapLibreView({
   const mapRef = useRef<MapRef>(null);
   const [pitch, setPitch] = useState(0);
   const [bearing, setBearing] = useState(0);
+  const [is3d, setIs3d] = useState(false);
   const [tileProvider] = useState<TileProviderKey>(getStoredProvider);
 
   const mapStyle = useMemo(() => {
@@ -133,11 +134,16 @@ export function MapLibreView({
     [],
   );
 
-  const handleResetNorth = useCallback(() => {
-    mapRef.current?.easeTo({ bearing: 0, pitch: 0, duration: 500 });
-    setBearing(0);
-    setPitch(0);
-  }, []);
+
+  const handleToggle3d = useCallback(() => {
+    const next = !is3d;
+    setIs3d(next);
+    mapRef.current?.easeTo({ pitch: next ? 60 : 0, bearing: next ? bearing : 0, duration: 800 });
+    if (!next) {
+      setBearing(0);
+      setPitch(0);
+    }
+  }, [is3d, bearing]);
 
   // Bússola: ativa → desativa e reseta norte; inativa → ativa heading follow
   const handleCompass = useCallback(() => {
@@ -257,6 +263,53 @@ export function MapLibreView({
           />
         )}
       </Map>
+
+      {/* Controles de zoom e visão — lado esquerdo */}
+      <div className="pointer-events-none absolute left-2 top-2 z-900 flex flex-col items-center">
+        <button
+          type="button"
+          onClick={() => mapRef.current?.zoomIn()}
+          aria-label="Aumentar zoom"
+          title="Aumentar zoom"
+          className={cn(
+            'pointer-events-auto flex h-10 w-10 cursor-pointer items-center justify-center bg-card text-text-primary hover:bg-card-hover',
+            'rounded-t-sm border border-b-0 border-card-border shadow-sm transition-colors duration-150',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+          )}
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          onClick={() => mapRef.current?.zoomOut()}
+          aria-label="Diminuir zoom"
+          title="Diminuir zoom"
+          className={cn(
+            'pointer-events-auto flex h-10 w-10 cursor-pointer items-center justify-center bg-card text-text-primary hover:bg-card-hover',
+            'rounded-b-sm border border-card-border shadow-sm transition-colors duration-150',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+          )}
+        >
+          <Minus className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <div className="my-1.5 h-px w-8 bg-card-border" />
+        <button
+          type="button"
+          onClick={handleToggle3d}
+          aria-pressed={is3d}
+          aria-label={is3d ? 'Voltar à visão 2D' : 'Ativar visão 3D'}
+          title={is3d ? 'Visão 2D' : 'Visão 3D'}
+          className={cn(
+            'pointer-events-auto flex h-10 w-10 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+            is3d
+              ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+              : 'bg-card text-text-primary hover:bg-card-hover',
+          )}
+        >
+          <Box className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </div>
 
       {/* FABs — fora do <Map> mas dentro do container relativo */}
       <div className="pointer-events-none fixed bottom-24 right-4 z-1000 flex flex-col items-end gap-2 [margin-bottom:env(safe-area-inset-bottom)] md:bottom-6 md:[margin-bottom:0]">

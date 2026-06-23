@@ -109,7 +109,7 @@ export function ControlesUsuarioMapa({
   carregandoLocalizacao = false,
   rastreioColaborativo,
   onAlternarRastreioColaborativo,
-  compassEnabled = false,
+  compassEnabled: _compassEnabled = false,
   onToggleCompass,
 }: ControlesUsuarioMapaProps) {
   const analytics = useAnalytics();

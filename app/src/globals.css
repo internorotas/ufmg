@@ -764,3 +764,53 @@ body {
   box-shadow: var(--neo-shadow-sm);
   transform: translate(2px, 2px);
 }
+
+/* MapLibre GL Popups — match design system (mirrors Leaflet popup overrides) */
+.maplibregl-popup-content {
+  padding: 0 !important;
+  background-color: var(--card-background) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: var(--card-background) !important;
+  border-bottom-color: var(--card-background) !important;
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--card-background) !important;
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--card-background) !important;
+}
+
+.maplibregl-popup-close-button {
+  top: 6px !important;
+  right: 6px !important;
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 18px !important;
+  line-height: 24px !important;
+  border-radius: 9999px !important;
+  color: var(--text-secondary) !important;
+  background: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1;
+}
+
+.maplibregl-popup-close-button:hover {
+  color: var(--text-primary) !important;
+  background-color: var(--card-hover) !important;
+}
+
+.maplibregl-popup-close-button:focus-visible {
+  outline: 2px solid var(--color-brand-primary) !important;
+  outline-offset: 2px !important;
+}
