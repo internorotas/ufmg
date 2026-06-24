@@ -122,6 +122,14 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
     markerRef.current.getElement().innerHTML = criarIconeHtml(linha.corHex, livePos.heading, true, isStale);
   }, [livePos, linha.corHex, isStale]);
 
+  // Mantém popup sincronizado com a posição GPS ao vivo
+  useEffect(() => {
+    if (!livePos || !popupState) return;
+    setPopupState({ lng: livePos.lng, lat: livePos.lat });
+  // popupState intencionalmente omitido — queremos reagir ao livePos, não criar loop
+  // biome-ignore lint/correctness/useExhaustiveDependencies: veja comentário acima
+  }, [livePos]);
+
   // RAF: posição teórica animada quando não há GPS ao vivo
   useEffect(() => {
     if (livePos) return;
@@ -191,7 +199,12 @@ function BusPopup({ linha, num, isLive, isStale, hasConnectionError, livePos, th
         >
           {num}
         </span>
-        <span className="min-w-0 flex-1 truncate font-bold text-text-primary">{linha.nome}</span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-bold text-text-primary leading-tight">{linha.nome}</p>
+          {linha.sublinha && (
+            <p className="truncate text-[10px] text-text-secondary leading-tight">{linha.sublinha}</p>
+          )}
+        </div>
         {isLive && !isStale && (
           <span className="shrink-0 rounded bg-red-500 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-white">
             AO VIVO

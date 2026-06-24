@@ -52,7 +52,12 @@ function BusMarkerPopup({ linha, pos }: { linha: Linha; pos: PosicaoTeorica }) {
         >
           {num}
         </span>
-        <span className="min-w-0 flex-1 truncate font-bold text-text-primary">{linha.nome}</span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-bold text-text-primary leading-tight">{linha.nome}</p>
+          {linha.sublinha && (
+            <p className="truncate text-[10px] text-text-secondary leading-tight">{linha.sublinha}</p>
+          )}
+        </div>
       </div>
       <div className="flex flex-col gap-1 text-xs text-text-secondary">
         <div className="flex items-center gap-1.5">

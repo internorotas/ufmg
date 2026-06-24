@@ -57,7 +57,7 @@ export function GpsTrackingCard({
 
   if (isMinimized) {
     return (
-      <div className="pointer-events-auto absolute bottom-24 left-3 flex h-11 items-center gap-1 rounded neo-brutal bg-card px-2 md:bottom-6 md:left-4">
+      <div className="pointer-events-auto absolute bottom-24 left-3 flex h-11 items-center gap-1 rounded neo-brutal bg-card px-2 md:bottom-6 md:left-[min(calc(50vw+1rem),29rem)]">
         <button
           type="button"
           onClick={onToggleMinimize}
@@ -85,7 +85,7 @@ export function GpsTrackingCard({
     <div
       role="status"
       aria-label="Rastreio colaborativo ativo"
-      className="pointer-events-none absolute bottom-24 left-3 w-48 select-none neo-brutal bg-card md:bottom-6 md:left-4"
+      className="pointer-events-none absolute bottom-24 left-3 w-56 select-none neo-brutal bg-card md:bottom-6 md:left-[min(calc(50vw+1rem),29rem)]"
     >
       {/* Cabeçalho */}
       <div className="flex items-center gap-1.5 p-2.5 pb-2">
@@ -116,8 +116,11 @@ export function GpsTrackingCard({
             >
               {linha.linha}
             </span>
-            <p className="truncate text-[10px] font-semibold text-text-primary">{linha.nome}</p>
+            <p className="truncate text-[10px] font-semibold text-text-primary leading-tight">{linha.nome}</p>
           </div>
+          {linha.sublinha && (
+            <p className="truncate pl-5 text-[9px] text-text-tertiary leading-tight">{linha.sublinha}</p>
+          )}
         </div>
 
         <button

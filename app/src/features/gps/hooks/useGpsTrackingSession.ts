@@ -331,8 +331,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         } catch (err) {
           // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
           console.error('[GPS] Falha ao encerrar sessão de rastreio colaborativo:', err);
-          setStatus('error');
-          return;
+          // Não retorna — reseta a sessão mesmo em caso de erro para não bloquear o usuário
         }
       }
 
