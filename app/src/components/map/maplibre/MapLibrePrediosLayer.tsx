@@ -186,8 +186,6 @@ interface CardPredioProps {
 
 export function CardPredio({ predio, onClose: _onClose }: CardPredioProps) {
   const amenityInfo = predio.amenity ? formatarAmenity(predio.amenity) : null;
-  const osmId = typeof predio.id === 'number' && predio.id > 0 ? predio.id : null;
-  const osmUrl = osmId ? `https://www.openstreetmap.org/way/${osmId}` : null;
 
   return (
     <section
@@ -220,24 +218,6 @@ export function CardPredio({ predio, onClose: _onClose }: CardPredioProps) {
         <p className="text-xs leading-relaxed text-text-secondary">{predio.description}</p>
       )}
 
-      <div className="border-t border-card-border" />
-
-      {osmUrl && (
-        <a
-          href={osmUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-xs text-text-secondary transition-colors hover:text-brand-primary"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-            <polyline points="15 3 21 3 21 9" />
-            <line x1="10" y1="14" x2="21" y2="3" />
-          </svg>
-          Ver no OpenStreetMap
-        </a>
-      )}
     </section>
   );
 }

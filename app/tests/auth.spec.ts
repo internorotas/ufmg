@@ -82,7 +82,7 @@ test('login – link "Continuar sem login" existe e é clicável', async ({ page
 
 test('nav – ícone de perfil no menu leva usuário anônimo a /login', async ({ page }) => {
   await page.goto(`${BASE}/`);
-  await page.waitForSelector('.leaflet-container', { timeout: 15_000 });
+  await page.waitForSelector('.maplibregl-map', { timeout: 15_000 });
 
   const perfilLink = page
     .locator('nav a')

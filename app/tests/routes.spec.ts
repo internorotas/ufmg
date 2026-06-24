@@ -20,7 +20,7 @@ test.beforeEach(async ({ page }) => {
 test('home – mapa e cards de linha carregam', async ({ page }) => {
   await page.goto(`${BASE}/`);
   await expect(page).toHaveTitle(/Interno Rotas/i);
-  await page.waitForSelector('.leaflet-container', { timeout: 15_000 });
+  await page.waitForSelector('.maplibregl-map', { timeout: 15_000 });
   await ensureLineCardsVisible(page);
   const lineCard = page.locator('article[data-slot="card"]').first();
   await expect(lineCard).toBeVisible({ timeout: 12_000 });
@@ -28,7 +28,7 @@ test('home – mapa e cards de linha carregam', async ({ page }) => {
 
 test('home – campo de busca está acessível', async ({ page }) => {
   await page.goto(`${BASE}/`);
-  await page.waitForSelector('.leaflet-container', { timeout: 15_000 });
+  await page.waitForSelector('.maplibregl-map', { timeout: 15_000 });
   await ensureSearchVisible(page);
   await expect(page.getByRole('searchbox', { name: /Pesquisar linha/i })).toBeVisible({
     timeout: 10_000,

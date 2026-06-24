@@ -26,7 +26,16 @@ interface CompletedSession {
   snapshotsCount: number;
   linhaNome: string;
   linhaCorHex: string;
+  stopReason: string;
 }
+
+const STOP_REASON_LABELS: Record<string, string> = {
+  terminal: 'Chegou ao terminal!',
+  saiu_rota: 'Encerrado: você saiu do trajeto',
+  parado: 'Encerrado: sem movimento por 5 min',
+  timeout: 'Encerrado: limite de 1 hora atingido',
+  manual: 'Rastreio encerrado',
+};
 
 const GpsSessionContext = createContext<GpsTrackingState | null>(null);
 
@@ -48,6 +57,8 @@ function GpsSessionCompletedCard({
   onDismiss: () => void;
 }) {
   const pontosEstimados = Math.max(1, Math.floor(session.snapshotsCount / 2));
+  const reasonLabel = STOP_REASON_LABELS[session.stopReason] ?? 'Rastreio encerrado';
+  const isAutoStop = session.stopReason !== 'manual';
 
   return (
     <div className="pointer-events-none fixed inset-0 z-1050 flex items-end justify-start pb-24 pl-3 md:items-center md:justify-center md:pb-0 md:pl-0">
@@ -61,7 +72,7 @@ function GpsSessionCompletedCard({
             <Bus size={16} aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold text-success-text">Rastreio concluído</p>
+            <p className="text-xs font-bold text-success-text">{reasonLabel}</p>
             <p className="truncate text-[10px] text-text-secondary">{session.linhaNome}</p>
           </div>
           <button
@@ -73,6 +84,12 @@ function GpsSessionCompletedCard({
             ×
           </button>
         </div>
+
+        {isAutoStop && (
+          <p className="mb-2 rounded-lg bg-background-secondary px-2.5 py-1.5 text-[10px] text-text-secondary">
+            O rastreio foi encerrado automaticamente.
+          </p>
+        )}
 
         <div className="mb-3 h-px bg-card-border" />
 
@@ -218,6 +235,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
           ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
           : linhaSelecionada.nome,
         linhaCorHex: linhaSelecionada.corHex,
+        stopReason,
       });
 
       const timeoutId = window.setTimeout(() => setCompletedSession(null), 8000);

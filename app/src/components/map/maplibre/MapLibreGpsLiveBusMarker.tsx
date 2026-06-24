@@ -1,5 +1,5 @@
 import maplibregl from 'maplibre-gl';
-import { Bus, Clock, Radar, Target } from 'lucide-react';
+import { AlertTriangle, Bus, Clock, Radar, Target } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Popup, useMap } from 'react-map-gl/maplibre';
 import { calcularPosicaoTeorica } from '@/lib/busPosition';
@@ -21,15 +21,21 @@ function tempoDecorrido(updatedAt: string): string {
   return `há ${diff} min`;
 }
 
-function criarIconeHtml(corHex: string, heading: number | null, isLive: boolean): string {
+function criarIconeHtml(
+  corHex: string,
+  heading: number | null,
+  isLive: boolean,
+  isStale: boolean,
+): string {
   const rotacao = heading ?? 0;
   const mostrarSeta = heading !== null;
   const bg = isLive ? corHex : hexToRgba(corHex, 0.7);
   const pulseColor = hexToRgba(corHex, 0.5);
   const pulseColor0 = hexToRgba(corHex, 0);
+  const showPulse = isLive && !isStale;
 
   return `
-    ${isLive ? `<style>@keyframes gps-pulse{0%{box-shadow:0 0 0 0 ${pulseColor}}70%{box-shadow:0 0 0 8px ${pulseColor0}}100%{box-shadow:0 0 0 0 ${pulseColor0}}}</style>` : ''}
+    ${showPulse ? `<style>@keyframes gps-pulse{0%{box-shadow:0 0 0 0 ${pulseColor}}70%{box-shadow:0 0 0 8px ${pulseColor0}}100%{box-shadow:0 0 0 0 ${pulseColor0}}}</style>` : ''}
     <div style="position:relative;width:36px;height:36px;">
       ${
         mostrarSeta
@@ -38,12 +44,13 @@ function criarIconeHtml(corHex: string, heading: number | null, isLive: boolean)
              </div>`
           : ''
       }
-      <div style="position:absolute;inset:4px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;border:2px solid white;${isLive ? `animation:gps-pulse 1.8s ease-in-out infinite;` : 'box-shadow:0 2px 6px rgba(0,0,0,0.25);'}">
+      <div style="position:absolute;inset:4px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;border:2px solid white;${showPulse ? `animation:gps-pulse 1.8s ease-in-out infinite;` : 'box-shadow:0 2px 6px rgba(0,0,0,0.25);'}">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
           <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4S4 2.5 4 6v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/>
         </svg>
       </div>
-      ${isLive ? `<div style="position:absolute;bottom:-2px;right:-4px;background:#ef4444;color:white;font-size:6px;font-weight:800;font-family:sans-serif;letter-spacing:0.04em;padding:1px 3px;border-radius:3px;border:1px solid white;line-height:1.4;">AO VIVO</div>` : ''}
+      ${isLive && !isStale ? `<div style="position:absolute;bottom:-2px;right:-4px;background:#ef4444;color:white;font-size:6px;font-weight:800;font-family:sans-serif;letter-spacing:0.04em;padding:1px 3px;border-radius:3px;border:1px solid white;line-height:1.4;">AO VIVO</div>` : ''}
+      ${isStale ? `<div style="position:absolute;bottom:-2px;right:-4px;background:#d97706;color:white;font-size:6px;font-weight:800;font-family:sans-serif;letter-spacing:0.04em;padding:1px 3px;border-radius:3px;border:1px solid white;line-height:1.4;">ATR.</div>` : ''}
     </div>
   `;
 }
@@ -60,7 +67,7 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
   const prevHeadingRef = useRef<number | null>(null);
   const [popupState, setPopupState] = useState<PopupState | null>(null);
 
-  const livePos = useGpsLiveTracking(linha.idRota);
+  const { position: livePos, isStale, hasConnectionError } = useGpsLiveTracking(linha.idRota);
   const theoreticalPos = useBusPosition(linha, todasParadas);
 
   // Posição inicial — calculada uma vez na montagem
@@ -86,7 +93,7 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
     el.style.width = '36px';
     el.style.height = '36px';
     el.style.cursor = 'pointer';
-    el.innerHTML = criarIconeHtml(linha.corHex, null, false);
+    el.innerHTML = criarIconeHtml(linha.corHex, null, false, false);
 
     el.addEventListener('click', () => {
       const m = markerRef.current;
@@ -108,12 +115,12 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
     };
   }, [mapInstance, linha.idRota, initialPos]);
 
-  // Atualiza posição via GPS ao vivo (WebSocket)
+  // Atualiza posição via GPS ao vivo (WebSocket), refletindo stale no ícone
   useEffect(() => {
     if (!livePos || !markerRef.current) return;
     markerRef.current.setLngLat([livePos.lng, livePos.lat]);
-    markerRef.current.getElement().innerHTML = criarIconeHtml(linha.corHex, livePos.heading, true);
-  }, [livePos, linha.corHex]);
+    markerRef.current.getElement().innerHTML = criarIconeHtml(linha.corHex, livePos.heading, true, isStale);
+  }, [livePos, linha.corHex, isStale]);
 
   // RAF: posição teórica animada quando não há GPS ao vivo
   useEffect(() => {
@@ -126,7 +133,7 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
         const diff = Math.abs((pos.heading ?? 0) - (prevHeadingRef.current ?? 0));
         if (diff > 15 || prevHeadingRef.current === null) {
           prevHeadingRef.current = pos.heading;
-          markerRef.current.getElement().innerHTML = criarIconeHtml(linha.corHex, pos.heading, false);
+          markerRef.current.getElement().innerHTML = criarIconeHtml(linha.corHex, pos.heading, false, false);
         }
       }
       rafRef.current = requestAnimationFrame(animate);
@@ -155,6 +162,8 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
         linha={linha}
         num={num}
         isLive={isLive}
+        isStale={isStale}
+        hasConnectionError={hasConnectionError}
         livePos={livePos}
         theoreticalPos={theoreticalPos}
       />
@@ -166,11 +175,13 @@ interface BusPopupProps {
   linha: Linha;
   num: string;
   isLive: boolean;
+  isStale: boolean;
+  hasConnectionError: boolean;
   livePos: LiveLocationPayload | null;
   theoreticalPos: ReturnType<typeof useBusPosition>;
 }
 
-function BusPopup({ linha, num, isLive, livePos, theoreticalPos }: BusPopupProps) {
+function BusPopup({ linha, num, isLive, isStale, hasConnectionError, livePos, theoreticalPos }: BusPopupProps) {
   return (
     <div className="flex flex-col gap-2.5 font-sans text-sm">
       <div className="flex items-center gap-2">
@@ -181,14 +192,34 @@ function BusPopup({ linha, num, isLive, livePos, theoreticalPos }: BusPopupProps
           {num}
         </span>
         <span className="min-w-0 flex-1 truncate font-bold text-text-primary">{linha.nome}</span>
-        {isLive && (
+        {isLive && !isStale && (
           <span className="shrink-0 rounded bg-red-500 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-white">
             AO VIVO
           </span>
         )}
+        {isStale && (
+          <span className="shrink-0 rounded bg-amber-500 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-white">
+            ATRASADO
+          </span>
+        )}
       </div>
       <div className="border-t border-card-border" />
-      {isLive && livePos ? (
+
+      {hasConnectionError && (
+        <div className="flex items-center gap-1.5 rounded bg-warning-bg px-2 py-1.5 text-xs text-warning-text">
+          <AlertTriangle size={12} aria-hidden="true" className="shrink-0" />
+          <span>Sem conexão com o servidor</span>
+        </div>
+      )}
+
+      {isStale && livePos && (
+        <div className="flex items-center gap-1.5 rounded bg-warning-bg px-2 py-1.5 text-xs text-warning-text">
+          <AlertTriangle size={12} aria-hidden="true" className="shrink-0" />
+          <span>Posição desatualizada — última há {tempoDecorrido(livePos.updatedAt)}</span>
+        </div>
+      )}
+
+      {isLive && livePos && !isStale ? (
         <div className="flex flex-col gap-1.5 text-xs text-text-secondary">
           <div className="flex items-center gap-1.5">
             <Radar size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
@@ -208,7 +239,7 @@ function BusPopup({ linha, num, isLive, livePos, theoreticalPos }: BusPopupProps
           </p>
         </div>
       ) : (
-        theoreticalPos && (
+        !isStale && theoreticalPos && (
           <div className="flex flex-col gap-1.5 text-xs text-text-secondary">
             <div className="flex items-center gap-1.5">
               <Clock size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />

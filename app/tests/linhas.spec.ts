@@ -57,7 +57,8 @@ test('linhas – clicar em detalhes de linha abre modal', async ({ page }) => {
   const detailsBtn = firstCard.locator('button[data-slot="action"]').first();
   if (await detailsBtn.isVisible()) {
     await detailsBtn.click();
-    await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 8_000 });
+    // Desktop: abre painel inline (aside > section); Mobile: abre dialog modal
+    await expect(page.locator('[role="dialog"], aside > section[aria-label]')).toBeVisible({ timeout: 8_000 });
   }
 });
 

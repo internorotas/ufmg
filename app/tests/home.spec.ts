@@ -25,16 +25,16 @@ test.beforeEach(async ({ page }) => {
 // Mapa
 // ---------------------------------------------------------------------------
 
-test('mapa – contêiner Leaflet é montado', async ({ page }) => {
+test('mapa – contêiner MapLibre é montado', async ({ page }) => {
   await page.goto(`${BASE}/`);
   await waitForMap(page);
-  await expect(page.locator('.leaflet-container')).toBeVisible();
+  await expect(page.locator('.maplibregl-map')).toBeVisible();
 });
 
-test('mapa – tiles carregam (ao menos um img de tile presente)', async ({ page }) => {
+test('mapa – canvas MapLibre está presente', async ({ page }) => {
   await page.goto(`${BASE}/`);
   await waitForMap(page);
-  await page.waitForSelector('.leaflet-tile-loaded', { timeout: 20_000 });
+  await page.waitForSelector('.maplibregl-canvas', { timeout: 20_000 });
 });
 
 // ---------------------------------------------------------------------------
@@ -81,7 +81,8 @@ test('cards – clicar em detalhes abre modal', async ({ page }) => {
   await expect(firstCard).toBeVisible({ timeout: 12_000 });
 
   await firstCard.locator('button[data-slot="action"]').first().click();
-  await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 8_000 });
+  // Desktop: abre painel inline (aside > section); Mobile: abre dialog modal
+  await expect(page.locator('[role="dialog"], aside > section[aria-label]')).toBeVisible({ timeout: 8_000 });
 });
 
 // ---------------------------------------------------------------------------

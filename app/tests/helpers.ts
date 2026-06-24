@@ -24,9 +24,9 @@ export async function mockAuthAnonymous(page: Page) {
 /** Rota base do tenant (definida pelo VITE_BASE_PATH). */
 export const BASE = '/ufmg';
 
-/** Aguarda o mapa Leaflet estar montado no DOM. */
+/** Aguarda o mapa MapLibre estar montado no DOM. */
 export async function waitForMap(page: Page) {
-  await page.waitForSelector('.leaflet-container', { timeout: 15_000 });
+  await page.waitForSelector('.maplibregl-map', { timeout: 30_000 });
 }
 
 /**
