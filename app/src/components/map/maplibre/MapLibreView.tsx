@@ -23,7 +23,7 @@ import { MapLibreGpsLiveBusMarker } from './MapLibreGpsLiveBusMarker';
 import { MapLibreGpsRouteOverlay } from './MapLibreGpsRouteOverlay';
 import { ConteudoPopupParada, MapLibreParadasLayer } from './MapLibreParadasLayer';
 import { MapLibrePlannerOverlay } from './MapLibrePlannerOverlay';
-import { MapLibrePrediosLayer } from './MapLibrePrediosLayer';
+import { CardPredio, MapLibrePrediosLayer, type PredioInfo } from './MapLibrePrediosLayer';
 import { MapLibreRotasLayer } from './MapLibreRotasLayer';
 import { MapLibreUserMarker } from './MapLibreUserMarker';
 
@@ -96,6 +96,7 @@ export function MapLibreView({
   const [is3d, setIs3d] = useState(false);
   const [tileProvider] = useState<TileProviderKey>(getStoredProvider);
   const [paradaAberta, setParadaAberta] = useState<Parada | null>(null);
+  const [predioAberto, setPredioAberto] = useState<PredioInfo | null>(null);
 
   const mapStyle = useMemo(() => {
     const provider = TILE_PROVIDERS[tileProvider];
@@ -253,7 +254,7 @@ export function MapLibreView({
           <MapLibreGpsRouteOverlay linha={linhaSelecionada} />
         )}
 
-        <MapLibrePrediosLayer pitch={pitch} />
+        <MapLibrePrediosLayer pitch={pitch} onPredioClicado={setPredioAberto} />
 
         <MapLibreRotasLayer linha={linhaSelecionada} />
 
@@ -353,6 +354,31 @@ export function MapLibreView({
             </div>
             <div className="overflow-y-auto">
               <ConteudoPopupParada parada={paradaAberta} onClose={() => setParadaAberta(null)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Card do prédio — bottom sheet fora do <Map> para não ser clipado */}
+      {predioAberto && (
+        <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center">
+          <div
+            className="w-full max-w-sm flex flex-col rounded-t-2xl bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.18)] ring-1 ring-card-border"
+            style={{ maxHeight: 'min(60vh, 400px)' }}
+          >
+            <div className="relative flex items-center justify-center border-b border-card-border px-4 py-2.5">
+              <div className="h-1 w-10 rounded-full bg-card-border" aria-hidden="true" />
+              <button
+                type="button"
+                onClick={() => setPredioAberto(null)}
+                aria-label="Fechar card do prédio"
+                className="absolute right-2 flex size-8 items-center justify-center rounded-full text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              >
+                <X size={16} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="overflow-y-auto">
+              <CardPredio predio={predioAberto} onClose={() => setPredioAberto(null)} />
             </div>
           </div>
         </div>

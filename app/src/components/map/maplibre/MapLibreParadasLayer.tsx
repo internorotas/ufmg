@@ -194,7 +194,7 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
     <section
       data-slot="container"
       aria-labelledby={headingId}
-      className="flex w-[min(17rem,76vw)] flex-col gap-3 p-3 pt-4 text-text-primary"
+      className="flex w-full flex-col gap-3 p-3 pt-4 text-text-primary"
     >
       <header data-slot="header" className="flex items-start gap-3">
         <span
