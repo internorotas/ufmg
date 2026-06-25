@@ -1,0 +1,112 @@
+import { resolveApiEndpoint } from './apiClient';
+
+export interface GtfsRoute {
+  route_id: string;
+  short_name?: string;
+  long_name: string;
+  route_type: number;
+  route_color?: string;
+  route_text_color?: string;
+}
+
+export interface GtfsStop {
+  stop_id: string;
+  stop_name: string;
+  stop_lat: number;
+  stop_lon: number;
+  zone_id?: string;
+}
+
+export interface GtfsShape {
+  shape_id: string;
+  shape_pt_lat: number;
+  shape_pt_lon: number;
+  shape_pt_sequence: number;
+  shape_dist_traveled?: number;
+}
+
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const routesCache = new Map<string, { data: GtfsRoute[]; expires: number }>();
+const stopsCache = new Map<string, { data: GtfsStop[]; expires: number }>();
+const shapesCache = new Map<string, { data: GtfsShape[]; expires: number }>();
+
+export async function fetchGtfsRoutes(): Promise<GtfsRoute[]> {
+  const cached = routesCache.get('all');
+  if (cached && Date.now() < cached.expires) {
+    return cached.data;
+  }
+
+  const endpoint = resolveApiEndpoint('/api/gtfs/routes');
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    cache: 'no-store',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erro HTTP ${response.status} em ${endpoint}`);
+  }
+
+  const data = (await response.json()) as GtfsRoute[];
+  routesCache.set('all', { data, expires: Date.now() + CACHE_TTL_MS });
+  return data;
+}
+
+export async function fetchGtfsStops(routeId: string): Promise<GtfsStop[]> {
+  const cached = stopsCache.get(routeId);
+  if (cached && Date.now() < cached.expires) {
+    return cached.data;
+  }
+
+  const endpoint = resolveApiEndpoint(`/api/gtfs/routes/${routeId}/stops`);
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    cache: 'no-store',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erro HTTP ${response.status} em ${endpoint}`);
+  }
+
+  const data = (await response.json()) as GtfsStop[];
+  stopsCache.set(routeId, { data, expires: Date.now() + CACHE_TTL_MS });
+  return data;
+}
+
+export async function fetchGtfsShape(routeId: string): Promise<GtfsShape[]> {
+  const cached = shapesCache.get(routeId);
+  if (cached && Date.now() < cached.expires) {
+    return cached.data;
+  }
+
+  const endpoint = resolveApiEndpoint(`/api/gtfs/routes/${routeId}/shape`);
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    cache: 'no-store',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erro HTTP ${response.status} em ${endpoint}`);
+  }
+
+  const data = (await response.json()) as GtfsShape[];
+  shapesCache.set(routeId, { data, expires: Date.now() + CACHE_TTL_MS });
+  return data;
+}
+
+export async function searchGtfsStops(query: string): Promise<GtfsStop[]> {
+  const endpoint = resolveApiEndpoint(`/api/gtfs/stops/search?q=${encodeURIComponent(query)}`);
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    cache: 'no-store',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erro HTTP ${response.status} em ${endpoint}`);
+  }
+
+  return (await response.json()) as GtfsStop[];
+}
