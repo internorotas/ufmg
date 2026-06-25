@@ -268,6 +268,7 @@ function LineCardComponent({
         onClick={handleCardClick}
         aria-pressed={isSelected}
         aria-describedby={getLineDescriptionId(linha.idRota)}
+        aria-label={`Selecionar linha ${linha.nome}`}
         className="w-full cursor-pointer text-left focus-visible:outline-none"
       >
         <div data-slot="header" className="relative w-full p-4 pb-3 text-left">
