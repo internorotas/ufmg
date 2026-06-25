@@ -274,7 +274,7 @@ export function MapLibreView({
 
         <MapLibrePrediosLayer pitch={pitch} onPredioClicado={openPredio} />
 
-        <MapLibreRotasLayer linha={linhaSelecionada} />
+        <MapLibreRotasLayer key={linhaSelecionada?.idRota ?? '__none__'} linha={linhaSelecionada} />
 
         <MapLibreParadasLayer
           paradas={todasParadas}
