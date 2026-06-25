@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "pnpm -C app run build",
+    "build": "pnpm run build",
     "format": "biome format --write .",
     "lint": "biome lint .",
     "check": "biome check --write --unsafe .",
