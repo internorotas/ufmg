@@ -1,4 +1,28 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /pesquisa
+Disallow: /perfil
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Gemini
+Allow: /
 
 Sitemap: https://internorotas.github.io/ufmg/sitemap.xml

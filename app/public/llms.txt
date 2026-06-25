@@ -1,0 +1,42 @@
+# Interno Rotas
+
+> Aplicativo de transporte universitário em tempo real para o campus da UFMG (Universidade Federal de Minas Gerais), em Belo Horizonte, Minas Gerais, Brasil.
+
+Interno Rotas é uma Progressive Web App (PWA) gratuita que permite a estudantes, professores e funcionários da UFMG consultar em tempo real as linhas, paradas, horários e rotas do transporte universitário interno do campus Pampulha. Também integra dados de ônibus urbanos da BHTrans que circulam pela região do campus.
+
+## Funcionalidades principais
+
+- Mapa interativo com todas as linhas e paradas do campus
+- Localização em tempo real dos ônibus via GPS
+- Previsão de chegada nas paradas
+- Integração com linhas urbanas BHTrans próximas ao campus
+- Planejador de trajetos entre pontos do campus
+- Favoritos e histórico de linhas utilizadas
+- Modo offline com dados em cache via PWA
+
+## Páginas
+
+- [Mapa e início](https://internorotas.github.io/ufmg/): Mapa interativo principal com localização dos ônibus em tempo real e paradas do campus
+- [Linhas](https://internorotas.github.io/ufmg/linhas): Listagem e busca de todas as linhas de transporte universitário disponíveis no campus
+- [Sobre](https://internorotas.github.io/ufmg/sobre): Informações sobre o projeto Interno Rotas, créditos e links úteis
+- [Ranking](https://internorotas.github.io/ufmg/ranking): Ranking de contribuição dos usuários do sistema
+
+## Contexto institucional
+
+- **Instituição**: UFMG — Universidade Federal de Minas Gerais
+- **Campus**: Campus Pampulha, Belo Horizonte, MG, Brasil
+- **Coordenadas**: -19.8700, -43.9689
+- **Público-alvo**: Estudantes, professores e servidores da UFMG
+- **Operadora de transporte**: Transporte Universitário UFMG (ônibus internos) + BHTrans (ônibus urbanos)
+
+## Informações técnicas
+
+- **Tipo**: Progressive Web App (PWA), gratuita e sem fins lucrativos
+- **Tecnologia**: React 19, Vite, MapLibre GL, TypeScript
+- **API pública**: https://interno-rotas-api.onrender.com
+- **Idioma**: Português Brasileiro (pt-BR)
+- **Código-fonte**: Disponível no GitHub em github.com/internorotas
+
+## Sobre o projeto
+
+Interno Rotas foi criado para resolver a falta de visibilidade dos horários e localização dos ônibus internos da UFMG. O sistema coleta dados de GPS dos veículos em tempo real e exibe no mapa, permitindo que os usuários saibam exatamente onde está o ônibus e quando ele chegará à sua parada.

@@ -23,11 +23,16 @@
     />
     <meta
       name="keywords"
-      content="ônibus, linha, rotas, horários, mapa, transporte universitário, campus"
+      content="ônibus UFMG, transporte universitário UFMG, linhas de ônibus campus Pampulha, horários ônibus universitário, mapa ônibus UFMG, Interno Rotas, Universidade Federal de Minas Gerais, BHTrans UFMG, rotas campus UFMG, Belo Horizonte transporte universitário"
     />
     <meta name="author" content="Igor Martins" />
     <meta name="robots" content="index, follow" />
+    <meta name="geo.region" content="BR-MG" />
+    <meta name="geo.placename" content="Belo Horizonte, Minas Gerais, Brasil" />
+    <meta name="geo.position" content="-19.8700;-43.9689" />
+    <meta name="ICBM" content="-19.8700, -43.9689" />
     <link rel="canonical" href="https://internorotas.github.io/ufmg/" />
+    <link rel="llms" href="https://internorotas.github.io/ufmg/llms.txt" type="text/plain" />
 
     <!-- Pré-resolve DNS do servidor de tiles do mapa antes da interação -->
     <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
@@ -89,37 +94,99 @@
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Interno Rotas",
-        "alternateName": "Transporte universitário em tempo real",
-        "url": "https://internorotas.github.io/ufmg/",
-        "description": "Mapa interativo com rotas, paradas e horários em tempo real do transporte universitário.",
-        "applicationCategory": "TransportationApplication",
-        "operatingSystem": "Web",
-        "inLanguage": "pt-BR",
-        "isAccessibleForFree": true,
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "BRL"
+      [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "Interno Rotas",
+          "alternateName": "Transporte universitário UFMG em tempo real",
+          "url": "https://internorotas.github.io/ufmg/",
+          "description": "Mapa interativo com rotas, paradas e horários em tempo real do transporte universitário da UFMG (Universidade Federal de Minas Gerais) no campus Pampulha, Belo Horizonte.",
+          "applicationCategory": "TransportationApplication",
+          "operatingSystem": "Web, Android, iOS",
+          "inLanguage": "pt-BR",
+          "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "BRL"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "Igor Martins"
+          },
+          "provider": {
+            "@type": "EducationalOrganization",
+            "name": "Universidade Federal de Minas Gerais",
+            "alternateName": "UFMG",
+            "url": "https://ufmg.br",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Av. Antônio Carlos, 6627",
+              "addressLocality": "Belo Horizonte",
+              "addressRegion": "MG",
+              "postalCode": "31270-901",
+              "addressCountry": "BR"
+            }
+          },
+          "spatialCoverage": {
+            "@type": "Place",
+            "name": "Campus Pampulha — UFMG",
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": -19.8700,
+              "longitude": -43.9689
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Belo Horizonte",
+              "addressRegion": "MG",
+              "addressCountry": "BR"
+            }
+          },
+          "featureList": [
+            "Mapa interativo das linhas de ônibus da UFMG",
+            "Localização em tempo real dos ônibus via GPS",
+            "Previsão de chegada nas paradas",
+            "Integração com linhas BHTrans próximas ao campus",
+            "Planejador de trajetos entre pontos do campus",
+            "Itinerário detalhado das paradas",
+            "Filtro por linha e destino",
+            "Modo offline com dados em cache"
+          ],
+          "keywords": "ônibus UFMG, transporte universitário, campus Pampulha, BHTrans, Belo Horizonte, horários ônibus"
         },
-        "author": {
-          "@type": "Person",
-          "name": "Igor Martins"
-        },
-        "about": {
-          "@type": "EducationalOrganization",
-          "name": "Instituição participante do Interno Rotas"
-        },
-        "featureList": [
-          "Mapa interativo das linhas de ônibus",
-          "Horários em tempo real com previsão de chegada",
-          "Itinerário detalhado das paradas",
-          "Filtro por linha e destino"
-        ]
-      }
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Como ver os horários do ônibus da UFMG?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Acesse o Interno Rotas em internorotas.github.io/ufmg, abra a aba de Linhas e selecione a linha desejada para ver o itinerário e os horários em tempo real."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Quais linhas de ônibus atendem o campus da UFMG?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "O campus Pampulha da UFMG é atendido por linhas de transporte universitário interno operadas pela própria universidade, além de linhas urbanas da BHTrans. O Interno Rotas lista todas essas linhas com paradas, horários e rastreamento em tempo real."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "O Interno Rotas é gratuito?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim, o Interno Rotas é completamente gratuito, sem anúncios e sem fins lucrativos, desenvolvido para a comunidade da UFMG."
+              }
+            }
+          ]
+        }
+      ]
     </script>
   </head>
 
