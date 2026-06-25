@@ -333,6 +333,33 @@ export function AdminParadasTab({
                 />
               </div>
 
+              {/* Linhas BHTrans */}
+              <div>
+                <label
+                  htmlFor="ap-bhtrans"
+                  className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide"
+                >
+                  Linhas BHTrans{' '}
+                  <span className="normal-case font-normal">(separadas por vírgula, ex: 9502, 5102)</span>
+                </label>
+                <input
+                  id="ap-bhtrans"
+                  type="text"
+                  value={(selected.bhtransLinhas ?? []).join(', ')}
+                  onChange={(e) =>
+                    update({
+                      ...selected,
+                      bhtransLinhas: e.target.value
+                        .split(',')
+                        .map((s) => s.trim())
+                        .filter(Boolean),
+                    })
+                  }
+                  placeholder="ex: 9502, 5102, S53"
+                  className="w-full h-9 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                />
+              </div>
+
               {/* Coordenadas */}
               <div>
                 <span className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide">

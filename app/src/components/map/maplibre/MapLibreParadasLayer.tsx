@@ -83,7 +83,7 @@ export function MapLibreParadasLayer({ paradas, paradaDestacadaId, onParadaClica
           latitude={paradaClicada.latitude}
           onClose={() => setParadaClicada(null)}
           closeButton
-          closeOnClick={false}
+          closeOnClick={true}
           maxWidth="300px"
           offset={[0, -35] as [number, number]}
         >
@@ -294,6 +294,29 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
                 </li>
               );
             })}
+          </ul>
+        </section>
+      ) : null}
+
+      {parada.bhtransLinhas && parada.bhtransLinhas.length > 0 ? (
+        <section data-slot="bhtrans-lines" className="border-t border-card-border pt-3">
+          <div className="mb-2 flex items-center gap-2">
+            <span
+              aria-hidden="true"
+              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-orange-500 text-white shadow-sm"
+            >
+              <Bus size={14} />
+            </span>
+            <p className="text-xs font-semibold text-text-primary">Linhas BHTrans que param aqui</p>
+          </div>
+          <ul className="flex flex-wrap gap-1.5" aria-label="Linhas BHTrans">
+            {parada.bhtransLinhas.map((linha) => (
+              <li key={linha}>
+                <span className="rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-semibold text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                  {linha}
+                </span>
+              </li>
+            ))}
           </ul>
         </section>
       ) : null}

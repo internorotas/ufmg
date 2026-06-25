@@ -60,6 +60,7 @@ export interface Parada {
   idParada: string;
   nome: string;
   linhasAtendidas: string[];
+  bhtransLinhas?: string[];
   categoria: string;
   descricao: string;
   // Corrigido: Tupla explícita

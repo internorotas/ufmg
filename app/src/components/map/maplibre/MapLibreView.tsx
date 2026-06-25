@@ -99,6 +99,22 @@ export function MapLibreView({
   const [paradaAberta, setParadaAberta] = useState<Parada | null>(null);
   const [predioAberto, setPredioAberto] = useState<PredioInfo | null>(null);
 
+  // Exclusão mútua: abrir parada fecha prédio e vice-versa
+  const openParada = useCallback((parada: Parada | null) => {
+    setParadaAberta(parada);
+    if (parada) setPredioAberto(null);
+  }, []);
+
+  const openPredio = useCallback((predio: PredioInfo | null) => {
+    setPredioAberto(predio);
+    if (predio) setParadaAberta(null);
+  }, []);
+
+  const handleMapClick = useCallback(() => {
+    setParadaAberta(null);
+    setPredioAberto(null);
+  }, []);
+
   const mapStyle = useMemo(() => {
     const provider = TILE_PROVIDERS[tileProvider];
     const tiles = toMaplibreTiles(provider.url);
@@ -248,6 +264,7 @@ export function MapLibreView({
         onPitch={(e) => setPitch(e.target.getPitch())}
         onRotate={(e) => setBearing(e.target.getBearing())}
         attributionControl={false}
+        onClick={handleMapClick}
       >
         <MapLibrePlannerOverlay />
 
@@ -255,14 +272,14 @@ export function MapLibreView({
           <MapLibreGpsRouteOverlay linha={linhaSelecionada} />
         )}
 
-        <MapLibrePrediosLayer pitch={pitch} onPredioClicado={setPredioAberto} />
+        <MapLibrePrediosLayer pitch={pitch} onPredioClicado={openPredio} />
 
         <MapLibreRotasLayer linha={linhaSelecionada} />
 
         <MapLibreParadasLayer
           paradas={todasParadas}
           paradaDestacadaId={paradaDestacadaId}
-          onParadaClicada={setParadaAberta}
+          onParadaClicada={openParada}
         />
 
         <MapLibreAllBusMarkers
@@ -338,7 +355,10 @@ export function MapLibreView({
 
       {/* Card da parada — renderizado fora do <Map> para não ser clipado */}
       {paradaAberta && (
-        <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center">
+        <div
+          className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div
             className="w-full max-w-sm flex flex-col rounded-t-2xl bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.18)] ring-1 ring-card-border"
             style={{ maxHeight: 'min(78vh, 560px)' }}
@@ -348,7 +368,7 @@ export function MapLibreView({
               <div className="h-1 w-10 rounded-full bg-card-border" aria-hidden="true" />
               <button
                 type="button"
-                onClick={() => setParadaAberta(null)}
+                onClick={() => openParada(null)}
                 aria-label="Fechar card da parada"
                 className="absolute right-2 flex size-8 items-center justify-center rounded-full text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
               >
@@ -356,7 +376,7 @@ export function MapLibreView({
               </button>
             </div>
             <div className="overflow-y-auto">
-              <ConteudoPopupParada parada={paradaAberta} onClose={() => setParadaAberta(null)} />
+              <ConteudoPopupParada parada={paradaAberta} onClose={() => openParada(null)} />
             </div>
           </div>
         </div>
@@ -364,16 +384,19 @@ export function MapLibreView({
 
       {/* Card do prédio — bottom sheet fora do <Map> para não ser clipado */}
       {predioAberto && (
-        <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center">
+        <div
+          className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div
             className="w-full max-w-sm flex flex-col rounded-t-2xl bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.18)] ring-1 ring-card-border"
-            style={{ maxHeight: 'min(60vh, 400px)' }}
+            style={{ maxHeight: 'min(72vh, 500px)' }}
           >
             <div className="relative flex items-center justify-center border-b border-card-border px-4 py-2.5">
               <div className="h-1 w-10 rounded-full bg-card-border" aria-hidden="true" />
               <button
                 type="button"
-                onClick={() => setPredioAberto(null)}
+                onClick={() => openPredio(null)}
                 aria-label="Fechar card do prédio"
                 className="absolute right-2 flex size-8 items-center justify-center rounded-full text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
               >
@@ -381,7 +404,7 @@ export function MapLibreView({
               </button>
             </div>
             <div className="overflow-y-auto">
-              <CardPredio predio={predioAberto} onClose={() => setPredioAberto(null)} />
+              <CardPredio predio={predioAberto} onClose={() => openPredio(null)} />
             </div>
           </div>
         </div>

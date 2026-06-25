@@ -7,6 +7,7 @@ import type { CategoriaLinhas, Parada } from '../../types/data.types';
 import { AdminLinhasTab } from './AdminLinhasTab';
 import { AdminMobilidadeTab } from './AdminMobilidadeTab';
 import { AdminParadasTab } from './AdminParadasTab';
+import { AdminPrediosTab } from './AdminPrediosTab';
 
 function downloadFile(fileName: string, content: string) {
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
@@ -19,7 +20,7 @@ function downloadFile(fileName: string, content: string) {
 }
 
 export function AdminLayout() {
-  const [activeTab, setActiveTab] = useState<'paradas' | 'linhas' | 'mobilidade'>('paradas');
+  const [activeTab, setActiveTab] = useState<'paradas' | 'linhas' | 'predios' | 'mobilidade'>('paradas');
 
   const {
     state: paradasState,
@@ -44,6 +45,7 @@ export function AdminLayout() {
   const isParadasTab = activeTab === 'paradas';
   const isLinhasTab = activeTab === 'linhas';
   const isMobilidadeTab = activeTab === 'mobilidade';
+  const isPrediosTab = activeTab === 'predios';
   const canUndo = isLinhasTab ? canUndoLinhas : canUndoParadas;
   const canRedo = isLinhasTab ? canRedoLinhas : canRedoParadas;
   const changesCount = isLinhasTab ? undoCountLinhas : undoCountParadas;
@@ -120,6 +122,7 @@ export function AdminLayout() {
             [
               { id: 'paradas', label: 'Paradas' },
               { id: 'linhas', label: 'Linhas' },
+              { id: 'predios', label: 'Prédios' },
               { id: 'mobilidade', label: 'Mobilidade' },
             ] as const
           ).map(({ id, label }, i) => (
@@ -138,8 +141,8 @@ export function AdminLayout() {
           ))}
         </div>
 
-        {/* Indicador de alterações — oculto na aba de mobilidade (sem edições locais) */}
-        {!isMobilidadeTab && changesCount > 0 && (
+        {/* Indicador de alterações — oculto em abas sem edição local */}
+        {!isMobilidadeTab && !isPrediosTab && changesCount > 0 && (
           <span className="px-2 py-0.5 text-xs bg-warning-bg text-warning-text border border-warning-border rounded">
             {changesCount} {changesCount === 1 ? 'alteração' : 'alterações'}
           </span>
@@ -147,8 +150,8 @@ export function AdminLayout() {
 
         <div className="flex-1" />
 
-        {/* Desfazer / Refazer — oculto na aba mobilidade */}
-        {!isMobilidadeTab && (
+        {/* Desfazer / Refazer — oculto em abas sem edição local */}
+        {!isMobilidadeTab && !isPrediosTab && (
           <div className="flex gap-1">
             <button
               type="button"
@@ -171,8 +174,8 @@ export function AdminLayout() {
           </div>
         )}
 
-        {/* Exportar — oculto na aba mobilidade */}
-        {!isMobilidadeTab && (
+        {/* Exportar — oculto em abas sem edição local */}
+        {!isMobilidadeTab && !isPrediosTab && (
           <div className="flex gap-1 border-l border-card-border pl-2">
             <button
               type="button"
@@ -208,6 +211,8 @@ export function AdminLayout() {
       <div className="flex flex-1 overflow-hidden">
         {isMobilidadeTab ? (
           <AdminMobilidadeTab />
+        ) : isPrediosTab ? (
+          <AdminPrediosTab />
         ) : isParadasTab ? (
           <AdminParadasTab
             paradas={paradasState}
