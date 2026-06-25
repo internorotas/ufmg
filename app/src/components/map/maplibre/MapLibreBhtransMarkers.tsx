@@ -56,7 +56,7 @@ export function MapLibreBhtransMarkers() {
           longitude={pos.lng}
           latitude={pos.lat}
           anchor="center"
-          onClick={() => setSelectedId(pos.vehicleId)}
+          onClick={(e) => { e.originalEvent.stopPropagation(); setSelectedId(pos.vehicleId); }}
         >
           <BhtransIcon />
         </Marker>
