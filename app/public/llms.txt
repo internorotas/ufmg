@@ -16,10 +16,10 @@ Interno Rotas é uma Progressive Web App (PWA) gratuita que permite a estudantes
 
 ## Páginas
 
-- [Mapa e início](https://internorotas.github.io/ufmg/): Mapa interativo principal com localização dos ônibus em tempo real e paradas do campus
-- [Linhas](https://internorotas.github.io/ufmg/linhas): Listagem e busca de todas as linhas de transporte universitário disponíveis no campus
-- [Sobre](https://internorotas.github.io/ufmg/sobre): Informações sobre o projeto Interno Rotas, créditos e links úteis
-- [Ranking](https://internorotas.github.io/ufmg/ranking): Ranking de contribuição dos usuários do sistema
+- [Mapa e início](https://internorotas.com/): Mapa interativo principal com localização dos ônibus em tempo real e paradas do campus
+- [Linhas](https://internorotas.com/linhas): Listagem e busca de todas as linhas de transporte universitário disponíveis no campus
+- [Sobre](https://internorotas.com/sobre): Informações sobre o projeto Interno Rotas, créditos e links úteis
+- [Ranking](https://internorotas.com/ranking): Ranking de contribuição dos usuários do sistema
 
 ## Contexto institucional
 

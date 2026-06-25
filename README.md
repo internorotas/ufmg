@@ -13,7 +13,7 @@
 [![License](https://img.shields.io/github/license/internorotas/ufmg?style=flat-square)](https://github.com/internorotas/ufmg/blob/main/LICENSE)
 [![Repo Size](https://img.shields.io/github/repo-size/internorotas/ufmg?style=flat-square)](https://github.com/internorotas/ufmg)
 
-**[🌐 Acessar Aplicação](https://internorotas.github.io/ufmg/)** ·
+**[🌐 Acessar Aplicação](https://internorotas.com/)** ·
 **[🐛 Reportar Bug](https://forms.gle/5e9MHq9pp1p8T5Px5)** ·
 **[💡 Sugerir Feature](https://github.com/internorotas/ufmg/issues)**
 

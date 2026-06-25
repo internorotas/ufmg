@@ -23,4 +23,4 @@ Allow: /
 User-agent: Gemini
 Allow: /
 
-Sitemap: https://internorotas.github.io/ufmg/sitemap.xml
+Sitemap: https://internorotas.com/sitemap.xml

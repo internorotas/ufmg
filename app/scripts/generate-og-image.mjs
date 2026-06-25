@@ -145,7 +145,7 @@ const html = `<!DOCTYPE html>
       <p class="subtitle">Mapa interativo e horários dos ônibus internos em tempo real</p>
       <div class="url">
         <span class="dot"></span>
-        internorotas.github.io/ufmg
+        internorotas.com
       </div>
     </div>
     <div class="icon-area">
