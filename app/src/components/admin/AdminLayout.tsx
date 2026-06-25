@@ -5,6 +5,7 @@ import dataParadas from '../../data/paradas';
 import { useUndoRedo } from '../../hooks/useUndoRedo';
 import type { CategoriaLinhas, Parada } from '../../types/data.types';
 import { AdminLinhasTab } from './AdminLinhasTab';
+import { AdminMobilidadeTab } from './AdminMobilidadeTab';
 import { AdminParadasTab } from './AdminParadasTab';
 
 function downloadFile(fileName: string, content: string) {
@@ -18,7 +19,7 @@ function downloadFile(fileName: string, content: string) {
 }
 
 export function AdminLayout() {
-  const [activeTab, setActiveTab] = useState<'paradas' | 'linhas'>('paradas');
+  const [activeTab, setActiveTab] = useState<'paradas' | 'linhas' | 'mobilidade'>('paradas');
 
   const {
     state: paradasState,
@@ -41,19 +42,21 @@ export function AdminLayout() {
   } = useUndoRedo<CategoriaLinhas>(dataLinhas);
 
   const isParadasTab = activeTab === 'paradas';
-  const canUndo = isParadasTab ? canUndoParadas : canUndoLinhas;
-  const canRedo = isParadasTab ? canRedoParadas : canRedoLinhas;
-  const changesCount = isParadasTab ? undoCountParadas : undoCountLinhas;
+  const isLinhasTab = activeTab === 'linhas';
+  const isMobilidadeTab = activeTab === 'mobilidade';
+  const canUndo = isLinhasTab ? canUndoLinhas : canUndoParadas;
+  const canRedo = isLinhasTab ? canRedoLinhas : canRedoParadas;
+  const changesCount = isLinhasTab ? undoCountLinhas : undoCountParadas;
 
   const handleUndo = useCallback(() => {
-    if (isParadasTab) undoParadas();
-    else undoLinhas();
-  }, [isParadasTab, undoParadas, undoLinhas]);
+    if (isLinhasTab) undoLinhas();
+    else undoParadas();
+  }, [isLinhasTab, undoLinhas, undoParadas]);
 
   const handleRedo = useCallback(() => {
-    if (isParadasTab) redoParadas();
-    else redoLinhas();
-  }, [isParadasTab, redoParadas, redoLinhas]);
+    if (isLinhasTab) redoLinhas();
+    else redoParadas();
+  }, [isLinhasTab, redoLinhas, redoParadas]);
 
   // Atalhos de teclado: ignora quando o foco está em um campo de texto
   useEffect(() => {
@@ -113,32 +116,30 @@ export function AdminLayout() {
 
         {/* Seletor de aba */}
         <div className="flex neo-brutal-sm overflow-hidden text-xs font-medium">
-          <button
-            type="button"
-            onClick={() => setActiveTab('paradas')}
-            className={`px-3 py-1.5 transition-colors ${
-              isParadasTab
-                ? 'bg-brand-primary text-text-inverse'
-                : 'text-text-secondary hover:bg-background-secondary'
-            }`}
-          >
-            Paradas
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('linhas')}
-            className={`px-3 py-1.5 transition-colors border-l border-card-border ${
-              !isParadasTab
-                ? 'bg-brand-primary text-text-inverse'
-                : 'text-text-secondary hover:bg-background-secondary'
-            }`}
-          >
-            Linhas
-          </button>
+          {(
+            [
+              { id: 'paradas', label: 'Paradas' },
+              { id: 'linhas', label: 'Linhas' },
+              { id: 'mobilidade', label: 'Mobilidade' },
+            ] as const
+          ).map(({ id, label }, i) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setActiveTab(id)}
+              className={`px-3 py-1.5 transition-colors ${i > 0 ? 'border-l border-card-border' : ''} ${
+                activeTab === id
+                  ? 'bg-brand-primary text-text-inverse'
+                  : 'text-text-secondary hover:bg-background-secondary'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* Indicador de alterações */}
-        {changesCount > 0 && (
+        {/* Indicador de alterações — oculto na aba de mobilidade (sem edições locais) */}
+        {!isMobilidadeTab && changesCount > 0 && (
           <span className="px-2 py-0.5 text-xs bg-warning-bg text-warning-text border border-warning-border rounded">
             {changesCount} {changesCount === 1 ? 'alteração' : 'alterações'}
           </span>
@@ -146,62 +147,68 @@ export function AdminLayout() {
 
         <div className="flex-1" />
 
-        {/* Desfazer / Refazer */}
-        <div className="flex gap-1">
-          <button
-            type="button"
-            onClick={handleUndo}
-            disabled={!canUndo}
-            title="Desfazer (Ctrl+Z)"
-            className={`${btnBase} border-card-border hover:enabled:bg-background-secondary`}
-          >
-            ↩ Desfazer
-          </button>
-          <button
-            type="button"
-            onClick={handleRedo}
-            disabled={!canRedo}
-            title="Refazer (Ctrl+Y)"
-            className={`${btnBase} border-card-border hover:enabled:bg-background-secondary`}
-          >
-            ↪ Refazer
-          </button>
-        </div>
+        {/* Desfazer / Refazer — oculto na aba mobilidade */}
+        {!isMobilidadeTab && (
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={handleUndo}
+              disabled={!canUndo}
+              title="Desfazer (Ctrl+Z)"
+              className={`${btnBase} border-card-border hover:enabled:bg-background-secondary`}
+            >
+              ↩ Desfazer
+            </button>
+            <button
+              type="button"
+              onClick={handleRedo}
+              disabled={!canRedo}
+              title="Refazer (Ctrl+Y)"
+              className={`${btnBase} border-card-border hover:enabled:bg-background-secondary`}
+            >
+              ↪ Refazer
+            </button>
+          </div>
+        )}
 
-        {/* Exportar */}
-        <div className="flex gap-1 border-l border-card-border pl-2">
-          <button
-            type="button"
-            onClick={exportParadas}
-            title="Baixar paradas.ts atualizado"
-            className={`${btnBase} border-card-border hover:bg-background-secondary`}
-          >
-            ↓ paradas.ts
-          </button>
-          <button
-            type="button"
-            onClick={exportLinhas}
-            title="Baixar linhas.ts atualizado"
-            className={`${btnBase} border-card-border hover:bg-background-secondary`}
-          >
-            ↓ linhas.ts
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              exportParadas();
-              exportLinhas();
-            }}
-            className="px-3 py-1.5 text-xs neo-brutal-sm font-semibold bg-brand-primary text-text-inverse hover:opacity-90 transition-opacity"
-          >
-            ↓ Exportar Tudo
-          </button>
-        </div>
+        {/* Exportar — oculto na aba mobilidade */}
+        {!isMobilidadeTab && (
+          <div className="flex gap-1 border-l border-card-border pl-2">
+            <button
+              type="button"
+              onClick={exportParadas}
+              title="Baixar paradas.ts atualizado"
+              className={`${btnBase} border-card-border hover:bg-background-secondary`}
+            >
+              ↓ paradas.ts
+            </button>
+            <button
+              type="button"
+              onClick={exportLinhas}
+              title="Baixar linhas.ts atualizado"
+              className={`${btnBase} border-card-border hover:bg-background-secondary`}
+            >
+              ↓ linhas.ts
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                exportParadas();
+                exportLinhas();
+              }}
+              className="px-3 py-1.5 text-xs neo-brutal-sm font-semibold bg-brand-primary text-text-inverse hover:opacity-90 transition-opacity"
+            >
+              ↓ Exportar Tudo
+            </button>
+          </div>
+        )}
       </header>
 
       {/* Conteúdo da aba */}
       <div className="flex flex-1 overflow-hidden">
-        {isParadasTab ? (
+        {isMobilidadeTab ? (
+          <AdminMobilidadeTab />
+        ) : isParadasTab ? (
           <AdminParadasTab
             paradas={paradasState}
             setParadas={setParadasState}
