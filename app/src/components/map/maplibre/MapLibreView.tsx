@@ -19,6 +19,7 @@ import type { Linha, Parada } from '@/types/data.types';
 import { MapPitchHint } from '../MapPitchHint';
 import { TILE_PROVIDERS, type TileProviderKey } from '../TileSwitcher';
 import { MapLibreAllBusMarkers } from './MapLibreAllBusMarkers';
+import { MapLibreBhtransMarkers } from './MapLibreBhtransMarkers';
 import { MapLibreGpsLiveBusMarker } from './MapLibreGpsLiveBusMarker';
 import { MapLibreGpsRouteOverlay } from './MapLibreGpsRouteOverlay';
 import { ConteudoPopupParada, MapLibreParadasLayer } from './MapLibreParadasLayer';
@@ -269,6 +270,8 @@ export function MapLibreView({
           todasParadas={todasParadas}
           linhaNumeroExcluido={linhaSelecionada?.linha ?? null}
         />
+
+        <MapLibreBhtransMarkers />
 
         {linhaSelecionada && (
           <MapLibreGpsLiveBusMarker
