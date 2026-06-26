@@ -61,12 +61,28 @@ export default defineConfig({
     },
   },
   server: {
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google-analytics.com https://*.analytics.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org https://*.google-analytics.com; connect-src 'self' ws: wss: https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com;",
+    },
     fs: {
       // Permite que o servidor de desenvolvimento acesse o workspace e o
       // node_modules compartilhado na raiz do monorepo. Sem isso, os arquivos
       // do @fontsource/poppins resolvidos via pnpm ficam fora da allow list
       // e retornam 403 no ambiente local.
       allow: ['..', '../..'],
+    },
+  },
+  preview: {
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google-analytics.com https://*.analytics.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org https://*.google-analytics.com; connect-src 'self' ws: wss: https://*.tile.openstreetmap.org https://*.google-analytics.com https://*.analytics.google.com;",
     },
   },
   define: {
