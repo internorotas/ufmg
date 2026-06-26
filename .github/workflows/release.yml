@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   build-and-deploy:
@@ -41,18 +39,20 @@ jobs:
         # Isto é o que gera a tag, atualiza o package.json e cria o CHANGELOG.md!
         run: pnpm exec semantic-release
 
-      - name: Configurar identidade do git para deploy
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-
-      - name: Deploy no GH Pages
+      - name: Build
         working-directory: ./app
         env:
           VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_API_VERSION: v1
           VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
-          VITE_BASE_PATH: /ufmg/
-        run: pnpm run deploy
+          VITE_BASE_PATH: /
+        run: pnpm build
+
+      - name: Deploy no Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=interno-rotas --branch=main
+          workingDirectory: ./app
