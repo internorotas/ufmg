@@ -133,6 +133,39 @@ function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
   return 'diasUteis';
 }
 
+const _horariosCache = new WeakMap<string[], number[]>();
+
+/**
+ * Retorna os horários válidos da linha para o dia atual em minutos com memoização via WeakMap.
+ * Essencial para evitar recálculos O(N log N) em re-renders do LineCard e filtros.
+ */
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  let horariosDia: string[] | undefined;
+
+  const horariosBrutos = linha.horarios as unknown;
+  if (Array.isArray(horariosBrutos)) {
+    horariosDia = horariosBrutos;
+  } else if (horariosBrutos && typeof horariosBrutos === 'object') {
+    const chaveDia = obterChaveDiaSemana(dataAtual);
+    horariosDia = (horariosBrutos as HorariosPorDia)[chaveDia];
+  }
+
+  if (!Array.isArray(horariosDia) || horariosDia.length === 0) {
+    return [];
+  }
+
+  let cached = _horariosCache.get(horariosDia);
+  if (cached) return cached;
+
+  cached = obterHorariosLinhaNoDia(linha, dataAtual)
+    .map(converterHoraParaMinutos)
+    .filter(Number.isFinite)
+    .sort((a, b) => a - b);
+
+  _horariosCache.set(horariosDia, cached);
+  return cached;
+}
+
 /**
  * Retorna os horários válidos da linha para o dia atual.
  * Suporta formato legado (array) e formato por dia (objeto).
