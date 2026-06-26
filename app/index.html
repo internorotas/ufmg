@@ -8,7 +8,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://lh3.googleusercontent.com https://vercel.com; connect-src 'self' https://interno-rotas-api.onrender.com wss://interno-rotas-api.onrender.com https://accounts.google.com https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://*.ingest.sentry.io https://vercel.live wss://*.pusher.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:; frame-src https://vercel.live; object-src 'none'; base-uri 'self'; form-action 'self' https://accounts.google.com;"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://lh3.googleusercontent.com https://vercel.com; connect-src 'self' https://api.internorotas.com wss://api.internorotas.com https://accounts.google.com https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://*.ingest.sentry.io https://vercel.live wss://*.pusher.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:; frame-src https://vercel.live; object-src 'none'; base-uri 'self'; form-action 'self' https://accounts.google.com;"
     />
     <meta name="google-site-verification" content="udp8Mm0bqOKj_IvRSVDX-WAy2NAgPWyLlbsmYGAicSE" />
 
@@ -48,48 +48,30 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://internorotas.com/" />
-    <meta property="og:title" content="Interno Rotas" />
+    <meta property="og:title" content="Interno Rotas — Transporte universitário da UFMG em tempo real" />
     <meta
       property="og:description"
-      content="Planeje seus trajetos no campus com o Interno Rotas. Consulte linhas, paradas e previsões em tempo real do transporte universitário."
+      content="Mapa interativo com linhas, paradas e localização em tempo real dos ônibus universitários da UFMG no campus Pampulha. Gratuito, sem anúncios."
     />
-    <meta
-      property="og:image"
-      content="https://internorotas.com/og-image.png"
-    />
-    <meta
-      property="og:image:secure_url"
-      content="https://internorotas.com/og-image.png"
-    />
-    <meta property="og:image:type" content="image/png" />
-    <meta
-      property="og:image:alt"
-      content="Interno Rotas — mapa e horários do transporte universitário"
-    />
+    <meta property="og:image" content="https://internorotas.com/og-image.svg" />
+    <meta property="og:image:secure_url" content="https://internorotas.com/og-image.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:alt" content="Interno Rotas — mapa e horários do transporte universitário da UFMG" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:site_name" content="Interno Rotas" />
 
-    <!-- Twitter -->
+    <!-- Twitter / X (usa PNG pois não suporta SVG em cards) -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta
-      property="twitter:url"
-      content="https://internorotas.com/"
-    />
-    <meta property="twitter:title" content="Interno Rotas" />
+    <meta property="twitter:url" content="https://internorotas.com/" />
+    <meta property="twitter:title" content="Interno Rotas — Transporte universitário da UFMG" />
     <meta
       property="twitter:description"
-      content="Planeje seus trajetos no campus com o Interno Rotas. Consulte linhas, paradas e previsões em tempo real do transporte universitário."
+      content="Mapa interativo com linhas, paradas e localização em tempo real dos ônibus universitários da UFMG. Gratuito, sem anúncios."
     />
-    <meta
-      property="twitter:image"
-      content="https://internorotas.com/og-image.png"
-    />
-    <meta
-      property="twitter:image:alt"
-      content="Interno Rotas — mapa e horários do transporte universitário"
-    />
+    <meta property="twitter:image" content="https://internorotas.com/android-chrome-512x512.png" />
+    <meta property="twitter:image:alt" content="Ícone do Interno Rotas — ônibus universitário da UFMG" />
     <meta property="twitter:creator" content="@titanmpolo" />
 
     <!-- Structured Data (JSON-LD) -->
