@@ -127,7 +127,7 @@ test('security – Authorization header não aparece em requests para domínios 
     // Qualquer request com Auth que não seja para a API do projeto
     if (
       authHeader &&
-      !url.includes('interno-rotas-api.onrender.com') &&
+      !url.includes('api.internorotas.com') &&
       !url.includes('localhost') &&
       !url.includes('127.0.0.1')
     ) {
@@ -151,7 +151,7 @@ test('security – push subscription endpoint não é enviado a domínio externo
     if (
       req.method() === 'POST' &&
       body.includes('"endpoint"') &&
-      !url.includes('interno-rotas-api.onrender.com') &&
+      !url.includes('api.internorotas.com') &&
       !url.includes('localhost') &&
       !url.includes('127.0.0.1')
     ) {

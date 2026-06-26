@@ -51,7 +51,7 @@ jobs:
         working-directory: ./app
         env:
           VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
-          VITE_API_URL: https://interno-rotas-api.onrender.com
+          VITE_API_URL: https://api.internorotas.com
           VITE_API_VERSION: v1
           VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
           VITE_BASE_PATH: /ufmg/
