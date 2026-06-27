@@ -607,6 +607,8 @@ export function AdminLinhasTab({
                         ? 'bg-info-bg text-info-text border-info-border'
                         : 'border-card-border text-text-secondary hover:bg-background-secondary'
                     }`}
+                    aria-label={drawMode ? 'Parar de desenhar' : 'Desenhar nova rota'}
+                    title={drawMode ? 'Parar de desenhar' : 'Desenhar nova rota'}
                   >
                     {drawMode ? '✏️ Desenhando...' : '✏️ Desenhar'}
                   </button>
