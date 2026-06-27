@@ -168,6 +168,50 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
   return horariosDia.filter((horario) => parseHorarioValido(horario) !== null);
 }
 
+const _horariosMinutosCache = new WeakMap<string[], number[]>();
+
+/**
+ * Retorna os horários em minutos da linha para o dia atual, cacheados.
+ *
+ * @param linha Linha a ser consultada.
+ * @param dataAtual Data/hora de referência.
+ * @returns Array de minutos.
+ */
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const horariosBrutos = linha.horarios as unknown;
+  let arrayOriginal: string[] | undefined;
+
+  if (Array.isArray(horariosBrutos)) {
+    arrayOriginal = horariosBrutos;
+  } else if (horariosBrutos && typeof horariosBrutos === 'object') {
+    const horariosPorDia = horariosBrutos as HorariosPorDia;
+    const chaveDia = obterChaveDiaSemana(dataAtual);
+    const horariosDia = horariosPorDia[chaveDia];
+    if (Array.isArray(horariosDia) && horariosDia.length > 0) {
+      arrayOriginal = horariosDia;
+    }
+  }
+
+  if (!arrayOriginal) {
+    return [];
+  }
+
+  let cached = _horariosMinutosCache.get(arrayOriginal);
+  if (!cached) {
+    cached = arrayOriginal
+      .map(converterHoraParaMinutos)
+      .filter(Number.isFinite)
+      .sort((a, b) => a - b);
+    _horariosMinutosCache.set(arrayOriginal, cached);
+  }
+
+  return cached;
+}
+
 /**
  * Calcula status operacional da linha no instante atual.
  *
@@ -187,12 +231,7 @@ export function obterStatusLinha(
     return { id: 'NAO_CIRCULA_HOJE', texto: 'Não circula hoje', cor: 'danger' };
   }
 
-  const horariosHoje =
-    horariosPreCalculados ??
-    obterHorariosLinhaNoDia(linha, dataAtual)
-      .map((horario) => converterHoraParaMinutos(horario))
-      .filter((minutos) => Number.isFinite(minutos))
-      .sort((a, b) => a - b);
+  const horariosHoje = horariosPreCalculados ?? obterHorariosMinutosLinhaNoDia(linha, dataAtual);
 
   if (horariosHoje.length === 0) {
     return {
