@@ -5,7 +5,7 @@
 
 import { Bus, ChevronRight, Clock } from 'lucide-react';
 import type React from 'react';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/specialPeriods';
 import { useAnalytics } from '../hooks/useAnalytics';
@@ -16,9 +16,8 @@ import {
   findScheduleIndex,
   hexToRgba,
   minutesToTime,
-  obterHorariosLinhaNoDia,
+  obterHorariosMinutosLinhaNoDia,
   obterStatusLinha,
-  timeToMinutes,
 } from '../lib/utils';
 import type { Linha } from '../types/data.types';
 import { PrevisaoBadge } from './PrevisaoBadge';
@@ -75,19 +74,6 @@ export interface LineCardProps extends VariantProps<typeof lineCardVariants> {
   idParada?: string;
   /** Classe CSS adicional */
   className?: string;
-}
-
-/**
- * Analisa e ordena os horários em minutos.
- * Esta operação é cara (O(N log N)) e deve ser memoizada.
- */
-function parseSchedules(horarios: string[]): number[] {
-  if (!horarios || horarios.length === 0) return [];
-
-  return horarios
-    .filter((time) => time?.includes(':'))
-    .map(timeToMinutes)
-    .sort((a, b) => a - b);
 }
 
 function calculateSchedules(schedulesInMinutes: number[], currentMinutes: number): ScheduleResult {
@@ -208,10 +194,7 @@ function LineCardComponent({
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
   const getSuspendedMessage = () => getLinhaNotRunningMessage(linha.categoriaDia);
 
-  const schedulesInMinutes = useMemo(() => {
-    const horariosDoDia = obterHorariosLinhaNoDia(linha, now);
-    return parseSchedules(horariosDoDia);
-  }, [linha, now]);
+  const schedulesInMinutes = obterHorariosMinutosLinhaNoDia(linha, now);
 
   // Passa schedulesInMinutes para obterStatusLinha para evitar recálculo O(N log N)
   const statusLinha = obterStatusLinha(linha, now, schedulesInMinutes);

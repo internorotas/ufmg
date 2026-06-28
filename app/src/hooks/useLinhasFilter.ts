@@ -9,7 +9,7 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'rea
 import { useDebounce } from 'use-debounce';
 import { getCurrentSpecialPeriod } from '../config/specialPeriods';
 import { getSaoPauloDayOfWeek, getSaoPauloNow } from '../lib/time';
-import { converterHoraParaMinutos, obterHorariosLinhaNoDia, obterStatusLinha } from '../lib/utils';
+import { obterHorariosMinutosLinhaNoDia, obterStatusLinha } from '../lib/utils';
 import type { CategoriaLinhas, DadosLinhas, Linha } from '../types/data.types';
 import { useAnalytics } from './useAnalytics';
 import { useCurrentTime } from './useCurrentTime';
@@ -105,10 +105,7 @@ function sortLinhas(linhas: Linha[], agora: Date): Linha[] {
   return linhas
     .map((linha) => {
       // Pré-calcula os horários uma vez por linha para evitar recomputações redundantes no comparator
-      const horariosHoje = obterHorariosLinhaNoDia(linha, agora)
-        .map(converterHoraParaMinutos)
-        .filter(Number.isFinite)
-        .sort((a, b) => a - b);
+      const horariosHoje = obterHorariosMinutosLinhaNoDia(linha, agora);
 
       const status = obterStatusLinha(linha, agora, horariosHoje);
 
