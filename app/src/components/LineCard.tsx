@@ -267,6 +267,7 @@ function LineCardComponent({
         data-slot="select-line"
         onClick={handleCardClick}
         aria-pressed={isSelected}
+        aria-label={`Selecionar linha ${linha.nome}${linha.sublinha ? ` - ${linha.sublinha}` : ''}`}
         aria-describedby={getLineDescriptionId(linha.idRota)}
         className="w-full cursor-pointer text-left focus-visible:outline-none"
       >
