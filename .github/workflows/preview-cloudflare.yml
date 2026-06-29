@@ -46,4 +46,4 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-        run: pnpm exec wrangler pages deploy --branch=${{ github.ref_name }}
+        run: pnpm dlx wrangler pages deploy --branch=${{ github.ref_name }}
