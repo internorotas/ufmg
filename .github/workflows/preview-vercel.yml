@@ -36,6 +36,11 @@ jobs:
       - name: Instalar Vercel CLI
         run: npm install -g vercel@latest
 
+      - name: Criar .vercel/project.json
+        run: |
+          mkdir -p .vercel
+          printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
+
       - name: Pull Vercel environment (preview)
         # Roda da raiz: rootDirectory=app está nas project settings do Vercel,
         # então `vercel pull` precisa ver o repo inteiro para resolver o path.
