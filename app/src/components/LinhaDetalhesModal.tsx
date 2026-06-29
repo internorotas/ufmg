@@ -116,7 +116,6 @@ function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
         zoomControl={false}
         doubleClickZoom={false}
         keyboard={false}
-        attributionControl={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

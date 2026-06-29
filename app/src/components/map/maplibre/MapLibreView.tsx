@@ -274,7 +274,6 @@ export function MapLibreView({
         touchPitch
         onPitch={(e) => setPitch(e.target.getPitch())}
         onRotate={(e) => setBearing(e.target.getBearing())}
-        attributionControl={false}
         onClick={handleMapClick}
       >
         <MapLibrePlannerOverlay />
