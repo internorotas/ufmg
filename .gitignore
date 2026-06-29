@@ -152,4 +152,3 @@ test-results/
 *.png
 package-lock.json
 .vercel
-app/public/.well-known/security.txt
