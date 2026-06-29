@@ -46,5 +46,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy --branch=feat/integracao-geral
+          command: pages deploy --branch=${{ github.ref_name }}
           workingDirectory: ./app
