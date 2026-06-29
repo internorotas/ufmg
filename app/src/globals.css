@@ -772,7 +772,9 @@ body {
   color: var(--text-primary) !important;
   border: 1px solid var(--card-border) !important;
   border-radius: 0.5rem !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.08) !important;
   overflow: hidden;
 }
 

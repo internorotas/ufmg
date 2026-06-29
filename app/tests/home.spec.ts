@@ -82,7 +82,9 @@ test('cards – clicar em detalhes abre modal', async ({ page }) => {
 
   await firstCard.locator('button[data-slot="action"]').first().click();
   // Desktop: abre painel inline (aside > section); Mobile: abre dialog modal
-  await expect(page.locator('[role="dialog"], aside > section[aria-label]')).toBeVisible({ timeout: 8_000 });
+  await expect(page.locator('[role="dialog"], aside > section[aria-label]')).toBeVisible({
+    timeout: 8_000,
+  });
 });
 
 // ---------------------------------------------------------------------------

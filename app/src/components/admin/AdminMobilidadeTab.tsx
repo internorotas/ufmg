@@ -78,7 +78,10 @@ export function AdminMobilidadeTab() {
             {[
               { label: 'Eventos (1h)', value: data.eventos1h.toLocaleString('pt-BR') },
               { label: 'Eventos (24h)', value: data.eventos24h.toLocaleString('pt-BR') },
-              { label: 'Veículos ativos (1h)', value: data.veiculosAtivos1h.toLocaleString('pt-BR') },
+              {
+                label: 'Veículos ativos (1h)',
+                value: data.veiculosAtivos1h.toLocaleString('pt-BR'),
+              },
               {
                 label: 'Último evento',
                 value: data.ultimoEvento ? timeAgo(data.ultimoEvento) : '—',
@@ -88,7 +91,9 @@ export function AdminMobilidadeTab() {
                 key={label}
                 className="flex flex-col gap-1 rounded border border-card-border bg-card p-3 neo-brutal-sm"
               >
-                <span className="text-[10px] text-text-tertiary uppercase tracking-wide">{label}</span>
+                <span className="text-[10px] text-text-tertiary uppercase tracking-wide">
+                  {label}
+                </span>
                 <span className="text-xl font-bold text-text-primary leading-tight">{value}</span>
               </div>
             ))}
@@ -108,18 +113,24 @@ export function AdminMobilidadeTab() {
                 {data.porLinha.length === 0 ? (
                   <tr>
                     <td colSpan={3} className={`${cell} text-text-tertiary text-center py-4`}>
-                      Nenhum evento no último 1h — poller pode estar pausado ou API BHTrans indisponível
+                      Nenhum evento no último 1h — poller pode estar pausado ou API BHTrans
+                      indisponível
                     </td>
                   </tr>
                 ) : (
                   data.porLinha.map((row) => (
-                    <tr key={row.linha} className="border-t border-card-border hover:bg-background-secondary">
+                    <tr
+                      key={row.linha}
+                      className="border-t border-card-border hover:bg-background-secondary"
+                    >
                       <td className={cell}>
                         <span className="rounded bg-orange-100 dark:bg-orange-900/30 px-1.5 py-0.5 font-mono font-semibold text-orange-700 dark:text-orange-400">
                           {row.linha}
                         </span>
                       </td>
-                      <td className={`${cell} text-right tabular-nums`}>{row.total.toLocaleString('pt-BR')}</td>
+                      <td className={`${cell} text-right tabular-nums`}>
+                        {row.total.toLocaleString('pt-BR')}
+                      </td>
                       <td className={`${cell} text-right tabular-nums`}>{row.veiculos}</td>
                     </tr>
                   ))

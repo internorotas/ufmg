@@ -17,9 +17,7 @@ export function GtfsStopsLayer({ routeId, visible = true }: GtfsStopsLayerProps)
       try {
         const data = await fetchGtfsStops(routeId);
         setStops(data);
-      } catch (err) {
-        console.error(`Failed to load GTFS stops for route ${routeId}:`, err);
-      }
+      } catch (_err) {}
     };
 
     loadStops();

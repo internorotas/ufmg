@@ -12,7 +12,7 @@
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -117,29 +117,21 @@ function processFile(filename, typeName) {
   const filePath = resolve(SRC_DIR, filename);
   const content = readFileSync(filePath, 'utf-8');
 
-  console.log(`Processing ${filename}...`);
-
   try {
     const data = extractData(content);
     const encoded = encode(data);
-
-    console.log(`  Original size: ${content.length} bytes`);
-    console.log(`  Encoded data length: ${encoded.length} chars`);
 
     // Verify round-trip
     const decoded = decode(encoded);
     if (JSON.stringify(decoded) !== JSON.stringify(data)) {
       throw new Error('Round-trip verification failed!');
     }
-    console.log('  Round-trip verification: OK');
 
     const newContent = generateEncodedFile(content, encoded, typeName);
     writeFileSync(filePath, newContent, 'utf-8');
-    console.log(`  Written: ${filePath}`);
 
     return true;
-  } catch (err) {
-    console.error(`  ERROR: ${err.message}`);
+  } catch (_err) {
     return false;
   }
 }
@@ -148,9 +140,6 @@ function processFile(filename, typeName) {
 const isDecode = process.argv.includes('--decode');
 
 if (isDecode) {
-  // Verification mode: decode and print stats
-  console.log('=== Decode verification mode ===\n');
-
   for (const [filename, typeName] of [
     ['linhas.ts', 'CategoriaLinhas'],
     ['paradas.ts', '{ paradas: Parada[] }'],
@@ -160,37 +149,23 @@ if (isDecode) {
 
     const encMatch = content.match(/const encoded = '(.*?)';/s);
     if (!encMatch) {
-      console.log(`${filename}: Not encoded (no encoded string found)`);
       continue;
     }
 
     const decoded = decode(encMatch[1]);
-    console.log(`${filename}:`);
-    console.log(`  Type: ${typeName}`);
     if (typeName === 'CategoriaLinhas') {
-      console.log(`  Categories: ${decoded.categoriasDias?.length}`);
-      const totalLinhas = decoded.categoriasDias?.reduce(
-        (sum, cat) => sum + (cat.linhas?.length || 0), 0
-      ) || 0;
-      console.log(`  Total linhas: ${totalLinhas}`);
+      const _totalLinhas =
+        decoded.categoriasDias?.reduce((sum, cat) => sum + (cat.linhas?.length || 0), 0) || 0;
     } else {
-      console.log(`  Paradas: ${decoded.paradas?.length}`);
     }
-    console.log('');
   }
 } else {
-  // Encode mode
-  console.log('=== Encoding data files ===\n');
-
   let allOk = true;
   allOk = processFile('linhas.ts', 'CategoriaLinhas') && allOk;
   allOk = processFile('paradas.ts', '{ paradas: Parada[] }') && allOk;
 
   if (allOk) {
-    console.log('\nAll files encoded successfully!');
-    console.log('Run "pnpm test" to verify decoding works correctly.');
   } else {
-    console.error('\nSome files failed to encode!');
     process.exit(1);
   }
 }

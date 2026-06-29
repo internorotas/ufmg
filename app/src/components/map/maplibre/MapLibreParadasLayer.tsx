@@ -1,6 +1,7 @@
 import { Bell, BellRing, Bus, MapPin, Navigation } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Marker, Popup } from 'react-map-gl/maplibre';
+import markerSvgUrl from '@/assets/marker.svg';
 import { isLineAvailableToday } from '@/config/specialPeriods';
 import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
 import { useRotasData, useRotasSelection } from '@/contexts/RotasContext';
@@ -10,7 +11,6 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { useCurrentTime } from '@/hooks/useCurrentTime';
 import { cn, normalizarNomeLinha } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
-import markerSvgUrl from '@/assets/marker.svg';
 import { DisclaimerEstimativa } from '../../DisclaimerEstimativa';
 import { PrevisaoBadge } from '../../PrevisaoBadge';
 
@@ -36,7 +36,11 @@ interface MapLibreParadasLayerProps {
   onParadaClicada?: (parada: Parada) => void;
 }
 
-export function MapLibreParadasLayer({ paradas, paradaDestacadaId, onParadaClicada }: MapLibreParadasLayerProps) {
+export function MapLibreParadasLayer({
+  paradas,
+  paradaDestacadaId,
+  onParadaClicada,
+}: MapLibreParadasLayerProps) {
   const [paradaClicada, setParadaClicada] = useState<ParadaClicada | null>(null);
 
   return (
@@ -58,7 +62,11 @@ export function MapLibreParadasLayer({ paradas, paradaDestacadaId, onParadaClica
               if (onParadaClicada) {
                 onParadaClicada(p);
               } else {
-                setParadaClicada({ parada: p, longitude: p.coordenadas[1], latitude: p.coordenadas[0] });
+                setParadaClicada({
+                  parada: p,
+                  longitude: p.coordenadas[1],
+                  latitude: p.coordenadas[0],
+                });
               }
             }}
           >
@@ -171,7 +179,10 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
       if (!entry.linha) continue;
       const key = entry.linha.nome;
       const existing = byNome.get(key);
-      if (!existing) { byNome.set(key, entry); continue; }
+      if (!existing) {
+        byNome.set(key, entry);
+        continue;
+      }
       const thisMin = entry.minutosFaltantes;
       const prevMin = existing.minutosFaltantes;
       if (thisMin !== null && (prevMin === null || thisMin < prevMin)) {
@@ -204,7 +215,10 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
           <MapPin size={20} />
         </span>
         <div className="min-w-0">
-          <h3 id={headingId} className="text-sm font-bold leading-snug text-text-primary sm:text-base">
+          <h3
+            id={headingId}
+            className="text-sm font-bold leading-snug text-text-primary sm:text-base"
+          >
             {parada.nome}
           </h3>
           {parada.categoria ? (
@@ -216,7 +230,11 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
       <DisclaimerEstimativa />
 
       {totalLinhas > 0 ? (
-        <section data-slot="lines-section" aria-labelledby={linhasLabelId} className="border-t border-card-border pt-3">
+        <section
+          data-slot="lines-section"
+          aria-labelledby={linhasLabelId}
+          className="border-t border-card-border pt-3"
+        >
           <div className="mb-2 flex items-center gap-2">
             <span
               aria-hidden="true"
@@ -229,71 +247,106 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
             </p>
           </div>
 
-          <ul className="max-h-44 space-y-1.5 overflow-y-auto" aria-label="Linhas com previsão de chegada">
-            {linhasDisponiveis.map(({ nomeLinha, linha, minutosFaltantes, horarioChegada, minutosUltimoPassou }) => {
-              const nomeExibicao = getNomeExibicao(linha, nomeLinha);
-              const isAlarmAtivo = linha && suportado ? isAlarmado(linha.idRota, parada.idParada) : false;
-              const showBell = Boolean(linha) && suportado && minutosFaltantes !== null;
+          <ul
+            className="max-h-44 space-y-1.5 overflow-y-auto"
+            aria-label="Linhas com previsão de chegada"
+          >
+            {linhasDisponiveis.map(
+              ({ nomeLinha, linha, minutosFaltantes, horarioChegada, minutosUltimoPassou }) => {
+                const nomeExibicao = getNomeExibicao(linha, nomeLinha);
+                const isAlarmAtivo =
+                  linha && suportado ? isAlarmado(linha.idRota, parada.idParada) : false;
+                const showBell = Boolean(linha) && suportado && minutosFaltantes !== null;
 
-              return (
-                <li key={nomeLinha} className="rounded-(--shape-xs) border border-card-border bg-card p-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <button
-                      type="button"
-                      className="flex min-h-9 flex-1 items-center gap-1.5 truncate rounded px-1 py-0.5 text-left text-xs font-semibold leading-tight text-text-primary transition-colors hover:text-brand-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
-                      title={nomeExibicao}
-                      disabled={!linha}
-                      aria-label={linha ? `Ver linha ${nomeExibicao} no menu` : `Linha ${nomeExibicao} sem dados detalhados`}
-                      onClick={() => {
-                        if (!linha) return;
-                        analytics.trackEvent({ category: 'map_interaction', action: 'select_line_from_popup', label: `${parada.nome} -> ${linha.nome}` });
-                        selecionarLinha(linha);
-                      }}
-                    >
-                      {linha && (
-                        <span
-                          className="mr-1 inline-block h-3.5 w-1 shrink-0 rounded-full"
-                          style={{ backgroundColor: linha.corHex }}
-                          aria-hidden="true"
-                        />
-                      )}
-                      <span className="truncate">{nomeExibicao}</span>
-                    </button>
-
-                    {showBell && linha && minutosFaltantes !== null ? (
+                return (
+                  <li
+                    key={nomeLinha}
+                    className="rounded-(--shape-xs) border border-card-border bg-card p-2"
+                  >
+                    <div className="flex items-center justify-between gap-2">
                       <button
                         type="button"
-                        onClick={() => toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)}
-                        className={cn(
-                          'flex size-8 shrink-0 items-center justify-center rounded-full transition-colors',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95',
-                          isAlarmAtivo
-                            ? 'bg-brand-accent/20 text-brand-accent hover:bg-brand-accent/30'
-                            : 'text-text-secondary hover:bg-card-hover hover:text-text-primary',
-                        )}
-                        aria-label={isAlarmAtivo ? `Cancelar alarme de chegada para ${nomeExibicao}` : `Avisar quando ${nomeExibicao} chegar`}
-                        aria-pressed={isAlarmAtivo}
+                        className="flex min-h-9 flex-1 items-center gap-1.5 truncate rounded px-1 py-0.5 text-left text-xs font-semibold leading-tight text-text-primary transition-colors hover:text-brand-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
+                        title={nomeExibicao}
+                        disabled={!linha}
+                        aria-label={
+                          linha
+                            ? `Ver linha ${nomeExibicao} no menu`
+                            : `Linha ${nomeExibicao} sem dados detalhados`
+                        }
+                        onClick={() => {
+                          if (!linha) return;
+                          analytics.trackEvent({
+                            category: 'map_interaction',
+                            action: 'select_line_from_popup',
+                            label: `${parada.nome} -> ${linha.nome}`,
+                          });
+                          selecionarLinha(linha);
+                        }}
                       >
-                        {isAlarmAtivo ? <BellRing size={15} aria-hidden="true" /> : <Bell size={15} aria-hidden="true" />}
+                        {linha && (
+                          <span
+                            className="mr-1 inline-block h-3.5 w-1 shrink-0 rounded-full"
+                            style={{ backgroundColor: linha.corHex }}
+                            aria-hidden="true"
+                          />
+                        )}
+                        <span className="truncate">{nomeExibicao}</span>
                       </button>
-                    ) : null}
-                  </div>
 
-                  <div className="mt-1.5 flex items-center justify-between gap-1">
-                    {linha ? (
-                      <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
-                    ) : (
-                      <span className="rounded px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: 'var(--neutral-bg)', color: 'var(--neutral-text)' }}>
-                        Sem previsão
-                      </span>
-                    )}
-                    {minutosUltimoPassou !== null ? (
-                      <p className="text-[11px] text-text-secondary">Último há {minutosUltimoPassou}min</p>
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
+                      {showBell && linha && minutosFaltantes !== null ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            toggleNotificacao(linha, parada, minutosFaltantes, horarioChegada)
+                          }
+                          className={cn(
+                            'flex size-8 shrink-0 items-center justify-center rounded-full transition-colors',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary active:scale-95',
+                            isAlarmAtivo
+                              ? 'bg-brand-accent/20 text-brand-accent hover:bg-brand-accent/30'
+                              : 'text-text-secondary hover:bg-card-hover hover:text-text-primary',
+                          )}
+                          aria-label={
+                            isAlarmAtivo
+                              ? `Cancelar alarme de chegada para ${nomeExibicao}`
+                              : `Avisar quando ${nomeExibicao} chegar`
+                          }
+                          aria-pressed={isAlarmAtivo}
+                        >
+                          {isAlarmAtivo ? (
+                            <BellRing size={15} aria-hidden="true" />
+                          ) : (
+                            <Bell size={15} aria-hidden="true" />
+                          )}
+                        </button>
+                      ) : null}
+                    </div>
+
+                    <div className="mt-1.5 flex items-center justify-between gap-1">
+                      {linha ? (
+                        <PrevisaoBadge linha={linha} idParada={parada.idParada} compacto />
+                      ) : (
+                        <span
+                          className="rounded px-2 py-0.5 text-xs font-medium"
+                          style={{
+                            backgroundColor: 'var(--neutral-bg)',
+                            color: 'var(--neutral-text)',
+                          }}
+                        >
+                          Sem previsão
+                        </span>
+                      )}
+                      {minutosUltimoPassou !== null ? (
+                        <p className="text-[11px] text-text-secondary">
+                          Último há {minutosUltimoPassou}min
+                        </p>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              },
+            )}
           </ul>
         </section>
       ) : null}

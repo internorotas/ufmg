@@ -15,7 +15,7 @@ export const MapLibreRotasLayer = React.memo(function MapLibreRotasLayer({
     () => (linha?.coordenadasTrajeto ?? []) as [number, number][],
     // idRota é string estável — evita recriar o array a cada re-render do pai
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [linha?.idRota],
+    [linha?.coordenadasTrajeto],
   );
 
   const snappedCoords = useOsrmRoute(linha?.idRota, fallbackCoords);

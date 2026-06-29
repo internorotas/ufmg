@@ -5,7 +5,7 @@
  */
 
 import type { Story } from '@ladle/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   EmptyState,
   ErrorEmptyState,
@@ -780,7 +780,7 @@ export const ToggleRowGroup: Story = () => {
   const [idioma, setIdioma] = useState<'PT' | 'EN'>('PT');
 
   const temasArr = ['Claro', 'Escuro', 'Sistema'] as const;
-  const idiomasArr = ['PT', 'EN'] as const;
+  const _idiomasArr = ['PT', 'EN'] as const;
 
   return (
     <div className="p-6 max-w-sm border rounded-xl divide-y">

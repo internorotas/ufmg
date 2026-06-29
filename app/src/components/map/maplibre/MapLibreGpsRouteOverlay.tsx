@@ -9,15 +9,18 @@ interface MapLibreGpsRouteOverlayProps {
 export function MapLibreGpsRouteOverlay({ linha }: MapLibreGpsRouteOverlayProps) {
   const coords = linha.coordenadasTrajeto;
 
-  const geojson = useMemo(() => ({
-    type: 'Feature' as const,
-    properties: {},
-    geometry: {
-      type: 'LineString' as const,
-      // [lat, lng] → [lng, lat]
-      coordinates: (coords ?? []).map(([lat, lng]) => [lng, lat]),
-    },
-  }), [coords]);
+  const geojson = useMemo(
+    () => ({
+      type: 'Feature' as const,
+      properties: {},
+      geometry: {
+        type: 'LineString' as const,
+        // [lat, lng] → [lng, lat]
+        coordinates: (coords ?? []).map(([lat, lng]) => [lng, lat]),
+      },
+    }),
+    [coords],
+  );
 
   if (!coords || coords.length < 2) return null;
 

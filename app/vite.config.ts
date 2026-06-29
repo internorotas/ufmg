@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
     'http://127.0.0.1:43111';
   const usePolling =
     env.CHOKIDAR_USEPOLLING === 'true' || process.env.CHOKIDAR_USEPOLLING === 'true';
-  const tenantBasePath = resolveTenantDefinition(
+  const _tenantBasePath = resolveTenantDefinition(
     env.VITE_TENANT_SLUG || process.env.VITE_TENANT_SLUG,
   ).basePath;
   // Padrão '/' funciona em qualquer host (Cloudflare Pages, Vercel, domínio próprio, etc).

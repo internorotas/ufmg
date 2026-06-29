@@ -58,7 +58,9 @@ test('linhas – clicar em detalhes de linha abre modal', async ({ page }) => {
   if (await detailsBtn.isVisible()) {
     await detailsBtn.click();
     // Desktop: abre painel inline (aside > section); Mobile: abre dialog modal
-    await expect(page.locator('[role="dialog"], aside > section[aria-label]')).toBeVisible({ timeout: 8_000 });
+    await expect(page.locator('[role="dialog"], aside > section[aria-label]')).toBeVisible({
+      timeout: 8_000,
+    });
   }
 });
 

@@ -146,6 +146,7 @@ export const AppShellWithRichContent: Story = () => (
           </div>
           {/* Extra content to demonstrate scrolling */}
           {Array.from({ length: 6 }).map((_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: story data has no stable IDs
             <div key={i} className="neo-brutal bg-card p-4 rounded">
               <p className="text-text-secondary text-sm">Seção adicional {i + 1}</p>
             </div>

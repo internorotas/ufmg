@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { fetchGtfsRoutes, type GtfsRoute } from '@/services/api/gtfsApi';
 
 interface GtfsRouteSelectorProps {
@@ -7,10 +7,7 @@ interface GtfsRouteSelectorProps {
   onSelectRoute: (routeId: string | null) => void;
 }
 
-export function GtfsRouteSelector({
-  selectedRouteId,
-  onSelectRoute,
-}: GtfsRouteSelectorProps) {
+export function GtfsRouteSelector({ selectedRouteId, onSelectRoute }: GtfsRouteSelectorProps) {
   const [routes, setRoutes] = useState<GtfsRoute[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -20,9 +17,7 @@ export function GtfsRouteSelector({
       try {
         const data = await fetchGtfsRoutes();
         setRoutes(data);
-      } catch (err) {
-        console.error('Failed to load GTFS routes:', err);
-      }
+      } catch (_err) {}
     };
 
     loadRoutes();
@@ -60,7 +55,6 @@ export function GtfsRouteSelector({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded border px-2 py-1 text-sm"
-              autoFocus
             />
           </div>
 

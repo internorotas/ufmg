@@ -122,7 +122,7 @@ test('security – Authorization header não aparece em requests para domínios 
   const leakedAuthRequests: string[] = [];
 
   page.on('request', (req) => {
-    const authHeader = req.headers()['authorization'];
+    const authHeader = req.headers().authorization;
     const url = req.url();
     // Qualquer request com Auth que não seja para a API do projeto
     if (
@@ -172,7 +172,7 @@ test('security – localStorage não contém tokens JWT em plaintext', async ({ 
   const storageContents: Record<string, string> = await page.evaluate(() => {
     const items: Record<string, string> = {};
     for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)!;
+      const key = localStorage.key(i) ?? '';
       items[key] = localStorage.getItem(key) ?? '';
     }
     return items;
@@ -194,7 +194,7 @@ test('security – sessionStorage GPS não vaza dados após fim de sessão', asy
   // Sem iniciar rastreio, não deve haver dados GPS na sessionStorage
   const gpsData = await page.evaluate(() => {
     for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i)!;
+      const key = sessionStorage.key(i) ?? '';
       if (key.includes('gps')) return sessionStorage.getItem(key);
     }
     return null;

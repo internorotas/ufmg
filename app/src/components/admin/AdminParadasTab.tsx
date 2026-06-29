@@ -159,9 +159,7 @@ function LinhasMultiPicker({
                     <span className="font-medium text-text-primary">
                       {l.linha}. {l.nome}
                     </span>
-                    {l.sublinha && (
-                      <span className="text-text-secondary"> · {l.sublinha}</span>
-                    )}
+                    {l.sublinha && <span className="text-text-secondary"> · {l.sublinha}</span>}
                   </span>
                   <span className="text-xs font-mono text-text-tertiary shrink-0 bg-background-secondary px-1 rounded">
                     {l.idRota}
@@ -471,7 +469,9 @@ export function AdminParadasTab({
                   className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide"
                 >
                   Linhas BHTrans{' '}
-                  <span className="normal-case font-normal">(separadas por vírgula, ex: 9502, 5102)</span>
+                  <span className="normal-case font-normal">
+                    (separadas por vírgula, ex: 9502, 5102)
+                  </span>
                 </label>
                 <input
                   id="ap-bhtrans"

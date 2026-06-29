@@ -1,5 +1,5 @@
 import { Pencil, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { type DragEndEvent } from 'leaflet';
@@ -197,9 +197,7 @@ function ParadasPicker({
   const disponiveis = useMemo(() => {
     const q = search.trim().toLowerCase();
     return uniqueParadas.filter(
-      (p) =>
-        p.nome.toLowerCase().includes(q) ||
-        p.idParada.toLowerCase().includes(q),
+      (p) => p.nome.toLowerCase().includes(q) || p.idParada.toLowerCase().includes(q),
     );
   }, [uniqueParadas, search]);
 
@@ -242,7 +240,7 @@ function ParadasPicker({
             const p = uniqueParadas.find((x) => x.idParada === idParada);
             return (
               <li
-                key={`${idParada}-${idx}`}
+                key={String(idParada)}
                 className="flex items-center gap-1 text-xs bg-card rounded px-2 py-1 border border-card-border"
               >
                 <span className="text-text-tertiary font-mono w-5 text-right shrink-0">

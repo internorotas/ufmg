@@ -4,7 +4,6 @@
  */
 
 import type { Story } from '@ladle/react';
-import React from 'react';
 import { Badge, CountBadge, DayCategoryBadge, LineStatusBadge } from '../components/ui/Badge';
 import { Button, ButtonGroup } from '../components/ui/Button';
 import {

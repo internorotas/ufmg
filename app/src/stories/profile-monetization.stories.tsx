@@ -9,7 +9,6 @@ import { PartnerSpotlightCard } from '@/features/monetization/components/Partner
 import { SupportActionsCard } from '@/features/monetization/components/SupportActionsCard';
 import type { UserMonetizationSummary } from '@/features/profile/api/profileClient';
 import { PROFILE_QUERY_KEY } from '@/features/profile/queries/useProfileQuery';
-import { StoryContainer } from './StoryContainer';
 
 // ---------------------------------------------------------------------------
 // Shared fixtures
@@ -132,7 +131,7 @@ function ProfileSheetWrapper({
   user = MOCK_USER_WITH_AVATAR,
 }: ProfileSheetWrapperProps) {
   const [open, setOpen] = useState(true);
-  const qc = React.useMemo(() => makeQueryClient(profileData), []);
+  const qc = React.useMemo(() => makeQueryClient(profileData), [profileData]);
 
   useEffect(() => {
     if (user) {

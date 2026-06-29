@@ -116,10 +116,14 @@ export function GpsTrackingCard({
             >
               {linha.linha}
             </span>
-            <p className="truncate text-[10px] font-semibold text-text-primary leading-tight">{linha.nome}</p>
+            <p className="truncate text-[10px] font-semibold text-text-primary leading-tight">
+              {linha.nome}
+            </p>
           </div>
           {linha.sublinha && (
-            <p className="truncate pl-5 text-[9px] text-text-tertiary leading-tight">{linha.sublinha}</p>
+            <p className="truncate pl-5 text-[9px] text-text-tertiary leading-tight">
+              {linha.sublinha}
+            </p>
           )}
         </div>
 

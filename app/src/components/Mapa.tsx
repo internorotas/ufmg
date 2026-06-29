@@ -10,10 +10,10 @@
 import { X } from 'lucide-react';
 import { type Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { useRotasSelection } from '@/contexts/RotasContext';
+import type { MapaRef } from '@/contexts/RotasSelectionContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '../hooks/useAnalytics';
 import type { Linha, Parada } from '../types/data.types';
-import { type MapaRef } from '@/contexts/RotasSelectionContext';
 import { MapLibreView } from './map/maplibre';
 
 // Re-exporta para callers que importam MapaRef de Mapa.tsx

@@ -1,5 +1,16 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { Box, Compass, CornerUpLeft, LoaderCircle, LocateFixed, Minus, Plus, Radio, Square, X } from 'lucide-react';
+import {
+  Box,
+  Compass,
+  CornerUpLeft,
+  LoaderCircle,
+  LocateFixed,
+  Minus,
+  Plus,
+  Radio,
+  Square,
+  X,
+} from 'lucide-react';
 import {
   type Ref,
   useCallback,
@@ -9,11 +20,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import Map, { type MapRef } from 'react-map-gl/maplibre';
+import MapLibreMap, { type MapRef } from 'react-map-gl/maplibre';
 import type { MapaRef } from '@/contexts/RotasSelectionContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
-import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
 import { cn } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
 import { MapPitchHint } from '../MapPitchHint';
@@ -248,7 +259,7 @@ export function MapLibreView({
     <div className="relative h-full w-full">
       <MapPitchHint visible={true} />
 
-      <Map
+      <MapLibreMap
         ref={mapRef}
         initialViewState={{
           longitude: CAMPUS_LNG,
@@ -299,12 +310,9 @@ export function MapLibreView({
         )}
 
         {localizacaoUsuario && (
-          <MapLibreUserMarker
-            localizacao={localizacaoUsuario}
-            heading={headingUsuario ?? null}
-          />
+          <MapLibreUserMarker localizacao={localizacaoUsuario} heading={headingUsuario ?? null} />
         )}
-      </Map>
+      </MapLibreMap>
 
       {/* Controles de zoom e visão — lado esquerdo */}
       <div className="pointer-events-none absolute left-2 top-2 z-900 flex flex-col items-center">
@@ -353,11 +361,14 @@ export function MapLibreView({
         </button>
       </div>
 
-      {/* Card da parada — renderizado fora do <Map> para não ser clipado */}
+      {/* Card da parada — renderizado fora do <MapLibreMap> para não ser clipado */}
       {paradaAberta && (
+        // biome-ignore lint/a11y/noStaticElementInteractions: wrapper que bloqueia propagação de clique — não é interativo para o usuário
         <div
           className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center"
+          role="presentation"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
         >
           <div
             className="w-full max-w-sm flex flex-col rounded-t-2xl bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.18)] ring-1 ring-card-border"
@@ -382,11 +393,14 @@ export function MapLibreView({
         </div>
       )}
 
-      {/* Card do prédio — bottom sheet fora do <Map> para não ser clipado */}
+      {/* Card do prédio — bottom sheet fora do <MapLibreMap> para não ser clipado */}
       {predioAberto && (
+        // biome-ignore lint/a11y/noStaticElementInteractions: wrapper que bloqueia propagação de clique — não é interativo para o usuário
         <div
           className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center"
+          role="presentation"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
         >
           <div
             className="w-full max-w-sm flex flex-col rounded-t-2xl bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.18)] ring-1 ring-card-border"

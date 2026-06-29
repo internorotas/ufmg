@@ -14,7 +14,12 @@ interface GpsLiveBusMarkerProps {
   todasParadas: Parada[];
 }
 
-function criarIcone(corHex: string, heading: number | null, isLive: boolean, isStale: boolean): L.DivIcon {
+function criarIcone(
+  corHex: string,
+  heading: number | null,
+  isLive: boolean,
+  isStale: boolean,
+): L.DivIcon {
   const rotacao = heading ?? 0;
   const mostrarSeta = heading !== null;
   const bg = isLive ? corHex : hexToRgba(corHex, 0.7);
@@ -132,7 +137,15 @@ interface BusPopupProps {
   theoreticalPos: ReturnType<typeof useBusPosition>;
 }
 
-function BusPopup({ linha, num, isLive, isStale, hasConnectionError, livePos, theoreticalPos }: BusPopupProps) {
+function BusPopup({
+  linha,
+  num,
+  isLive,
+  isStale,
+  hasConnectionError,
+  livePos,
+  theoreticalPos,
+}: BusPopupProps) {
   return (
     <div className="flex flex-col gap-2.5 font-sans text-sm">
       <div className="flex items-center gap-2">
@@ -193,7 +206,8 @@ function BusPopup({ linha, num, isLive, isStale, hasConnectionError, livePos, th
           </p>
         </div>
       ) : (
-        !isStale && theoreticalPos && (
+        !isStale &&
+        theoreticalPos && (
           <div className="flex flex-col gap-1.5 text-xs text-text-secondary">
             <div className="flex items-center gap-1.5">
               <Clock size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />

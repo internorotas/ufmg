@@ -26,9 +26,7 @@ export function GtfsRouteLayer({
       try {
         const data = await fetchGtfsShape(routeId);
         setShapes(data);
-      } catch (err) {
-        console.error(`Failed to load GTFS shape for route ${routeId}:`, err);
-      }
+      } catch (_err) {}
     };
 
     loadShapes();

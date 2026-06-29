@@ -1,7 +1,6 @@
 import type { Story } from '@ladle/react';
-import React from 'react';
+import type React from 'react';
 import { CardPredio, type PredioInfo } from '@/components/map/maplibre/MapLibrePrediosLayer';
-import { CategoriaDia } from '@/types/data.types';
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -26,8 +25,9 @@ const predioComDescricao: PredioInfo = {
   id: 1003,
   nome: 'Biblioteca Central',
   amenity: 'library',
-  description: 'Biblioteca central do campus com acervo de mais de 500 mil volumes. Funciona de segunda a sábado, 8h às 22h.',
-  longitude: -43.9690,
+  description:
+    'Biblioteca central do campus com acervo de mais de 500 mil volumes. Funciona de segunda a sábado, 8h às 22h.',
+  longitude: -43.969,
   latitude: -19.873,
 };
 
@@ -205,32 +205,63 @@ function CompletedSessionPreview({
             🚌
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-success-text, #065f46)', margin: 0 }}>
+            <p
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                color: 'var(--color-success-text, #065f46)',
+                margin: 0,
+              }}
+            >
               {reasonLabel}
             </p>
-            <p style={{ fontSize: '10px', color: 'var(--color-text-secondary, #6b7280)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p
+              style={{
+                fontSize: '10px',
+                color: 'var(--color-text-secondary, #6b7280)',
+                margin: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
               Campus — Reitoria
             </p>
           </div>
         </div>
 
         {isAutoStop && (
-          <p style={{
-            marginBottom: '8px',
-            padding: '6px 10px',
-            borderRadius: '8px',
-            background: 'var(--color-background-secondary, #f3f4f6)',
-            fontSize: '10px',
-            color: 'var(--color-text-secondary, #6b7280)',
-          }}>
+          <p
+            style={{
+              marginBottom: '8px',
+              padding: '6px 10px',
+              borderRadius: '8px',
+              background: 'var(--color-background-secondary, #f3f4f6)',
+              fontSize: '10px',
+              color: 'var(--color-text-secondary, #6b7280)',
+            }}
+          >
             O rastreio foi encerrado automaticamente.
           </p>
         )}
 
-        <div style={{ height: '1px', background: 'var(--color-card-border, #e5e7eb)', marginBottom: '12px' }} />
+        <div
+          style={{
+            height: '1px',
+            background: 'var(--color-card-border, #e5e7eb)',
+            marginBottom: '12px',
+          }}
+        />
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '12px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '8px',
+            marginBottom: '12px',
+          }}
+        >
           {[
             { label: 'Duração', value: durationLabel },
             { label: 'Distância', value: `${distanceKm.toFixed(2)} km` },
@@ -245,13 +276,37 @@ function CompletedSessionPreview({
                 textAlign: 'center',
               }}
             >
-              <p style={{ fontSize: '9px', color: 'var(--color-text-tertiary, #9ca3af)', margin: '0 0 2px' }}>{label}</p>
-              <p style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-text-primary, #111827)', margin: 0 }}>{value}</p>
+              <p
+                style={{
+                  fontSize: '9px',
+                  color: 'var(--color-text-tertiary, #9ca3af)',
+                  margin: '0 0 2px',
+                }}
+              >
+                {label}
+              </p>
+              <p
+                style={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  color: 'var(--color-text-primary, #111827)',
+                  margin: 0,
+                }}
+              >
+                {value}
+              </p>
             </div>
           ))}
         </div>
 
-        <p style={{ fontSize: '10px', color: 'var(--color-text-secondary, #6b7280)', textAlign: 'center', margin: 0 }}>
+        <p
+          style={{
+            fontSize: '10px',
+            color: 'var(--color-text-secondary, #6b7280)',
+            textAlign: 'center',
+            margin: 0,
+          }}
+        >
           ❤️ Obrigado por ajudar a comunidade!
         </p>
       </div>
@@ -259,9 +314,7 @@ function CompletedSessionPreview({
   );
 }
 
-export const SessionCompletedManual: Story = () => (
-  <CompletedSessionPreview stopReason="manual" />
-);
+export const SessionCompletedManual: Story = () => <CompletedSessionPreview stopReason="manual" />;
 SessionCompletedManual.storyName = 'SessionCompleted — encerrado manualmente';
 
 export const SessionCompletedTerminal: Story = () => (
@@ -270,16 +323,31 @@ export const SessionCompletedTerminal: Story = () => (
 SessionCompletedTerminal.storyName = 'SessionCompleted — chegou ao terminal';
 
 export const SessionCompletedSaiuRota: Story = () => (
-  <CompletedSessionPreview stopReason="saiu_rota" distanceKm={1.1} durationMs={7 * 60 * 1000} snapshotsCount={40} />
+  <CompletedSessionPreview
+    stopReason="saiu_rota"
+    distanceKm={1.1}
+    durationMs={7 * 60 * 1000}
+    snapshotsCount={40}
+  />
 );
 SessionCompletedSaiuRota.storyName = 'SessionCompleted — saiu do trajeto';
 
 export const SessionCompletedParado: Story = () => (
-  <CompletedSessionPreview stopReason="parado" distanceKm={2.8} durationMs={22 * 60 * 1000} snapshotsCount={90} />
+  <CompletedSessionPreview
+    stopReason="parado"
+    distanceKm={2.8}
+    durationMs={22 * 60 * 1000}
+    snapshotsCount={90}
+  />
 );
 SessionCompletedParado.storyName = 'SessionCompleted — parado por 5 min';
 
 export const SessionCompletedTimeout: Story = () => (
-  <CompletedSessionPreview stopReason="timeout" distanceKm={8.1} durationMs={60 * 60 * 1000} snapshotsCount={600} />
+  <CompletedSessionPreview
+    stopReason="timeout"
+    distanceKm={8.1}
+    durationMs={60 * 60 * 1000}
+    snapshotsCount={600}
+  />
 );
 SessionCompletedTimeout.storyName = 'SessionCompleted — timeout (1 hora)';

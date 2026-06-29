@@ -4,8 +4,9 @@
 
   // Remove parâmetros legados de recovery da barra de endereço (poluição de URL).
   // O controle de "já rodou" é feito por sessionStorage, não pela query string.
+  var current;
   try {
-    var current = new URL(window.location.href);
+    current = new URL(window.location.href);
     if (current.searchParams.has('cache-recovery') || current.searchParams.has('v')) {
       current.searchParams.delete('cache-recovery');
       current.searchParams.delete('v');
@@ -21,8 +22,8 @@
 
   var pathSegments = window.location.pathname.split('/').filter(Boolean);
   var tenantSlug = pathSegments[0] || 'ufmg';
-  var appBasePath = isLocalhost ? '/' : '/' + tenantSlug + '/';
-  var recoveryKey = 'interno-rotas:' + tenantSlug + ':cache-recovery:v2';
+  var appBasePath = isLocalhost ? '/' : `/${tenantSlug}/`;
+  var recoveryKey = `interno-rotas:${tenantSlug}:cache-recovery:v2`;
   var alreadyRan = false;
 
   try {

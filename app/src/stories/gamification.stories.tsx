@@ -1,5 +1,4 @@
 import type { Story } from '@ladle/react';
-import React from 'react';
 import { AchievementsGrid } from '@/features/gamification/components/AchievementsGrid';
 import { ContributionHeatmap } from '@/features/gamification/components/ContributionHeatmap';
 import { PointDeltaToast } from '@/features/gamification/components/PointDeltaToast';

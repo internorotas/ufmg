@@ -33,12 +33,17 @@ function useBuildingList() {
     }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   return { buildings, loading, error, reload: load };
 }
 
-async function patchBuilding(id: string, body: { description?: string | null; properties?: Record<string, unknown> }): Promise<void> {
+async function patchBuilding(
+  id: string,
+  body: { description?: string | null; properties?: Record<string, unknown> },
+): Promise<void> {
   const res = await fetch(resolveApiEndpoint(`/v1/admin/map-buildings/${id}`), {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...withTenantHeaders() },
@@ -72,10 +77,15 @@ export function AdminPrediosTab() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return buildings;
-    return buildings.filter((b) => b.name.toLowerCase().includes(q) || b.amenity?.toLowerCase().includes(q));
+    return buildings.filter(
+      (b) => b.name.toLowerCase().includes(q) || b.amenity?.toLowerCase().includes(q),
+    );
   }, [buildings, search]);
 
-  const selected = useMemo(() => buildings.find((b) => b.id === selectedId) ?? null, [buildings, selectedId]);
+  const selected = useMemo(
+    () => buildings.find((b) => b.id === selectedId) ?? null,
+    [buildings, selectedId],
+  );
 
   useEffect(() => {
     if (selected) {
@@ -107,7 +117,9 @@ export function AdminPrediosTab() {
     setImportResult(null);
     try {
       const result = await importOsm();
-      setImportResult(`Importados: ${result.imported} | Pulados: ${result.skipped} | Erros: ${result.errors}`);
+      setImportResult(
+        `Importados: ${result.imported} | Pulados: ${result.skipped} | Erros: ${result.errors}`,
+      );
       await reload();
     } catch (err) {
       setImportResult(`Erro: ${err instanceof Error ? err.message : String(err)}`);
@@ -172,17 +184,25 @@ export function AdminPrediosTab() {
                 type="button"
                 onClick={() => setSelectedId(b.id)}
                 className={`w-full text-left px-3 py-2.5 border-b border-card-border hover:bg-card-hover transition-colors ${
-                  selectedId === b.id ? 'bg-brand-primary/10 border-l-[3px] border-l-brand-primary pl-[9px]' : ''
+                  selectedId === b.id
+                    ? 'bg-brand-primary/10 border-l-[3px] border-l-brand-primary pl-[9px]'
+                    : ''
                 }`}
               >
                 <div className="text-sm font-medium text-text-primary truncate">{b.name}</div>
-                {b.amenity && (
-                  <div className="text-xs text-text-tertiary">{b.amenity}</div>
-                )}
-                {(b.description || Boolean(b.properties['banner_url'])) && (
+                {b.amenity && <div className="text-xs text-text-tertiary">{b.amenity}</div>}
+                {(b.description || Boolean(b.properties.banner_url)) && (
                   <div className="flex gap-1.5 mt-0.5">
-                    {b.description && <span className="text-[10px] rounded bg-blue-100 text-blue-700 px-1">desc</span>}
-                    {Boolean(b.properties['banner_url']) && <span className="text-[10px] rounded bg-green-100 text-green-700 px-1">banner</span>}
+                    {b.description && (
+                      <span className="text-[10px] rounded bg-blue-100 text-blue-700 px-1">
+                        desc
+                      </span>
+                    )}
+                    {Boolean(b.properties.banner_url) && (
+                      <span className="text-[10px] rounded bg-green-100 text-green-700 px-1">
+                        banner
+                      </span>
+                    )}
                   </div>
                 )}
               </button>
@@ -238,7 +258,9 @@ export function AdminPrediosTab() {
                   src={draftBanner}
                   alt="Preview do banner"
                   className="mt-2 w-full max-h-32 object-cover rounded border border-card-border"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                  }}
                 />
               )}
               <p className="mt-1 text-[10px] text-text-tertiary">
@@ -246,9 +268,7 @@ export function AdminPrediosTab() {
               </p>
             </div>
 
-            {saveError && (
-              <p className="text-xs text-error-text">{saveError}</p>
-            )}
+            {saveError && <p className="text-xs text-error-text">{saveError}</p>}
 
             <button
               type="button"

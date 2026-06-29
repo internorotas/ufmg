@@ -5,7 +5,7 @@
 
 import type { Story } from '@ladle/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React, { useState } from 'react';
+import React from 'react';
 import '@/i18n';
 import { LineCard } from '@/components/LineCard';
 import { PrevisaoBadge } from '@/components/PrevisaoBadge';
@@ -450,6 +450,7 @@ export const LineCardAllCallbacksFired: Story = () => {
           <span className="text-text-secondary">Interaja com o card para ver eventos...</span>
         ) : (
           log.map((entry, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: story data has no stable IDs
             <div key={i} className="text-text-primary">
               {entry}
             </div>

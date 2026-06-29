@@ -95,8 +95,12 @@ export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
     const map = mapRef?.getMap();
     if (!map) return;
 
-    const onEnter = () => { map.getCanvas().style.cursor = 'pointer'; };
-    const onLeave = () => { map.getCanvas().style.cursor = ''; };
+    const onEnter = () => {
+      map.getCanvas().style.cursor = 'pointer';
+    };
+    const onLeave = () => {
+      map.getCanvas().style.cursor = '';
+    };
 
     LAYER_IDS.forEach((id) => {
       map.on('click', id, handleClick);
@@ -135,7 +139,7 @@ export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
   if (!prediosData) return null;
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: GeoJSON type incompatibility
     <Source id="predios" type="geojson" data={prediosData as any}>
       {/* Modo 3D: fill-extrusion */}
       <Layer
@@ -160,8 +164,9 @@ export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
         paint={{
           'fill-color': [
             'case',
-            ['!=', ['get', 'amenity'], null], '#3b82f6',  // amenity: azul mais intenso
-            '#60a5fa',                                      // sem amenity: azul padrão
+            ['!=', ['get', 'amenity'], null],
+            '#3b82f6', // amenity: azul mais intenso
+            '#60a5fa', // sem amenity: azul padrão
           ],
           'fill-opacity': 0.28,
         }}
@@ -204,7 +209,9 @@ export function CardPredio({ predio, onClose: _onClose }: CardPredioProps) {
             alt={`Banner de ${predio.nome}`}
             className="w-full object-cover"
             style={{ maxHeight: 160 }}
-            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = 'none';
+            }}
           />
         </div>
       )}
@@ -216,7 +223,17 @@ export function CardPredio({ predio, onClose: _onClose }: CardPredioProps) {
             aria-hidden="true"
             className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-primary/15 text-brand-primary shadow-sm"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <rect x="4" y="2" width="16" height="20" rx="2" />
               <path d="M9 22v-4h6v4" />
               <path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01M12 14h.01" />
@@ -225,7 +242,9 @@ export function CardPredio({ predio, onClose: _onClose }: CardPredioProps) {
           <div className="min-w-0 flex-1">
             <h3 className="text-sm font-bold leading-snug text-text-primary">{predio.nome}</h3>
             {amenityInfo && (
-              <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${amenityInfo.cor}`}>
+              <span
+                className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${amenityInfo.cor}`}
+              >
                 {amenityInfo.label}
               </span>
             )}

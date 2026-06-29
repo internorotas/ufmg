@@ -323,6 +323,7 @@ function useSetupAnonymous() {
   }, []);
 }
 
+// biome-ignore lint/correctness/noUnusedVariables: story helper reservado para uso futuro
 function useSetupAuthenticated() {
   useEffect(() => {
     useAuthStore.getState().setAuthenticatedSession({
@@ -460,7 +461,7 @@ function RankingStoryBase({
       restore();
       useAuthStore.getState().setAnonymousSession();
     };
-  }, []);
+  }, [shouldFail, authData, publicData, isAuthenticated]);
 
   return (
     <QueryClientProvider client={qc}>
@@ -560,6 +561,7 @@ export const RankingPeriodAllTime: Story = () => (
  *              pass null to simulate a cache miss (triggers loading).
  *              pass 'error' to simulate a failed query.
  */
+// biome-ignore lint/correctness/noUnusedVariables: story helper reservado para uso futuro
 function ProfileStoryBase({
   profileData,
   authStatus,
@@ -596,7 +598,7 @@ function ProfileStoryBase({
     return () => {
       useAuthStore.getState().setAnonymousSession();
     };
-  }, []);
+  }, [isAuthenticated, authStatus]);
 
   // Pre-seed the query cache when we have data
   useEffect(() => {
@@ -641,9 +643,10 @@ function ProfileErrorSeeder({ children }: { children: React.ReactNode }) {
     void qc
       .prefetchQuery({
         queryKey: PROFILE_QUERY_KEY,
-        queryFn: () => Promise.reject(new Error('Falha ao carregar perfil: HTTP 500')),
+        queryFn: (): Promise<never> =>
+          Promise.reject(new Error('Falha ao carregar perfil: HTTP 500')),
         retry: false,
-      } as any)
+      })
       .catch(() => {});
   }, [qc]);
   return <>{children}</>;

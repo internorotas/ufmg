@@ -20,7 +20,9 @@ function downloadFile(fileName: string, content: string) {
 }
 
 export function AdminLayout() {
-  const [activeTab, setActiveTab] = useState<'paradas' | 'linhas' | 'predios' | 'mobilidade'>('paradas');
+  const [activeTab, setActiveTab] = useState<'paradas' | 'linhas' | 'predios' | 'mobilidade'>(
+    'paradas',
+  );
 
   const {
     state: paradasState,

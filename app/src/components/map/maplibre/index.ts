@@ -1,10 +1,10 @@
-export { MapLibreView, type MapLibreViewProps, type MapaRef } from './MapLibreView';
-export { MapLibreParadasLayer } from './MapLibreParadasLayer';
-export { MapLibreRotasLayer } from './MapLibreRotasLayer';
-export { MapLibrePrediosLayer } from './MapLibrePrediosLayer';
-export { MapLibreGpsRouteOverlay } from './MapLibreGpsRouteOverlay';
 export { MapLibreAllBusMarkers } from './MapLibreAllBusMarkers';
 export { MapLibreGpsLiveBusMarker } from './MapLibreGpsLiveBusMarker';
-export { MapLibreUserMarker } from './MapLibreUserMarker';
+export { MapLibreGpsRouteOverlay } from './MapLibreGpsRouteOverlay';
+export { MapLibreParadasLayer } from './MapLibreParadasLayer';
 export { MapLibrePlannerOverlay } from './MapLibrePlannerOverlay';
+export { MapLibrePrediosLayer } from './MapLibrePrediosLayer';
+export { MapLibreRotasLayer } from './MapLibreRotasLayer';
+export { MapLibreUserMarker } from './MapLibreUserMarker';
+export { type MapaRef, MapLibreView, type MapLibreViewProps } from './MapLibreView';
 export { useRouteAnimation } from './useRouteAnimation';

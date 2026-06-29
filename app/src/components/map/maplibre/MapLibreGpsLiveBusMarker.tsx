@@ -1,13 +1,16 @@
-import maplibregl from 'maplibre-gl';
 import { AlertTriangle, Bus, Clock, Radar, Target } from 'lucide-react';
+import maplibregl from 'maplibre-gl';
 import { useEffect, useRef, useState } from 'react';
 import { Popup, useMap } from 'react-map-gl/maplibre';
+import { useBusPosition } from '@/features/gps/hooks/useBusPosition';
+import {
+  type LiveLocationPayload,
+  useGpsLiveTracking,
+} from '@/features/gps/hooks/useGpsLiveTracking';
+import { numLinha } from '@/features/gps/lib/markerUtils';
 import { calcularPosicaoTeorica } from '@/lib/busPosition';
 import { hexToRgba } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
-import { useBusPosition } from '@/features/gps/hooks/useBusPosition';
-import { type LiveLocationPayload, useGpsLiveTracking } from '@/features/gps/hooks/useGpsLiveTracking';
-import { numLinha } from '@/features/gps/lib/markerUtils';
 
 interface MapLibreGpsLiveBusMarkerProps {
   linha: Linha;
@@ -113,22 +116,26 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
       prevHeadingRef.current = null;
       cancelAnimationFrame(rafRef.current);
     };
-  }, [mapInstance, linha.idRota, initialPos]);
+  }, [mapInstance, initialPos, linha.corHex]);
 
   // Atualiza posição via GPS ao vivo (WebSocket), refletindo stale no ícone
   useEffect(() => {
     if (!livePos || !markerRef.current) return;
     markerRef.current.setLngLat([livePos.lng, livePos.lat]);
-    markerRef.current.getElement().innerHTML = criarIconeHtml(linha.corHex, livePos.heading, true, isStale);
+    markerRef.current.getElement().innerHTML = criarIconeHtml(
+      linha.corHex,
+      livePos.heading,
+      true,
+      isStale,
+    );
   }, [livePos, linha.corHex, isStale]);
 
   // Mantém popup sincronizado com a posição GPS ao vivo
   useEffect(() => {
     if (!livePos || !popupState) return;
     setPopupState({ lng: livePos.lng, lat: livePos.lat });
-  // popupState intencionalmente omitido — queremos reagir ao livePos, não criar loop
-  // biome-ignore lint/correctness/useExhaustiveDependencies: veja comentário acima
-  }, [livePos]);
+    // popupState intencionalmente omitido — queremos reagir ao livePos, não criar loop
+  }, [livePos, popupState]);
 
   // RAF: posição teórica animada quando não há GPS ao vivo
   useEffect(() => {
@@ -141,7 +148,12 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
         const diff = Math.abs((pos.heading ?? 0) - (prevHeadingRef.current ?? 0));
         if (diff > 15 || prevHeadingRef.current === null) {
           prevHeadingRef.current = pos.heading;
-          markerRef.current.getElement().innerHTML = criarIconeHtml(linha.corHex, pos.heading, false, false);
+          markerRef.current.getElement().innerHTML = criarIconeHtml(
+            linha.corHex,
+            pos.heading,
+            false,
+            false,
+          );
         }
       }
       rafRef.current = requestAnimationFrame(animate);
@@ -189,7 +201,15 @@ interface BusPopupProps {
   theoreticalPos: ReturnType<typeof useBusPosition>;
 }
 
-function BusPopup({ linha, num, isLive, isStale, hasConnectionError, livePos, theoreticalPos }: BusPopupProps) {
+function BusPopup({
+  linha,
+  num,
+  isLive,
+  isStale,
+  hasConnectionError,
+  livePos,
+  theoreticalPos,
+}: BusPopupProps) {
   return (
     <div className="flex flex-col gap-2.5 font-sans text-sm">
       <div className="flex items-center gap-2">
@@ -202,7 +222,9 @@ function BusPopup({ linha, num, isLive, isStale, hasConnectionError, livePos, th
         <div className="min-w-0 flex-1">
           <p className="truncate font-bold text-text-primary leading-tight">{linha.nome}</p>
           {linha.sublinha && (
-            <p className="truncate text-[10px] text-text-secondary leading-tight">{linha.sublinha}</p>
+            <p className="truncate text-[10px] text-text-secondary leading-tight">
+              {linha.sublinha}
+            </p>
           )}
         </div>
         {isLive && !isStale && (
@@ -242,7 +264,9 @@ function BusPopup({ linha, num, isLive, isStale, hasConnectionError, livePos, th
             <Target size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
             <span>
               Confiança:{' '}
-              <strong className={livePos.confidence >= 0.7 ? 'text-success-text' : 'text-warning-text'}>
+              <strong
+                className={livePos.confidence >= 0.7 ? 'text-success-text' : 'text-warning-text'}
+              >
                 {Math.round(livePos.confidence * 100)}%
               </strong>
             </span>
@@ -252,7 +276,8 @@ function BusPopup({ linha, num, isLive, isStale, hasConnectionError, livePos, th
           </p>
         </div>
       ) : (
-        !isStale && theoreticalPos && (
+        !isStale &&
+        theoreticalPos && (
           <div className="flex flex-col gap-1.5 text-xs text-text-secondary">
             <div className="flex items-center gap-1.5">
               <Clock size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />

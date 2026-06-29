@@ -2,9 +2,9 @@ import type { FeatureCollection } from 'geojson';
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 import { useRotasData } from '@/contexts/RotasDataContext';
-import type { Linha } from '@/types/data.types';
 import { usePlannerStore } from '@/features/planner/store/plannerStore';
 import type { PlannerBusLeg } from '@/features/planner/types';
+import type { Linha } from '@/types/data.types';
 
 function nearestIdx(traj: readonly [number, number][], target: readonly [number, number]): number {
   let best = 0;
