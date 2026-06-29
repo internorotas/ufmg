@@ -61,6 +61,9 @@ function findCategoryIndex(
 }
 
 export function getActiveCategoryLinhas(linhasData: CategoriaLinhas): Linha[] {
+  const today = getSaoPauloDayOfWeek(getSaoPauloNow());
+  // Domingo: nenhuma categoria de serviço roda — retorna vazio para não mostrar ônibus no mapa
+  if (today === 0) return [];
   const idx = getInitialCategory(linhasData);
   return linhasData.categoriasDias[idx]?.linhas ?? [];
 }

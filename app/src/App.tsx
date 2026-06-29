@@ -460,8 +460,8 @@ function AppContent() {
   }, [handleInactivityTimeout, trackEvent]);
 
   const linhasAtivas = useMemo(
-    () => (linhasData ? getActiveCategoryLinhas(linhasData) : []),
-    [linhasData],
+    () => (linhasData && !isOfflineDataFallback ? getActiveCategoryLinhas(linhasData) : []),
+    [linhasData, isOfflineDataFallback],
   );
 
   // Validação dos dados

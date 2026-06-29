@@ -1,12 +1,12 @@
 import L, { type DragEndEvent } from 'leaflet';
 import { MousePointerClick } from 'lucide-react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import icon from '../../assets/marker.svg';
 import { DEFAULT_MAP_CENTER } from '../../config/mapDefaults';
-import type { CategoriaLinhas, Parada } from '../../types/data.types';
+import type { CategoriaLinhas, Linha, Parada } from '../../types/data.types';
 
 const stationIcon = L.icon({
   iconUrl: icon,
@@ -30,6 +30,151 @@ const CATEGORIA_OPTIONS = [
   'Externo',
   'Especial',
 ];
+
+/** Picker multi-seleção de linhas para "Linhas Atendidas" */
+function LinhasMultiPicker({
+  linhasData,
+  selected,
+  onChange,
+}: {
+  linhasData: CategoriaLinhas;
+  selected: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const todasLinhas = useMemo(() => {
+    const byId = new Map<string, Linha>();
+    for (const cat of linhasData.categoriasDias) {
+      for (const l of cat.linhas) {
+        if (!byId.has(l.idRota)) byId.set(l.idRota, l);
+      }
+    }
+    return Array.from(byId.values()).sort((a, b) => a.nome.localeCompare(b.nome));
+  }, [linhasData]);
+
+  const filtered = search.trim()
+    ? todasLinhas.filter(
+        (l) =>
+          l.nome.toLowerCase().includes(search.toLowerCase()) ||
+          l.idRota.toLowerCase().includes(search.toLowerCase()),
+      )
+    : todasLinhas;
+
+  const toggle = (idRota: string) => {
+    onChange(
+      selected.includes(idRota) ? selected.filter((id) => id !== idRota) : [...selected, idRota],
+    );
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full h-9 flex items-center justify-between gap-2 border border-input-border bg-input text-text-primary px-3 rounded text-sm hover:bg-card-hover transition-colors"
+      >
+        <span className="truncate">
+          {selected.length === 0
+            ? 'Nenhuma linha vinculada'
+            : `${selected.length} linha(s) vinculada(s)`}
+        </span>
+        <span className="text-text-secondary text-xs shrink-0">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {selected.map((idRota) => {
+            const l = todasLinhas.find((x) => x.idRota === idRota);
+            return (
+              <span
+                key={idRota}
+                className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded border border-card-border bg-background-secondary"
+              >
+                {l && (
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ background: l.corHex }}
+                  />
+                )}
+                <span className="font-mono">{l ? `${l.linha}. ${l.nome}` : idRota}</span>
+                <button
+                  type="button"
+                  onClick={() => toggle(idRota)}
+                  className="text-text-secondary hover:text-text-primary leading-none"
+                  aria-label={`Remover ${idRota}`}
+                >
+                  ×
+                </button>
+              </span>
+            );
+          })}
+        </div>
+      )}
+
+      {open && (
+        <div className="absolute z-9999 top-full left-0 right-0 mt-1 bg-card border border-card-border rounded shadow-lg max-h-64 overflow-hidden flex flex-col">
+          <div className="p-2 border-b border-card-border shrink-0">
+            <input
+              type="search"
+              placeholder="Buscar linha..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full h-8 border border-input-border bg-input text-text-primary px-2 rounded text-xs"
+              // biome-ignore lint/a11y/noAutofocus: campo de busca do picker precisa foco ao abrir
+              autoFocus
+            />
+          </div>
+          <div className="overflow-y-auto flex-1">
+            {filtered.length === 0 ? (
+              <p className="p-3 text-xs text-text-secondary">Nenhuma linha encontrada.</p>
+            ) : (
+              filtered.map((l) => (
+                <label
+                  key={l.idRota}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-card-hover cursor-pointer border-b border-card-border last:border-0"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(l.idRota)}
+                    onChange={() => toggle(l.idRota)}
+                    className="shrink-0"
+                  />
+                  <span
+                    className="w-3 h-3 rounded-full shrink-0 border border-black/20"
+                    style={{ background: l.corHex }}
+                  />
+                  <span className="flex-1 min-w-0 text-xs">
+                    <span className="font-medium text-text-primary">
+                      {l.linha}. {l.nome}
+                    </span>
+                    {l.sublinha && (
+                      <span className="text-text-secondary"> · {l.sublinha}</span>
+                    )}
+                  </span>
+                  <span className="text-xs font-mono text-text-tertiary shrink-0 bg-background-secondary px-1 rounded">
+                    {l.idRota}
+                  </span>
+                </label>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 /** Componente interno: atualiza coordenadas via ref (sem re-render na raiz) */
 function MapInteraction({
@@ -309,27 +454,13 @@ export function AdminParadasTab({
 
               {/* Linhas atendidas */}
               <div>
-                <label
-                  htmlFor="ap-linhas"
-                  className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide"
-                >
-                  Linhas Atendidas{' '}
-                  <span className="normal-case font-normal">(separadas por vírgula)</span>
-                </label>
-                <input
-                  id="ap-linhas"
-                  type="text"
-                  value={selected.linhasAtendidas.join(', ')}
-                  onChange={(e) =>
-                    update({
-                      ...selected,
-                      linhasAtendidas: e.target.value
-                        .split(',')
-                        .map((s) => s.trim())
-                        .filter(Boolean),
-                    })
-                  }
-                  className="w-full h-9 border border-input-border bg-input text-text-primary px-3 rounded text-sm"
+                <span className="block text-xs font-semibold text-text-primary mb-1 uppercase tracking-wide">
+                  Linhas Atendidas
+                </span>
+                <LinhasMultiPicker
+                  linhasData={linhasData}
+                  selected={selected.linhasAtendidas}
+                  onChange={(ids) => update({ ...selected, linhasAtendidas: ids })}
                 />
               </div>
 

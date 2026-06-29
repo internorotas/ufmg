@@ -64,10 +64,11 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
 
     const chave = normalizarNomeLinha(nomeLinhaParada);
     const candidatas = rotasService.getLinhasPorNomeNormalizado(chave);
-    if (candidatas.length === 0) return null;
+    if (candidatas.length === 0) return porId ?? null;
 
     const candidatasDoDia = candidatas.filter((l) => isLineAvailableToday(l.categoriaDia));
-    if (candidatasDoDia.length === 0) return null;
+    // Linha existe mas não circula hoje — retorna mesmo assim para exibir badge correto no popup
+    if (candidatasDoDia.length === 0) return porId ?? candidatas[0] ?? null;
 
     const candidatasNaParada = candidatasDoDia.filter(
       (linha) => linha.trajetoDetalhado?.some((t) => t.idParada === idParadaAtual) ?? false,
@@ -116,11 +117,11 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
     [parada.idParada, parada.linhasAtendidas, rotasService, currentTime],
   );
 
-  // Agrupa por nome-base da linha; exibe apenas a sublinha com menor ETA
+  // Agrupa por nome-base da linha; exibe apenas a sublinha com menor ETA (ou a única conhecida se não circula hoje)
   const linhasDisponiveis = useMemo(() => {
     const byNome = new Map<string, (typeof linhasResolvidas)[0]>();
     for (const entry of linhasResolvidas) {
-      if (!entry.linha) continue;
+      if (!entry.linha) continue; // ignora linhas completamente desconhecidas
       const key = entry.linha.nome;
       const existing = byNome.get(key);
       if (!existing) {

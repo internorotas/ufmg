@@ -1,5 +1,5 @@
 import { Pencil, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { type DragEndEvent } from 'leaflet';
@@ -173,6 +173,162 @@ function LinhaSelector({
   );
 }
 
+/** Picker visual para montar itinerário de paradas (ordenado) */
+function ParadasPicker({
+  paradas,
+  itinerario,
+  onChange,
+}: {
+  paradas: Parada[];
+  itinerario: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const [search, setSearch] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const uniqueParadas = useMemo(() => {
+    const byId = new Map<string, Parada>();
+    for (const p of paradas) {
+      if (!byId.has(p.idParada)) byId.set(p.idParada, p);
+    }
+    return Array.from(byId.values());
+  }, [paradas]);
+
+  const disponiveis = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return uniqueParadas.filter(
+      (p) =>
+        p.nome.toLowerCase().includes(q) ||
+        p.idParada.toLowerCase().includes(q),
+    );
+  }, [uniqueParadas, search]);
+
+  const addParada = (idParada: string) => {
+    if (itinerario.includes(idParada)) return;
+    onChange([...itinerario, idParada]);
+  };
+
+  const removeParada = (idx: number) => {
+    onChange(itinerario.filter((_, i) => i !== idx));
+  };
+
+  const moveUp = (idx: number) => {
+    if (idx === 0) return;
+    const next = [...itinerario];
+    [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+    onChange(next);
+  };
+
+  const moveDown = (idx: number) => {
+    if (idx === itinerario.length - 1) return;
+    const next = [...itinerario];
+    [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
+    onChange(next);
+  };
+
+  const handleSearchKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && disponiveis.length > 0) {
+      addParada(disponiveis[0].idParada);
+      setSearch('');
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      {/* Lista ordenada do itinerário atual */}
+      {itinerario.length > 0 ? (
+        <ol className="space-y-1 max-h-36 overflow-y-auto border border-card-border rounded p-1.5 bg-background-secondary">
+          {itinerario.map((idParada, idx) => {
+            const p = uniqueParadas.find((x) => x.idParada === idParada);
+            return (
+              <li
+                key={`${idParada}-${idx}`}
+                className="flex items-center gap-1 text-xs bg-card rounded px-2 py-1 border border-card-border"
+              >
+                <span className="text-text-tertiary font-mono w-5 text-right shrink-0">
+                  {idx + 1}.
+                </span>
+                <span className="flex-1 min-w-0 truncate text-text-primary">
+                  {p ? p.nome : idParada}
+                  <span className="text-text-tertiary font-mono ml-1">({idParada})</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => moveUp(idx)}
+                  disabled={idx === 0}
+                  className="text-text-secondary hover:text-text-primary disabled:opacity-30 px-0.5"
+                  title="Mover para cima"
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveDown(idx)}
+                  disabled={idx === itinerario.length - 1}
+                  className="text-text-secondary hover:text-text-primary disabled:opacity-30 px-0.5"
+                  title="Mover para baixo"
+                >
+                  ▼
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeParada(idx)}
+                  className="text-text-secondary hover:text-brand-accent px-0.5"
+                  title="Remover parada"
+                >
+                  ×
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      ) : (
+        <p className="text-xs text-text-secondary italic">Nenhuma parada no itinerário.</p>
+      )}
+
+      {/* Busca e adição de paradas */}
+      <div className="flex gap-1.5">
+        <input
+          ref={searchRef}
+          type="search"
+          placeholder="Buscar parada para adicionar (Enter)..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleSearchKey}
+          className="flex-1 h-8 border border-input-border bg-input text-text-primary px-2 rounded text-xs"
+        />
+      </div>
+      {search.trim() && (
+        <div className="border border-card-border rounded bg-card max-h-40 overflow-y-auto">
+          {disponiveis.length === 0 ? (
+            <p className="p-2 text-xs text-text-secondary">Nenhuma parada encontrada.</p>
+          ) : (
+            disponiveis.slice(0, 20).map((p) => (
+              <button
+                key={p.idParada}
+                type="button"
+                onClick={() => {
+                  addParada(p.idParada);
+                  setSearch('');
+                  searchRef.current?.focus();
+                }}
+                disabled={itinerario.includes(p.idParada)}
+                className="w-full text-left px-3 py-1.5 text-xs hover:bg-card-hover border-b border-card-border last:border-0 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <span className="flex-1 min-w-0 truncate text-text-primary">{p.nome}</span>
+                <span className="text-text-tertiary font-mono shrink-0">{p.idParada}</span>
+                {itinerario.includes(p.idParada) && (
+                  <span className="text-success-text text-xs shrink-0">✓</span>
+                )}
+              </button>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AdminLinhasTab({
   linhasData,
   setLinhasData,
@@ -185,7 +341,6 @@ export function AdminLinhasTab({
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [drawMode, setDrawMode] = useState(false);
   const [activeCategoryIdx, setActiveCategoryIdx] = useState(0);
-  const [itinerarioDraft, setItinerarioDraft] = useState<string | null>(null);
   const [horariosDraft, setHorariosDraft] = useState<string | null>(null);
   const [showDeleteLinhaConfirm, setShowDeleteLinhaConfirm] = useState(false);
 
@@ -301,7 +456,6 @@ export function AdminLinhasTab({
       ),
     );
     setSelectedRouteId(newId);
-    setItinerarioDraft(null);
     setHorariosDraft(null);
     setShowDeleteLinhaConfirm(false);
     setDrawMode(false);
@@ -320,13 +474,11 @@ export function AdminLinhasTab({
     setShowDeleteLinhaConfirm(false);
   }, [selectedRouteId, activeCategoryIdx, updateCats]);
 
-  const itinerarioValue = itinerarioDraft ?? selectedLinha?.itinerarioParadasIds.join(', ') ?? '';
   const horariosValue = horariosDraft ?? JSON.stringify(selectedLinha?.horarios ?? [], null, 2);
   const vertexCount = selectedLinha?.coordenadasTrajeto.length ?? 0;
 
   const selectLinha = (id: string | null) => {
     setSelectedRouteId(id);
-    setItinerarioDraft(null);
     setHorariosDraft(null);
     setShowDeleteLinhaConfirm(false);
     setDrawMode(false);
@@ -436,22 +588,8 @@ export function AdminLinhasTab({
                 />
               </div>
 
-              {/* Número + Cor */}
+              {/* Cor */}
               <div className="flex gap-2">
-                <div style={{ width: '80px' }}>
-                  <label htmlFor="al-numero" className={FIELD_LABEL}>
-                    Nº
-                  </label>
-                  <input
-                    id="al-numero"
-                    type="number"
-                    value={selectedLinha.linha}
-                    onChange={(e) =>
-                      updateLinha({ ...selectedLinha, linha: Number(e.target.value) })
-                    }
-                    className="w-full h-9 border border-input-border bg-input text-text-primary px-2 rounded text-sm"
-                  />
-                </div>
                 <div className="flex-1">
                   <label htmlFor="al-cor-hex" className={FIELD_LABEL}>
                     Cor
@@ -537,27 +675,17 @@ export function AdminLinhasTab({
 
               {/* Itinerário */}
               <div>
-                <label htmlFor="al-itinerario" className={FIELD_LABEL}>
+                <span className={FIELD_LABEL}>
                   Itinerário{' '}
-                  <span className="normal-case font-normal">(IDs das paradas, por vírgula)</span>
-                </label>
-                <textarea
-                  id="al-itinerario"
-                  rows={4}
-                  value={itinerarioValue}
-                  onChange={(e) => {
-                    setItinerarioDraft(e.target.value);
-                    const ids = e.target.value
-                      .split(',')
-                      .map((s) => s.trim())
-                      .filter(Boolean);
-                    updateLinha({ ...selectedLinha, itinerarioParadasIds: ids });
-                  }}
-                  className="w-full border border-input-border bg-input text-text-primary p-3 rounded text-xs font-mono resize-none"
+                  <span className="normal-case font-normal">
+                    ({selectedLinha.itinerarioParadasIds.length} paradas)
+                  </span>
+                </span>
+                <ParadasPicker
+                  paradas={uniqueParadas}
+                  itinerario={selectedLinha.itinerarioParadasIds}
+                  onChange={(ids) => updateLinha({ ...selectedLinha, itinerarioParadasIds: ids })}
                 />
-                <p className="text-xs text-text-secondary mt-0.5">
-                  {selectedLinha.itinerarioParadasIds.length} paradas no itinerário
-                </p>
               </div>
 
               {/* Horários */}
