@@ -46,6 +46,7 @@ jobs:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_API_VERSION: v1
           VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
           VITE_BASE_PATH: /
         run: pnpm build
 
@@ -54,5 +55,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=interno-rotas --branch=main
+          command: pages deploy --branch=main
           workingDirectory: ./app
