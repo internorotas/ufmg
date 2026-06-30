@@ -439,7 +439,7 @@ export function AdminLinhasTab({
       idRota: newId,
       linha: 99,
       nome: 'Nova Linha',
-      tipo: 'circular',
+      tipo: 'ufmg',
       sublinha: null,
       categoriaDia: activeCategory.categoriaDia,
       corHex: '#888888',
