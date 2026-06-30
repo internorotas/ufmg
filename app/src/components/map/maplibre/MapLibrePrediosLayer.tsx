@@ -83,7 +83,9 @@ export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
         longitude: e.lngLat.lng,
         latitude: e.lngLat.lat,
       };
-      // Impede que o click no prédio propague para o handler global do mapa
+      // preventDefault() sinaliza para handleMapClick que esse click já foi tratado
+      // (MapLibre dispara o evento de layer E o evento global do mapa para o mesmo click).
+      e.originalEvent.preventDefault();
       e.originalEvent.stopPropagation();
       onPredioClicado?.(info);
     },

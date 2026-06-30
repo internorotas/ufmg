@@ -121,7 +121,10 @@ export function MapLibreView({
     if (predio) setParadaAberta(null);
   }, []);
 
-  const handleMapClick = useCallback(() => {
+  const handleMapClick = useCallback((e: { originalEvent: MouseEvent }) => {
+    // Se um layer click (ex: prédio) já chamou preventDefault(), ignorar o click global.
+    // MapLibre dispara layer event + map event para o mesmo click nativo.
+    if (e.originalEvent.defaultPrevented) return;
     setParadaAberta(null);
     setPredioAberto(null);
   }, []);
@@ -362,16 +365,19 @@ export function MapLibreView({
 
       {/* Card da parada — renderizado fora do <MapLibreMap> para não ser clipado */}
       {paradaAberta && (
-        // biome-ignore lint/a11y/noStaticElementInteractions: wrapper que bloqueia propagação de clique — não é interativo para o usuário
+        // biome-ignore lint/a11y/noStaticElementInteractions: clicar na área transparente ao redor do card fecha-o
         <div
           className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center"
           role="presentation"
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => e.stopPropagation()}
+          onClick={() => openParada(null)}
+          onKeyDown={(e) => e.key === 'Escape' && openParada(null)}
         >
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: bloqueia propagação para o wrapper externo que fecha o card */}
           <div
             className="w-full max-w-sm flex flex-col rounded-t-2xl bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.18)] ring-1 ring-card-border"
             style={{ maxHeight: 'min(78vh, 560px)' }}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             {/* Header: handle centralizado + botão fechar absoluto */}
             <div className="relative flex items-center justify-center border-b border-card-border px-4 py-2.5">
@@ -394,16 +400,19 @@ export function MapLibreView({
 
       {/* Card do prédio — bottom sheet fora do <MapLibreMap> para não ser clipado */}
       {predioAberto && (
-        // biome-ignore lint/a11y/noStaticElementInteractions: wrapper que bloqueia propagação de clique — não é interativo para o usuário
+        // biome-ignore lint/a11y/noStaticElementInteractions: clicar na área transparente ao redor do card fecha-o
         <div
           className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center"
           role="presentation"
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => e.stopPropagation()}
+          onClick={() => openPredio(null)}
+          onKeyDown={(e) => e.key === 'Escape' && openPredio(null)}
         >
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: bloqueia propagação para o wrapper externo que fecha o card */}
           <div
             className="w-full max-w-sm flex flex-col rounded-t-2xl bg-card shadow-[0_-4px_24px_rgba(0,0,0,0.18)] ring-1 ring-card-border"
             style={{ maxHeight: 'min(72vh, 500px)' }}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             <div className="relative flex items-center justify-center border-b border-card-border px-4 py-2.5">
               <div className="h-1 w-10 rounded-full bg-card-border" aria-hidden="true" />
