@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
-import { normalizeBhtransLineId, UFMG_BHTRANS_LINE_IDS } from '../config/bhtransLines';
+import { UFMG_BHTRANS_LINE_IDS } from '../config/bhtransLines';
 
 export interface BhtransVehiclePosition {
   vehicleId: string;
   linhaId: string;
+  nome: string;
   lat: number;
   lng: number;
   recordedAt: string;
@@ -33,9 +34,7 @@ export function useBhtransLivePositions(): BhtransLiveState {
         });
         if (res.ok && !cancelled) {
           const data = (await res.json()) as BhtransVehiclePosition[];
-          const filtered = data
-            .map((p) => ({ ...p, linhaId: normalizeBhtransLineId(p.linhaId) }))
-            .filter((p) => UFMG_LINE_IDS.has(p.linhaId));
+          const filtered = data.filter((p) => UFMG_LINE_IDS.has(p.linhaId));
           setState({ positions: filtered, fetchedAt: new Date().toISOString() });
         }
       } catch {

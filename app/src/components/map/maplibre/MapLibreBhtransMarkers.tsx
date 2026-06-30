@@ -47,12 +47,13 @@ function timeAgo(iso: string): string {
 
 interface BhtransCardProps {
   linhaId: string;
+  nome: string;
   vehicleId: string;
   recordedAt: string;
   fetchedAt: string | null;
 }
 
-function BhtransCard({ linhaId, vehicleId, recordedAt, fetchedAt }: BhtransCardProps) {
+function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }: BhtransCardProps) {
   const cfg = getBhtransLineConfig(linhaId);
   const iconBg = hexToRgba(cfg.color, 0.15);
   const iconBorder = hexToRgba(cfg.color, 0.3);
@@ -78,8 +79,8 @@ function BhtransCard({ linhaId, vehicleId, recordedAt, fetchedAt }: BhtransCardP
               {cfg.label}
             </span>
             <span className="text-sm font-bold text-text-primary">{cfg.nome}</span>
+            {nome && <span className="text-xs text-text-secondary">— {nome}</span>}
           </div>
-          {cfg.sublinha && <p className="mt-0.5 text-xs text-text-secondary">{cfg.sublinha}</p>}
         </div>
       </div>
 
@@ -146,6 +147,7 @@ export function MapLibreBhtransMarkers() {
         >
           <BhtransCard
             linhaId={selected.linhaId}
+            nome={selected.nome}
             vehicleId={selected.vehicleId}
             recordedAt={selected.recordedAt}
             fetchedAt={fetchedAt}
