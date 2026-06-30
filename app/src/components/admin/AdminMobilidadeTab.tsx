@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { resolveApiEndpoint, withTenantHeaders } from '../../services/api/apiClient';
 
 interface MobilidadeSnapshot {
@@ -6,8 +7,11 @@ interface MobilidadeSnapshot {
   eventos24h: number;
   veiculosAtivos1h: number;
   ultimoEvento: string | null;
-  porLinha: { linha: string; total: number; veiculos: number }[];
+  porLinha: { linha: string; nome: string; total: number; veiculos: number }[];
 }
+
+type SortKey = 'linha' | 'nome' | 'total' | 'veiculos';
+type SortDir = 'asc' | 'desc';
 
 function timeAgo(iso: string): string {
   const diffS = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -22,6 +26,39 @@ export function AdminMobilidadeTab() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [sortKey, setSortKey] = useState<SortKey>('linha');
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  };
+
+  const sortedPorLinha = useMemo(() => {
+    if (!data?.porLinha) return [];
+    return [...data.porLinha].sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case 'linha':
+          cmp = a.linha.localeCompare(b.linha);
+          break;
+        case 'nome':
+          cmp = a.nome.localeCompare(b.nome);
+          break;
+        case 'total':
+          cmp = a.total - b.total;
+          break;
+        case 'veiculos':
+          cmp = a.veiculos - b.veiculos;
+          break;
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }, [data?.porLinha, sortKey, sortDir]);
 
   useEffect(() => {
     let cancelled = false;
@@ -104,21 +141,43 @@ export function AdminMobilidadeTab() {
             <table className="w-full border-collapse text-xs">
               <thead>
                 <tr>
-                  <th className={th}>Linha BHTrans</th>
-                  <th className={`${th} text-right`}>Eventos (1h)</th>
-                  <th className={`${th} text-right`}>Veículos (1h)</th>
+                  {(
+                    [
+                      { key: 'linha', label: 'Linha BHTrans', align: 'left' },
+                      { key: 'nome', label: 'Nome', align: 'left' },
+                      { key: 'total', label: 'Eventos (1h)', align: 'right' },
+                      { key: 'veiculos', label: 'Veículos (1h)', align: 'right' },
+                    ] as const
+                  ).map(({ key, label, align }) => (
+                    <th
+                      key={key}
+                      className={`${th} cursor-pointer select-none hover:bg-background-tertiary ${align === 'right' ? 'text-right' : ''}`}
+                      onClick={() => handleSort(key)}
+                    >
+                      <span className="inline-flex items-center gap-1">
+                        {label}
+                        {sortKey === key ? (
+                          sortDir === 'asc' ? (
+                            <ChevronUp size={12} />
+                          ) : (
+                            <ChevronDown size={12} />
+                          )
+                        ) : null}
+                      </span>
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {data.porLinha.length === 0 ? (
+                {sortedPorLinha.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className={`${cell} text-text-tertiary text-center py-4`}>
+                    <td colSpan={4} className={`${cell} text-text-tertiary text-center py-4`}>
                       Nenhum evento no último 1h — poller pode estar pausado ou API BHTrans
                       indisponível
                     </td>
                   </tr>
                 ) : (
-                  data.porLinha.map((row) => (
+                  sortedPorLinha.map((row) => (
                     <tr
                       key={row.linha}
                       className="border-t border-card-border hover:bg-background-secondary"
@@ -127,6 +186,9 @@ export function AdminMobilidadeTab() {
                         <span className="rounded bg-orange-100 dark:bg-orange-900/30 px-1.5 py-0.5 font-mono font-semibold text-orange-700 dark:text-orange-400">
                           {row.linha}
                         </span>
+                      </td>
+                      <td className={cell}>
+                        <span className="text-text-secondary">{row.nome}</span>
                       </td>
                       <td className={`${cell} text-right tabular-nums`}>
                         {row.total.toLocaleString('pt-BR')}
