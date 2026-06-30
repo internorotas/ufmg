@@ -1,35 +1,33 @@
+import { Bus } from 'lucide-react';
 import { useState } from 'react';
 import { Marker, Popup } from 'react-map-gl/maplibre';
+import { getBhtransLineConfig } from '@/features/gps/config/bhtransLines';
 import { useBhtransLivePositions } from '@/features/gps/hooks/useBhtransLivePositions';
+import { hexToRgba } from '@/lib/utils';
 
-function BhtransIcon() {
+function BhtransMarkerIcon({ color }: { color: string }) {
+  // MOVE (#b3ff19) é claro demais para ícone branco — usa escuro para legibilidade.
+  const iconColor = color === '#b3ff19' ? '#1a1a1a' : 'white';
   return (
-    <div
-      style={{
-        position: 'relative',
-        width: 26,
-        height: 26,
-        cursor: 'pointer',
-      }}
-    >
+    <div style={{ position: 'relative', width: 30, height: 30, cursor: 'pointer' }}>
       <div
         style={{
           position: 'absolute',
-          inset: 3,
+          inset: 2,
           borderRadius: '50%',
-          background: '#f97316',
+          background: color,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           border: '2px solid white',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.35)',
         }}
       >
         <svg
-          width="10"
-          height="10"
+          width="12"
+          height="12"
           viewBox="0 0 24 24"
-          fill="white"
+          fill={iconColor}
           xmlns="http://www.w3.org/2000/svg"
         >
           <title>Ônibus BHTrans</title>
@@ -47,8 +45,70 @@ function timeAgo(iso: string): string {
   return `há ${Math.floor(diffS / 60)} min`;
 }
 
+interface BhtransCardProps {
+  linhaId: string;
+  vehicleId: string;
+  recordedAt: string;
+  fetchedAt: string | null;
+}
+
+function BhtransCard({ linhaId, vehicleId, recordedAt, fetchedAt }: BhtransCardProps) {
+  const cfg = getBhtransLineConfig(linhaId);
+  const iconBg = hexToRgba(cfg.color, 0.15);
+  const iconBorder = hexToRgba(cfg.color, 0.3);
+  const labelBg = hexToRgba(cfg.color, 0.15);
+  const labelColor = cfg.color === '#b3ff19' ? '#5a6600' : cfg.color;
+
+  return (
+    <div className="flex flex-col gap-2 p-1 font-sans" style={{ minWidth: 200 }}>
+      {/* Cabeçalho: ícone + nome */}
+      <div className="flex items-start gap-2">
+        <div
+          className="flex size-10 shrink-0 items-center justify-center rounded-lg border"
+          style={{ backgroundColor: iconBg, borderColor: iconBorder }}
+        >
+          <Bus className="size-5" style={{ color: cfg.color }} aria-hidden="true" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span
+              className="rounded px-1.5 py-0.5 text-[10px] font-extrabold"
+              style={{ backgroundColor: labelBg, color: labelColor }}
+            >
+              {cfg.label}
+            </span>
+            <span className="text-sm font-bold text-text-primary">{cfg.nome}</span>
+          </div>
+          {cfg.sublinha && <p className="mt-0.5 text-xs text-text-secondary">{cfg.sublinha}</p>}
+        </div>
+      </div>
+
+      {/* Separador */}
+      <div className="h-px bg-border" />
+
+      {/* Infos do veículo */}
+      <div className="flex flex-col gap-1 text-xs">
+        <div className="flex justify-between gap-2">
+          <span className="text-text-tertiary">Veículo</span>
+          <span className="font-medium text-text-primary">{vehicleId}</span>
+        </div>
+        <div className="flex justify-between gap-2">
+          <span className="text-text-tertiary">Posição GPS</span>
+          <span className="font-medium text-text-primary">{timeAgo(recordedAt)}</span>
+        </div>
+        {fetchedAt && (
+          <div className="flex justify-between gap-2">
+            <span className="text-text-tertiary">Atualizado</span>
+            <span className="font-medium text-text-primary">{timeAgo(fetchedAt)}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function MapLibreBhtransMarkers() {
-  const positions = useBhtransLivePositions();
+  const { positions, fetchedAt } = useBhtransLivePositions();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   if (positions.length === 0) return null;
@@ -57,20 +117,23 @@ export function MapLibreBhtransMarkers() {
 
   return (
     <>
-      {positions.map((pos) => (
-        <Marker
-          key={pos.vehicleId}
-          longitude={pos.lng}
-          latitude={pos.lat}
-          anchor="center"
-          onClick={(e) => {
-            e.originalEvent.stopPropagation();
-            setSelectedId(pos.vehicleId);
-          }}
-        >
-          <BhtransIcon />
-        </Marker>
-      ))}
+      {positions.map((pos) => {
+        const { color } = getBhtransLineConfig(pos.linhaId);
+        return (
+          <Marker
+            key={pos.vehicleId}
+            longitude={pos.lng}
+            latitude={pos.lat}
+            anchor="center"
+            onClick={(e: { originalEvent: Event }) => {
+              e.originalEvent.stopPropagation();
+              setSelectedId(pos.vehicleId);
+            }}
+          >
+            <BhtransMarkerIcon color={color} />
+          </Marker>
+        );
+      })}
 
       {selected && (
         <Popup
@@ -79,17 +142,14 @@ export function MapLibreBhtransMarkers() {
           onClose={() => setSelectedId(null)}
           closeButton
           closeOnClick={false}
-          maxWidth="180px"
+          maxWidth="240px"
         >
-          <div className="flex flex-col gap-1 p-2 font-sans text-sm">
-            <div className="flex items-center gap-1.5">
-              <span className="rounded bg-orange-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white">
-                BHTrans
-              </span>
-              <span className="font-bold text-text-primary">Linha {selected.linhaId}</span>
-            </div>
-            <p className="text-[11px] text-text-tertiary">{timeAgo(selected.recordedAt)}</p>
-          </div>
+          <BhtransCard
+            linhaId={selected.linhaId}
+            vehicleId={selected.vehicleId}
+            recordedAt={selected.recordedAt}
+            fetchedAt={fetchedAt}
+          />
         </Popup>
       )}
     </>

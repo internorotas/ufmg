@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+import { normalizeBhtransLineId, UFMG_BHTRANS_LINE_IDS } from '../config/bhtransLines';
 
 export interface BhtransVehiclePosition {
   vehicleId: string;
@@ -9,10 +10,18 @@ export interface BhtransVehiclePosition {
   recordedAt: string;
 }
 
+export interface BhtransLiveState {
+  positions: BhtransVehiclePosition[];
+  fetchedAt: string | null;
+}
+
+// Espelha o filtro do backend — defesa em profundidade contra regressões de deploy.
+const UFMG_LINE_IDS = new Set(UFMG_BHTRANS_LINE_IDS);
+
 const POLL_INTERVAL_MS = 20_000;
 
-export function useBhtransLivePositions(): BhtransVehiclePosition[] {
-  const [positions, setPositions] = useState<BhtransVehiclePosition[]>([]);
+export function useBhtransLivePositions(): BhtransLiveState {
+  const [state, setState] = useState<BhtransLiveState>({ positions: [], fetchedAt: null });
 
   useEffect(() => {
     let cancelled = false;
@@ -24,7 +33,10 @@ export function useBhtransLivePositions(): BhtransVehiclePosition[] {
         });
         if (res.ok && !cancelled) {
           const data = (await res.json()) as BhtransVehiclePosition[];
-          setPositions(data);
+          const filtered = data
+            .map((p) => ({ ...p, linhaId: normalizeBhtransLineId(p.linhaId) }))
+            .filter((p) => UFMG_LINE_IDS.has(p.linhaId));
+          setState({ positions: filtered, fetchedAt: new Date().toISOString() });
         }
       } catch {
         // BHTrans é fonte auxiliar — ignora falhas silenciosamente
@@ -39,5 +51,5 @@ export function useBhtransLivePositions(): BhtransVehiclePosition[] {
     };
   }, []);
 
-  return positions;
+  return state;
 }

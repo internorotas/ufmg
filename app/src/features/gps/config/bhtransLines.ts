@@ -1,0 +1,55 @@
+/**
+ * Configuração estática das linhas BHTrans relevantes para a UFMG.
+ * Atualizar `nome` e `sublinha` conforme nomenclatura oficial da BHTrans.
+ */
+
+export interface BhtransLineConfig {
+  color: string;
+  /** Rótulo do grupo de serviço (MOVE, BH Comum, Suplementar). */
+  label: string;
+  nome: string;
+  sublinha?: string;
+}
+
+export const BHTRANS_LINE_CONFIG: Record<string, BhtransLineConfig> = {
+  // MOVE (BRT) — verde limão
+  '64': { color: '#b3ff19', label: 'MOVE', nome: 'Linha 64', sublinha: 'Cristiano Machado' },
+  '67': {
+    color: '#b3ff19',
+    label: 'MOVE',
+    nome: 'Linha 67',
+    sublinha: 'Antônio Carlos / Pedro I',
+  },
+  '5106': { color: '#b3ff19', label: 'MOVE', nome: 'Linha 5106', sublinha: 'UFMG' },
+
+  // BH Comum — azul
+  '5102': { color: '#0066af', label: 'BH Comum', nome: 'Linha 5102' },
+  '9502': { color: '#0066af', label: 'BH Comum', nome: 'Linha 9502' },
+  '9550': { color: '#0066af', label: 'BH Comum', nome: 'Linha 9550' },
+
+  // Suplementares — âmbar
+  S53: { color: '#efb12d', label: 'Suplementar', nome: 'Linha S53' },
+  S56: { color: '#efb12d', label: 'Suplementar', nome: 'Linha S56' },
+  S54: { color: '#efb12d', label: 'Suplementar', nome: 'Linha S54' },
+};
+
+export const UFMG_BHTRANS_LINE_IDS = Object.keys(BHTRANS_LINE_CONFIG);
+
+/** Normaliza o ID de linha BHTrans: strips leading zeros, mantém prefixo letra. */
+export function normalizeBhtransLineId(raw: string): string {
+  const s = String(raw).trim();
+  const letterMatch = s.match(/^([A-Za-z]+)\s*0*(\d+)$/);
+  if (letterMatch) return `${letterMatch[1].toUpperCase()}${letterMatch[2]}`;
+  const num = Number.parseInt(s, 10);
+  return Number.isNaN(num) ? s : String(num);
+}
+
+export function getBhtransLineConfig(linhaId: string): BhtransLineConfig {
+  return (
+    BHTRANS_LINE_CONFIG[linhaId] ?? {
+      color: '#94a3b8',
+      label: 'BHTrans',
+      nome: `Linha ${linhaId}`,
+    }
+  );
+}
