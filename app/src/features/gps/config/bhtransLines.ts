@@ -13,24 +13,23 @@ export interface BhtransLineConfig {
 
 export const BHTRANS_LINE_CONFIG: Record<string, BhtransLineConfig> = {
   // MOVE (BRT) — verde limão
-  '64': { color: '#b3ff19', label: 'MOVE', nome: 'Linha 64', sublinha: 'Cristiano Machado' },
+  '64': { color: '#b3ff19', label: 'MOVE', nome: '64' },
   '67': {
     color: '#b3ff19',
     label: 'MOVE',
-    nome: 'Linha 67',
-    sublinha: 'Antônio Carlos / Pedro I',
+    nome: '67',
   },
-  '5106': { color: '#b3ff19', label: 'MOVE', nome: 'Linha 5106', sublinha: 'UFMG' },
+  '5106': { color: '#b3ff19', label: 'MOVE', nome: '5106' },
 
   // BH Comum — azul
-  '5102': { color: '#0066af', label: 'BH Comum', nome: 'Linha 5102' },
-  '9502': { color: '#0066af', label: 'BH Comum', nome: 'Linha 9502' },
-  '9550': { color: '#0066af', label: 'BH Comum', nome: 'Linha 9550' },
+  '5102': { color: '#0066af', label: 'BH Comum', nome: '5102' },
+  '9502': { color: '#0066af', label: 'BH Comum', nome: '9502' },
+  '9550': { color: '#0066af', label: 'BH Comum', nome: '9550' },
 
   // Suplementares — âmbar
-  S53: { color: '#efb12d', label: 'Suplementar', nome: 'Linha S53' },
-  S56: { color: '#efb12d', label: 'Suplementar', nome: 'Linha S56' },
-  S54: { color: '#efb12d', label: 'Suplementar', nome: 'Linha S54' },
+  S53: { color: '#efb12d', label: 'Suplementar', nome: 'S53' },
+  S56: { color: '#efb12d', label: 'Suplementar', nome: 'S56' },
+  S54: { color: '#efb12d', label: 'Suplementar', nome: 'S54' },
 };
 
 export const UFMG_BHTRANS_LINE_IDS = Object.keys(BHTRANS_LINE_CONFIG);
