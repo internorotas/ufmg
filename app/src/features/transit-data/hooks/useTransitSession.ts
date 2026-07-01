@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+import { setCurrentTransitToken } from '@/services/api/transitApi';
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
 const TTL_MS = 120_000;
@@ -45,6 +46,7 @@ export function useTransitSession(): TransitSession {
   const scheduleRefresh = useCallback((delayMs: number) => {
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
     refreshTimerRef.current = setTimeout(() => {
+      setCurrentTransitToken(null);
       setState((prev) => ({ ...prev, turnstileReady: false, transitToken: null }));
     }, delayMs);
   }, []);
@@ -55,12 +57,14 @@ export function useTransitSession(): TransitSession {
       if (!token) return;
       expiresAtRef.current = Date.now() + TTL_MS;
       setState({ transitToken: token, turnstileReady: true, disabled: false });
+      setCurrentTransitToken(token);
       scheduleRefresh(TTL_MS - REFRESH_BEFORE_EXPIRY_MS);
     },
     [scheduleRefresh],
   );
 
   const onTurnstileError = useCallback(() => {
+    setCurrentTransitToken(null);
     setState((prev) => ({ ...prev, turnstileReady: false, transitToken: null }));
   }, []);
 

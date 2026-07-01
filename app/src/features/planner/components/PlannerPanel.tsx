@@ -9,6 +9,8 @@ import { tv } from 'tailwind-variants';
 import { Button } from '@/components/ui/Button';
 import { useRotasData } from '@/contexts/RotasDataContext';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+import { getCurrentTransitToken } from '@/services/api/transitApi';
+import { decryptGeoPayload } from '@/services/api/transitGeo';
 import type { Parada } from '@/types/data.types';
 import { usePlannerRoutes } from '../api/usePlannerRoutes';
 import { type PlannerEndpoint, type PlannerStop, usePlannerStore } from '../store/plannerStore';
@@ -278,17 +280,23 @@ export function PlannerPanel() {
           const { latitude: lat, longitude: lng } = pos.coords;
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 6000);
+          const transitToken = getCurrentTransitToken();
           const url = resolveApiEndpoint(`/v1/stops/nearest?lat=${lat}&lng=${lng}&limit=1`);
           const res = await fetch(url, {
             signal: controller.signal,
-            headers: withTenantHeaders(),
+            headers: withTenantHeaders({
+              ...(transitToken ? { 'X-Transit-Token': transitToken } : {}),
+            }),
           });
           clearTimeout(timeoutId);
           if (!res.ok) {
             setLocationError('Não foi possível encontrar paradas próximas. Tente novamente.');
             return;
           }
-          const paradas: Parada[] = (await res.json()) as Parada[];
+          const json = (await res.json()) as { p: string };
+          const paradas: Parada[] = transitToken
+            ? await decryptGeoPayload<Parada[]>(json.p, transitToken)
+            : [];
           if (!paradas.length) {
             setLocationError('Nenhuma parada encontrada próxima à sua localização.');
             return;

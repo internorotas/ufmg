@@ -1,4 +1,5 @@
-import { resolveApiEndpoint } from './apiClient';
+import { resolveApiEndpoint, withTenantHeaders } from './apiClient';
+import { getCurrentTransitToken } from './transitApi';
 
 export interface GtfsRoute {
   route_id: string;
@@ -37,10 +38,13 @@ export async function fetchGtfsRoutes(): Promise<GtfsRoute[]> {
   }
 
   const endpoint = resolveApiEndpoint('/api/gtfs/routes');
+  const token = getCurrentTransitToken();
+  const headers = withTenantHeaders({ ...(token ? { 'X-Transit-Token': token } : {}) });
   const response = await fetch(endpoint, {
     method: 'GET',
     cache: 'no-store',
     credentials: 'include',
+    headers,
   });
 
   if (!response.ok) {
@@ -59,10 +63,13 @@ export async function fetchGtfsStops(routeId: string): Promise<GtfsStop[]> {
   }
 
   const endpoint = resolveApiEndpoint(`/api/gtfs/routes/${routeId}/stops`);
+  const token = getCurrentTransitToken();
+  const headers = withTenantHeaders({ ...(token ? { 'X-Transit-Token': token } : {}) });
   const response = await fetch(endpoint, {
     method: 'GET',
     cache: 'no-store',
     credentials: 'include',
+    headers,
   });
 
   if (!response.ok) {
@@ -81,10 +88,13 @@ export async function fetchGtfsShape(routeId: string): Promise<GtfsShape[]> {
   }
 
   const endpoint = resolveApiEndpoint(`/api/gtfs/routes/${routeId}/shape`);
+  const token = getCurrentTransitToken();
+  const headers = withTenantHeaders({ ...(token ? { 'X-Transit-Token': token } : {}) });
   const response = await fetch(endpoint, {
     method: 'GET',
     cache: 'no-store',
     credentials: 'include',
+    headers,
   });
 
   if (!response.ok) {
@@ -119,10 +129,13 @@ export async function fetchGtfsShape(routeId: string): Promise<GtfsShape[]> {
 
 export async function searchGtfsStops(query: string): Promise<GtfsStop[]> {
   const endpoint = resolveApiEndpoint(`/api/gtfs/stops/search?q=${encodeURIComponent(query)}`);
+  const token = getCurrentTransitToken();
+  const headers = withTenantHeaders({ ...(token ? { 'X-Transit-Token': token } : {}) });
   const response = await fetch(endpoint, {
     method: 'GET',
     cache: 'no-store',
     credentials: 'include',
+    headers,
   });
 
   if (!response.ok) {

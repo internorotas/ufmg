@@ -136,6 +136,16 @@ function decodeTransitProto(buffer: ArrayBuffer): {
 // compartilham a mesma Promise em vez de fazer dois requests idênticos.
 let _pendingTransitData: Promise<{ linhas: CategoriaLinhas; paradas: Parada[] }> | null = null;
 
+let _currentTransitToken: string | null = null;
+
+export function setCurrentTransitToken(token: string | null): void {
+  _currentTransitToken = token;
+}
+
+export function getCurrentTransitToken(): string | null {
+  return _currentTransitToken;
+}
+
 async function doFetchTransitDataBinary(
   transitToken?: string,
 ): Promise<{ linhas: CategoriaLinhas; paradas: Parada[] }> {
