@@ -46,9 +46,16 @@ function BusIconMini({ corHex }: { corHex: string }) {
   );
 }
 
-function BusMarkerPopup({ linha, pos }: { linha: Linha; pos: PosicaoTeorica }) {
+function BusMarkerPopup({
+  linha,
+  pos,
+  onVerLinha,
+}: {
+  linha: Linha;
+  pos: PosicaoTeorica;
+  onVerLinha: () => void;
+}) {
   const num = numLinha(linha);
-  const { selecionarLinha } = useRotasSelection();
 
   return (
     <div className="flex flex-col gap-2 p-3 font-sans text-sm">
@@ -84,7 +91,7 @@ function BusMarkerPopup({ linha, pos }: { linha: Linha; pos: PosicaoTeorica }) {
       </div>
       <button
         type="button"
-        onClick={() => selecionarLinha(linha)}
+        onClick={onVerLinha}
         className="mt-1 w-full rounded bg-brand-primary px-2 py-1.5 text-center text-xs font-semibold text-white transition-colors hover:bg-brand-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
       >
         Ver esta linha
@@ -101,6 +108,7 @@ export function MapLibreAllBusMarkers({
   const posicoes = useAllBusPositions(linhas, todasParadas);
   const [selectedIdRota, setSelectedIdRota] = useState<string | null>(null);
   const linhaMap = useMemo(() => new Map(linhas.map((l) => [l.idRota, l])), [linhas]);
+  const { selecionarLinha, limparSelecao } = useRotasSelection();
 
   // Fecha popup se o ônibus selecionado não está mais na lista de posições
   useEffect(() => {
@@ -111,6 +119,11 @@ export function MapLibreAllBusMarkers({
 
   const selectedPos = selectedIdRota ? (posicoes.get(selectedIdRota) ?? null) : null;
   const selectedLinha = selectedIdRota ? (linhaMap.get(selectedIdRota) ?? null) : null;
+
+  const handleClose = () => {
+    setSelectedIdRota(null);
+    limparSelecao();
+  };
 
   return (
     <>
@@ -128,7 +141,10 @@ export function MapLibreAllBusMarkers({
               longitude={pos.lng}
               latitude={pos.lat}
               anchor="center"
-              onClick={() => setSelectedIdRota(idRota)}
+              onClick={(e: { originalEvent: Event }) => {
+                e.originalEvent.stopPropagation();
+                setSelectedIdRota(idRota);
+              }}
             >
               <BusIconMini corHex={linha.corHex} />
             </Marker>
@@ -139,12 +155,19 @@ export function MapLibreAllBusMarkers({
         <Popup
           longitude={selectedPos.lng}
           latitude={selectedPos.lat}
-          onClose={() => setSelectedIdRota(null)}
+          onClose={handleClose}
           closeButton
-          closeOnClick={false}
+          closeOnClick
           maxWidth="220px"
         >
-          <BusMarkerPopup linha={selectedLinha} pos={selectedPos} />
+          <BusMarkerPopup
+            linha={selectedLinha}
+            pos={selectedPos}
+            onVerLinha={() => {
+              selecionarLinha(selectedLinha);
+              setSelectedIdRota(null);
+            }}
+          />
         </Popup>
       )}
     </>
