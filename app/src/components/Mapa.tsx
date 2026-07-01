@@ -11,9 +11,11 @@ import { X } from 'lucide-react';
 import { type Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { useRotasSelection } from '@/contexts/RotasContext';
 import type { MapaRef } from '@/contexts/RotasSelectionContext';
+import { useAuthContext } from '@/features/auth/context/AuthContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '../hooks/useAnalytics';
 import type { Linha, Parada } from '../types/data.types';
+import { LoginBenefitsBanner } from './LoginBenefitsBanner';
 import { MapLibreView } from './map/maplibre';
 
 // Re-exporta para callers que importam MapaRef de Mapa.tsx
@@ -56,6 +58,7 @@ export function Mapa({
 }: MapaProps) {
   const { trackTiming } = useAnalytics();
   const { limparSelecao } = useRotasSelection();
+  const { isAuthenticated } = useAuthContext();
   const mapLoadStartRef = useRef<number>(0);
 
   const [compassEnabled, setCompassEnabled] = useState(false);
@@ -120,6 +123,8 @@ export function Mapa({
         rastreioColaborativo={rastreioColaborativo}
         onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
       />
+
+      {!isAuthenticated && <LoginBenefitsBanner />}
     </div>
   );
 }
