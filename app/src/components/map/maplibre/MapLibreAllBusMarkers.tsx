@@ -46,15 +46,13 @@ function BusIconMini({ corHex }: { corHex: string }) {
   );
 }
 
-function BusMarkerPopup({
-  linha,
-  pos,
-  onVerLinha,
-}: {
+export interface BusMarkerPopupProps {
   linha: Linha;
   pos: PosicaoTeorica;
   onVerLinha: () => void;
-}) {
+}
+
+export function BusMarkerPopup({ linha, pos, onVerLinha }: BusMarkerPopupProps) {
   const num = numLinha(linha);
 
   return (

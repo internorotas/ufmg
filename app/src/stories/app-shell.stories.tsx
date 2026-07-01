@@ -9,14 +9,19 @@
  */
 
 import type { Story } from '@ladle/react';
-import { AlertTriangle, Bell, CheckCircle, Download, Info } from 'lucide-react';
+import { AlertTriangle, BarChart3, Bell, CheckCircle, Download, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type React from 'react';
 import { useState } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
+import { BottomNav } from '@/components/app/BottomNav';
 import { DataSourceBanner } from '@/components/app/DataSourceBanner';
 import { DataStatusScreen } from '@/components/app/DataStatusScreen';
+import { MobileTopBar } from '@/components/app/MobileTopBar';
+import { NavRail } from '@/components/app/NavRail';
 import { OfflineToast } from '@/components/app/OfflineToast';
+import { Button } from '@/components/ui/Button';
 import { SystemBanner } from '@/components/SystemBanner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -706,6 +711,143 @@ export const ComposedErrorScenario: Story = () => (
     />
   </div>
 );
+
+// ---------------------------------------------------------------------------
+// MobileTopBar
+// ---------------------------------------------------------------------------
+
+export const MobileTopBarAnonymous: Story = () => (
+  <div className="max-w-sm">
+    <MobileTopBar authStatus="anonymous" isAuthenticated={false} onAuthAction={() => alert('Login')} />
+  </div>
+);
+MobileTopBarAnonymous.storyName = 'MobileTopBar — anônimo (botão Entrar)';
+
+export const MobileTopBarAuthenticated: Story = () => (
+  <div className="max-w-sm">
+    <MobileTopBar authStatus="authenticated" isAuthenticated={true} onAuthAction={() => alert('Perfil')} />
+  </div>
+);
+MobileTopBarAuthenticated.storyName = 'MobileTopBar — autenticado (botão Perfil)';
+
+export const MobileTopBarBooting: Story = () => (
+  <div className="max-w-sm">
+    <MobileTopBar authStatus="booting" isAuthenticated={false} onAuthAction={() => {}} />
+  </div>
+);
+MobileTopBarBooting.storyName = 'MobileTopBar — carregando sessão (skeleton)';
+
+// ---------------------------------------------------------------------------
+// BottomNav
+// ---------------------------------------------------------------------------
+
+export const BottomNavHome: Story = () => (
+  <WithRouter>
+    <div className="relative h-32 bg-background-secondary">
+      <p className="p-4 text-sm text-text-secondary">BottomNav fixo na base (rota: /)</p>
+      <BottomNav />
+    </div>
+  </WithRouter>
+);
+BottomNavHome.storyName = 'BottomNav — ativo em /';
+
+export const BottomNavRanking: Story = () => (
+  <MemoryRouter initialEntries={['/ranking']}>
+    <div className="relative h-32 bg-background-secondary">
+      <p className="p-4 text-sm text-text-secondary">BottomNav fixo na base (rota: /ranking)</p>
+      <BottomNav />
+    </div>
+  </MemoryRouter>
+);
+BottomNavRanking.storyName = 'BottomNav — ativo em /ranking';
+
+export const BottomNavPerfil: Story = () => (
+  <MemoryRouter initialEntries={['/perfil']}>
+    <div className="relative h-32 bg-background-secondary">
+      <p className="p-4 text-sm text-text-secondary">BottomNav fixo na base (rota: /perfil)</p>
+      <BottomNav />
+    </div>
+  </MemoryRouter>
+);
+BottomNavPerfil.storyName = 'BottomNav — ativo em /perfil';
+
+// ---------------------------------------------------------------------------
+// NavRail
+// ---------------------------------------------------------------------------
+
+export const NavRailHome: Story = () => (
+  <WithRouter>
+    <div className="flex h-64 border border-card-border">
+      <NavRail />
+      <div className="flex-1 p-4 text-sm text-text-secondary">Conteúdo da página (rota: /)</div>
+    </div>
+  </WithRouter>
+);
+NavRailHome.storyName = 'NavRail — ativo em / (desktop)';
+
+export const NavRailLinhas: Story = () => (
+  <MemoryRouter initialEntries={['/linhas']}>
+    <div className="flex h-64 border border-card-border">
+      <NavRail />
+      <div className="flex-1 p-4 text-sm text-text-secondary">Conteúdo da página (rota: /linhas)</div>
+    </div>
+  </MemoryRouter>
+);
+NavRailLinhas.storyName = 'NavRail — ativo em /linhas (desktop)';
+
+export const NavRailPerfil: Story = () => (
+  <MemoryRouter initialEntries={['/perfil']}>
+    <div className="flex h-64 border border-card-border">
+      <NavRail />
+      <div className="flex-1 p-4 text-sm text-text-secondary">Conteúdo da página (rota: /perfil)</div>
+    </div>
+  </MemoryRouter>
+);
+NavRailPerfil.storyName = 'NavRail — ativo em /perfil (desktop)';
+
+// ---------------------------------------------------------------------------
+// AnalyticsConsentBanner
+// ---------------------------------------------------------------------------
+
+// O GA_MEASUREMENT_ID não está disponível em Ladle (env de build), então
+// renderizamos o conteúdo visual diretamente para mostrar o design.
+export const AnalyticsConsentBannerPreview: Story = () => (
+  <div className="relative min-h-40 bg-background-secondary p-4">
+    <p className="text-sm text-text-secondary mb-20">Conteúdo da app (banner aparece embaixo)</p>
+    <div
+      role="alertdialog"
+      aria-label="Consentimento de analytics"
+      className="pointer-events-auto absolute inset-x-0 bottom-0 border-t-2 border-(--neo-border-color) bg-card px-4 py-4"
+    >
+      <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center neo-brutal-sm bg-brand-primary text-white">
+            <BarChart3 size={16} aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-text-primary">Análise de uso (opcional)</p>
+            <p className="mt-0.5 text-xs text-text-secondary">
+              Usamos Google Analytics para entender como o app é utilizado e melhorar a experiência.
+              Nenhum dado pessoal identificável é coletado.{' '}
+              <span className="font-medium text-brand-primary underline underline-offset-2">
+                Política de privacidade
+              </span>
+            </p>
+          </div>
+        </div>
+        <div className="flex shrink-0 gap-2">
+          <Button type="button" variant="outline" size="sm" className="min-h-9 text-xs">
+            Recusar
+          </Button>
+          <Button type="button" size="sm" className="min-h-9 text-xs">
+            Aceitar
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+AnalyticsConsentBannerPreview.storyName = 'AnalyticsConsentBanner — preview visual';
 
 // ---------------------------------------------------------------------------
 // Export order

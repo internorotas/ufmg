@@ -44,7 +44,7 @@ function timeAgo(iso: string): string {
   return `há ${Math.floor(diffS / 60)} min`;
 }
 
-interface BhtransCardProps {
+export interface BhtransCardProps {
   linhaId: string;
   nome: string;
   vehicleId: string;
@@ -52,7 +52,7 @@ interface BhtransCardProps {
   fetchedAt: string | null;
 }
 
-function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }: BhtransCardProps) {
+export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }: BhtransCardProps) {
   const cfg = getBhtransLineConfig(linhaId);
   const badgeBg = cfg.color === '#b3ff19' ? '#5a6600' : cfg.color;
 
