@@ -5,7 +5,7 @@
 
 export interface BhtransLineConfig {
   color: string;
-  /** Rótulo do grupo de serviço (MOVE, BH Comum, Suplementar). */
+  /** Rótulo do grupo de serviço (MOVE, Municipal, Suplementar). */
   label: string;
   nome: string;
   sublinha?: string;
@@ -21,10 +21,10 @@ export const BHTRANS_LINE_CONFIG: Record<string, BhtransLineConfig> = {
   },
   '5106': { color: '#b3ff19', label: 'MOVE', nome: '5106' },
 
-  // BH Comum — azul
-  '5102': { color: '#0066af', label: 'BH Comum', nome: '5102' },
-  '9502': { color: '#0066af', label: 'BH Comum', nome: '9502' },
-  '9550': { color: '#0066af', label: 'BH Comum', nome: '9550' },
+  // Municipal — azul
+  '5102': { color: '#0066af', label: 'Municipal', nome: '5102' },
+  '9502': { color: '#0066af', label: 'Municipal', nome: '9502' },
+  '9550': { color: '#0066af', label: 'Municipal', nome: '9550' },
 
   // Suplementares — âmbar
   S53: { color: '#efb12d', label: 'Suplementar', nome: 'S53' },
