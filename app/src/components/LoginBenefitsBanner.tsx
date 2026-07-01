@@ -1,6 +1,6 @@
+import { Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap } from 'lucide-react';
 
 const DISMISS_KEY = 'login-benefits-banner-dismissed';
 
