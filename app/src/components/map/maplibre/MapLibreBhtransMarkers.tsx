@@ -54,46 +54,61 @@ export interface BhtransCardProps {
 
 export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }: BhtransCardProps) {
   const cfg = getBhtransLineConfig(linhaId);
+  // MOVE (#b3ff19) é claro demais para texto branco — escurece o badge.
   const badgeBg = cfg.color === '#b3ff19' ? '#5a6600' : cfg.color;
 
   return (
-    <div className="flex flex-col gap-2 p-3 font-sans text-sm">
-      {/* Cabeçalho: badge + nome */}
-      <div className="flex items-center gap-2">
-        <span
-          className="shrink-0 rounded px-1.5 py-0.5 text-xs font-extrabold text-white"
-          style={{ background: badgeBg }}
-        >
-          {cfg.label}
+    <div className="flex flex-col font-sans text-sm">
+      {/* Barra de título: light=escuro sobre branco, dark=cinza médio sobre card escuro.
+          pr-9 reserva espaço para o botão × do MapLibre (24px + 6px gap). */}
+      <div className="bg-brand-dark dark:bg-neutral-bg px-3 pr-9 py-1.5">
+        <span className="text-xs font-bold tracking-wide uppercase text-text-inverse dark:text-text-primary">
+          BHTRANS (AO VIVO)
         </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-bold text-text-primary leading-tight">{cfg.nome}</p>
-          {nome && (
-            <p className="truncate text-[10px] text-text-secondary leading-tight">— {nome}</p>
-          )}
-        </div>
       </div>
 
-      {/* Infos do veículo */}
-      <div className="flex flex-col gap-1 text-xs text-text-secondary">
-        <div className="flex items-center gap-1.5">
-          <Radio size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
-          <span className="font-semibold text-text-primary">Posição ao vivo</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Bus size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
-          <span>
-            Veículo <strong className="text-text-primary">{vehicleId}</strong>
+      <div className="flex flex-col gap-2 p-3">
+        {/* Badge com número da linha + nome da rota */}
+        <div className="flex items-center gap-2">
+          <span
+            className="shrink-0 rounded px-1.5 py-0.5 text-xs font-extrabold text-white"
+            style={{ background: badgeBg }}
+          >
+            {cfg.nome}
           </span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Clock size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
-          <span>
-            GPS <strong className="text-text-primary">{timeAgo(recordedAt)}</strong>
-            {fetchedAt && (
-              <> · atualizado <strong className="text-text-primary">{timeAgo(fetchedAt)}</strong></>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-bold text-text-primary leading-tight">
+              {nome || cfg.nome}
+            </p>
+            {nome && (
+              <p className="truncate text-[10px] text-text-secondary leading-tight">
+                {cfg.label} (BHTRANS)
+              </p>
             )}
-          </span>
+          </div>
+        </div>
+
+        {/* Infos do veículo */}
+        <div className="flex flex-col gap-1 text-xs text-text-secondary">
+          <div className="flex items-center gap-1.5">
+            <Radio size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
+            <span className="font-semibold text-text-primary">Posição ao vivo</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Bus size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
+            <span>
+              Veículo <strong className="text-text-primary">{vehicleId}</strong>
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Clock size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
+            <span>
+              GPS <strong className="text-text-primary">{timeAgo(recordedAt)}</strong>
+              {fetchedAt && (
+                <> · atualizado <strong className="text-text-primary">{timeAgo(fetchedAt)}</strong></>
+              )}
+            </span>
+          </div>
         </div>
       </div>
     </div>
