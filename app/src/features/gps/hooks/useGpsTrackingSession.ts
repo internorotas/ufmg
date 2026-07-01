@@ -15,7 +15,7 @@ const IDLE_INTERVAL_MS = 30_000;
 const MAX_QUEUE_POINTS = 500;
 const IDLE_AUTO_FINISH_MS = 5 * 60 * 1000;
 const MAX_SESSION_DURATION_MS = 60 * 60 * 1000;
-const MAX_ROUTE_DISTANCE_KM = 0.3;
+const MAX_ROUTE_DISTANCE_KM = 0.2;
 const TERMINAL_DISTANCE_KM = 0.08;
 const OFFLINE_SESSION_STORAGE_KEY = getTenantStorageKey('gps-offline-session');
 
