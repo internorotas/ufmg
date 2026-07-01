@@ -2,11 +2,7 @@ import { useMemo } from 'react';
 import { isLineAvailableToday } from '../config/specialPeriods';
 import { obterMultiplicadorTrafego } from '../config/trafegoConfig';
 import { getSaoPauloMinutesOfDay, getSaoPauloNow, toSaoPauloDate } from '../lib/time';
-import {
-  converterHoraParaMinutos,
-  converterMinutosParaHora,
-  obterHorariosLinhaNoDia,
-} from '../lib/utils';
+import { converterMinutosParaHora, obterHorariosMinutosLinhaNoDia } from '../lib/utils';
 import type { Linha } from '../types/data.types';
 import { useCurrentTime } from './useCurrentTime';
 
@@ -55,7 +51,7 @@ export function calcularPrevisaoChegada(
     return null;
   }
   const agoraSaoPaulo = toSaoPauloDate(agora);
-  const horariosSaida = obterHorariosLinhaNoDia(linha, agoraSaoPaulo);
+  const horariosSaida = obterHorariosMinutosLinhaNoDia(linha, agoraSaoPaulo);
   if (horariosSaida.length === 0) return null;
 
   const horaAtualMinutos = getSaoPauloMinutesOfDay(agoraSaoPaulo);
@@ -91,7 +87,7 @@ export function calcularPrevisaoChegada(
   let ultimaChegadaPassada: number | null = null;
 
   for (let i = 0; i < horariosSaida.length; i++) {
-    const saidaMinutos = converterHoraParaMinutos(horariosSaida[i]);
+    const saidaMinutos = horariosSaida[i];
     if (Number.isNaN(saidaMinutos)) continue;
 
     let chegadaPrevistaMinutos = saidaMinutos + tempoViagemReal;
