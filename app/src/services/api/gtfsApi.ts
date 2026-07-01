@@ -91,7 +91,28 @@ export async function fetchGtfsShape(routeId: string): Promise<GtfsShape[]> {
     throw new Error(`Erro HTTP ${response.status} em ${endpoint}`);
   }
 
-  const data = (await response.json()) as GtfsShape[];
+  const raw = (await response.json()) as unknown;
+
+  // Backend retorna FeatureCollection RFC 7946 com LineString ([lng, lat])
+  // Converter para GtfsShape[] para compatibilidade com GtfsRouteLayer
+  const fc = raw as {
+    type?: string;
+    features?: Array<{ geometry?: { type?: string; coordinates?: number[][] } }>;
+  };
+  let data: GtfsShape[];
+  if (fc.type === 'FeatureCollection' && Array.isArray(fc.features)) {
+    const coords = fc.features[0]?.geometry?.coordinates ?? [];
+    data = coords.map(([lng, lat], i) => ({
+      shape_id: routeId,
+      shape_pt_lat: lat ?? 0,
+      shape_pt_lon: lng ?? 0,
+      shape_pt_sequence: i,
+    }));
+  } else {
+    // fallback: formato legado de array de pontos
+    data = raw as GtfsShape[];
+  }
+
   shapesCache.set(routeId, { data, expires: Date.now() + CACHE_TTL_MS });
   return data;
 }
