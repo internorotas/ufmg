@@ -6,6 +6,17 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('../src', import.meta.url)),
+      'react-map-gl/maplibre': fileURLToPath(
+        new URL('../node_modules/react-map-gl/dist/maplibre.js', import.meta.url),
+      ),
+    },
+    dedupe: ['react', 'react-dom'],
+  },
+  server: {
+    fs: {
+      // Permite acesso ao workspace raiz (node_modules compartilhado do monorepo)
+      // e aos internals do @ladle/react fora da pasta do app.
+      allow: ['..', '../..', '../../..'],
     },
   },
   define: {
