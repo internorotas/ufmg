@@ -95,6 +95,9 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_API_VERSION': JSON.stringify(env.VITE_API_VERSION || 'v1'),
     },
     build: {
+      // MapLibre GL (~1 MB) não pode ser dividido — é uma lib WebGL monolítica.
+      // Já isolado em vendor-maplibre; levantamos o limite para suprimir o aviso.
+      chunkSizeWarningLimit: 1100,
       rollupOptions: {
         output: {
           manualChunks(id) {
