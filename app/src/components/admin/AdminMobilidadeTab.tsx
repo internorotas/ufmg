@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { resolveApiEndpoint, withTenantHeaders } from '../../services/api/apiClient';
+import { getAdminHeaders } from '../../services/api/adminAuth';
 
 interface MobilidadeSnapshot {
   eventos1h: number;
@@ -66,7 +67,7 @@ export function AdminMobilidadeTab() {
       try {
         setLoading(true);
         const res = await fetch(resolveApiEndpoint('/v1/admin/telemetria/mobilidade'), {
-          headers: withTenantHeaders(),
+          headers: withTenantHeaders(getAdminHeaders()),
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = (await res.json()) as MobilidadeSnapshot;

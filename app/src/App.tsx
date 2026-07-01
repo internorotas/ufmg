@@ -93,6 +93,9 @@ const AboutPage = lazy(() =>
 const FakeAdminLoginPage = lazy(() =>
   import('./routes/admin/FakeAdminLoginPage').then((m) => ({ default: m.FakeAdminLoginPage })),
 );
+const AdminPage = lazy(() =>
+  import('./routes/admin/AdminPage').then((m) => ({ default: m.AdminPage })),
+);
 const LinhasPage = lazy(() =>
   import('./routes/linhas/LinhasPage').then((m) => ({ default: m.LinhasPage })),
 );
@@ -750,6 +753,7 @@ export function App() {
         <Suspense fallback={<PageLoading />}>
           <Routes>
             <Route path="/admin/*" element={<FakeAdminLoginPage />} />
+            <Route path="/gestao" element={<AdminPage />} />
             <Route path="/pesquisa" element={<ResearchDashboardPage />} />
             <Route path="/*" element={<AppAuthenticatedRoutes />} />
           </Routes>

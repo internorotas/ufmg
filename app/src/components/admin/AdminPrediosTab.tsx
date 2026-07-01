@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { resolveApiEndpoint, withTenantHeaders } from '../../services/api/apiClient';
+import { getAdminHeaders } from '../../services/api/adminAuth';
 
 interface AdminBuilding {
   id: string;
@@ -20,7 +21,7 @@ function useBuildingList() {
     setLoading(true);
     try {
       const res = await fetch(resolveApiEndpoint('/v1/admin/map-buildings'), {
-        headers: withTenantHeaders(),
+        headers: withTenantHeaders(getAdminHeaders()),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as AdminBuilding[];
@@ -46,7 +47,7 @@ async function patchBuilding(
 ): Promise<void> {
   const res = await fetch(resolveApiEndpoint(`/v1/admin/map-buildings/${id}`), {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...withTenantHeaders() },
+    headers: { 'Content-Type': 'application/json', ...withTenantHeaders(getAdminHeaders()) },
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -55,7 +56,7 @@ async function patchBuilding(
 async function importOsm(): Promise<{ imported: number; skipped: number; errors: number }> {
   const res = await fetch(resolveApiEndpoint('/v1/admin/map-buildings/import-osm'), {
     method: 'POST',
-    headers: withTenantHeaders(),
+    headers: withTenantHeaders(getAdminHeaders()),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json() as Promise<{ imported: number; skipped: number; errors: number }>;
