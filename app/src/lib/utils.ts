@@ -168,6 +168,59 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
   return horariosDia.filter((horario) => parseHorarioValido(horario) !== null);
 }
 
+const _horariosCache = new WeakMap<string[], number[]>();
+
+/**
+ * Retorna os horários da linha para o dia atual, já formatados em minutos e ordenados.
+ * Usa WeakMap interno para evitar `O(N log N)` redundante, com speedups massivos.
+ */
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  // Regra de negócio central: somente linhas vigentes no dia entram no motor de horários/ETA.
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const horariosBrutos = linha.horarios as unknown;
+
+  if (Array.isArray(horariosBrutos)) {
+    const cached = _horariosCache.get(horariosBrutos as string[]);
+    if (cached) return cached;
+
+    const computed = horariosBrutos
+      .map((horario) => converterHoraParaMinutos(horario))
+      .filter((minutos) => Number.isFinite(minutos))
+      .sort((a, b) => a - b);
+
+    _horariosCache.set(horariosBrutos as string[], computed);
+    return computed;
+  }
+
+  if (!horariosBrutos || typeof horariosBrutos !== 'object') {
+    return [];
+  }
+
+  const horariosPorDia = horariosBrutos as HorariosPorDia;
+  const chaveDia = obterChaveDiaSemana(dataAtual);
+  const horariosDia = horariosPorDia[chaveDia];
+
+  if (!Array.isArray(horariosDia) || horariosDia.length === 0) {
+    return [];
+  }
+
+  const cached = _horariosCache.get(horariosDia);
+  if (cached) {
+    return cached;
+  }
+
+  const computed = horariosDia
+    .map((horario) => converterHoraParaMinutos(horario))
+    .filter((minutos) => Number.isFinite(minutos))
+    .sort((a, b) => a - b);
+
+  _horariosCache.set(horariosDia, computed);
+  return computed;
+}
+
 /**
  * Calcula status operacional da linha no instante atual.
  *
@@ -187,12 +240,7 @@ export function obterStatusLinha(
     return { id: 'NAO_CIRCULA_HOJE', texto: 'Não circula hoje', cor: 'danger' };
   }
 
-  const horariosHoje =
-    horariosPreCalculados ??
-    obterHorariosLinhaNoDia(linha, dataAtual)
-      .map((horario) => converterHoraParaMinutos(horario))
-      .filter((minutos) => Number.isFinite(minutos))
-      .sort((a, b) => a - b);
+  const horariosHoje = horariosPreCalculados ?? obterHorariosMinutosLinhaNoDia(linha, dataAtual);
 
   if (horariosHoje.length === 0) {
     return {
