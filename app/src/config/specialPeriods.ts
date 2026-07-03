@@ -6,6 +6,7 @@
  */
 
 import { getSaoPauloDayOfWeek, getSaoPauloNow, toSaoPauloDate } from '../lib/time';
+import { fetchSpecialPeriods } from '../services/api/specialPeriodsApi';
 import { CategoriaDia } from '../types/data.types';
 
 export interface SpecialPeriod {
@@ -17,7 +18,10 @@ export interface SpecialPeriod {
 }
 
 /**
- * Lista de períodos especiais configurados para operação diferenciada.
+ * Fallback estático usado até a primeira sincronização com a API responder
+ * (ou se ela falhar). A fonte de verdade é o calendário escolar da UFMG,
+ * sincronizado no backend pelo módulo `academic-calendar` — ver
+ * initSpecialPeriodsFromApi().
  */
 export const SPECIAL_PERIODS: SpecialPeriod[] = [
   {
@@ -36,6 +40,65 @@ export const SPECIAL_PERIODS: SpecialPeriod[] = [
   },
 ];
 
+let runtimePeriods: SpecialPeriod[] | null = null;
+let runtimeHolidayDates: Set<string> | null = null;
+
+function currentPeriods(): SpecialPeriod[] {
+  return runtimePeriods ?? SPECIAL_PERIODS;
+}
+
+/**
+ * Busca os períodos especiais (férias/recesso) e feriados sincronizados a
+ * partir do calendário escolar da UFMG e substitui o fallback estático.
+ * Deve ser chamada uma vez na inicialização do app (ver main.tsx). Falhas de
+ * rede são silenciosas — o fallback hardcoded continua valendo.
+ */
+export async function initSpecialPeriodsFromApi(): Promise<void> {
+  try {
+    const items = await fetchSpecialPeriods();
+    const periods: SpecialPeriod[] = [];
+    const holidayDates = new Set<string>();
+
+    for (const item of items) {
+      if (item.tipo === 'feriado') {
+        holidayDates.add(item.dataInicio.slice(0, 10));
+        continue;
+      }
+      if (item.tipo === 'ferias' || item.tipo === 'recesso') {
+        periods.push({
+          name: item.nome,
+          description: item.nome,
+          startDate: new Date(item.dataInicio),
+          endDate: new Date(item.dataFim),
+          isActive: true,
+        });
+      }
+    }
+
+    runtimePeriods = periods;
+    runtimeHolidayDates = holidayDates;
+  } catch {
+    // Mantém o fallback estático (SPECIAL_PERIODS / sem feriados isolados).
+  }
+}
+
+function formatDateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Verifica se hoje é um feriado isolado (ex: Tiradentes) sincronizado do
+ * calendário escolar da UFMG. Diferente de um período de férias/recesso:
+ * é um único dia em que as linhas não circulam mesmo sendo dia útil.
+ */
+export function isHolidayToday(): boolean {
+  if (!runtimeHolidayDates) return false;
+  return runtimeHolidayDates.has(formatDateKey(getSaoPauloNow()));
+}
+
 /**
  * Verifica se estamos atualmente em um período especial ativo
  * @returns {SpecialPeriod | null} O período especial ativo ou null se não houver nenhum
@@ -45,7 +108,7 @@ export function getCurrentSpecialPeriod(): SpecialPeriod | null {
   const nowSp = getSaoPauloNow();
   const now = new Date(nowSp.getFullYear(), nowSp.getMonth(), nowSp.getDate(), 0, 0, 0, 0);
 
-  for (const period of SPECIAL_PERIODS) {
+  for (const period of currentPeriods()) {
     if (!period.isActive) continue;
 
     const start = toSaoPauloDate(new Date(period.startDate));
@@ -110,10 +173,11 @@ export function isLineAvailableToday(categoriaDia: CategoriaDia): boolean {
   const isSunday = today === 0;
   const isWeekday = today >= 1 && today <= 5;
   const isInVacationPeriod = shouldDisableRegularSchedules();
+  const isHoliday = isHolidayToday();
 
   return (
-    (categoriaDia === CategoriaDia.DiasUteis && isWeekday && !isInVacationPeriod) ||
-    (categoriaDia === CategoriaDia.Sabado && isSaturday && !isInVacationPeriod) ||
+    (categoriaDia === CategoriaDia.DiasUteis && isWeekday && !isInVacationPeriod && !isHoliday) ||
+    (categoriaDia === CategoriaDia.Sabado && isSaturday && !isInVacationPeriod && !isHoliday) ||
     (categoriaDia === CategoriaDia.FeriasERecessos &&
       isInVacationPeriod &&
       !isSaturday &&
@@ -129,15 +193,18 @@ export function getLinhaNotRunningMessage(categoriaDia: CategoriaDia): string {
   const isSaturday = today === 6;
   const isSunday = today === 0;
   const isInVacationPeriod = shouldDisableRegularSchedules();
+  const isHoliday = isHolidayToday();
 
   switch (categoriaDia) {
     case CategoriaDia.DiasUteis:
       if (isInVacationPeriod) return 'Linha suspensa durante férias';
+      if (isHoliday) return 'Linha não circula em feriado';
       if (isSaturday) return 'Linha não circula aos sábados';
       if (isSunday) return 'Linha não circula aos domingos';
       break;
     case CategoriaDia.Sabado:
       if (isInVacationPeriod) return 'Linha suspensa durante férias';
+      if (isHoliday) return 'Linha não circula em feriado';
       return 'Linha circula apenas aos sábados';
     case CategoriaDia.FeriasERecessos:
       if (!isInVacationPeriod) return 'Linha circula apenas durante férias';
