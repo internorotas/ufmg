@@ -175,6 +175,44 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
  * @param dataAtual Data/hora de referência.
  * @returns Identificador técnico, texto de exibição e severidade visual do status.
  */
+
+const _horariosMinutosCache = new WeakMap<string[], number[]>();
+
+/**
+ * Retorna os horários válidos da linha em minutos para o dia atual.
+ * Usa um cache baseado na referência do array de horários do dia para evitar recálculos O(N log N).
+ */
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const horariosBrutos = linha.horarios as unknown;
+  let horariosDia: string[] | undefined;
+
+  if (Array.isArray(horariosBrutos)) {
+    horariosDia = horariosBrutos;
+  } else if (horariosBrutos && typeof horariosBrutos === 'object') {
+    const chaveDia = obterChaveDiaSemana(dataAtual);
+    horariosDia = (horariosBrutos as HorariosPorDia)[chaveDia];
+  }
+
+  if (!Array.isArray(horariosDia) || horariosDia.length === 0) {
+    return [];
+  }
+
+  let cached = _horariosMinutosCache.get(horariosDia);
+  if (!cached) {
+    cached = horariosDia
+      .map(converterHoraParaMinutos)
+      .filter((minutos) => Number.isFinite(minutos))
+      .sort((a, b) => a - b);
+    _horariosMinutosCache.set(horariosDia, cached);
+  }
+
+  return cached;
+}
+
 export function obterStatusLinha(
   linha: Linha,
   dataAtual: Date,
@@ -187,12 +225,7 @@ export function obterStatusLinha(
     return { id: 'NAO_CIRCULA_HOJE', texto: 'Não circula hoje', cor: 'danger' };
   }
 
-  const horariosHoje =
-    horariosPreCalculados ??
-    obterHorariosLinhaNoDia(linha, dataAtual)
-      .map((horario) => converterHoraParaMinutos(horario))
-      .filter((minutos) => Number.isFinite(minutos))
-      .sort((a, b) => a - b);
+  const horariosHoje = horariosPreCalculados ?? obterHorariosMinutosLinhaNoDia(linha, dataAtual);
 
   if (horariosHoje.length === 0) {
     return {
