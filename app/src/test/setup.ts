@@ -13,7 +13,7 @@ function createStorageMock(): Storage {
       return Object.keys(store)[index] ?? null;
     },
     getItem(key: string) {
-      return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null;
+      return Object.hasOwn(store, key) ? store[key] : null;
     },
     setItem(key: string, value: string) {
       store[key] = String(value);
