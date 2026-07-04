@@ -10,7 +10,6 @@
 
 import type { Story } from '@ladle/react';
 import { AlertTriangle, BarChart3, Bell, CheckCircle, Download, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import type React from 'react';
 import { useState } from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -21,9 +20,9 @@ import { DataStatusScreen } from '@/components/app/DataStatusScreen';
 import { MobileTopBar } from '@/components/app/MobileTopBar';
 import { NavRail } from '@/components/app/NavRail';
 import { OfflineToast } from '@/components/app/OfflineToast';
-import { Button } from '@/components/ui/Button';
 import { SystemBanner } from '@/components/SystemBanner';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { Button } from '@/components/ui/Button';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // ---------------------------------------------------------------------------
@@ -718,14 +717,22 @@ export const ComposedErrorScenario: Story = () => (
 
 export const MobileTopBarAnonymous: Story = () => (
   <div className="max-w-sm">
-    <MobileTopBar authStatus="anonymous" isAuthenticated={false} onAuthAction={() => alert('Login')} />
+    <MobileTopBar
+      authStatus="anonymous"
+      isAuthenticated={false}
+      onAuthAction={() => alert('Login')}
+    />
   </div>
 );
 MobileTopBarAnonymous.storyName = 'MobileTopBar — anônimo (botão Entrar)';
 
 export const MobileTopBarAuthenticated: Story = () => (
   <div className="max-w-sm">
-    <MobileTopBar authStatus="authenticated" isAuthenticated={true} onAuthAction={() => alert('Perfil')} />
+    <MobileTopBar
+      authStatus="authenticated"
+      isAuthenticated={true}
+      onAuthAction={() => alert('Perfil')}
+    />
   </div>
 );
 MobileTopBarAuthenticated.storyName = 'MobileTopBar — autenticado (botão Perfil)';
@@ -789,7 +796,9 @@ export const NavRailLinhas: Story = () => (
   <MemoryRouter initialEntries={['/linhas']}>
     <div className="flex h-64 border border-card-border">
       <NavRail />
-      <div className="flex-1 p-4 text-sm text-text-secondary">Conteúdo da página (rota: /linhas)</div>
+      <div className="flex-1 p-4 text-sm text-text-secondary">
+        Conteúdo da página (rota: /linhas)
+      </div>
     </div>
   </MemoryRouter>
 );
@@ -799,7 +808,9 @@ export const NavRailPerfil: Story = () => (
   <MemoryRouter initialEntries={['/perfil']}>
     <div className="flex h-64 border border-card-border">
       <NavRail />
-      <div className="flex-1 p-4 text-sm text-text-secondary">Conteúdo da página (rota: /perfil)</div>
+      <div className="flex-1 p-4 text-sm text-text-secondary">
+        Conteúdo da página (rota: /perfil)
+      </div>
     </div>
   </MemoryRouter>
 );

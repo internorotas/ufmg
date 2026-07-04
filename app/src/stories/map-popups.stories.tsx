@@ -8,10 +8,10 @@
 
 import type { Story } from '@ladle/react';
 import React from 'react';
-import { BhtransCard } from '@/components/map/maplibre/MapLibreBhtransMarkers';
 import { BusMarkerPopup } from '@/components/map/maplibre/MapLibreAllBusMarkers';
-import type { Linha } from '@/types/data.types';
+import { BhtransCard } from '@/components/map/maplibre/MapLibreBhtransMarkers';
 import type { PosicaoTeorica } from '@/lib/busPosition';
+import type { Linha } from '@/types/data.types';
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -149,13 +149,7 @@ BhtransSuplem.storyName = 'BhtransCard — Suplementar (S53, GPS antigo)';
 
 export const BhtransSemNome: Story = () => (
   <PopupWrapper>
-    <BhtransCard
-      linhaId="9550"
-      nome=""
-      vehicleId="3301"
-      recordedAt={AGO_40S}
-      fetchedAt={null}
-    />
+    <BhtransCard linhaId="9550" nome="" vehicleId="3301" recordedAt={AGO_40S} fetchedAt={null} />
   </PopupWrapper>
 );
 BhtransSemNome.storyName = 'BhtransCard — sem itinerário, sem fetchedAt';
@@ -175,13 +169,15 @@ BhtransDesconhecida.storyName = 'BhtransCard — linha desconhecida (fallback ci
 
 export const BhtransTodas: Story = () => (
   <div className="flex flex-wrap gap-4 p-6">
-    {([
-      { linhaId: '64', nome: 'PAMPULHA / SAVASSI', vehicleId: '11001' },
-      { linhaId: '9502', nome: 'SAO GERALDO / SAO FRANCISCO', vehicleId: '11164' },
-      { linhaId: '9550', nome: 'PAMPULHA / LAGOINHA', vehicleId: '22340' },
-      { linhaId: 'S53', nome: 'CAMPUS / CENTRO VIA SUPLEMENTAR', vehicleId: '7892' },
-      { linhaId: 'S56', nome: 'PAMPULHA / BARREIRO', vehicleId: '5512' },
-    ] as const).map(({ linhaId, nome, vehicleId }) => (
+    {(
+      [
+        { linhaId: '64', nome: 'PAMPULHA / SAVASSI', vehicleId: '11001' },
+        { linhaId: '9502', nome: 'SAO GERALDO / SAO FRANCISCO', vehicleId: '11164' },
+        { linhaId: '9550', nome: 'PAMPULHA / LAGOINHA', vehicleId: '22340' },
+        { linhaId: 'S53', nome: 'CAMPUS / CENTRO VIA SUPLEMENTAR', vehicleId: '7892' },
+        { linhaId: 'S56', nome: 'PAMPULHA / BARREIRO', vehicleId: '5512' },
+      ] as const
+    ).map(({ linhaId, nome, vehicleId }) => (
       <div
         key={linhaId}
         className="rounded shadow-lg border border-card-border bg-card overflow-hidden"
@@ -228,11 +224,7 @@ BusUFMGMeio.storyName = 'BusMarkerPopup — com sublinha, meio da rota (17 min)'
 
 export const BusUFMGLongo: Story = () => (
   <PopupWrapper>
-    <BusMarkerPopup
-      linha={linhaFerias}
-      pos={posicaoLonga}
-      onVerLinha={() => alert('Ver linha')}
-    />
+    <BusMarkerPopup linha={linhaFerias} pos={posicaoLonga} onVerLinha={() => alert('Ver linha')} />
   </PopupWrapper>
 );
 BusUFMGLongo.storyName = 'BusMarkerPopup — sublinha férias, rota longa (48 min)';
@@ -268,7 +260,10 @@ export const ComparacaoPopups: Story = () => (
       <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide">
         BHTrans (ao vivo)
       </p>
-      <div className="rounded shadow-lg border border-card-border bg-card overflow-hidden" style={{ minWidth: 220 }}>
+      <div
+        className="rounded shadow-lg border border-card-border bg-card overflow-hidden"
+        style={{ minWidth: 220 }}
+      >
         <BhtransCard
           linhaId="9502"
           nome="SAO GERALDO/SAO FRANCISCO VIA ESPLANADA"
@@ -282,15 +277,13 @@ export const ComparacaoPopups: Story = () => (
       <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide">
         UFMG (estimativa)
       </p>
-      <div className="rounded shadow-lg border border-card-border bg-card overflow-hidden" style={{ minWidth: 220 }}>
-        <BusMarkerPopup
-          linha={linhaCircularCampi}
-          pos={posicaoInicio}
-          onVerLinha={() => {}}
-        />
+      <div
+        className="rounded shadow-lg border border-card-border bg-card overflow-hidden"
+        style={{ minWidth: 220 }}
+      >
+        <BusMarkerPopup linha={linhaCircularCampi} pos={posicaoInicio} onVerLinha={() => {}} />
       </div>
     </div>
   </div>
 );
 ComparacaoPopups.storyName = 'Comparação — BHTrans vs UFMG (design padronizado)';
-

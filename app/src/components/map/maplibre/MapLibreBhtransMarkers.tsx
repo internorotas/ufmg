@@ -77,9 +77,7 @@ export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }:
             {cfg.nome}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-bold text-text-primary leading-tight">
-              {nome || cfg.nome}
-            </p>
+            <p className="truncate font-bold text-text-primary leading-tight">{nome || cfg.nome}</p>
             {nome && (
               <p className="truncate text-[10px] text-text-secondary leading-tight">
                 {cfg.label} (BHTRANS)
@@ -105,7 +103,10 @@ export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }:
             <span>
               GPS <strong className="text-text-primary">{timeAgo(recordedAt)}</strong>
               {fetchedAt && (
-                <> · atualizado <strong className="text-text-primary">{timeAgo(fetchedAt)}</strong></>
+                <>
+                  {' '}
+                  · atualizado <strong className="text-text-primary">{timeAgo(fetchedAt)}</strong>
+                </>
               )}
             </span>
           </div>

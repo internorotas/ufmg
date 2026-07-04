@@ -1,6 +1,45 @@
 /// <reference types="node" />
 import { createRequire } from 'node:module';
 
+// Jsdom não expõe localStorage/sessionStorage via window em todos os cenários.
+// Polyfill in-memory compatível com a Web Storage API.
+function createStorageMock(): Storage {
+  let store: Record<string, string> = {};
+  return {
+    get length() {
+      return Object.keys(store).length;
+    },
+    key(index: number) {
+      return Object.keys(store)[index] ?? null;
+    },
+    getItem(key: string) {
+      return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null;
+    },
+    setItem(key: string, value: string) {
+      store[key] = String(value);
+    },
+    removeItem(key: string) {
+      delete store[key];
+    },
+    clear() {
+      store = {};
+    },
+  };
+}
+
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', {
+    value: createStorageMock(),
+    writable: true,
+    configurable: true,
+  });
+  Object.defineProperty(window, 'sessionStorage', {
+    value: createStorageMock(),
+    writable: true,
+    configurable: true,
+  });
+}
+
 const _require = createRequire(import.meta.url);
 
 type Internals = Record<string, unknown>;

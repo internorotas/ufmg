@@ -77,16 +77,10 @@ export function GpsPositionWarningDialog({
 
             {/* Ações */}
             <div className="flex flex-col gap-2">
-              <Button
-                type="button"
-                variant="primary"
-                fullWidth
-                onClick={onConfirm}
-              >
-                <span className='flex gap-2 items-center'>
-
-                <Radio size={15} aria-hidden="true" />
-                Contribuir mesmo assim
+              <Button type="button" variant="primary" fullWidth onClick={onConfirm}>
+                <span className="flex gap-2 items-center">
+                  <Radio size={15} aria-hidden="true" />
+                  Contribuir mesmo assim
                 </span>
               </Button>
               <Button type="button" variant="ghost" fullWidth onClick={onCancel}>
