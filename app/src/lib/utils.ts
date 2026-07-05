@@ -175,6 +175,42 @@ export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[]
  * @param dataAtual Data/hora de referência.
  * @returns Identificador técnico, texto de exibição e severidade visual do status.
  */
+
+const _horariosMinutosCache = new WeakMap<string[], number[]>();
+
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const horariosBrutos = linha.horarios as unknown;
+
+  let horariosDia: string[] | undefined;
+  if (Array.isArray(horariosBrutos)) {
+    horariosDia = horariosBrutos as string[];
+  } else if (horariosBrutos && typeof horariosBrutos === 'object') {
+    const horariosPorDia = horariosBrutos as HorariosPorDia;
+    const chaveDia = obterChaveDiaSemana(dataAtual);
+    horariosDia = horariosPorDia[chaveDia];
+  }
+
+  if (!Array.isArray(horariosDia) || horariosDia.length === 0) {
+    return [];
+  }
+
+  let cached = _horariosMinutosCache.get(horariosDia);
+  if (cached) return cached;
+
+  cached = horariosDia
+    .filter((h) => h?.includes(':'))
+    .map(converterHoraParaMinutos)
+    .filter((m) => Number.isFinite(m))
+    .sort((a, b) => a - b);
+
+  _horariosMinutosCache.set(horariosDia, cached);
+  return cached;
+}
+
 export function obterStatusLinha(
   linha: Linha,
   dataAtual: Date,
