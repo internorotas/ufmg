@@ -12,6 +12,16 @@ import { calcularPosicaoTeorica } from '@/lib/busPosition';
 import { hexToRgba } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
 
+let _gpsPulseStyleInjected = false;
+function ensureGpsPulseStyle(pulseColor: string, pulseColor0: string) {
+  if (_gpsPulseStyleInjected) return;
+  _gpsPulseStyleInjected = true;
+  const style = document.createElement('style');
+  style.id = 'gps-pulse-style';
+  style.textContent = `@keyframes gps-pulse{0%{box-shadow:0 0 0 0 ${pulseColor}}70%{box-shadow:0 0 0 8px ${pulseColor0}}100%{box-shadow:0 0 0 0 ${pulseColor0}}}`;
+  document.head.appendChild(style);
+}
+
 interface MapLibreGpsLiveBusMarkerProps {
   linha: Linha;
   todasParadas: Parada[];
@@ -37,8 +47,9 @@ function criarIconeHtml(
   const pulseColor0 = hexToRgba(corHex, 0);
   const showPulse = isLive && !isStale;
 
+  if (showPulse) ensureGpsPulseStyle(pulseColor, pulseColor0);
+
   return `
-    ${showPulse ? `<style>@keyframes gps-pulse{0%{box-shadow:0 0 0 0 ${pulseColor}}70%{box-shadow:0 0 0 8px ${pulseColor0}}100%{box-shadow:0 0 0 0 ${pulseColor0}}}</style>` : ''}
     <div style="position:relative;width:36px;height:36px;">
       ${
         mostrarSeta
@@ -66,7 +77,7 @@ interface PopupState {
 export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiveBusMarkerProps) {
   const { current: mapInstance } = useMap();
   const markerRef = useRef<maplibregl.Marker | null>(null);
-  const rafRef = useRef<number>(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevHeadingRef = useRef<number | null>(null);
   const [popupState, setPopupState] = useState<PopupState | null>(null);
 
@@ -114,7 +125,7 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
       marker.remove();
       markerRef.current = null;
       prevHeadingRef.current = null;
-      cancelAnimationFrame(rafRef.current);
+      if (intervalRef.current !== null) clearInterval(intervalRef.current);
     };
   }, [mapInstance, initialPos, linha.corHex]);
 
@@ -137,11 +148,11 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
     // popupState intencionalmente omitido — queremos reagir ao livePos, não criar loop
   }, [livePos, popupState]);
 
-  // RAF: posição teórica animada quando não há GPS ao vivo
+  // Posição teórica atualizada a cada 5s quando não há GPS ao vivo
   useEffect(() => {
     if (livePos) return;
 
-    const animate = () => {
+    const tick = () => {
       const pos = calcularPosicaoTeorica(linha, todasParadas, new Date());
       if (pos && markerRef.current) {
         markerRef.current.setLngLat([pos.lng, pos.lat]);
@@ -156,11 +167,12 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
           );
         }
       }
-      rafRef.current = requestAnimationFrame(animate);
     };
 
-    rafRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafRef.current);
+    intervalRef.current = setInterval(tick, 5_000);
+    return () => {
+      if (intervalRef.current !== null) clearInterval(intervalRef.current);
+    };
   }, [linha, todasParadas, livePos]);
 
   if (!popupState) return null;

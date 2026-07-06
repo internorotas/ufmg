@@ -35,25 +35,19 @@ export function useRouteAnimation(layerId: string, active: boolean): void {
     const map = mapInstance.getMap();
     if (!map) return;
 
-    let rafId: number;
     let step = 0;
 
-    const animate = (timestamp: number) => {
-      const newStep = Math.floor(timestamp / 80) % DASH_SEQUENCE.length;
-      if (newStep !== step) {
-        step = newStep;
-        try {
-          if (map.getLayer(layerId)) {
-            map.setPaintProperty(layerId, 'line-dasharray', DASH_SEQUENCE[step]);
-          }
-        } catch {
-          // layer ainda não foi adicionado ao estilo — ignora silenciosamente
+    const id = setInterval(() => {
+      step = (step + 1) % DASH_SEQUENCE.length;
+      try {
+        if (map.getLayer(layerId)) {
+          map.setPaintProperty(layerId, 'line-dasharray', DASH_SEQUENCE[step]);
         }
+      } catch {
+        // layer ainda não foi adicionado ao estilo — ignora silenciosamente
       }
-      rafId = requestAnimationFrame(animate);
-    };
+    }, 80);
 
-    rafId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafId);
+    return () => clearInterval(id);
   }, [mapInstance, layerId, active]);
 }
