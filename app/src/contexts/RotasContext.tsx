@@ -6,7 +6,7 @@
  * estado de seleção de UI (linha/parada/mapa).
  */
 
-import type { ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import {
   type RotasDataContextData,
   RotasDataProvider,
@@ -44,10 +44,7 @@ export function useRotas(): RotasContextData {
   const data = useRotasDataState();
   const selection = useRotasSelectionState();
 
-  return {
-    ...data,
-    ...selection,
-  };
+  return useMemo(() => ({ ...data, ...selection }), [data, selection]);
 }
 
 export function useRotasData() {
