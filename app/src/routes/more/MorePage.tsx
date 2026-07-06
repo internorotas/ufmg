@@ -445,7 +445,7 @@ export function MorePage() {
 
       <footer className="pt-4 text-center">
         <a
-          href="https://github.com/igormartins4"
+          href="https://github.com/internorotas"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary hover:text-text-primary transition-colors"

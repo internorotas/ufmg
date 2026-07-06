@@ -360,7 +360,7 @@ export function PrivacyPolicyContent() {
           </li>
           <li>pseudonimização das contribuições GPS por HMAC-SHA-256 com sal semanal;</li>
           <li>
-            controle de acesso administrativo por Cloudflare Access e autenticação multifator;
+            controle de acesso administrativo com autenticação multifator e restrição de origem;
           </li>
           <li>redação automática de campos sensíveis em logs (Pino redact);</li>
           <li>

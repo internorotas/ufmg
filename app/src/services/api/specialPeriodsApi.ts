@@ -19,7 +19,7 @@ export async function fetchSpecialPeriods(): Promise<SpecialPeriodApiItem[]> {
   });
 
   if (!response.ok) {
-    throw new Error(`Erro HTTP ${response.status} em ${endpoint}`);
+    throw new Error(`Erro HTTP ${response.status} ao buscar períodos especiais`);
   }
 
   const body = (await response.json()) as { periodos: SpecialPeriodApiItem[] };

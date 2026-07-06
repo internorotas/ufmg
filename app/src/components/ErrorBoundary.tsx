@@ -26,11 +26,11 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, _errorInfo: ErrorInfo) {
     ga4Analytics.trackEvent({
       category: 'engagement',
       action: 'react_error_boundary',
-      label: `${error.name}: ${error.message} - Component Stack: ${errorInfo.componentStack?.slice(0, 150)}`,
+      label: error.name,
       value: 1,
     });
   }

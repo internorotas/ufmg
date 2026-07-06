@@ -166,7 +166,7 @@ async function doFetchTransitDataBinary(
   });
 
   if (!response.ok) {
-    throw new Error(`Erro HTTP ${response.status} em ${endpoint}`);
+    throw new Error(`Erro HTTP ${response.status} ao buscar dados de trânsito`);
   }
 
   const buffer = await response.arrayBuffer();
