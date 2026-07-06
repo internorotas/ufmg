@@ -449,12 +449,15 @@ export const MenuLateral = React.memo(function MenuLateral({
     [handleCardClick, trackEvent],
   );
 
-  const handleParadaClickWrapper = (parada: Parada) => {
-    onParadaClick(parada);
-    if (window.innerWidth < 768) {
-      setMenuVisible(false);
-    }
-  };
+  const handleParadaClickWrapper = useCallback(
+    (parada: Parada) => {
+      onParadaClick(parada);
+      if (window.innerWidth < 768) {
+        setMenuVisible(false);
+      }
+    },
+    [onParadaClick],
+  );
 
   return (
     <>
