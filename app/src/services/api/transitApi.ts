@@ -149,11 +149,12 @@ export function getCurrentTransitToken(): string | null {
 async function doFetchTransitDataBinary(
   transitToken?: string,
 ): Promise<{ linhas: CategoriaLinhas; paradas: Parada[] }> {
+  const effectiveToken = transitToken ?? _currentTransitToken;
   const endpoint = resolveApiEndpoint('/v1/transit/data');
   const authToken = getInMemoryAuthToken();
   const headers = withTenantHeaders({
     Accept: 'application/x-protobuf',
-    ...(transitToken ? { 'X-Transit-Token': transitToken } : {}),
+    ...(effectiveToken ? { 'X-Transit-Token': effectiveToken } : {}),
     ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
   });
 
