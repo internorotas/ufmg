@@ -440,13 +440,16 @@ function AppContent() {
     navigate('/login', { state: { authFeedback: 'Sessão encerrada por inatividade.' } });
   }, [navigate]);
 
+  const handleInactivityWarning = useCallback(() => setIsInactivityWarningOpen(true), []);
+  const handleInactivityTimeoutCb = useCallback(() => {
+    void handleInactivityTimeout();
+  }, [handleInactivityTimeout]);
+
   const { resetTimer: resetInactivityTimer } = useInactivityTimer({
     warningMs: 25 * 60 * 1000,
     timeoutMs: 30 * 60 * 1000,
-    onWarning: () => setIsInactivityWarningOpen(true),
-    onTimeout: () => {
-      void handleInactivityTimeout();
-    },
+    onWarning: handleInactivityWarning,
+    onTimeout: handleInactivityTimeoutCb,
     enabled: isAuthenticated,
   });
 
