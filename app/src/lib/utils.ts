@@ -141,6 +141,54 @@ function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
  * @param dataAtual Data usada para escolher o conjunto de horários vigente.
  * @returns Lista de horários válidos para o dia, já filtrada por formato.
  */
+const _horariosEmMinutosCache = new WeakMap<string[], number[]>();
+
+/**
+ * Retorna os horários válidos da linha para o dia atual em minutos absolutos,
+ * ordenados e cacheados usando WeakMap.
+ *
+ * Ao invés de reprocessar todas as strings de "HH:MM" e reordenar o array em todo
+ * o processo de renderização (O(N log N) e O(N) memory), esta função extrai
+ * a matriz do próprio JSON como referência de cache estática.
+ */
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  // Somente linhas vigentes no dia
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const horariosBrutos = linha.horarios as unknown;
+
+  let horariosTarget: string[] | undefined;
+
+  if (Array.isArray(horariosBrutos)) {
+    horariosTarget = horariosBrutos;
+  } else if (horariosBrutos && typeof horariosBrutos === 'object') {
+    const horariosPorDia = horariosBrutos as HorariosPorDia;
+    const chaveDia = obterChaveDiaSemana(dataAtual);
+    horariosTarget = horariosPorDia[chaveDia];
+  }
+
+  if (!Array.isArray(horariosTarget) || horariosTarget.length === 0) {
+    return [];
+  }
+
+  let cacheEmMinutos = _horariosEmMinutosCache.get(horariosTarget);
+
+  if (!cacheEmMinutos) {
+    // Processamento pesado (parse, filter, map e sort) acontece apenas UMA vez por "tipo de dia".
+    cacheEmMinutos = horariosTarget
+      .filter((horario) => parseHorarioValido(horario) !== null)
+      .map(converterHoraParaMinutos)
+      .filter((min) => Number.isFinite(min))
+      .sort((a, b) => a - b);
+
+    _horariosEmMinutosCache.set(horariosTarget, cacheEmMinutos);
+  }
+
+  return cacheEmMinutos;
+}
+
 export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[] {
   // Regra de negócio central: somente linhas vigentes no dia entram no motor de horários/ETA.
   if (!isLineAvailableToday(linha.categoriaDia)) {
@@ -187,12 +235,7 @@ export function obterStatusLinha(
     return { id: 'NAO_CIRCULA_HOJE', texto: 'Não circula hoje', cor: 'danger' };
   }
 
-  const horariosHoje =
-    horariosPreCalculados ??
-    obterHorariosLinhaNoDia(linha, dataAtual)
-      .map((horario) => converterHoraParaMinutos(horario))
-      .filter((minutos) => Number.isFinite(minutos))
-      .sort((a, b) => a - b);
+  const horariosHoje = horariosPreCalculados ?? obterHorariosMinutosLinhaNoDia(linha, dataAtual);
 
   if (horariosHoje.length === 0) {
     return {
