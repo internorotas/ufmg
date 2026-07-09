@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
+  AtSign,
   Bell,
   Eye,
   EyeOff,
@@ -16,6 +17,7 @@ import { AppShell } from '@/components/app/AppShell';
 import { DataStatusScreen } from '@/components/app/DataStatusScreen';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
@@ -60,6 +62,7 @@ export function ProfilePage() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [feedback, setFeedback] = useState<ProfileFeedbackState | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [nicknameInput, setNicknameInput] = useState('');
 
   // Refs estáveis para evitar que funções de contexto com referência instável
   // disparem re-execuções desnecessárias do efeito de sincronização de perfil.
@@ -77,6 +80,11 @@ export function ProfilePage() {
     if (!profile) return;
     updateUserRef.current(toAuthenticatedUser(profile));
     publishPointEventRef.current(profile.gamification.recentPointEvents[0] ?? null);
+  }, [profile]);
+
+  // Sincroniza input de nickname com o perfil (na carga inicial e após salvar)
+  useEffect(() => {
+    if (profile) setNicknameInput(profile.nickname ?? '');
   }, [profile]);
 
   const handleProfileUpdate = useCallback(
@@ -102,6 +110,12 @@ export function ProfilePage() {
     },
     [isUpdatingProfile, profile, queryClient, updateUser],
   );
+
+  const nicknameChanged = nicknameInput !== (profile?.nickname ?? '');
+
+  const handleSaveNickname = useCallback(async () => {
+    await handleProfileUpdate({ nickname: nicknameInput.trim() || null });
+  }, [handleProfileUpdate, nicknameInput]);
 
   const handleToggleProfilePublic = useCallback(() => {
     if (!profile) {
@@ -406,6 +420,40 @@ export function ProfilePage() {
 
           {/* ─── Configurações ─── */}
           <TabsContent value="configuracoes" className="mt-4 flex flex-col gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <AtSign size={18} aria-hidden="true" />
+                  Identificação
+                </CardTitle>
+                <CardDescription>
+                  Nickname exibido no ranking e no seu perfil público.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-2">
+                  <Input
+                    value={nicknameInput}
+                    onChange={(e) => setNicknameInput(e.target.value)}
+                    placeholder="sem nickname"
+                    maxLength={40}
+                    leftIcon={<AtSign size={14} aria-hidden="true" />}
+                    disabled={isUpdatingProfile}
+                    aria-label="Nickname"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={!nicknameChanged || isUpdatingProfile}
+                    onClick={() => void handleSaveNickname()}
+                  >
+                    Salvar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
