@@ -152,6 +152,8 @@ if (GA_MEASUREMENT_ID && readAnalyticsConsent() === 'accepted') {
   ga4Analytics.grantConsent();
 }
 
+const GPS_VALIDATION_THRESHOLD_M = 300;
+
 /**
  * Componente interno que consome o contexto de rotas.
  * Separado do App principal para que o useRotas funcione dentro do Provider.
@@ -317,18 +319,40 @@ function AppContent() {
     usePlannerStore.getState().registerOpenMenu(fn);
   }, []);
 
-  // Quando GPS permission chega após seleção de linha, inicia o rastreio automaticamente
+  // Quando GPS permission chega após seleção de linha, inicia o rastreio automaticamente.
+  // Aguarda a primeira leitura de localização para re-verificar a distância antes de iniciar.
   useEffect(() => {
-    if (permissaoConcedida && pendingGpsLinhaRef.current && !rastreioAtivo) {
-      const pendingLine = pendingGpsLinhaRef.current;
-      pendingGpsLinhaRef.current = null;
-      void iniciarRastreioColaborativo(pendingLine);
+    if (!permissaoConcedida || !pendingGpsLinhaRef.current || rastreioAtivo) return;
+    if (!localizacao) return; // espera localizacao chegar antes de validar
+
+    const pendingLine = pendingGpsLinhaRef.current;
+    const coords = pendingLine.coordenadasTrajeto;
+
+    if (coords.length > 0) {
+      const [userLat, userLng] = localizacao;
+      let minKm = Infinity;
+      for (const [lat, lng] of coords) {
+        const d = calcularDistanciaKm(userLat, userLng, lat, lng);
+        if (d < minKm) minKm = d;
+      }
+      if (minKm * 1000 > GPS_VALIDATION_THRESHOLD_M) {
+        pendingGpsLinhaRef.current = null;
+        setGpsWarning({
+          distanceMeters: Math.round(minKm * 1000),
+          linha: pendingLine,
+          pendingAction: () => void iniciarRastreioColaborativo(pendingLine),
+        });
+        return;
+      }
     }
-  }, [permissaoConcedida, rastreioAtivo, iniciarRastreioColaborativo]);
+
+    pendingGpsLinhaRef.current = null;
+    void iniciarRastreioColaborativo(pendingLine);
+  }, [permissaoConcedida, rastreioAtivo, iniciarRastreioColaborativo, localizacao]);
 
   const startGpsForLinha = useCallback(
     (linha: Linha) => {
-      const VALIDATION_THRESHOLD_M = 300;
+      const VALIDATION_THRESHOLD_M = GPS_VALIDATION_THRESHOLD_M;
       const coords = linha.coordenadasTrajeto;
 
       if (localizacao && coords.length > 0) {
