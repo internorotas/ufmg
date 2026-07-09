@@ -126,7 +126,7 @@ function parseHorarioValido(horario: string): number | null {
   return Number.isFinite(minutos) ? minutos : null;
 }
 
-function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
+export function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
   const diaSemana = getSaoPauloDayOfWeek(dataAtual);
   if (diaSemana === 6) return 'sabados';
   if (diaSemana === 0) return 'domingos';
@@ -141,6 +141,47 @@ function obterChaveDiaSemana(dataAtual: Date): keyof HorariosPorDia {
  * @param dataAtual Data usada para escolher o conjunto de horários vigente.
  * @returns Lista de horários válidos para o dia, já filtrada por formato.
  */
+
+const horariosMinutosCache = new WeakMap<string[], number[]>();
+
+/**
+ * Retorna os horários válidos da linha para o dia atual já convertidos para minutos e ordenados.
+ * Cacheia os cálculos pesados de O(N log N) num WeakMap, chaveado pela referência
+ * do array original de horários, garantindo um ganho de performance substancial.
+ */
+export function obterHorariosMinutosLinhaNoDia(linha: Linha, dataAtual: Date): number[] {
+  if (!isLineAvailableToday(linha.categoriaDia)) {
+    return [];
+  }
+
+  const horariosBrutos = linha.horarios as unknown;
+  let arrayOriginal: string[] | undefined;
+
+  if (Array.isArray(horariosBrutos)) {
+    arrayOriginal = horariosBrutos;
+  } else if (horariosBrutos && typeof horariosBrutos === 'object') {
+    const horariosPorDia = horariosBrutos as HorariosPorDia;
+    const chaveDia = obterChaveDiaSemana(dataAtual);
+    arrayOriginal = horariosPorDia[chaveDia];
+  }
+
+  if (!Array.isArray(arrayOriginal) || arrayOriginal.length === 0) {
+    return [];
+  }
+
+  let cached = horariosMinutosCache.get(arrayOriginal);
+  if (!cached) {
+    cached = arrayOriginal
+      .map(parseHorarioValido)
+      .filter((min): min is number => min !== null)
+      .sort((a, b) => a - b);
+
+    horariosMinutosCache.set(arrayOriginal, cached);
+  }
+
+  return cached;
+}
+
 export function obterHorariosLinhaNoDia(linha: Linha, dataAtual: Date): string[] {
   // Regra de negócio central: somente linhas vigentes no dia entram no motor de horários/ETA.
   if (!isLineAvailableToday(linha.categoriaDia)) {
