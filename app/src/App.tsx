@@ -11,11 +11,13 @@ import { NavRail } from './components/app/NavRail';
 import { OfflineToast } from './components/app/OfflineToast';
 import { InactivityWarningDialog } from './components/auth/InactivityWarningDialog';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { InfoBanner } from './components/InfoBanner';
 import { LegalModal } from './components/legal/LegalModal';
 import { MenuLateral } from './components/MenuLateral';
 import { OfflineBanner } from './components/OfflineBanner';
 import { OnboardingModal } from './components/OnboardingModal';
 import { ProfileSheet } from './components/profile/ProfileSheet';
+import { VacationBanner } from './components/VacationBanner';
 import { GA_MEASUREMENT_ID } from './config/analytics';
 import { LocationProvider, useLocationContext } from './contexts/LocationContext';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
@@ -182,6 +184,9 @@ function AppContent() {
   const [isSummarySheetOpen, setIsSummarySheetOpen] = useState(false);
   const [isGpsLinePickerOpen, setIsGpsLinePickerOpen] = useState(false);
   const [isInactivityWarningOpen, setIsInactivityWarningOpen] = useState(false);
+  const [infoBannerDismissed, setInfoBannerDismissed] = useState(
+    () => sessionStorage.getItem('info-banner-dismissed') === '1',
+  );
   const [gpsWarning, setGpsWarning] = useState<{
     distanceMeters: number;
     linha: Linha;
@@ -516,6 +521,11 @@ function AppContent() {
     navigate('/login', { state: { from: location.pathname } });
   };
 
+  const handleInfoBannerDismiss = useCallback(() => {
+    sessionStorage.setItem('info-banner-dismissed', '1');
+    setInfoBannerDismissed(true);
+  }, []);
+
   return (
     <div className="relative flex flex-1 min-h-0 w-full overflow-hidden bg-background pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
       <OnboardingModal onOpenLegalModal={handleOpenLegalModal} />
@@ -528,6 +538,10 @@ function AppContent() {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AnalyticsConsentBanner />
         <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
+        <VacationBanner className="mx-3 mt-2" />
+        {!infoBannerDismissed && (
+          <InfoBanner className="mx-3 mt-2" onDismiss={handleInfoBannerDismiss} />
+        )}
         <MobileTopBar
           authStatus={authStatus}
           isAuthenticated={isAuthenticated}
