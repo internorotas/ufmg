@@ -24,6 +24,8 @@ export const MapLibreRotasLayer = React.memo(function MapLibreRotasLayer({
   // Anima as dashes brancas (rota-ants) sobre a linha colorida de fundo
   useRouteAnimation('rota-ants', active);
 
+  const corHex = linha?.corHex ?? '#2c0eeb';
+
   // Converte [lat, lng] do projeto para [lng, lat] do GeoJSON
   const geojson = useMemo(
     () => ({
@@ -31,15 +33,16 @@ export const MapLibreRotasLayer = React.memo(function MapLibreRotasLayer({
       properties: {},
       geometry: {
         type: 'LineString' as const,
-        coordinates: snappedCoords.map(([lat, lng]) => [lng, lat]),
+        // Coordenadas vazias quando inativo evita que a linha fique visível
+        coordinates: active ? snappedCoords.map(([lat, lng]) => [lng, lat]) : [],
       },
     }),
-    [snappedCoords],
+    [active, snappedCoords],
   );
 
-  const corHex = linha?.corHex ?? '#2c0eeb';
-
-  if (!active) return null;
+  // Usa visibility: none em vez de return null — evita race condition no MapLibre
+  // onde o Source pode não ser removido antes das layers filhas na desmontagem.
+  const visibility = active ? ('visible' as const) : ('none' as const);
 
   return (
     <Source id="rota" type="geojson" data={geojson}>
@@ -47,7 +50,7 @@ export const MapLibreRotasLayer = React.memo(function MapLibreRotasLayer({
       <Layer
         id="rota-bg"
         type="line"
-        layout={{ 'line-cap': 'butt', 'line-join': 'round' }}
+        layout={{ 'line-cap': 'butt', 'line-join': 'round', visibility }}
         paint={{
           'line-color': corHex,
           'line-width': 6,
@@ -58,7 +61,7 @@ export const MapLibreRotasLayer = React.memo(function MapLibreRotasLayer({
       <Layer
         id="rota-ants"
         type="line"
-        layout={{ 'line-cap': 'butt', 'line-join': 'round' }}
+        layout={{ 'line-cap': 'butt', 'line-join': 'round', visibility }}
         paint={{
           'line-color': 'rgba(255,255,255,0.85)',
           'line-width': 3,
