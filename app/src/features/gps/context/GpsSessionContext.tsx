@@ -176,6 +176,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   }, [rastreio.lastStopReason]);
 
   const [completedSession, setCompletedSession] = useState<CompletedSession | null>(null);
+  const [earlyStopReason, setEarlyStopReason] = useState<string | null>(null);
   const prevIsActiveRef = useRef(false);
   const prevStatusRef = useRef<string>('idle');
 
@@ -209,37 +210,50 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     const wasActive = prevIsActiveRef.current;
     const nowIdle = status === 'idle';
 
-    if (wasActive && nowIdle && lastActiveStatsRef.current.durationMs > 5000 && linhaSelecionada) {
+    if (wasActive && nowIdle && linhaSelecionada) {
       const stats = lastActiveStatsRef.current;
       const stopReason = capturedStopReasonRef.current ?? 'manual';
-
-      // === Tracking: sessão encerrada com stats ===
-      trackEvent({
-        event: 'gps_session_completed',
-        category: 'engagement',
-        action: 'gps_session_completed',
-        label: linhaSelecionada.nome,
-        params: {
-          stop_reason: stopReason,
-          distance_km: Math.round(stats.distanceKm * 100) / 100,
-          duration_s: Math.round(stats.durationMs / 1000),
-          snapshots: stats.snapshotsCount,
-          linha_id: linhaSelecionada.idRota,
-        },
-      });
       capturedStopReasonRef.current = null;
+      prevIsActiveRef.current = isActive;
 
-      setCompletedSession({
-        ...stats,
-        linhaNome: linhaSelecionada.sublinha
-          ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
-          : linhaSelecionada.nome,
-        linhaCorHex: linhaSelecionada.corHex,
-        stopReason,
-      });
+      // Sessão encerrada automaticamente antes de 5s: toast breve em vez do card completo
+      if (stats.durationMs <= 5000 && stopReason !== 'manual') {
+        const msg = STOP_REASON_LABELS[stopReason] ?? 'Rastreio encerrado automaticamente';
+        setEarlyStopReason(msg);
+        const timeoutId = window.setTimeout(() => setEarlyStopReason(null), 5000);
+        return () => window.clearTimeout(timeoutId);
+      }
 
-      const timeoutId = window.setTimeout(() => setCompletedSession(null), 8000);
-      return () => window.clearTimeout(timeoutId);
+      if (stats.durationMs > 5000) {
+        // === Tracking: sessão encerrada com stats ===
+        trackEvent({
+          event: 'gps_session_completed',
+          category: 'engagement',
+          action: 'gps_session_completed',
+          label: linhaSelecionada.nome,
+          params: {
+            stop_reason: stopReason,
+            distance_km: Math.round(stats.distanceKm * 100) / 100,
+            duration_s: Math.round(stats.durationMs / 1000),
+            snapshots: stats.snapshotsCount,
+            linha_id: linhaSelecionada.idRota,
+          },
+        });
+
+        setCompletedSession({
+          ...stats,
+          linhaNome: linhaSelecionada.sublinha
+            ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
+            : linhaSelecionada.nome,
+          linhaCorHex: linhaSelecionada.corHex,
+          stopReason,
+        });
+
+        const timeoutId = window.setTimeout(() => setCompletedSession(null), 8000);
+        return () => window.clearTimeout(timeoutId);
+      }
+
+      return;
     }
 
     prevIsActiveRef.current = isActive;
@@ -283,6 +297,27 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
       {/* Card de conclusão */}
       {completedSession && (
         <GpsSessionCompletedCard session={completedSession} onDismiss={dismissCompleted} />
+      )}
+
+      {/* Toast para sessões encerradas automaticamente antes de 5s */}
+      {earlyStopReason && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="pointer-events-none fixed inset-0 z-1050 flex items-end justify-start pb-24 pl-3 md:pb-8"
+        >
+          <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg">
+            <span>{earlyStopReason}</span>
+            <button
+              type="button"
+              onClick={() => setEarlyStopReason(null)}
+              aria-label="Fechar aviso"
+              className="flex size-5 shrink-0 items-center justify-center rounded text-warning-text/70 hover:text-warning-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-warning-text"
+            >
+              ×
+            </button>
+          </div>
+        </div>
       )}
     </GpsSessionContext.Provider>
   );
