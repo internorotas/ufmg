@@ -104,7 +104,6 @@ export async function fetchGtfsShape(routeId: string): Promise<GtfsShape[]> {
   const raw = (await response.json()) as unknown;
 
   // Backend retorna FeatureCollection RFC 7946 com LineString ([lng, lat])
-  // Converter para GtfsShape[] para compatibilidade com GtfsRouteLayer
   const fc = raw as {
     type?: string;
     features?: Array<{ geometry?: { type?: string; coordinates?: number[][] } }>;
