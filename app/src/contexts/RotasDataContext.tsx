@@ -85,7 +85,7 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
     };
 
     void loadBinary();
-  }, [transitSession.transitToken, isMounted]);
+  }, [transitSession.transitToken, isMounted, transitSession.onTurnstileError]);
 
   // Reset binary flag quando token expira (transitToken volta a null)
   useEffect(() => {
