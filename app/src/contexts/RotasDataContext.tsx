@@ -12,7 +12,7 @@ import { useTransitSession } from '@/features/transit-data/hooks/useTransitSessi
 import { useLinhasQuery } from '@/features/transit-data/queries/useLinhasQuery';
 import { useParadasQuery } from '@/features/transit-data/queries/useParadasQuery';
 import { useMounted } from '@/hooks/useMounted';
-import { fetchTransitDataBinary } from '@/services/api/transitApi';
+import { fetchTransitDataBinary, setCurrentTransitToken } from '@/services/api/transitApi';
 import {
   type IRotasService,
   loadRotasFallbackData,
@@ -74,9 +74,13 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
         setDataError(null);
         setIsLoadingData(false);
         fallbackAttemptedRef.current = false;
-      } catch {
-        // binary falhou — JSON path assume o controle abaixo
+      } catch (err) {
         binaryLoadedRef.current = false;
+        // Token rejeitado pelo servidor (expirado/inválido) — limpa e força re-verificação Turnstile
+        if (err instanceof Error && err.message.includes('401')) {
+          setCurrentTransitToken(null);
+          transitSession.onTurnstileError();
+        }
       }
     };
 
