@@ -34,17 +34,20 @@ function tempoDecorrido(updatedAt: string): string {
   return `há ${diff} min`;
 }
 
+const HEX_COLOR_RE = /^#[0-9A-Fa-f]{3,6}$/;
+
 function criarIconeHtml(
   corHex: string,
   heading: number | null,
   isLive: boolean,
   isStale: boolean,
 ): string {
+  const cor = HEX_COLOR_RE.test(corHex) ? corHex : '#6b7280';
   const rotacao = heading ?? 0;
   const mostrarSeta = heading !== null;
-  const bg = isLive ? corHex : hexToRgba(corHex, 0.7);
-  const pulseColor = hexToRgba(corHex, 0.5);
-  const pulseColor0 = hexToRgba(corHex, 0);
+  const bg = isLive ? cor : hexToRgba(cor, 0.7);
+  const pulseColor = hexToRgba(cor, 0.5);
+  const pulseColor0 = hexToRgba(cor, 0);
   const showPulse = isLive && !isStale;
 
   if (showPulse) ensureGpsPulseStyle(pulseColor, pulseColor0);
@@ -54,7 +57,7 @@ function criarIconeHtml(
       ${
         mostrarSeta
           ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:rotate(${rotacao}deg);">
-              <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid ${hexToRgba(corHex, 0.8)};transform:translateY(-14px);"></div>
+              <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid ${hexToRgba(cor, 0.8)};transform:translateY(-14px);"></div>
              </div>`
           : ''
       }

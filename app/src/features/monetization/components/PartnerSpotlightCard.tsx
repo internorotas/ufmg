@@ -16,7 +16,19 @@ interface PartnerSpotlightCardProps {
   onClick?: () => void;
 }
 
+function safeUrl(url: string): string | undefined {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? url : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function PartnerSpotlightCard({ partner, onClick }: PartnerSpotlightCardProps) {
+  const safeDestino = safeUrl(partner.urlDestino);
+  const safeLogo = partner.logoUrl ? safeUrl(partner.logoUrl) : undefined;
+
   return (
     <section data-slot="partner-spotlight" className="mb-3">
       <Card>
@@ -29,16 +41,16 @@ export function PartnerSpotlightCard({ partner, onClick }: PartnerSpotlightCardP
           </div>
 
           <a
-            href={partner.urlDestino}
+            href={safeDestino}
             target="_blank"
             rel="noopener noreferrer"
             onClick={onClick}
             className="block neo-brutal-interactive bg-background px-3 py-3"
           >
             <div className="flex items-start gap-3">
-              {partner.logoUrl ? (
+              {safeLogo ? (
                 <img
-                  src={partner.logoUrl}
+                  src={safeLogo}
                   alt={`Logo de ${partner.nome}`}
                   className="size-12 neo-brutal-sm bg-card object-cover"
                 />
