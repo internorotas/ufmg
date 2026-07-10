@@ -496,6 +496,11 @@ function AppContent() {
     [linhasData, isOfflineDataFallback],
   );
 
+  const handleInfoBannerDismiss = useCallback(() => {
+    sessionStorage.setItem('info-banner-dismissed', '1');
+    setInfoBannerDismissed(true);
+  }, []);
+
   // Validação dos dados
   if (isLoadingData) {
     return (
@@ -544,11 +549,6 @@ function AppContent() {
     }
     navigate('/login', { state: { from: location.pathname } });
   };
-
-  const handleInfoBannerDismiss = useCallback(() => {
-    sessionStorage.setItem('info-banner-dismissed', '1');
-    setInfoBannerDismissed(true);
-  }, []);
 
   return (
     <div className="relative flex flex-1 min-h-0 w-full overflow-hidden bg-background pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
