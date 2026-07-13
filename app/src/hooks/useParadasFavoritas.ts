@@ -1,6 +1,12 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useSyncExternalStore } from 'react';
+import { useAuthContext } from '@/features/auth/context/AuthContext';
+import { type UserProfile, updateProfile } from '@/features/profile/api/profileClient';
+import { PROFILE_QUERY_KEY, useProfileQuery } from '@/features/profile/queries/useProfileQuery';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import type { Parada } from '@/types/data.types';
+
+// ── localStorage store (unauthenticated fallback) ───────────────────────────
 
 const STORAGE_KEY = 'favoritas_paradas_v1';
 
@@ -19,10 +25,6 @@ function readFromStorage(): string[] {
   }
 }
 
-function writeToStorage(ids: string[]): void {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
-}
-
 function areArraysEqual(a: string[], b: string[]): boolean {
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) {
@@ -31,28 +33,26 @@ function areArraysEqual(a: string[], b: string[]): boolean {
   return true;
 }
 
-let paradasFavoritasCache = readFromStorage();
-const listeners = new Set<() => void>();
+let localCache = readFromStorage();
+const localListeners = new Set<() => void>();
 
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
+function localSubscribe(listener: () => void) {
+  localListeners.add(listener);
+  return () => localListeners.delete(listener);
 }
 
-function getSnapshot(): string[] {
-  return paradasFavoritasCache;
+function localSnapshot() {
+  return localCache;
 }
 
-function notifyListeners(): void {
-  for (const listener of listeners) listener();
+function setLocalCache(next: string[]): void {
+  if (areArraysEqual(localCache, next)) return;
+  localCache = next;
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  for (const fn of localListeners) fn();
 }
 
-function setParadasFavoritasCache(next: string[]): void {
-  if (areArraysEqual(paradasFavoritasCache, next)) return;
-  paradasFavoritasCache = next;
-  writeToStorage(next);
-  notifyListeners();
-}
+// ── hook ────────────────────────────────────────────────────────────────────
 
 export interface UseParadasFavoritasReturn {
   favoritasIds: string[];
@@ -62,27 +62,30 @@ export interface UseParadasFavoritasReturn {
 }
 
 export function useParadasFavoritas(): UseParadasFavoritasReturn {
+  const { isAuthenticated } = useAuthContext();
+  const { data: profile } = useProfileQuery();
+  const queryClient = useQueryClient();
   const { trackEvent } = useAnalytics();
-  const favoritasIds = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const localIds = useSyncExternalStore(localSubscribe, localSnapshot, localSnapshot);
 
   useEffect(() => {
-    const storageSnapshot = readFromStorage();
-    if (!areArraysEqual(paradasFavoritasCache, storageSnapshot)) {
-      paradasFavoritasCache = storageSnapshot;
-      notifyListeners();
+    if (!isAuthenticated) {
+      const snapshot = readFromStorage();
+      if (!areArraysEqual(localCache, snapshot)) {
+        localCache = snapshot;
+        for (const fn of localListeners) fn();
+      }
+      const sync = (e: StorageEvent) => {
+        if (e.key !== STORAGE_KEY && e.key !== null) return;
+        const next = readFromStorage();
+        if (!areArraysEqual(localCache, next)) setLocalCache(next);
+      };
+      window.addEventListener('storage', sync);
+      return () => window.removeEventListener('storage', sync);
     }
+  }, [isAuthenticated]);
 
-    const syncFromStorage = (event: StorageEvent) => {
-      if (event.key !== STORAGE_KEY && event.key !== null) return;
-      const next = readFromStorage();
-      if (areArraysEqual(paradasFavoritasCache, next)) return;
-      paradasFavoritasCache = next;
-      notifyListeners();
-    };
-
-    window.addEventListener('storage', syncFromStorage);
-    return () => window.removeEventListener('storage', syncFromStorage);
-  }, []);
+  const favoritasIds = isAuthenticated ? (profile?.favoriteStopIds ?? []) : localIds;
 
   const isFavorita = useCallback(
     (idParada: string) => favoritasIds.includes(idParada),
@@ -91,12 +94,23 @@ export function useParadasFavoritas(): UseParadasFavoritasReturn {
 
   const toggleFavorita = useCallback(
     (idParada: string, nomeParada?: string) => {
-      const currentlyFavorite = paradasFavoritasCache.includes(idParada);
-      const next = currentlyFavorite
-        ? paradasFavoritasCache.filter((id) => id !== idParada)
-        : [...paradasFavoritasCache, idParada];
+      const currentlyFavorite = favoritasIds.includes(idParada);
+      const newIds = currentlyFavorite
+        ? favoritasIds.filter((id) => id !== idParada)
+        : [...favoritasIds, idParada];
 
-      setParadasFavoritasCache(next);
+      if (isAuthenticated) {
+        queryClient.setQueryData<UserProfile>(PROFILE_QUERY_KEY, (prev) =>
+          prev ? { ...prev, favoriteStopIds: newIds } : prev,
+        );
+        void updateProfile({ favoriteStopIds: newIds }).catch(() => {
+          queryClient.setQueryData<UserProfile>(PROFILE_QUERY_KEY, (prev) =>
+            prev ? { ...prev, favoriteStopIds: favoritasIds } : prev,
+          );
+        });
+      } else {
+        setLocalCache(newIds);
+      }
 
       trackEvent({
         category: 'preferences',
@@ -104,7 +118,7 @@ export function useParadasFavoritas(): UseParadasFavoritasReturn {
         label: nomeParada ?? idParada,
       });
     },
-    [trackEvent],
+    [favoritasIds, isAuthenticated, queryClient, trackEvent],
   );
 
   const getParadasFavoritas = useCallback(
