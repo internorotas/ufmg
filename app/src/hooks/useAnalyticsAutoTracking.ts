@@ -127,16 +127,13 @@ export function useAnalyticsAutoTracking() {
     document.addEventListener('visibilitychange', onVisibilityChange);
 
     const onWindowError = (event: ErrorEvent) => {
-      const message = truncateLabel(`${event.message} @ ${event.filename}:${event.lineno}`);
-      trackError(new Error(message), true);
+      const err = event.error instanceof Error ? event.error : new Error('ScriptError');
+      trackError(err, true);
     };
 
     const onUnhandledRejection = (event: PromiseRejectionEvent) => {
-      const reasonText =
-        typeof event.reason === 'string'
-          ? event.reason
-          : JSON.stringify(event.reason ?? 'unknown rejection');
-      trackError(new Error(truncateLabel(`Unhandled rejection: ${reasonText}`)), true);
+      const err = event.reason instanceof Error ? event.reason : new Error('UnhandledRejection');
+      trackError(err, true);
     };
 
     window.addEventListener('error', onWindowError);

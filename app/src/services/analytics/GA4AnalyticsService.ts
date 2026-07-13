@@ -183,7 +183,7 @@ export class GA4AnalyticsService implements IAnalyticsService {
     this.trackEvent({
       event: 'application_error',
       category: 'engagement',
-      label: error.message,
+      label: error.name,
       value: fatal ? 1 : 0,
     });
   }
