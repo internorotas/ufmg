@@ -6,7 +6,15 @@
  * conjunto de alarmes e o fluxo de permissão seja executado uma única vez.
  */
 
-import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useConsentGate } from '@/features/auth/hooks/useConsentGate';
 import { PointDeltaToast } from '@/features/gamification/components/PointDeltaToast';
 import type { RecentPointEvent } from '@/features/profile/api/profileClient';
@@ -91,6 +99,17 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   const { executeProtectedAction } = useConsentGate();
   const collaborativeFeedbackTimeoutRef = useRef<number | null>(null);
   const pointEventTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (collaborativeFeedbackTimeoutRef.current !== null) {
+        window.clearTimeout(collaborativeFeedbackTimeoutRef.current);
+      }
+      if (pointEventTimeoutRef.current !== null) {
+        window.clearTimeout(pointEventTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const publishCollaborativeEvent = useCallback(
     (event: CollaborativeEvent) => {

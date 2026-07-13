@@ -15,6 +15,7 @@ function isTransientBootstrapError(error: unknown): boolean {
 
 export function useAuthBootstrap() {
   const hasBootstrapped = useRef(false);
+  const retryTimerRef = useRef<number | null>(null);
   const setAuthenticatedSession = useAuthStore((state) => state.setAuthenticatedSession);
   const setAnonymousSession = useAuthStore((state) => state.setAnonymousSession);
   const isMounted = useMounted();
@@ -54,7 +55,8 @@ export function useAuthBootstrap() {
 
         const retryDelay = AUTH_BOOTSTRAP_RETRY_DELAYS_MS[attempt];
         if (retryDelay !== undefined && isTransientBootstrapError(error)) {
-          window.setTimeout(() => {
+          retryTimerRef.current = window.setTimeout(() => {
+            retryTimerRef.current = null;
             if (!isMounted()) return;
             void bootstrap(attempt + 1);
           }, retryDelay);
@@ -66,5 +68,12 @@ export function useAuthBootstrap() {
     };
 
     void bootstrap();
+
+    return () => {
+      if (retryTimerRef.current !== null) {
+        window.clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
+    };
   }, [isMounted, setAnonymousSession, setAuthenticatedSession]);
 }
