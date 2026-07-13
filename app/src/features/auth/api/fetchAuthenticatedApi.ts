@@ -19,15 +19,19 @@ export async function fetchAuthenticatedApi(
   url: string,
   init: RequestInit = {},
 ): Promise<Response> {
-  const makeRequest = (token: string | null): Promise<Response> => {
+  const makeRequest = async (token: string | null): Promise<Response> => {
     const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
-    return fetch(url, {
-      ...init,
-      headers: withTenantHeaders({
-        ...authHeader,
-        ...(init.headers as Record<string, string> | undefined),
-      }),
-    });
+    try {
+      return await fetch(url, {
+        ...init,
+        headers: withTenantHeaders({
+          ...authHeader,
+          ...(init.headers as Record<string, string> | undefined),
+        }),
+      });
+    } catch {
+      throw new Error('Falha de rede ao comunicar com a API');
+    }
   };
 
   const currentToken = useAuthStore.getState().accessToken;

@@ -36,9 +36,8 @@ export async function fetchPlannerRoutes(
       cache: 'no-store',
       headers,
     });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Falha de rede ao calcular rotas';
-    throw new PlannerRequestError(message, null);
+  } catch {
+    throw new PlannerRequestError('Falha de rede ao calcular rotas', null);
   }
 
   if (!response.ok) {

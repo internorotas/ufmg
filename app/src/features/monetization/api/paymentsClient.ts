@@ -64,14 +64,19 @@ function buildAuthenticatedHeaders(extraHeaders?: HeadersInit): HeadersInit {
 async function createCheckout(
   pathname: '/v1/payments/donations/checkout' | '/v1/payments/subscriptions/checkout',
 ): Promise<CreatedCheckoutResponse> {
-  const response = await fetch(resolvePaymentsEndpoint(pathname), {
-    method: 'POST',
-    cache: 'no-store',
-    headers: buildAuthenticatedHeaders({
-      'Content-Type': 'application/json',
-    }),
-    body: '{}',
-  });
+  let response: Response;
+  try {
+    response = await fetch(resolvePaymentsEndpoint(pathname), {
+      method: 'POST',
+      cache: 'no-store',
+      headers: buildAuthenticatedHeaders({
+        'Content-Type': 'application/json',
+      }),
+      body: '{}',
+    });
+  } catch {
+    throw new Error('Falha de rede ao iniciar checkout');
+  }
 
   if (!response.ok) {
     throw new Error(`Falha ao iniciar checkout: HTTP ${response.status}`);

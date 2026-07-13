@@ -81,9 +81,8 @@ export async function refreshSession(): Promise<RefreshResponse> {
       cache: 'no-store',
       headers: withTenantHeaders(),
     });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Falha de rede no refresh de sessao';
-    throw new AuthRequestError(message, null);
+  } catch {
+    throw new AuthRequestError('Falha de rede no refresh de sessao', null);
   }
 
   if (!response.ok) {
@@ -108,9 +107,8 @@ export async function startGoogleLoginFlow(returnUrl?: string): Promise<void> {
       cache: 'no-store',
       headers: withTenantHeaders(),
     });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Falha de rede ao iniciar login';
-    throw new AuthRequestError(message, null);
+  } catch {
+    throw new AuthRequestError('Falha de rede ao iniciar login', null);
   }
 
   if (!response.ok) {
@@ -152,11 +150,16 @@ export async function warmupBackend(): Promise<void> {
 }
 
 export async function getConsentState(): Promise<ConsentState> {
-  const response = await fetch(resolveAuthEndpoint('/v1/auth/consent'), {
-    method: 'GET',
-    cache: 'no-store',
-    headers: withTenantHeaders(getAuthHeaders()),
-  });
+  let response: Response;
+  try {
+    response = await fetch(resolveAuthEndpoint('/v1/auth/consent'), {
+      method: 'GET',
+      cache: 'no-store',
+      headers: withTenantHeaders(getAuthHeaders()),
+    });
+  } catch {
+    throw new AuthRequestError('Falha de rede ao carregar consentimento', null);
+  }
 
   if (!response.ok) {
     throw new AuthRequestError(
@@ -178,12 +181,17 @@ export async function updateConsentState(payload: {
     'Content-Type': 'application/json',
   };
 
-  const response = await fetch(resolveAuthEndpoint('/v1/auth/consent'), {
-    method: 'PUT',
-    cache: 'no-store',
-    headers,
-    body: JSON.stringify(payload),
-  });
+  let response: Response;
+  try {
+    response = await fetch(resolveAuthEndpoint('/v1/auth/consent'), {
+      method: 'PUT',
+      cache: 'no-store',
+      headers,
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new AuthRequestError('Falha de rede ao atualizar consentimento', null);
+  }
 
   if (!response.ok) {
     throw new AuthRequestError(
