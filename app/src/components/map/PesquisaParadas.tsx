@@ -61,8 +61,7 @@ export function PesquisaParadas({ paradas, isOpen, onClose }: PesquisaParadasPro
       role="dialog"
       aria-modal="true"
       aria-label="Pesquisar paradas"
-      className="pointer-events-auto absolute inset-x-0 top-0 z-1300 flex flex-col bg-card shadow-xl"
-      style={{ maxHeight: '70%' }}
+      className="pointer-events-auto absolute inset-x-0 top-0 z-1300 flex max-h-[70%] flex-col bg-card shadow-xl"
     >
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-card-border px-3 py-2">
