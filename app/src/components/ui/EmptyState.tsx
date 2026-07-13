@@ -33,19 +33,24 @@ export const emptyStateVariants = tv({
  * Variantes do ícone
  */
 export const emptyStateIconVariants = tv({
-  base: [
-    'flex items-center justify-center rounded-(--shape-lg)',
-    'bg-brand-secondary text-text-tertiary',
-  ],
+  base: ['flex items-center justify-center rounded-(--shape-lg)'],
   variants: {
     size: {
       sm: 'size-12',
       md: 'size-16',
       lg: 'size-20',
     },
+    tone: {
+      neutral: 'bg-brand-secondary text-text-tertiary',
+      brand: 'bg-brand-primary/12 text-brand-primary',
+      accent: 'bg-brand-accent/15 text-brand-accent',
+      success: 'bg-success-bg text-success-text',
+      danger: 'bg-warning-bg text-warning-text',
+    },
   },
   defaultVariants: {
     size: 'md',
+    tone: 'neutral',
   },
 });
 
@@ -68,6 +73,8 @@ export interface EmptyStateProps
     label: string;
     onClick: () => void;
   };
+  /** Cor do chip do ícone */
+  tone?: VariantProps<typeof emptyStateIconVariants>['tone'];
 }
 
 /**
@@ -86,6 +93,7 @@ export function EmptyState({
   className,
   size,
   icon,
+  tone,
   title,
   description,
   action,
@@ -101,7 +109,7 @@ export function EmptyState({
       {...props}
     >
       {icon && (
-        <div data-slot="empty-state-icon" className={emptyStateIconVariants({ size })}>
+        <div data-slot="empty-state-icon" className={emptyStateIconVariants({ size, tone })}>
           {icon}
         </div>
       )}
@@ -183,6 +191,7 @@ export function LinesEmptyState({ category, size = 'md' }: LinesEmptyStateProps)
   return (
     <EmptyState
       size={size}
+      tone="accent"
       icon={<Bus size={iconSizes[size]} />}
       title="Nenhuma linha disponível"
       description={
@@ -208,6 +217,7 @@ export function MapEmptyState({ size = 'lg' }: MapEmptyStateProps) {
   return (
     <EmptyState
       size={size}
+      tone="brand"
       icon={<MapPin size={iconSizes[size]} />}
       title="Selecione uma linha"
       description="Clique em uma linha no menu para ver seu trajeto no mapa"
@@ -233,6 +243,7 @@ export function ErrorEmptyState({ message, onRetry, size = 'md' }: ErrorEmptySta
   return (
     <EmptyState
       size={size}
+      tone="danger"
       icon={<AlertCircle size={iconSizes[size]} />}
       title="Algo deu errado"
       description={message || 'Ocorreu um erro ao carregar os dados'}

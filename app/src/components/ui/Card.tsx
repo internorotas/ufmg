@@ -34,10 +34,7 @@ export const cardVariants = tv({
       ],
     },
     selected: {
-      true: [
-        'border-2 border-(--color-brand-primary)',
-        'shadow-[4px_4px_0_var(--color-brand-primary)]',
-      ],
+      true: ['border-2 border-(--color-brand-primary)', 'shadow-(--elevation-3)'],
       false: '',
     },
     padding: {

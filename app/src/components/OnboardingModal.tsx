@@ -6,21 +6,30 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import type { LegalModalType } from '@/types/legal.types';
 
+const SLIDE_TONES = {
+  brand: 'bg-brand-primary/10 text-brand-primary',
+  success: 'bg-success-bg text-success-text',
+  accent: 'bg-brand-accent/15 text-brand-accent',
+} as const;
+
 const SLIDES = [
   {
     icon: Bus,
+    tone: 'brand',
     title: 'Bem-vindo ao Interno Rotas',
     description:
       'Sem cadastro obrigatório: consulte linhas e paradas da UFMG rapidamente e salve favoritas quando quiser.',
   },
   {
     icon: MapPin,
+    tone: 'success',
     title: 'GPS Colaborativo',
     description:
       'Ajude a comunidade com GPS colaborativo: quando você compartilha posição, mais pessoas recebem previsões melhores.',
   },
   {
     icon: Shield,
+    tone: 'accent',
     title: 'Seus dados são seus',
     description: 'Seguimos a LGPD para tratamento de dados de localização e transparência de uso.',
   },
@@ -78,6 +87,7 @@ export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
 
   const isLastSlide = currentSlide === SLIDES.length - 1;
   const CurrentIcon = SLIDES[currentSlide].icon;
+  const currentTone = SLIDE_TONES[SLIDES[currentSlide].tone];
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
@@ -85,8 +95,10 @@ export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
         <Dialog.Backdrop />
         <Dialog.Popup size="sm">
           <div className="flex flex-col items-center py-6 px-4">
-            <div className="mb-6 flex h-16 w-16 items-center justify-center surface-card-sm bg-brand-primary/10">
-              <CurrentIcon className="h-8 w-8 text-brand-primary" />
+            <div
+              className={`mb-6 flex h-16 w-16 items-center justify-center surface-card-sm ${currentTone}`}
+            >
+              <CurrentIcon className="h-8 w-8" />
             </div>
 
             <Dialog.Title className="mb-3 text-center text-xl font-semibold">
