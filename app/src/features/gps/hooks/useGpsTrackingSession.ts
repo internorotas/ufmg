@@ -384,12 +384,14 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         lastMovementAtRef.current = snapshot.timestamp;
       }
 
-      if (!isNearLineRoute(snapshot, options.selectedLine)) {
+      const trackedLine = lockedLineRef.current ?? options.selectedLine;
+
+      if (!isNearLineRoute(snapshot, trackedLine)) {
         await stop('saiu_rota');
         return;
       }
 
-      if (isTerminalPoint(snapshot, options.selectedLine)) {
+      if (isTerminalPoint(snapshot, trackedLine)) {
         await stop('terminal');
         return;
       }
@@ -414,6 +416,13 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   );
 
   useEffect(() => {
+    // Só restaura sessão persistida se ainda não há sessão em memória —
+    // evita reverter uma sessão já ativa quando `options.selectedLine` muda
+    // de referência (ex.: refetch do React Query) sem o idRota mudar de fato.
+    if (sessionId !== null) {
+      return;
+    }
+
     const persistedSession = readPersistedSession();
     if (!persistedSession) {
       return;
@@ -429,7 +438,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     if (persistedSession.points.length > 0) {
       setStatus('paused');
     }
-  }, [options.selectedLine]);
+  }, [sessionId, options.selectedLine]);
 
   useEffect(() => {
     const handleOnline = () => {
