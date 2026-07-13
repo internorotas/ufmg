@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { Bell, ChevronRight, LogOut, ShieldAlert, UserCircle2 } from 'lucide-react';
+import { ChevronRight, Globe, LogOut, ShieldAlert, UserCircle2 } from 'lucide-react';
 import { useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
@@ -148,7 +148,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
               <ToggleRow
                 label={
                   <span className="flex items-center gap-2 text-text-primary">
-                    <Bell size={16} aria-hidden="true" />
+                    <Globe size={16} aria-hidden="true" />
                     Perfil público
                   </span>
                 }
