@@ -15,6 +15,7 @@ import { Marker, useMap } from 'react-leaflet';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { COORDENADAS_UFMG } from '../hooks/useLocalizacaoUsuario';
 import { cn } from '../lib/utils';
+import { Tooltip } from './ui/Tooltip';
 
 interface ControlesUsuarioMapaProps {
   /** Coordenadas atuais do usuário [lat, lng] */
@@ -147,58 +148,63 @@ export function ControlesUsuarioMapa({
       {/* FABs - Floating Action Buttons */}
       <div className="fixed bottom-6 right-4 z-1000 flex flex-col gap-2 md:bottom-6">
         {/* Botão: centralizar no campus UFMG */}
-        <button
-          type="button"
-          onClick={handleCentralizarUFMG}
-          className={cn(
-            'flex h-12 w-12 cursor-pointer items-center justify-center',
-            'rounded-full shadow-lg transition-all duration-200',
-            'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
-          )}
-          aria-label="Centralizar mapa no campus UFMG"
-          title="Centralizar mapa no campus UFMG"
-        >
-          <CornerUpLeft className="h-6 w-6 text-white" aria-hidden="true" />
-        </button>
+        <Tooltip content="Centralizar mapa no campus UFMG" position="left">
+          <button
+            type="button"
+            onClick={handleCentralizarUFMG}
+            className={cn(
+              'flex h-12 w-12 cursor-pointer items-center justify-center',
+              'rounded-full shadow-lg transition-all duration-200',
+              'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+            )}
+            aria-label="Centralizar mapa no campus UFMG"
+          >
+            <CornerUpLeft className="h-6 w-6 text-white" aria-hidden="true" />
+          </button>
+        </Tooltip>
 
         {/* Botão: centralizar na localização do usuário */}
-        <button
-          type="button"
-          onClick={handleCentralizar}
-          disabled={carregandoLocalizacao}
-          aria-busy={carregandoLocalizacao}
-          className={cn(
-            // Tamanho mínimo para touch (48x48px) - Mobile friendly
-            'flex h-12 w-12 cursor-pointer items-center justify-center',
-            // Estilo visual - Azul brand igual ao botão Ver Linhas
-            'rounded-full shadow-lg transition-all duration-200',
-            'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
-            // Focus state para acessibilidade
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
-            'disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100',
-          )}
-          aria-label={
+        <Tooltip
+          content={
             carregandoLocalizacao
               ? 'Buscando localização...'
               : permissaoConcedida
                 ? 'Centralizar mapa na minha localização'
                 : 'Ativar localização'
           }
-          title={
-            carregandoLocalizacao
-              ? 'Buscando localização...'
-              : permissaoConcedida
-                ? 'Centralizar mapa na minha localização'
-                : 'Ativar localização'
-          }
+          position="left"
         >
-          {carregandoLocalizacao ? (
-            <LoaderCircle className="h-6 w-6 animate-spin text-white" aria-hidden="true" />
-          ) : (
-            <LocateFixed className="h-6 w-6 text-white" aria-hidden="true" />
-          )}
-        </button>
+          <button
+            type="button"
+            onClick={handleCentralizar}
+            disabled={carregandoLocalizacao}
+            aria-busy={carregandoLocalizacao}
+            className={cn(
+              // Tamanho mínimo para touch (48x48px) - Mobile friendly
+              'flex h-12 w-12 cursor-pointer items-center justify-center',
+              // Estilo visual - Azul brand igual ao botão Ver Linhas
+              'rounded-full shadow-lg transition-all duration-200',
+              'bg-brand-primary hover:bg-brand-primary/90 active:scale-95',
+              // Focus state para acessibilidade
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+              'disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100',
+            )}
+            aria-label={
+              carregandoLocalizacao
+                ? 'Buscando localização...'
+                : permissaoConcedida
+                  ? 'Centralizar mapa na minha localização'
+                  : 'Ativar localização'
+            }
+          >
+            {carregandoLocalizacao ? (
+              <LoaderCircle className="h-6 w-6 animate-spin text-white" aria-hidden="true" />
+            ) : (
+              <LocateFixed className="h-6 w-6 text-white" aria-hidden="true" />
+            )}
+          </button>
+        </Tooltip>
       </div>
     </>
   );
