@@ -89,11 +89,19 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   const [collaborativeFeedback, setCollaborativeFeedback] = useState<string | null>(null);
   const [pointEvent, setPointEvent] = useState<RecentPointEvent | null>(null);
   const { executeProtectedAction } = useConsentGate();
+  const collaborativeFeedbackTimeoutRef = useRef<number | null>(null);
+  const pointEventTimeoutRef = useRef<number | null>(null);
 
   const publishCollaborativeEvent = useCallback(
     (event: CollaborativeEvent) => {
+      if (collaborativeFeedbackTimeoutRef.current !== null) {
+        window.clearTimeout(collaborativeFeedbackTimeoutRef.current);
+      }
       setCollaborativeFeedback(event.message);
-      window.setTimeout(() => setCollaborativeFeedback(null), 4200);
+      collaborativeFeedbackTimeoutRef.current = window.setTimeout(
+        () => setCollaborativeFeedback(null),
+        4200,
+      );
       trackEvent({
         event: event.type,
         category: 'engagement',
@@ -105,9 +113,13 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   );
 
   const publishPointEvent = useCallback((event: RecentPointEvent | null) => {
+    if (pointEventTimeoutRef.current !== null) {
+      window.clearTimeout(pointEventTimeoutRef.current);
+      pointEventTimeoutRef.current = null;
+    }
     setPointEvent(event);
     if (event) {
-      window.setTimeout(() => setPointEvent(null), 4200);
+      pointEventTimeoutRef.current = window.setTimeout(() => setPointEvent(null), 4200);
     }
   }, []);
 
