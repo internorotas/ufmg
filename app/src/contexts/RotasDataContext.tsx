@@ -1,7 +1,7 @@
-import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import {
   createContext,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -23,6 +23,28 @@ import {
 import type { CategoriaLinhas, Parada } from '@/types/data.types';
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
+
+// ponytail: API vanilla do Turnstile — @marsidev/react-turnstile injeta <script> dinâmico
+// que o Rocket Loader do Cloudflare intercepta e quebra. Usar window.turnstile direto
+// evita esse problema. Se precisar de mais features (reset, remove), consultar
+// https://developers.cloudflare.com/turnstile/troubleshooting/javascript-api/
+interface TurnstileWindow {
+  turnstile?: {
+    render: (
+      container: string | HTMLElement,
+      options: {
+        sitekey: string;
+        size?: string;
+        callback?: (token: string) => void;
+        'error-callback'?: () => void;
+        'expired-callback'?: () => void;
+        action?: string;
+      },
+    ) => string;
+    execute: (widgetId: string) => void;
+    remove: (widgetId: string) => void;
+  };
+}
 
 export interface RotasDataContextData {
   linhasData: CategoriaLinhas;
@@ -52,7 +74,8 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
 
   const fallbackAttemptedRef = useRef(false);
   const binaryLoadedRef = useRef(false);
-  const turnstileRef = useRef<TurnstileInstance>(null);
+  const turnstileWidgetRef = useRef<string | null>(null);
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const isMounted = useMounted();
 
   const transitSession = useTransitSession();
@@ -163,9 +186,39 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
     void loadFallback();
   }, [hasApiData, hasApiError, isApiLoading, isMounted]);
 
+  const handleTurnstileSuccess = useCallback(
+    (token: string) => {
+      void transitSession.onTurnstileSuccess(token);
+    },
+    [transitSession.onTurnstileSuccess],
+  );
+
+  // Renderiza Turnstile via API vanilla (sem depender do React wrapper que o Rocket Loader quebra)
   useEffect(() => {
-    turnstileRef.current?.execute();
-  }, []);
+    if (!TURNSTILE_SITE_KEY || transitSession.disabled) return;
+
+    const container = turnstileContainerRef.current;
+    if (!container) return;
+
+    const tw = (window as unknown as TurnstileWindow).turnstile;
+    if (!tw) return;
+
+    const widgetId = tw.render(container, {
+      sitekey: TURNSTILE_SITE_KEY,
+      size: 'invisible',
+      callback: handleTurnstileSuccess,
+      'error-callback': transitSession.onTurnstileError,
+      'expired-callback': transitSession.onTurnstileError,
+    });
+    turnstileWidgetRef.current = widgetId;
+
+    return () => {
+      if (turnstileWidgetRef.current) {
+        tw.remove(turnstileWidgetRef.current);
+        turnstileWidgetRef.current = null;
+      }
+    };
+  }, [TURNSTILE_SITE_KEY, transitSession.disabled, handleTurnstileSuccess, transitSession.onTurnstileError]);
 
   const linhasData = useMemo(() => rotasService.getTodasLinhas(), [rotasService]);
   const todasParadas = useMemo(() => rotasService.getTodasParadas(), [rotasService]);
@@ -197,17 +250,7 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
   return (
     <RotasDataContext.Provider value={contextValue}>
       {TURNSTILE_SITE_KEY && !transitSession.disabled && (
-        <Turnstile
-          ref={turnstileRef}
-          siteKey={TURNSTILE_SITE_KEY}
-          options={{ size: 'invisible', execution: 'execute' }}
-          onSuccess={(token) => {
-            void transitSession.onTurnstileSuccess(token);
-          }}
-          onError={transitSession.onTurnstileError}
-          onExpire={transitSession.onTurnstileError}
-          style={{ display: 'none' }}
-        />
+        <div ref={turnstileContainerRef} style={{ display: 'none' }} />
       )}
       {children}
     </RotasDataContext.Provider>

@@ -14,9 +14,6 @@ importers:
       '@fontsource/poppins':
         specifier: ^5.2.7
         version: 5.2.7
-      '@marsidev/react-turnstile':
-        specifier: 1.5.3
-        version: 1.5.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@sentry/react':
         specifier: 10.51.0
         version: 10.51.0(react@19.2.5)
@@ -1204,12 +1201,6 @@ packages:
 
   '@maplibre/vt-pbf@4.3.2':
     resolution: {integrity: sha512-j6p0AdjvAR19Z3XaCysle7A4ZSo08tYOzxD0Y9NQylwPAkwJJeYub5b2eVucdeDh7erhv69DahoLOevDRERRUw==}
-
-  '@marsidev/react-turnstile@1.5.3':
-    resolution: {integrity: sha512-8Dij2jiNGNczq1U4EKpO4do2XepcTPxSMc2ZzvHndO+gcp68tvMULm27z2P99rGkdB89hc3452NZeu2Rti4g6A==}
-    peerDependencies:
-      react: ^17.0.2 || ^18.0.0 || ^19.0
-      react-dom: ^17.0.2 || ^18.0.0 || ^19.0
 
   '@mdx-js/mdx@3.1.1':
     resolution: {integrity: sha512-f6ZO2ifpwAQIpzGWaBQT2TXxPv6z3RBzQKpVftEWN78Vl/YweF1uwussDx8ECAXVtr3Rs89fKyG9YlzUs9DyGQ==}
@@ -6116,11 +6107,6 @@ snapshots:
       '@mapbox/point-geometry': 1.1.0
       '@types/geojson': 7946.0.16
       pbf: 5.1.1
-
-  '@marsidev/react-turnstile@1.5.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
 
   '@mdx-js/mdx@3.1.1':
     dependencies:
