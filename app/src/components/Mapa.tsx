@@ -7,7 +7,7 @@
  * Atualizado para React 19: ref como prop (sem forwardRef).
  */
 
-import { X } from 'lucide-react';
+import { Share2, X } from 'lucide-react';
 import { type Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { useRotasSelection } from '@/contexts/RotasContext';
 import type { MapaRef } from '@/contexts/RotasSelectionContext';
@@ -16,7 +16,9 @@ import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSessio
 import { useAnalytics } from '../hooks/useAnalytics';
 import type { Linha, Parada } from '../types/data.types';
 import { LoginBenefitsBanner } from './LoginBenefitsBanner';
+import { FavoritasWidget } from './map/FavoritasWidget';
 import { MapLibreView } from './map/maplibre';
+import { PesquisaParadas } from './map/PesquisaParadas';
 
 // Re-exporta para callers que importam MapaRef de Mapa.tsx
 export type { MapaRef };
@@ -62,6 +64,7 @@ export function Mapa({
   const mapLoadStartRef = useRef<number>(0);
 
   const [compassEnabled, setCompassEnabled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const toggleCompass = useCallback(() => {
     setCompassEnabled((v) => !v);
@@ -82,6 +85,13 @@ export function Mapa({
 
   return (
     <div className="relative h-full w-full">
+      {/* Pesquisa de paradas — overlay absoluto no topo */}
+      <PesquisaParadas
+        paradas={todasParadas}
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+      />
+
       {/* Chip da linha selecionada — aparece no topo centralizado */}
       {linhaSelecionada && (
         <div className="pointer-events-none absolute inset-x-0 top-3 z-2001 flex justify-center px-3">
@@ -95,6 +105,21 @@ export function Mapa({
             <span className="min-w-0 truncate text-xs font-semibold text-text-primary">
               {linhaSelecionada.nome}
             </span>
+            <button
+              type="button"
+              onClick={() => {
+                const text = `Linha ${linhaSelecionada.linha} — ${linhaSelecionada.nome}`;
+                if (navigator.share) {
+                  void navigator.share({ title: linhaSelecionada.nome, text });
+                } else {
+                  void navigator.clipboard?.writeText(text);
+                }
+              }}
+              aria-label={`Compartilhar linha ${linhaSelecionada.nome}`}
+              className="flex size-6 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            >
+              <Share2 size={13} aria-hidden="true" />
+            </button>
             <button
               type="button"
               onClick={limparSelecao}
@@ -122,7 +147,11 @@ export function Mapa({
         carregandoLocalizacao={carregandoLocalizacao}
         rastreioColaborativo={rastreioColaborativo}
         onAlternarRastreioColaborativo={onAlternarRastreioColaborativo}
+        onOpenSearch={() => setSearchOpen(true)}
       />
+
+      {/* Widget de paradas favoritas */}
+      <FavoritasWidget todasParadas={todasParadas} />
 
       {!isAuthenticated && <LoginBenefitsBanner />}
     </div>

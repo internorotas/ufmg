@@ -1,4 +1,4 @@
-import { Bell, BellRing, Bus, MapPin, Navigation } from 'lucide-react';
+import { Bell, BellRing, Bus, Heart, MapPin, Navigation } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Marker, Popup } from 'react-map-gl/maplibre';
 import markerSvgUrl from '@/assets/marker.svg';
@@ -9,6 +9,7 @@ import { calcularPrevisaoChegada } from '@/features/eta/domain/calculateEta';
 import { usePlannerStore } from '@/features/planner/store/plannerStore';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useCurrentTime } from '@/hooks/useCurrentTime';
+import { useParadasFavoritas } from '@/hooks/useParadasFavoritas';
 import { cn, normalizarNomeLinha } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
 import { DisclaimerEstimativa } from '../../DisclaimerEstimativa';
@@ -115,6 +116,7 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
   const { rotasService } = useRotasData();
   const { selecionarLinha } = useRotasSelection();
   const { suportado, isAlarmado, toggleNotificacao } = useNotificacaoContext();
+  const { isFavorita, toggleFavorita } = useParadasFavoritas();
   const currentTime = useCurrentTime();
 
   const resolverLinhaPorNome = (nomeLinhaParada: string, idParadaAtual: string): Linha | null => {
@@ -214,7 +216,7 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
         >
           <MapPin size={20} />
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h3
             id={headingId}
             className="text-sm font-bold leading-snug text-text-primary sm:text-base"
@@ -225,6 +227,27 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
             <p className="mt-0.5 text-xs text-text-secondary">{parada.categoria}</p>
           ) : null}
         </div>
+        <button
+          type="button"
+          onClick={() => toggleFavorita(parada.idParada, parada.nome)}
+          aria-label={
+            isFavorita(parada.idParada)
+              ? `Remover ${parada.nome} dos favoritos`
+              : `Adicionar ${parada.nome} aos favoritos`
+          }
+          aria-pressed={isFavorita(parada.idParada)}
+          className="flex size-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        >
+          <Heart
+            size={16}
+            aria-hidden="true"
+            className={
+              isFavorita(parada.idParada)
+                ? 'fill-brand-primary text-brand-primary'
+                : 'text-text-secondary'
+            }
+          />
+        </button>
       </header>
 
       <DisclaimerEstimativa />

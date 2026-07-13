@@ -8,6 +8,8 @@ import {
   Minus,
   Plus,
   Radio,
+  Search,
+  Share2,
   Square,
   X,
 } from 'lucide-react';
@@ -82,6 +84,7 @@ export interface MapLibreViewProps {
   carregandoLocalizacao?: boolean;
   rastreioColaborativo?: GpsTrackingState;
   onAlternarRastreioColaborativo?: () => void;
+  onOpenSearch?: () => void;
   ref?: Ref<MapaRef>;
 }
 
@@ -99,6 +102,7 @@ export function MapLibreView({
   carregandoLocalizacao = false,
   rastreioColaborativo,
   onAlternarRastreioColaborativo,
+  onOpenSearch,
   ref,
 }: MapLibreViewProps) {
   const analytics = useAnalytics();
@@ -333,7 +337,7 @@ export function MapLibreView({
       </MapLibreMap>
 
       {/* Controles de zoom e visão — lado esquerdo */}
-      <div className="pointer-events-none absolute left-2 top-2 z-900 flex flex-col items-center">
+      <div className="pointer-events-none absolute left-2 top-2 z-1200 flex flex-col items-center">
         <button
           type="button"
           onClick={() => mapRef.current?.zoomIn()}
@@ -395,8 +399,23 @@ export function MapLibreView({
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
           >
-            {/* Header: handle centralizado + botão fechar absoluto */}
+            {/* Header: handle centralizado + share + botão fechar */}
             <div className="relative flex items-center justify-center border-b border-card-border px-4 py-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  const text = paradaAberta.nome;
+                  if (navigator.share) {
+                    void navigator.share({ title: text, text });
+                  } else {
+                    void navigator.clipboard?.writeText(text);
+                  }
+                }}
+                aria-label={`Compartilhar parada ${paradaAberta.nome}`}
+                className="absolute left-2 flex size-8 items-center justify-center rounded-full text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              >
+                <Share2 size={15} aria-hidden="true" />
+              </button>
               <div className="h-1 w-10 rounded-full bg-card-border" aria-hidden="true" />
               <button
                 type="button"
@@ -450,6 +469,21 @@ export function MapLibreView({
 
       {/* FABs — fora do <Map> mas dentro do container relativo */}
       <div className="pointer-events-none fixed bottom-24 right-4 z-1000 flex flex-col items-end gap-2 mb-[env(safe-area-inset-bottom)] md:bottom-6 md:mb-0">
+        {onOpenSearch ? (
+          <button
+            type="button"
+            onClick={onOpenSearch}
+            aria-label="Pesquisar paradas"
+            title="Pesquisar paradas"
+            className={cn(
+              'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center surface-card transition-all duration-200',
+              'bg-card text-text-primary hover:bg-card-hover',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+            )}
+          >
+            <Search className="h-5 w-5" aria-hidden="true" />
+          </button>
+        ) : null}
         {rastreioColaborativo && onAlternarRastreioColaborativo ? (
           <button
             type="button"
