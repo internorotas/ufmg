@@ -297,4 +297,4 @@ self.addEventListener('message', (event: ExtendableMessageEvent) => {
 // sem catch → "Uncaught (in promise) no-response" no console. Retornar
 // Response.error() é semanticamente idêntico a "nenhum SW interceptou": o caller
 // (React Query) recebe erro de rede normalmente, sem uncaught rejection.
-setCatchHandler(async () => Response.error());
+setCatchHandler(() => Promise.resolve(Response.error()));
