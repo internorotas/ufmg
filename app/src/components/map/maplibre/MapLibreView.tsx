@@ -225,12 +225,27 @@ export function MapLibreView({
 
   const paradaDestacadaId = paradaSelecionada?.idParada ?? null;
 
+  // Ref para acessar paradaSelecionada no onLoad sem criar dependência circular
+  const paradaSelecionadaRef = useRef(paradaSelecionada);
+  useEffect(() => {
+    paradaSelecionadaRef.current = paradaSelecionada;
+  }, [paradaSelecionada]);
+
   // Centraliza na parada selecionada
   useEffect(() => {
     if (!paradaSelecionada) return;
     const [lat, lng] = paradaSelecionada.coordenadas;
     mapRef.current?.flyTo({ center: [lng, lat], zoom: 17, duration: 800 });
   }, [paradaSelecionada]);
+
+  // Quando o mapa termina de carregar (ex: após navegação da aba Próximos),
+  // centraliza na parada selecionada caso já esteja definida no contexto.
+  const handleMapLoad = useCallback(() => {
+    const parada = paradaSelecionadaRef.current;
+    if (!parada) return;
+    const [lat, lng] = parada.coordenadas;
+    mapRef.current?.flyTo({ center: [lng, lat], zoom: 17, duration: 0 });
+  }, []);
 
   // Ajusta bounds para linha selecionada
   useEffect(() => {
@@ -277,6 +292,7 @@ export function MapLibreView({
         touchPitch
         onPitch={(e) => setPitch(e.target.getPitch())}
         onRotate={(e) => setBearing(e.target.getBearing())}
+        onLoad={handleMapLoad}
         onClick={handleMapClick}
       >
         <MapLibrePlannerOverlay />

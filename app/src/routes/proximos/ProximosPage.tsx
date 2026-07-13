@@ -1,20 +1,33 @@
 import { AlertTriangle, MapPinned, Navigation } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { useRotasSelection } from '@/contexts/RotasContext';
 import { useNearestStopsQuery } from '@/features/transit-data/queries/useNearestStopsQuery';
 import { calcularDistanciaKm } from '@/lib/utils';
+import type { Parada } from '@/types/data.types';
 
 function formatarDistancia(km: number): string {
   return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
 }
 
 export function ProximosPage() {
+  const navigate = useNavigate();
+  const { selecionarParada } = useRotasSelection();
   const [coords, setCoords] = useState<[number, number] | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+
+  const handleParadaClick = useCallback(
+    (parada: Parada) => {
+      selecionarParada(parada);
+      navigate('/');
+    },
+    [navigate, selecionarParada],
+  );
 
   const { data: paradas, isLoading, isError } = useNearestStopsQuery(coords);
 
@@ -101,9 +114,11 @@ export function ProximosPage() {
           );
 
           return (
-            <div
+            <button
               key={parada.idParada}
-              className="surface-card flex items-center justify-between gap-3 p-4"
+              type="button"
+              onClick={() => handleParadaClick(parada)}
+              className="surface-card flex w-full items-center justify-between gap-3 p-4 text-left transition-all hover:-translate-y-px hover:shadow-(--elevation-2) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold text-text-primary">{parada.nome}</p>
@@ -123,7 +138,7 @@ export function ProximosPage() {
               <Badge variant="outline" size="sm" className="shrink-0">
                 {formatarDistancia(distanciaKm)}
               </Badge>
-            </div>
+            </button>
           );
         })}
 
