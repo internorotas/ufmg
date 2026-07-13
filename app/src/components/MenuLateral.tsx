@@ -211,12 +211,21 @@ export const MenuLateral = React.memo(function MenuLateral({
   const { t } = useTranslation('menu');
   const analytics = useAnalytics();
   const { trackEvent } = analytics;
-  const { paradaSelecionada } = useRotasSelection();
+  const { paradaSelecionada, limparSelecao } = useRotasSelection();
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth < 768 : false,
   );
-  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
+  // Inicializa a partir de linhaSelecionada para restaurar o painel ao voltar de outra tela
+  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(linhaSelecionada);
+
+  // Fecha o painel quando a seleção for limpa externamente (ex: X no chip do mapa)
+  useEffect(() => {
+    if (!linhaSelecionada) {
+      setLinhaDetalhesAberta(null);
+    }
+  }, [linhaSelecionada]);
+
   const [partnerSpotlight, setPartnerSpotlight] = useState<PartnerSpotlight | null>(null);
   const [disclaimerBannerDismissed, setDisclaimerBannerDismissed] = useState(false);
   const selectedRouteId = usePlannerStore((state) => state.selectedRouteId);
@@ -429,8 +438,9 @@ export const MenuLateral = React.memo(function MenuLateral({
         label: linha.nome,
       });
       setLinhaDetalhesAberta(linha);
+      onLinhaSelect(linha);
     },
-    [trackEvent],
+    [onLinhaSelect, trackEvent],
   );
 
   const handleFavoritaCardClick = useCallback(
@@ -732,6 +742,7 @@ export const MenuLateral = React.memo(function MenuLateral({
                 label: linhaDetalhesAberta.nome,
               });
               setLinhaDetalhesAberta(null);
+              limparSelecao();
             }}
             linha={linhaDetalhesAberta}
             todasParadas={todasParadas}

@@ -27,13 +27,16 @@ export function useOsrmRoute(
   lineId: string | undefined,
   fallbackCoords: [number, number][],
 ): [number, number][] {
+  const [prevLineId, setPrevLineId] = useState(lineId);
   const [coords, setCoords] = useState<[number, number][]>(fallbackCoords);
   const pendingRef = useRef<string | null>(null);
 
-  // Sincroniza fallback imediatamente quando a linha muda
-  useEffect(() => {
+  // Derived-state pattern: reseta coords no mesmo render quando lineId muda,
+  // evitando que coords de uma linha fiquem visíveis ao trocar/deselecionar.
+  if (prevLineId !== lineId) {
+    setPrevLineId(lineId);
     setCoords(fallbackCoords);
-  }, [fallbackCoords]);
+  }
 
   useEffect(() => {
     if (!lineId || fallbackCoords.length < 2) return;
