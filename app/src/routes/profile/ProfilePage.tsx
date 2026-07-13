@@ -425,7 +425,6 @@ export function ProfilePage() {
                 </div>
               </CardContent>
             </Card>
-            {/* Histórico de viagens (local) */}
             {historico.length > 0 && (
               <Card>
                 <CardHeader>
@@ -433,18 +432,22 @@ export function ProfilePage() {
                     <Route size={18} aria-hidden="true" />
                     Histórico de viagens
                   </CardTitle>
-                  <CardDescription>
-                    Últimas viagens registradas neste dispositivo (dados locais).
-                  </CardDescription>
+                  <CardDescription>Últimas viagens registradas no servidor.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {historico.slice(0, 10).map((viagem) => {
-                    const durMin = Math.round(viagem.durationMs / 60_000);
+                    const durMs =
+                      new Date(viagem.encerradoAt).getTime() -
+                      new Date(viagem.iniciadoAt).getTime();
+                    const durMin = Math.round(durMs / 60_000);
+                    const km = viagem.displacementKm;
                     const distStr =
-                      viagem.distanceKm < 1
-                        ? `${Math.round(viagem.distanceKm * 1000)} m`
-                        : `${viagem.distanceKm.toFixed(1)} km`;
-                    const data = new Date(viagem.endedAt);
+                      km == null
+                        ? null
+                        : km < 1
+                          ? `${Math.round(km * 1000)} m`
+                          : `${km.toFixed(1)} km`;
+                    const data = new Date(viagem.encerradoAt);
                     const dataStr = data.toLocaleDateString('pt-BR', {
                       day: '2-digit',
                       month: '2-digit',
@@ -461,17 +464,18 @@ export function ProfilePage() {
                       >
                         <span
                           className="flex size-8 shrink-0 items-center justify-center rounded-full text-white"
-                          style={{ backgroundColor: viagem.linhaCorHex }}
+                          style={{ backgroundColor: viagem.linhaCorHex ?? '#6b7280' }}
                           aria-hidden="true"
                         >
                           <Bus size={14} />
                         </span>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-semibold text-text-primary">
-                            {viagem.linhaNome}
+                            {viagem.linhaNome ?? viagem.linhaId}
                           </p>
                           <p className="text-xs text-text-secondary">
-                            {distStr} · {durMin} min
+                            {distStr ? `${distStr} · ` : ''}
+                            {durMin} min
                           </p>
                         </div>
                         <p className="shrink-0 text-xs text-text-tertiary">
@@ -576,7 +580,10 @@ export function ProfilePage() {
                   <select
                     value={profile.notificationProfile}
                     onChange={(e) =>
-                      void handleProfileUpdate({ notificationProfile: e.target.value })
+                      void handleProfileUpdate({
+                        notificationProfile: e.target
+                          .value as import('@/features/auth/api/authClient').NotificationProfile,
+                      })
                     }
                     disabled={isUpdatingProfile}
                     className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary disabled:opacity-50"
