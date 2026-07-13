@@ -1,12 +1,13 @@
-import { ArrowLeft, Info, LayoutList } from 'lucide-react';
+import { ArrowLeft, Info, LayoutList, Star } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { LineCard } from '@/components/LineCard';
 import { CategoryTabs } from '@/components/MenuLateral';
 import { SystemBanner } from '@/components/SystemBanner';
-import { SearchEmptyState } from '@/components/ui/EmptyState';
+import { EmptyState, SearchEmptyState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/Input';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { getCurrentSpecialPeriod, isWeekday } from '@/config/specialPeriods';
 import { useRotasData, useRotasSelection } from '@/contexts/RotasContext';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -39,6 +40,7 @@ export function LinhasPage() {
   const isDesktop = useIsDesktop();
 
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
+  const [filtroAtivo, setFiltroAtivo] = useState<'todas' | 'favoritas'>('todas');
   const [movimentoPorId, setMovimentoPorId] = useState<Record<string, 'up' | 'down'>>({});
   const previousFavoritosRef = useRef<Set<string>>(new Set());
 
@@ -190,6 +192,23 @@ export function LinhasPage() {
         onSelect={handleCategoriaChange}
       />
 
+      {/* Filtro Todas/Favoritas */}
+      <div className="shrink-0 border-b border-card-border bg-background-secondary px-2 py-2 lg:px-3">
+        <Tabs
+          value={filtroAtivo}
+          onValueChange={(value) => setFiltroAtivo(value as 'todas' | 'favoritas')}
+        >
+          <TabsList variant="pills" fullWidth={false}>
+            <TabsTrigger value="todas" fullWidth={false}>
+              Todas
+            </TabsTrigger>
+            <TabsTrigger value="favoritas" fullWidth={false}>
+              Favoritas
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       {/* Two-column area */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Left: scrollable list */}
@@ -238,61 +257,95 @@ export function LinhasPage() {
             }
           />
 
-          {hasFavoritas && (
-            <section aria-label="Linhas favoritas">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
-                Favoritas
-              </p>
-              {linhasFavoritas.map((linha) => (
-                <div
-                  key={linha.idRota}
-                  className={
-                    movimentoPorId[linha.idRota] === 'up'
-                      ? 'motion-safe:animate-line-favorite-up'
-                      : ''
-                  }
-                >
-                  <LineCard
-                    linha={linha}
-                    onClick={handleFavoritaClick}
-                    onDetailsClick={handleDetailsClick}
-                    isSelected={linhaSelecionada?.idRota === linha.idRota}
-                    isFavorita={true}
-                  />
-                </div>
-              ))}
-              <div className="mb-3 mt-1 border-b border-card-border" aria-hidden="true" />
-            </section>
-          )}
-
-          {hasFavoritas && hasRegularResults && (
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
-              Todas as Linhas
-            </p>
-          )}
-
-          {hasRegularResults
-            ? linhasRegulares.map((linha) => (
-                <div
-                  key={linha.idRota}
-                  className={
-                    movimentoPorId[linha.idRota] === 'down'
-                      ? 'motion-safe:animate-line-favorite-down'
-                      : ''
-                  }
-                >
-                  <LineCard
-                    linha={linha}
-                    onClick={handleLinhaClick}
-                    onDetailsClick={handleDetailsClick}
-                    isSelected={linhaSelecionada?.idRota === linha.idRota}
-                    isFavorita={false}
-                  />
-                </div>
-              ))
-            : !hasFavoritas && (
-                <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
+          {filtroAtivo === 'favoritas' ? (
+            hasFavoritas ? (
+              <section aria-label="Linhas favoritas">
+                {linhasFavoritas.map((linha) => (
+                  <div
+                    key={linha.idRota}
+                    className={
+                      movimentoPorId[linha.idRota] === 'up'
+                        ? 'motion-safe:animate-line-favorite-up'
+                        : ''
+                    }
+                  >
+                    <LineCard
+                      linha={linha}
+                      onClick={handleFavoritaClick}
+                      onDetailsClick={handleDetailsClick}
+                      isSelected={linhaSelecionada?.idRota === linha.idRota}
+                      isFavorita={true}
+                    />
+                  </div>
+                ))}
+              </section>
+            ) : (
+              <EmptyState
+                tone="accent"
+                icon={<Star size={32} />}
+                title="Nenhum favorito ainda"
+                description="Toque na estrela em uma linha para salvá-la aqui e acessar rapidamente."
+              />
+            )
+          ) : (
+            <>
+              {hasFavoritas && (
+                <section aria-label="Linhas favoritas">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+                    Favoritas
+                  </p>
+                  {linhasFavoritas.map((linha) => (
+                    <div
+                      key={linha.idRota}
+                      className={
+                        movimentoPorId[linha.idRota] === 'up'
+                          ? 'motion-safe:animate-line-favorite-up'
+                          : ''
+                      }
+                    >
+                      <LineCard
+                        linha={linha}
+                        onClick={handleFavoritaClick}
+                        onDetailsClick={handleDetailsClick}
+                        isSelected={linhaSelecionada?.idRota === linha.idRota}
+                        isFavorita={true}
+                      />
+                    </div>
+                  ))}
+                  <div className="mb-3 mt-1 border-b border-card-border" aria-hidden="true" />
+                </section>
               )}
+
+              {hasFavoritas && hasRegularResults && (
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
+                  Todas as Linhas
+                </p>
+              )}
+
+              {hasRegularResults
+                ? linhasRegulares.map((linha) => (
+                    <div
+                      key={linha.idRota}
+                      className={
+                        movimentoPorId[linha.idRota] === 'down'
+                          ? 'motion-safe:animate-line-favorite-down'
+                          : ''
+                      }
+                    >
+                      <LineCard
+                        linha={linha}
+                        onClick={handleLinhaClick}
+                        onDetailsClick={handleDetailsClick}
+                        isSelected={linhaSelecionada?.idRota === linha.idRota}
+                        isFavorita={false}
+                      />
+                    </div>
+                  ))
+                : !hasFavoritas && (
+                    <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
+                  )}
+            </>
+          )}
         </main>
 
         {/* Right: inline details panel (desktop only) */}
