@@ -3,11 +3,10 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { ArrowLeft, Info, Route, X } from 'lucide-react';
+import { ArrowLeft, Route, X } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { tv, type VariantProps } from 'tailwind-variants';
-import { getCurrentSpecialPeriod, isWeekday } from '@/config/specialPeriods';
 import {
   type PartnerSpotlight,
   PartnerSpotlightCard,
@@ -23,7 +22,6 @@ import type { CategoriaLinhas, Linha, Parada } from '../types/data.types';
 import type { LegalModalType } from '../types/legal.types';
 import { DisclaimerBanner } from './DisclaimerBanner';
 import { LineCard } from './LineCard';
-import { SystemBanner } from './SystemBanner';
 import { ThemeToggle } from './ThemeToggle';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
@@ -220,8 +218,6 @@ export const MenuLateral = React.memo(function MenuLateral({
   );
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
   const [partnerSpotlight, setPartnerSpotlight] = useState<PartnerSpotlight | null>(null);
-  const [vacationBannerDismissed, setVacationBannerDismissed] = useState(false);
-  const [infoBannerDismissed, setInfoBannerDismissed] = useState(false);
   const [disclaimerBannerDismissed, setDisclaimerBannerDismissed] = useState(false);
   const selectedRouteId = usePlannerStore((state) => state.selectedRouteId);
   const plannerMode = usePlannerStore((state) => state.mode);
@@ -303,9 +299,6 @@ export const MenuLateral = React.memo(function MenuLateral({
 
     return () => window.clearTimeout(clearAnimation);
   }, [favoritosIds]);
-
-  const specialPeriod = getCurrentSpecialPeriod();
-  const isWeekdayToday = isWeekday();
 
   useEffect(() => {
     const categoria = categoriaAtual?.displayName || 'desconhecida';
@@ -613,49 +606,6 @@ export const MenuLateral = React.memo(function MenuLateral({
           aria-label={t('list.aria')}
           hidden={isPlannerOpen}
         >
-          {specialPeriod && !vacationBannerDismissed ? (
-            <SystemBanner
-              variant="warning"
-              icon={<Info aria-hidden="true" />}
-              title={specialPeriod.name}
-              onDismiss={() => setVacationBannerDismissed(true)}
-              description={
-                <>
-                  <p>
-                    <Trans
-                      i18nKey="vacation.description"
-                      ns="system-banner"
-                      values={{
-                        start: specialPeriod.startDate.toLocaleDateString('pt-BR'),
-                        end: specialPeriod.endDate.toLocaleDateString('pt-BR'),
-                      }}
-                    />
-                  </p>
-                  {!isWeekdayToday && (
-                    <p className="mt-2 font-semibold">
-                      <Trans i18nKey="vacation.weekendWarning" ns="system-banner" />
-                    </p>
-                  )}
-                </>
-              }
-            />
-          ) : null}
-
-          {!infoBannerDismissed && (
-            <SystemBanner
-              variant="info"
-              icon={<Info aria-hidden="true" />}
-              onDismiss={() => setInfoBannerDismissed(true)}
-              description={
-                <Trans
-                  i18nKey="info.description"
-                  ns="system-banner"
-                  components={{ strong: <strong /> }}
-                />
-              }
-            />
-          )}
-
           {partnerSpotlight ? (
             <PartnerSpotlightCard
               partner={partnerSpotlight}

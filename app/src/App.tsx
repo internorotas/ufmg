@@ -573,12 +573,6 @@ function AppContent() {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AnalyticsConsentBanner />
         <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
-        {!vacationBannerDismissed && (
-          <VacationBanner className="mx-3 mt-2" onDismiss={handleVacationBannerDismiss} />
-        )}
-        {!infoBannerDismissed && (
-          <InfoBanner className="mx-3 mt-2" onDismiss={handleInfoBannerDismiss} />
-        )}
         <MobileTopBar
           authStatus={authStatus}
           isAuthenticated={isAuthenticated}
@@ -611,6 +605,37 @@ function AppContent() {
             aria-label="Mapa das rotas"
             className="relative h-full w-full grow"
           >
+            <div
+              aria-live="polite"
+              className="pointer-events-none absolute inset-x-3 top-3 z-1100 flex flex-col gap-2"
+            >
+              {!vacationBannerDismissed && (
+                <div className="pointer-events-auto">
+                  <VacationBanner onDismiss={handleVacationBannerDismiss} />
+                </div>
+              )}
+              {!infoBannerDismissed && (
+                <div className="pointer-events-auto">
+                  <InfoBanner onDismiss={handleInfoBannerDismiss} />
+                </div>
+              )}
+              {feedbackMessage ? (
+                <div
+                  role="alert"
+                  aria-label="Aviso de login necessário"
+                  className="pointer-events-auto flex items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg"
+                >
+                  <span className="flex-1">{feedbackMessage}</span>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/login', { state: { from: location.pathname } })}
+                    className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-md bg-warning-text px-3 text-xs font-semibold text-warning-bg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning-text focus-visible:ring-offset-2 focus-visible:ring-offset-warning-bg"
+                  >
+                    Entrar
+                  </button>
+                </div>
+              ) : null}
+            </div>
             <ErrorBoundary
               fallback={
                 <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-background-secondary p-8 text-center">
@@ -721,24 +746,6 @@ function AppContent() {
             className="pointer-events-none absolute bottom-32 left-1/2 z-1400 -translate-x-1/2 rounded-lg border border-success-border bg-success-bg px-3 py-2 text-xs text-success-text shadow-md"
           >
             {authFeedbackMessage}
-          </div>
-        ) : null}
-
-        {feedbackMessage ? (
-          <div
-            role="alert"
-            aria-live="polite"
-            aria-label="Aviso de login necessário"
-            className="pointer-events-auto fixed inset-x-4 bottom-24 z-1400 mx-auto flex max-w-md items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg md:bottom-20"
-          >
-            <span className="flex-1">{feedbackMessage}</span>
-            <button
-              type="button"
-              onClick={() => navigate('/login', { state: { from: location.pathname } })}
-              className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-md bg-warning-text px-3 text-xs font-semibold text-warning-bg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning-text focus-visible:ring-offset-2 focus-visible:ring-offset-warning-bg"
-            >
-              Entrar
-            </button>
           </div>
         ) : null}
       </div>
