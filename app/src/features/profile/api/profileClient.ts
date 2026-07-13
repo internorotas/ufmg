@@ -15,6 +15,7 @@ export interface UserProfile {
   mapMarkerVisible: boolean;
   rankingDetail: RankingDetail;
   notificationProfile: NotificationProfile;
+  favoriteStopIds: string[];
   consentGps: boolean;
   consentResearch: boolean;
   consentGpsAt: string | null;
@@ -91,6 +92,7 @@ export interface ProfileUpdatePayload {
   mapMarkerVisible?: boolean;
   rankingDetail?: RankingDetail;
   notificationProfile?: NotificationProfile;
+  favoriteStopIds?: string[];
 }
 
 export interface AccountDeletionRequestResult {
