@@ -3,10 +3,12 @@ import {
   AlertTriangle,
   AtSign,
   Bell,
+  Bus,
   Eye,
   EyeOff,
   MapPin,
   Medal,
+  Route,
   Settings,
   Trophy,
   UserCircle2,
@@ -39,6 +41,7 @@ import {
 } from '@/features/profile/api/profileClient';
 import { DeleteAccountDialog } from '@/features/profile/components/DeleteAccountDialog';
 import { PROFILE_QUERY_KEY, useProfileQuery } from '@/features/profile/queries/useProfileQuery';
+import { useHistoricoViagens } from '@/hooks/useHistoricoViagens';
 import { formatDateTimePtBr } from '@/lib/formatters';
 
 interface ProfileFeedbackState {
@@ -54,6 +57,7 @@ export function ProfilePage() {
   const queryClient = useQueryClient();
 
   const { data: profile, isPending: isLoadingProfile, error } = useProfileQuery();
+  const { historico } = useHistoricoViagens();
   const profileError =
     error instanceof Error ? error.message : error ? 'Falha ao carregar perfil.' : null;
 
@@ -421,6 +425,64 @@ export function ProfilePage() {
                 </div>
               </CardContent>
             </Card>
+            {/* Histórico de viagens (local) */}
+            {historico.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Route size={18} aria-hidden="true" />
+                    Histórico de viagens
+                  </CardTitle>
+                  <CardDescription>
+                    Últimas viagens registradas neste dispositivo (dados locais).
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {historico.slice(0, 10).map((viagem) => {
+                    const durMin = Math.round(viagem.durationMs / 60_000);
+                    const distStr =
+                      viagem.distanceKm < 1
+                        ? `${Math.round(viagem.distanceKm * 1000)} m`
+                        : `${viagem.distanceKm.toFixed(1)} km`;
+                    const data = new Date(viagem.endedAt);
+                    const dataStr = data.toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                    });
+                    const hora = data.toLocaleTimeString('pt-BR', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    });
+
+                    return (
+                      <div
+                        key={viagem.id}
+                        className="surface-card-sm flex items-center gap-3 bg-background px-3 py-2.5"
+                      >
+                        <span
+                          className="flex size-8 shrink-0 items-center justify-center rounded-full text-white"
+                          style={{ backgroundColor: viagem.linhaCorHex }}
+                          aria-hidden="true"
+                        >
+                          <Bus size={14} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-text-primary">
+                            {viagem.linhaNome}
+                          </p>
+                          <p className="text-xs text-text-secondary">
+                            {distStr} · {durMin} min
+                          </p>
+                        </div>
+                        <p className="shrink-0 text-xs text-text-tertiary">
+                          {dataStr} {hora}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* ─── Configurações ─── */}
