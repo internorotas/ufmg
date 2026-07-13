@@ -20,7 +20,6 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import { Input } from '@/components/ui/Input';
-import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { SwitchRow } from '@/components/ui/SwitchRow';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { ToggleRow } from '@/components/ui/ToggleRow';
@@ -68,6 +67,7 @@ export function ProfilePage() {
   // disparem re-execuções desnecessárias do efeito de sincronização de perfil.
   const publishPointEventRef = useRef(publishPointEvent);
   const updateUserRef = useRef(updateUser);
+  const lastShownEventRef = useRef<string | null>(null);
   useEffect(() => {
     publishPointEventRef.current = publishPointEvent;
   });
@@ -76,10 +76,15 @@ export function ProfilePage() {
   });
 
   // Sincroniza auth context e notificação de pontos quando o dado do perfil chega ou atualiza.
+  // Só publica o toast quando há um evento novo (earnedAt diferente do último exibido).
   useEffect(() => {
     if (!profile) return;
     updateUserRef.current(toAuthenticatedUser(profile));
-    publishPointEventRef.current(profile.gamification.recentPointEvents[0] ?? null);
+    const latest = profile.gamification.recentPointEvents[0] ?? null;
+    if (latest && latest.earnedAt !== lastShownEventRef.current) {
+      lastShownEventRef.current = latest.earnedAt;
+      publishPointEventRef.current(latest);
+    }
   }, [profile]);
 
   // Sincroniza input de nickname com o perfil (na carga inicial e após salvar)
@@ -506,16 +511,18 @@ export function ProfilePage() {
                   <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
                     Perfil de notificação
                   </p>
-                  <SegmentedControl
-                    options={[
-                      { value: 'minimo', label: 'Mínimo' },
-                      { value: 'normal', label: 'Normal' },
-                      { value: 'tudo', label: 'Tudo' },
-                    ]}
+                  <select
                     value={profile.notificationProfile}
-                    onChange={(value) => void handleProfileUpdate({ notificationProfile: value })}
+                    onChange={(e) =>
+                      void handleProfileUpdate({ notificationProfile: e.target.value })
+                    }
                     disabled={isUpdatingProfile}
-                  />
+                    className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary disabled:opacity-50"
+                  >
+                    <option value="minimo">Mínimo</option>
+                    <option value="normal">Normal</option>
+                    <option value="tudo">Tudo</option>
+                  </select>
                 </div>
 
                 <SwitchRow

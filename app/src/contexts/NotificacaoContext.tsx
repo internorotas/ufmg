@@ -244,7 +244,7 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
           {collaborativeFeedback}
         </div>
       ) : null}
-      <PointDeltaToast event={pointEvent} />
+      <PointDeltaToast event={pointEvent} onDismiss={() => publishPointEvent(null)} />
     </NotificacaoContext.Provider>
   );
 }
