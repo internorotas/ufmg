@@ -123,6 +123,7 @@ export function useLocalizacaoUsuario(options?: {
   const bussolaCleanupRef = useRef<(() => void) | null>(null);
   const jaVerificouDistanciaRef = useRef(false);
   const melhorPrecisaoRef = useRef<number>(Infinity);
+  const lastHeadingRef = useRef<number | null>(null);
 
   /**
    * Verifica se o usuário está longe do campus atual (apenas 1x por sessão de rastreamento)
@@ -233,13 +234,28 @@ export function useLocalizacaoUsuario(options?: {
   const iniciarBussola = useCallback(async (): Promise<(() => void) | null> => {
     const handleOrientation = (event: Event) => {
       const e = event as DeviceOrientationEventWebkit;
+      let newHeading: number | null = null;
+
       if (e.webkitCompassHeading !== undefined) {
-        // iOS: propriedade proprietária — heading absoluto em graus
-        setHeading(e.webkitCompassHeading);
-      } else if (e.alpha !== null && e.alpha !== undefined) {
-        // Android/desktop: alpha é rotação no sentido anti-horário; invertemos
-        setHeading(360 - e.alpha);
+        // iOS: propriedade proprietária — heading absoluto, já corrigido para orientação da tela
+        newHeading = e.webkitCompassHeading;
+      } else if (e.absolute === true && e.alpha !== null && e.alpha !== undefined) {
+        // Android (deviceorientationabsolute): alpha é CCW ao redor do eixo Z físico.
+        // screenAngle corrige o offset de orientação da tela (0=portrait, 90=landscape-right…).
+        // Sem essa correção o heading fica 90° errado em landscape.
+        const screenAngle = window.screen?.orientation?.angle ?? 0;
+        newHeading = (720 - e.alpha - screenAngle) % 360;
       }
+
+      if (newHeading === null) return;
+
+      // Suprime atualizações menores que 2° para evitar jitter e re-renders excessivos
+      const last = lastHeadingRef.current;
+      const delta = last === null ? 360 : Math.abs(((newHeading - last + 540) % 360) - 180);
+      if (delta < 2) return;
+
+      lastHeadingRef.current = newHeading;
+      setHeading(newHeading);
     };
 
     // CRÍTICO iOS 13+: requestPermission deve ser chamado antes do addEventListener.
