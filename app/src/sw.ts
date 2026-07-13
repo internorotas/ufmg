@@ -8,7 +8,7 @@ import {
   type PrecacheEntry,
   precacheAndRoute,
 } from 'workbox-precaching';
-import { NavigationRoute, registerRoute } from 'workbox-routing';
+import { NavigationRoute, registerRoute, setCatchHandler } from 'workbox-routing';
 import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { getTenantCacheName, getTenantPushTag, TENANT_CACHE_PREFIX } from './pwa/tenantNamespace';
 import { tenantConfig } from './tenants/tenantConfig';
@@ -292,3 +292,9 @@ self.addEventListener('message', (event: ExtendableMessageEvent) => {
 
   event.waitUntil(broadcastGpsFlushRequest());
 });
+
+// Quando NetworkFirst não consegue rede E não tem cache, Workbox rejeita a promise
+// sem catch → "Uncaught (in promise) no-response" no console. Retornar
+// Response.error() é semanticamente idêntico a "nenhum SW interceptou": o caller
+// (React Query) recebe erro de rede normalmente, sem uncaught rejection.
+setCatchHandler((): Response => Response.error());
