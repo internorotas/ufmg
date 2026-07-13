@@ -145,7 +145,7 @@ export function SkeletonAvatar({ size = 'md', className, ...props }: SkeletonAva
  */
 export function SkeletonLineCard({ className }: { className?: string }) {
   return (
-    <div data-slot="skeleton-line-card" className={cn('neo-brutal bg-card p-4', className)}>
+    <div data-slot="skeleton-line-card" className={cn('surface-card bg-card p-4', className)}>
       {/* Header */}
       <div className="mb-4 flex items-center gap-3">
         <Skeleton className="size-12" rounded="lg" />

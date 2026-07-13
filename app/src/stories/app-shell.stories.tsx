@@ -133,25 +133,25 @@ export const AppShellWithRichContent: Story = () => (
         }
       >
         <div className="space-y-4">
-          <div className="neo-brutal bg-card p-4 rounded">
+          <div className="surface-card bg-card p-4 rounded">
             <h2 className="font-semibold mb-2">Informações Pessoais</h2>
             <p className="text-text-secondary text-sm">Nome: Ana Paula Ferreira</p>
             <p className="text-text-secondary text-sm">Email: ana.ferreira@ufmg.br</p>
             <p className="text-text-secondary text-sm">Matrícula: 2021024567</p>
           </div>
-          <div className="neo-brutal bg-card p-4 rounded">
+          <div className="surface-card bg-card p-4 rounded">
             <h2 className="font-semibold mb-2">Estatísticas</h2>
             <p className="text-text-secondary text-sm">Viagens realizadas: 42</p>
             <p className="text-text-secondary text-sm">Avaliação média: 4.8 ★</p>
           </div>
-          <div className="neo-brutal bg-card p-4 rounded">
+          <div className="surface-card bg-card p-4 rounded">
             <h2 className="font-semibold mb-2">Preferências</h2>
             <p className="text-text-secondary text-sm">Rota favorita: Campus Pampulha → Centro</p>
           </div>
           {/* Extra content to demonstrate scrolling */}
           {Array.from({ length: 6 }).map((_, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: story data has no stable IDs
-            <div key={i} className="neo-brutal bg-card p-4 rounded">
+            <div key={i} className="surface-card bg-card p-4 rounded">
               <p className="text-text-secondary text-sm">Seção adicional {i + 1}</p>
             </div>
           ))}
@@ -668,7 +668,7 @@ export const ComposedOfflineScenario: Story = () => (
             source="source-fallback"
             updatedAt="2024-08-15T11:45:00.000Z"
           />
-          <div className="neo-brutal bg-card p-4 rounded">
+          <div className="surface-card bg-card p-4 rounded">
             <p className="text-text-secondary text-sm">Conteúdo da página em modo offline.</p>
           </div>
         </div>
@@ -828,11 +828,11 @@ export const AnalyticsConsentBannerPreview: Story = () => (
     <div
       role="alertdialog"
       aria-label="Consentimento de analytics"
-      className="pointer-events-auto absolute inset-x-0 bottom-0 border-t-2 border-(--neo-border-color) bg-card px-4 py-4"
+      className="pointer-events-auto absolute inset-x-0 bottom-0 border-t border-(--card-border) bg-card px-4 py-4"
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         <div className="flex min-w-0 flex-1 items-start gap-3">
-          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center neo-brutal-sm bg-brand-primary text-white">
+          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center surface-card-sm bg-brand-primary text-white">
             <BarChart3 size={16} aria-hidden="true" />
           </span>
           <div className="min-w-0">

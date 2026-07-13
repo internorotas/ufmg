@@ -352,7 +352,7 @@ export function MapLibreView({
           aria-label={is3d ? 'Voltar à visão 2D' : 'Ativar visão 3D'}
           title={is3d ? 'Visão 2D' : 'Visão 3D'}
           className={cn(
-            'pointer-events-auto flex h-10 w-10 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+            'pointer-events-auto flex h-10 w-10 cursor-pointer items-center justify-center surface-card transition-all duration-200',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
             is3d || compassEnabled
               ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
@@ -445,7 +445,7 @@ export function MapLibreView({
                 : `Iniciar ${rastreioColaborativo.label}`
             }
             className={cn(
-              'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+              'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center surface-card transition-all duration-200',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
               rastreioAtivo
                 ? 'border-success-border bg-success-border text-white'
@@ -466,7 +466,7 @@ export function MapLibreView({
           aria-label={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
           title={`Centralizar mapa em ${CAMPUS_DISPLAY_NAME}`}
           className={cn(
-            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center surface-card transition-all duration-200',
             'bg-card text-text-primary hover:bg-card-hover',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
           )}
@@ -486,7 +486,7 @@ export function MapLibreView({
           }
           title={compassEnabled ? 'Desativar bússola' : 'Ativar bússola (3D)'}
           className={cn(
-            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center surface-card transition-all duration-200',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
             compassEnabled
               ? 'border-brand-primary bg-brand-primary text-white'
@@ -515,7 +515,7 @@ export function MapLibreView({
                 : 'Ativar localização'
           }
           className={cn(
-            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center neo-brutal transition-all duration-200',
+            'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center surface-card transition-all duration-200',
             'bg-brand-primary text-white hover:bg-brand-primary/90',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-70',

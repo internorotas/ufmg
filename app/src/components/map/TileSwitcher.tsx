@@ -109,7 +109,7 @@ export function TileSwitcher() {
         aria-haspopup="listbox"
         title="Camadas do mapa"
         className={cn(
-          'flex h-10 w-10 items-center justify-center rounded-sm neo-brutal transition-all duration-200',
+          'flex h-10 w-10 items-center justify-center rounded-sm surface-card transition-all duration-200',
           'bg-card text-text-primary hover:bg-card-hover',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
         )}

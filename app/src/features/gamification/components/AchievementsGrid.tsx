@@ -24,12 +24,12 @@ function renderAchievementCard(achievement: AchievementView, unlocked: boolean) 
   return (
     <article
       key={achievement.slug}
-      className={`neo-brutal px-3 py-3 ${unlocked ? 'bg-card' : 'bg-background-secondary/70'}`}
+      className={`surface-card px-3 py-3 ${unlocked ? 'bg-card' : 'bg-background-secondary/70'}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <div
-            className={`mt-0.5 neo-brutal-sm p-2 ${
+            className={`mt-0.5 surface-card-sm p-2 ${
               unlocked ? 'bg-background' : 'bg-background-secondary'
             }`}
           >

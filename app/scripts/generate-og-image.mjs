@@ -25,14 +25,14 @@ const html = `<!DOCTYPE html>
 <head>
   <meta charset="utf-8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=block" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;800;900&display=block" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       width: 1200px;
       height: 630px;
       background: #2C0EEB;
-      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      font-family: 'Geist', system-ui, -apple-system, sans-serif;
       overflow: hidden;
     }
     .container {

@@ -24,7 +24,7 @@ function AboutLink({
       target="_blank"
       rel="noopener noreferrer"
       onClick={onClick}
-      className="flex min-h-11 items-center justify-between neo-brutal-interactive bg-background px-3 py-3 text-left"
+      className="flex min-h-11 items-center justify-between surface-card-interactive bg-background px-3 py-3 text-left"
     >
       <div>
         <p className="text-sm font-semibold text-text-primary">{label}</p>
@@ -53,7 +53,7 @@ export function AboutPage() {
   return (
     <AppShell title="Sobre" description="Transparência e funcionamento do projeto">
       <div className="flex flex-col gap-5">
-        <header className="neo-brutal-lg bg-card px-5 py-5">
+        <header className="surface-card-lg bg-card px-5 py-5">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="primary">Sobre o projeto</Badge>
             <Badge variant="success">sem anúncios intrusivos</Badge>
@@ -70,7 +70,7 @@ export function AboutPage() {
           <div className="mt-4 flex flex-wrap gap-2">
             <Link
               to="/ranking"
-              className="inline-flex min-h-11 items-center justify-center neo-brutal-interactive px-4 text-sm font-semibold text-text-primary"
+              className="inline-flex min-h-11 items-center justify-center surface-card-interactive px-4 text-sm font-semibold text-text-primary"
             >
               Ver ranking público
             </Link>
@@ -112,21 +112,21 @@ export function AboutPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-text-secondary">
-              <div className="neo-brutal-sm bg-background px-3 py-3">
+              <div className="surface-card-sm bg-background px-3 py-3">
                 <p className="font-semibold text-text-primary">Doação via PIX</p>
                 <p className="mt-1">
                   Apoio pontual com checkout hospedado pela AbacatePay para ajudar custos de
                   operação e manutenção.
                 </p>
               </div>
-              <div className="neo-brutal-sm bg-background px-3 py-3">
+              <div className="surface-card-sm bg-background px-3 py-3">
                 <p className="font-semibold text-text-primary">Assinatura Premium</p>
                 <p className="mt-1">
                   Apoio recorrente mensal também via AbacatePay, tratado no MVP como status de
                   sustentação do projeto e não como paywall funcional.
                 </p>
               </div>
-              <div className="neo-brutal-sm bg-background px-3 py-3">
+              <div className="surface-card-sm bg-background px-3 py-3">
                 <p className="font-semibold text-text-primary">Parceiro institucional</p>
                 <p className="mt-1">
                   Um slot público rotulado como Parceiro, controlado pelo admin, sem scripts,
@@ -147,21 +147,21 @@ export function AboutPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-text-secondary">
-              <div className="neo-brutal-sm bg-background px-3 py-3">
+              <div className="surface-card-sm bg-background px-3 py-3">
                 <p className="font-semibold text-text-primary">sem anúncios intrusivos</p>
                 <p className="mt-1">
                   Não usamos takeover de tela, autoplay, intersticial nem formatos que atrapalhem a
                   consulta de transporte.
                 </p>
               </div>
-              <div className="neo-brutal-sm bg-background px-3 py-3">
+              <div className="surface-card-sm bg-background px-3 py-3">
                 <p className="font-semibold text-text-primary">sem tracking de terceiros</p>
                 <p className="mt-1">
                   O slot de Parceiro não injeta SDK externo, script, pixel ou iframe. O app só
                   registra analytics internos mínimos no clique.
                 </p>
               </div>
-              <div className="neo-brutal-sm bg-background px-3 py-3">
+              <div className="surface-card-sm bg-background px-3 py-3">
                 <p className="font-semibold text-text-primary">Sem paywall funcional nesta fase</p>
                 <p className="mt-1">
                   Premium não desbloqueia mapa, ETA, linhas, paradas, GPS colaborativo nem fluxo

@@ -18,7 +18,7 @@ export function MobileTopBar({ authStatus, isAuthenticated, onAuthAction }: Mobi
   return (
     <header
       data-slot="mobile-top-bar"
-      className="shrink-0 bg-brand-primary pt-[env(safe-area-inset-top)] border-b-2 border-(--neo-border-color) md:hidden"
+      className="shrink-0 bg-brand-primary pt-[env(safe-area-inset-top)] border-b border-(--card-border) md:hidden"
     >
       <div className="flex w-full items-center gap-2 px-3 py-2">
         <div className="flex flex-1 items-center">
@@ -43,7 +43,7 @@ export function MobileTopBar({ authStatus, isAuthenticated, onAuthAction }: Mobi
             type="button"
             onClick={onAuthAction}
             aria-label={isAuthenticated ? 'Abrir seu perfil' : 'Entrar com sua conta'}
-            className="inline-flex min-h-9 items-center justify-center bg-white px-3 text-xs font-semibold text-brand-primary neo-brutal-sm transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary"
+            className="inline-flex min-h-9 items-center justify-center bg-white px-3 text-xs font-semibold text-brand-primary surface-card-sm transition-colors hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary"
           >
             {isAuthenticated ? 'Perfil' : 'Entrar'}
           </button>

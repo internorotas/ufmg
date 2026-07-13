@@ -32,14 +32,14 @@ const balloonClasses: Record<NonNullable<TooltipProps['position']>, string> = {
   right: 'left-full top-1/2 -translate-y-1/2 ml-3',
 };
 
-// Seta CSS apontando de volta para o elemento — usa --neo-color para adaptar ao dark mode
+// Seta CSS apontando de volta para o elemento — usa --text-primary para adaptar ao dark mode
 const arrowClasses: Record<NonNullable<TooltipProps['position']>, string> = {
-  top: 'top-full left-1/2 -translate-x-1/2 border-t-[6px] border-t-(--neo-color) border-x-[6px] border-x-transparent border-b-0',
+  top: 'top-full left-1/2 -translate-x-1/2 border-t-[6px] border-t-(--text-primary) border-x-[6px] border-x-transparent border-b-0',
   bottom:
-    'bottom-full left-1/2 -translate-x-1/2 border-b-[6px] border-b-(--neo-color) border-x-[6px] border-x-transparent border-t-0',
-  left: 'left-full top-1/2 -translate-y-1/2 border-l-[6px] border-l-(--neo-color) border-y-[6px] border-y-transparent border-r-0',
+    'bottom-full left-1/2 -translate-x-1/2 border-b-[6px] border-b-(--text-primary) border-x-[6px] border-x-transparent border-t-0',
+  left: 'left-full top-1/2 -translate-y-1/2 border-l-[6px] border-l-(--text-primary) border-y-[6px] border-y-transparent border-r-0',
   right:
-    'right-full top-1/2 -translate-y-1/2 border-r-[6px] border-r-(--neo-color) border-y-[6px] border-y-transparent border-l-0',
+    'right-full top-1/2 -translate-y-1/2 border-r-[6px] border-r-(--text-primary) border-y-[6px] border-y-transparent border-l-0',
 };
 
 export function Tooltip({ content, children, className, position = 'top' }: TooltipProps) {
@@ -74,7 +74,7 @@ export function Tooltip({ content, children, className, position = 'top' }: Tool
           role="tooltip"
           className={cn(
             'pointer-events-none absolute z-5000 w-max max-w-52 rounded-lg px-3 py-2 text-left shadow-xl',
-            'bg-(--neo-color) text-xs font-medium leading-snug text-(--background)',
+            'bg-(--text-primary) text-xs font-medium leading-snug text-(--background)',
             balloonClasses[position],
           )}
         >

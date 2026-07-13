@@ -1,10 +1,10 @@
-/* Poppins via @fontsource — apenas subset latin (pt-BR não usa devanagari/latin-ext),
-   eliminando ~10 preloads desnecessários de subsets não utilizados.
+/* Geist Sans via @fontsource — apenas subset latin (pt-BR não usa devanagari/latin-ext),
+   eliminando preloads desnecessários de subsets não utilizados.
    Weight 300 (font-light) não é usado no projeto. */
-@import "@fontsource/poppins/latin-400.css";
-@import "@fontsource/poppins/latin-500.css";
-@import "@fontsource/poppins/latin-600.css";
-@import "@fontsource/poppins/latin-700.css";
+@import "@fontsource/geist-sans/latin-400.css";
+@import "@fontsource/geist-sans/latin-500.css";
+@import "@fontsource/geist-sans/latin-600.css";
+@import "@fontsource/geist-sans/latin-700.css";
 @import "tailwindcss";
 /* leaflet.css movido para Mapa.tsx (componente lazy) para não gerar
    preloads das imagens do Leaflet durante o carregamento inicial. */
@@ -81,8 +81,8 @@ body,
   --color-internoRotas-cinza-grafite: #3a3b3c;
 
   /* Fontes */
-  --font-family-sans: Poppins, sans-serif;
-  --font-poppins: Poppins, sans-serif;
+  --font-family-sans: "Geist Sans", sans-serif;
+  --font-sans: "Geist Sans", sans-serif;
 }
 
 /* Variáveis CSS - Definição dos Valores */
@@ -91,22 +91,22 @@ body,
 
   /* Backgrounds */
   --background: #ffffff;
-  --background-secondary: #f3f4f6; /* Gray 100 */
-  --sidebar-background: #f3f4f6; /* Gray 100 — mais distinto do card branco */
+  --background-secondary: #f5f5f5; /* Neutral 100 */
+  --sidebar-background: #f5f5f5; /* Neutral 100 — mais distinto do card branco */
   --modal-background: #ffffff;
   --backdrop: rgba(0, 0, 0, 0.5);
 
   /* Cards & Inputs */
   --card-background: #ffffff;
-  --card-hover: #f9fafb;
-  --card-border: #d1d5db; /* Gray 300 — mais visível que o antigo Gray 200 */
-  --input-background: #f9fafb;
-  --input-border: #e5e7eb;
+  --card-hover: #fafafa; /* Neutral 50 */
+  --card-border: #e5e5e5; /* Neutral 200 */
+  --input-background: #fafafa; /* Neutral 50 */
+  --input-border: #e5e5e5; /* Neutral 200 */
 
   /* Texto */
-  --text-primary: #111827; /* Gray 900 */
-  --text-secondary: #4b5563; /* Gray 600 - Melhor contraste que o antigo 6b7280 */
-  --text-tertiary: #6b7280; /* Gray 500 - Melhor contraste WCAG vs #9ca3af (Gray 400) */
+  --text-primary: #171717; /* Neutral 900 */
+  --text-secondary: #525252; /* Neutral 600 */
+  --text-tertiary: #737373; /* Neutral 500 */
   --text-inverse: #ffffff;
 
   /* Semantic: Success (Verde) - Ajustado para WCAG */
@@ -165,16 +165,6 @@ body,
   --gamification-gps-uncertain-border: #f7d774;
   --gamification-gps-uncertain-text: #8a5a00;
 
-  /* Neo-Brutalismo — sombras com offset pronunciado e borda sólida */
-  --neo-color: #1a1819;
-  --neo-shadow-sm: 2px 2px 0 var(--neo-color);
-  --neo-shadow: 4px 4px 0 var(--neo-color);
-  --neo-shadow-lg: 6px 6px 0 var(--neo-color);
-  --neo-shadow-xl: 8px 8px 0 var(--neo-color);
-  --neo-border: 2px solid var(--neo-color);
-  --neo-border-color: var(--neo-color);
-  --neo-radius: 4px;
-
   /* M3 Expressive — Escala de forma (shape scale) */
   --shape-xs: 4px;
   --shape-sm: 8px;
@@ -201,23 +191,23 @@ body,
   /* --- Dark Mode --- */
 
   /* Backgrounds */
-  --background: #111827; /* Gray 900 */
-  --background-secondary: #1f2937; /* Gray 800 */
-  --sidebar-background: #0f172a; /* Slate 900 - Levemente diferente para profundidade */
-  --modal-background: #1f2937;
+  --background: #0a0a0a; /* Neutral 950 */
+  --background-secondary: #171717; /* Neutral 900 */
+  --sidebar-background: #171717; /* Neutral 900 — mais distinto do card */
+  --modal-background: #171717;
   --backdrop: rgba(0, 0, 0, 0.7);
 
   /* Cards & Inputs */
-  --card-background: #1f2937;
-  --card-hover: #374151; /* Gray 700 */
-  --card-border: #374151;
-  --input-background: #374151;
-  --input-border: #4b5563;
+  --card-background: #171717; /* Neutral 900 */
+  --card-hover: #262626; /* Neutral 800 */
+  --card-border: #262626; /* Neutral 800 */
+  --input-background: #262626; /* Neutral 800 */
+  --input-border: #404040; /* Neutral 700 */
 
   /* Texto */
-  --text-primary: #f9fafb; /* Gray 50 */
-  --text-secondary: #d1d5db; /* Gray 300 - Mais claro para contraste no dark */
-  --text-tertiary: #adb5bd; /* Gray ~350 — 4.5:1 on dark card backgrounds */
+  --text-primary: #fafafa; /* Neutral 50 */
+  --text-secondary: #d4d4d4; /* Neutral 300 */
+  --text-tertiary: #a3a3a3; /* Neutral 400 — 4.5:1 on dark card backgrounds */
   --text-inverse: #ffffff;
 
   /* Semantic: Success (Verde) - Dark Mode */
@@ -276,9 +266,6 @@ body,
   --gamification-gps-uncertain-border: #a16207;
   --gamification-gps-uncertain-text: #fef08a;
 
-  /* Neo-Brutalismo dark mode — sombras claras sobre fundo escuro */
-  --neo-color: #e8e4e3;
-
   /* M3 Expressive — Elevação dark (sombras mais pronunciadas) */
   --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
   --elevation-2: 0 2px 6px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -289,7 +276,7 @@ body,
 
 /* Global Reset & Typography */
 * {
-  font-family: var(--font-poppins);
+  font-family: var(--font-sans);
   /* Melhora a renderização de fontes */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -297,7 +284,7 @@ body,
 
 html,
 body {
-  font-family: var(--font-poppins);
+  font-family: var(--font-sans);
   background: var(--background);
   color: var(--text-primary);
   height: 100%;
@@ -722,47 +709,47 @@ body {
 }
 
 /* ============================================================================
-   NEO-BRUTALISMO UTILITIES
-   Linguagem visual: bordas sólidas pronunciadas + sombras com offset.
-   Use como complement ao design system existente — não substitua tokens.
+   SURFACE UTILITIES
+   Linguagem visual: borda sutil + sombra gaussiana sem offset (tokens M3
+   Expressive shape e elevation, ver bloco :root acima). Substitui o antigo
+   Neo-Brutalismo (borda sólida + sombra com offset).
    Garantem WCAG AA (não alteram contraste de texto).
    ============================================================================ */
 
-.neo-brutal {
-  border: var(--neo-border);
-  box-shadow: var(--neo-shadow);
-  border-radius: var(--neo-radius);
+.surface-card {
+  border: 1px solid var(--card-border);
+  box-shadow: var(--elevation-2);
+  border-radius: var(--shape-lg);
 }
 
-.neo-brutal-sm {
-  border: var(--neo-border);
-  box-shadow: var(--neo-shadow-sm);
-  border-radius: var(--neo-radius);
+.surface-card-sm {
+  border: 1px solid var(--card-border);
+  box-shadow: var(--elevation-1);
+  border-radius: var(--shape-md);
 }
 
-.neo-brutal-lg {
-  border: var(--neo-border);
-  box-shadow: var(--neo-shadow-lg);
-  border-radius: var(--neo-radius);
+.surface-card-lg {
+  border: 1px solid var(--card-border);
+  box-shadow: var(--elevation-3);
+  border-radius: var(--shape-xl);
 }
 
-.neo-brutal-interactive {
-  border: var(--neo-border);
-  box-shadow: var(--neo-shadow);
-  border-radius: var(--neo-radius);
+.surface-card-interactive {
+  border: 1px solid var(--card-border);
+  box-shadow: var(--elevation-2);
+  border-radius: var(--shape-lg);
   transition:
-    box-shadow 0.08s ease,
-    transform 0.08s ease;
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
-.neo-brutal-interactive:hover {
-  box-shadow: var(--neo-shadow-lg);
-  transform: translate(-2px, -2px);
+.surface-card-interactive:hover {
+  box-shadow: var(--elevation-3);
 }
 
-.neo-brutal-interactive:active {
-  box-shadow: var(--neo-shadow-sm);
-  transform: translate(2px, 2px);
+.surface-card-interactive:active {
+  box-shadow: var(--elevation-1);
+  transform: scale(0.99);
 }
 
 /* MapLibre GL Popups — match design system (mirrors Leaflet popup overrides) */

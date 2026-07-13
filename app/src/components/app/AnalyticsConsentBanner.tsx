@@ -16,11 +16,11 @@ export function AnalyticsConsentBanner() {
       role="alertdialog"
       aria-label="Consentimento de analytics"
       aria-live="polite"
-      className="pointer-events-auto fixed inset-x-0 bottom-0 z-[1300] border-t-2 border-(--neo-border-color) bg-card px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:bottom-0 md:px-6"
+      className="pointer-events-auto fixed inset-x-0 bottom-0 z-[1300] border-t border-(--card-border) bg-card px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:bottom-0 md:px-6"
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         <div className="flex min-w-0 flex-1 items-start gap-3">
-          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center neo-brutal-sm bg-brand-primary text-white">
+          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center surface-card-sm bg-brand-primary text-white">
             <BarChart3 size={16} aria-hidden="true" />
           </span>
           <div className="min-w-0">

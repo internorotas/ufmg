@@ -18,7 +18,7 @@ export function DataStatusScreen({ title, description, variant = 'info' }: DataS
       aria-describedby="data-status-description"
     >
       <div
-        className="w-full max-w-lg neo-brutal-lg bg-card p-8 text-center"
+        className="w-full max-w-lg surface-card-lg bg-card p-8 text-center"
         role={isWarning ? 'alert' : 'status'}
         aria-live={isWarning ? 'assertive' : 'polite'}
         aria-atomic="true"

@@ -41,7 +41,7 @@ export const titleContainerVariants = tv({
 });
 
 export const titleIconVariants = tv({
-  base: ['flex size-12 shrink-0 items-center justify-center neo-brutal-sm'],
+  base: ['flex size-12 shrink-0 items-center justify-center surface-card-sm'],
 });
 
 export const stopButtonVariants = tv({
@@ -68,7 +68,7 @@ export const scheduleCardVariants = tv({
 });
 
 export const infoCardVariants = tv({
-  base: ['neo-brutal-sm p-4 text-center text-sm', 'bg-card'],
+  base: ['surface-card-sm p-4 text-center text-sm', 'bg-card'],
 });
 
 export interface LinhaDetalhesModalProps {
@@ -106,7 +106,11 @@ function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
   }
 
   return (
-    <div className="overflow-hidden neo-brutal" role="img" aria-label="Mapa do itinerário da linha">
+    <div
+      className="overflow-hidden surface-card"
+      role="img"
+      aria-label="Mapa do itinerário da linha"
+    >
       <MapContainer
         center={linha.coordenadasTrajeto[0]}
         zoom={15}
@@ -495,7 +499,7 @@ export function LinhaDetalhesModal({
 
       <TabsContent value="horarios" data-slot="schedules-tab" className="space-y-6">
         {!isLineRunningToday && (
-          <div data-slot="not-running-notice" className="neo-brutal-sm bg-warning-bg p-4">
+          <div data-slot="not-running-notice" className="surface-card-sm bg-warning-bg p-4">
             <div className="flex items-center gap-3">
               <AlertTriangle size={24} className="shrink-0 text-warning-text" />
               <p className="text-sm font-medium text-warning-text">
@@ -508,7 +512,7 @@ export function LinhaDetalhesModal({
         {isLineRunningToday && proximoHorario && (
           <section
             data-slot="next-schedule-highlight"
-            className="neo-brutal p-4"
+            className="surface-card p-4"
             style={{ borderColor: hexToRgba(linha.corHex, 0.32) }}
           >
             <p className="text-xs font-semibold tracking-wide text-text-secondary uppercase">
@@ -558,7 +562,7 @@ export function LinhaDetalhesModal({
         )}
 
         {isLineRunningToday && !proximoHorario && (
-          <div className="neo-brutal bg-neutral-bg p-4 text-sm text-neutral-text">
+          <div className="surface-card bg-neutral-bg p-4 text-sm text-neutral-text">
             {t('schedules.noFuture')}
           </div>
         )}

@@ -277,7 +277,7 @@ export function ProfilePage() {
     <AppShell title="Perfil" description={profile.displayName}>
       <div className="flex flex-col gap-4">
         {/* Cabeçalho com avatar e nome — sempre visível */}
-        <header className="neo-brutal flex flex-wrap items-center gap-3 bg-card px-4 py-4 sm:px-5">
+        <header className="surface-card flex flex-wrap items-center gap-3 bg-card px-4 py-4 sm:px-5">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             {profile.avatarUrl && /^https?:\/\//i.test(profile.avatarUrl) ? (
               <img
@@ -353,7 +353,7 @@ export function ProfilePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-3">
-                <div className="neo-brutal-sm bg-background px-3 py-3">
+                <div className="surface-card-sm bg-background px-3 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
                     Pontos totais
                   </p>
@@ -361,13 +361,13 @@ export function ProfilePage() {
                     {profile.gamification.totalPoints}
                   </p>
                 </div>
-                <div className="neo-brutal-sm bg-background px-3 py-3">
+                <div className="surface-card-sm bg-background px-3 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
                     Ranking semanal
                   </p>
                   <p className="mt-2 text-sm font-semibold text-text-primary">{weeklyRankLabel}</p>
                 </div>
-                <div className="neo-brutal-sm bg-background px-3 py-3">
+                <div className="surface-card-sm bg-background px-3 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
                     Streak
                   </p>
@@ -402,7 +402,7 @@ export function ProfilePage() {
                   </h3>
                   <ContributionHeatmap history={profile.gamification.contributionHistory30d} />
                 </div>
-                <div className="neo-brutal-sm space-y-2 bg-background px-3 py-3">
+                <div className="surface-card-sm space-y-2 bg-background px-3 py-3">
                   <h3 className="text-sm font-semibold text-text-primary">Eventos recentes</h3>
                   <div className="space-y-2 text-sm text-text-secondary">
                     {profile.gamification.recentPointEvents.length === 0 ? (
@@ -530,7 +530,7 @@ export function ProfilePage() {
                   disabled={isUpdatingProfile}
                 />
 
-                <div className="neo-brutal-sm bg-background px-3 py-2 text-xs text-text-secondary">
+                <div className="surface-card-sm bg-background px-3 py-2 text-xs text-text-secondary">
                   Ao usar o app, você contribui com dados de localização por padrão — isso melhora
                   as informações em tempo real para todos os usuários. Você pode desativar a
                   qualquer momento usando o botão acima.
@@ -543,7 +543,7 @@ export function ProfilePage() {
                   disabled={isUpdatingProfile}
                 />
 
-                <div className="neo-brutal-sm bg-background px-3 py-2 text-sm text-text-secondary">
+                <div className="surface-card-sm bg-background px-3 py-2 text-sm text-text-secondary">
                   <p className="font-medium text-text-primary">
                     Eventos colaborativos ativos neste perfil
                   </p>

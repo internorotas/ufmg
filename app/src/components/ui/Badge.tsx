@@ -81,10 +81,9 @@ export const badgeVariants = tv({
     },
     clickable: {
       true: [
-        'cursor-pointer',
-        'shadow-[2px_2px_0_var(--neo-color)]',
-        'hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_var(--neo-color)]',
-        'active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_var(--neo-color)]',
+        'cursor-pointer shadow-(--elevation-1)',
+        'hover:shadow-(--elevation-2)',
+        'active:shadow-none active:scale-[0.97]',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1',
       ],
       false: '',

@@ -36,7 +36,7 @@ const cardVariants = tv({
   variants: {
     selected: {
       true: 'border-2 border-internoRotas-azul-eletrico shadow-[3px_3px_0_var(--color-internoRotas-azul-eletrico)]',
-      false: 'neo-brutal cursor-pointer hover:bg-card-hover',
+      false: 'surface-card cursor-pointer hover:bg-card-hover',
     },
   },
   defaultVariants: { selected: false },
@@ -316,7 +316,7 @@ function AlternativeCard({ alternative, isSelected, onSelect }: AlternativeCardP
           <button
             type="button"
             onClick={onSelect}
-            className="neo-brutal-interactive flex min-h-9 items-center px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="surface-card-interactive flex min-h-9 items-center px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-label={`Comparar este itinerário: ${alternative.totalMinutes} min`}
           >
             Comparar

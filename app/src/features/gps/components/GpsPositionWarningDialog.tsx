@@ -42,7 +42,7 @@ export function GpsPositionWarningDialog({
             </Dialog.Description>
 
             {/* Detalhes */}
-            <div className="neo-brutal bg-card p-3">
+            <div className="surface-card bg-card p-3">
               <div className="flex items-center gap-2.5">
                 <span
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold tabular-nums"

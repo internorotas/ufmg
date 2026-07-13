@@ -16,38 +16,34 @@ import { cn } from '../../lib/utils';
 export const buttonVariants = tv({
   base: [
     'inline-flex items-center justify-center gap-2 rounded-(--shape-sm)',
-    'font-bold transition-[box-shadow,transform,background-color,border-color] duration-100 ease-out cursor-pointer',
+    'font-semibold transition-[box-shadow,transform,background-color,border-color] duration-100 ease-out cursor-pointer',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     'disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed',
   ],
   variants: {
     variant: {
       primary: [
-        'bg-brand-primary text-text-inverse',
-        'border-2 border-(--neo-color) shadow-[3px_3px_0_var(--neo-color)]',
-        'hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_var(--neo-color)]',
-        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_var(--neo-color)]',
+        'bg-brand-primary text-text-inverse shadow-(--elevation-1)',
+        'hover:shadow-(--elevation-2) hover:brightness-110',
+        'active:shadow-none active:scale-[0.98]',
         'focus-visible:ring-brand-primary',
       ],
       secondary: [
-        'bg-brand-accent text-text-inverse',
-        'border-2 border-(--neo-color) shadow-[3px_3px_0_var(--neo-color)]',
-        'hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_var(--neo-color)]',
-        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_var(--neo-color)]',
+        'bg-brand-accent text-text-inverse shadow-(--elevation-1)',
+        'hover:shadow-(--elevation-2) hover:brightness-110',
+        'active:shadow-none active:scale-[0.98]',
         'focus-visible:ring-brand-accent',
       ],
       success: [
-        'bg-success-border text-text-inverse',
-        'border-2 border-(--neo-color) shadow-[3px_3px_0_var(--neo-color)]',
-        'hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_var(--neo-color)]',
-        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_var(--neo-color)]',
+        'bg-success-border text-text-inverse shadow-(--elevation-1)',
+        'hover:shadow-(--elevation-2) hover:brightness-110',
+        'active:shadow-none active:scale-[0.98]',
         'focus-visible:ring-success-border',
       ],
       danger: [
-        'bg-red-600 text-white',
-        'border-2 border-(--neo-color) shadow-[3px_3px_0_var(--neo-color)]',
-        'hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_var(--neo-color)]',
-        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_var(--neo-color)]',
+        'bg-red-600 text-white shadow-(--elevation-1)',
+        'hover:shadow-(--elevation-2) hover:brightness-110',
+        'active:shadow-none active:scale-[0.98]',
         'focus-visible:ring-red-500',
       ],
       ghost: [

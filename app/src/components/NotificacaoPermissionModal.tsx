@@ -76,7 +76,7 @@ export function NotificacaoPermissionModal({
 
         {/* Nota para usuários iOS */}
         {showIOSNote && (
-          <div className="flex w-full items-start gap-2 neo-brutal bg-warning-bg p-3 text-left">
+          <div className="flex w-full items-start gap-2 surface-card bg-warning-bg p-3 text-left">
             <Info size={16} className="mt-0.5 shrink-0 text-warning-text" aria-hidden="true" />
             <p className="text-xs leading-relaxed text-warning-text">
               <Trans

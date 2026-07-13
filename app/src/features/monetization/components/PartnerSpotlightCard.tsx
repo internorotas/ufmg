@@ -45,17 +45,17 @@ export function PartnerSpotlightCard({ partner, onClick }: PartnerSpotlightCardP
             target="_blank"
             rel="noopener noreferrer"
             onClick={onClick}
-            className="block neo-brutal-interactive bg-background px-3 py-3"
+            className="block surface-card-interactive bg-background px-3 py-3"
           >
             <div className="flex items-start gap-3">
               {safeLogo ? (
                 <img
                   src={safeLogo}
                   alt={`Logo de ${partner.nome}`}
-                  className="size-12 neo-brutal-sm bg-card object-cover"
+                  className="size-12 surface-card-sm bg-card object-cover"
                 />
               ) : (
-                <div className="flex size-12 items-center justify-center neo-brutal-sm bg-card text-brand-primary">
+                <div className="flex size-12 items-center justify-center surface-card-sm bg-card text-brand-primary">
                   <Building2 size={18} aria-hidden="true" />
                 </div>
               )}

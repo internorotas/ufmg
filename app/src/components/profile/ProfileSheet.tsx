@@ -96,7 +96,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
           </div>
 
           <div className="flex flex-col gap-4 overflow-y-auto p-4">
-            <div className="flex items-center gap-3 neo-brutal bg-card p-3">
+            <div className="flex items-center gap-3 surface-card bg-card p-3">
               {userDisplay.avatarUrl && /^https?:\/\//i.test(userDisplay.avatarUrl) ? (
                 <img
                   src={userDisplay.avatarUrl}
@@ -126,7 +126,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
               <FeedbackBanner message={errorMessage} className="rounded-lg text-xs" />
             ) : null}
 
-            <div className="neo-brutal bg-card p-3">
+            <div className="surface-card bg-card p-3">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
                 Consentimento LGPD
               </p>
@@ -144,7 +144,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
               </p>
             </div>
 
-            <div className="neo-brutal bg-card p-3">
+            <div className="surface-card bg-card p-3">
               <ToggleRow
                 label={
                   <span className="flex items-center gap-2 text-text-primary">
@@ -166,7 +166,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
               <Link
                 to="/perfil"
                 onClick={() => onOpenChange(false)}
-                className="flex min-h-11 items-center justify-between neo-brutal-interactive bg-card px-3 py-2 text-sm font-medium text-text-primary"
+                className="flex min-h-11 items-center justify-between surface-card-interactive bg-card px-3 py-2 text-sm font-medium text-text-primary"
               >
                 <span>Ir para /perfil</span>
                 <ChevronRight size={16} aria-hidden="true" />
