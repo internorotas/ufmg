@@ -16,6 +16,7 @@ export interface UserProfile {
   rankingDetail: RankingDetail;
   notificationProfile: NotificationProfile;
   favoriteStopIds: string[];
+  favoriteLineIds: string[];
   consentGps: boolean;
   consentResearch: boolean;
   consentGpsAt: string | null;
@@ -93,6 +94,7 @@ export interface ProfileUpdatePayload {
   rankingDetail?: RankingDetail;
   notificationProfile?: NotificationProfile;
   favoriteStopIds?: string[];
+  favoriteLineIds?: string[];
 }
 
 export interface AccountDeletionRequestResult {
