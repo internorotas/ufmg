@@ -1,10 +1,10 @@
-/* Geist Sans via @fontsource — apenas subset latin (pt-BR não usa devanagari/latin-ext),
+/* Poppins via @fontsource — apenas subset latin (pt-BR não usa devanagari/latin-ext),
    eliminando preloads desnecessários de subsets não utilizados.
    Weight 300 (font-light) não é usado no projeto. */
-@import "@fontsource/geist-sans/latin-400.css";
-@import "@fontsource/geist-sans/latin-500.css";
-@import "@fontsource/geist-sans/latin-600.css";
-@import "@fontsource/geist-sans/latin-700.css";
+@import "@fontsource/poppins/latin-400.css";
+@import "@fontsource/poppins/latin-500.css";
+@import "@fontsource/poppins/latin-600.css";
+@import "@fontsource/poppins/latin-700.css";
 @import "tailwindcss";
 /* leaflet.css movido para Mapa.tsx (componente lazy) para não gerar
    preloads das imagens do Leaflet durante o carregamento inicial. */
@@ -81,7 +81,7 @@ body,
   --color-internoRotas-cinza-grafite: #3a3b3c;
 
   /* Fontes */
-  --font-family-sans: "Geist Sans", sans-serif;
+  --font-family-sans: "Poppins", sans-serif;
   --font-sans: "Geist Sans", sans-serif;
 }
 

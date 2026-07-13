@@ -29,7 +29,7 @@ export function LoginBenefitsBanner() {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-auto fixed inset-x-4 bottom-28 z-1400 mx-auto flex max-w-md items-center gap-2 rounded-xl border border-info-border bg-info-bg px-3 py-2 text-xs text-info-text shadow-lg md:bottom-24"
+      className="pointer-events-auto fixed left-4 right-18 bottom-28 z-950 flex items-center gap-2 rounded-xl border border-info-border bg-info-bg px-3 py-2 text-xs text-info-text shadow-lg md:bottom-24"
     >
       <Zap className="size-4 shrink-0 text-info-text" aria-hidden="true" />
       <span className="flex-1">

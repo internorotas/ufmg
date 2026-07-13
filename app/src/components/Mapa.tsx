@@ -100,15 +100,25 @@ export function Mapa({
               className="shrink-0 rounded-full px-2 py-0.5 text-xs font-extrabold text-white"
               style={{ background: linhaSelecionada.corHex }}
             >
-              {linhaSelecionada.linha}
+              {linhaSelecionada.nome.replace(/^Linha\s+/i, '').trim() ||
+                String(linhaSelecionada.linha)}
             </span>
-            <span className="min-w-0 truncate text-xs font-semibold text-text-primary">
-              {linhaSelecionada.nome}
+            <span className="min-w-0 flex flex-col">
+              <span className="truncate text-xs font-semibold text-text-primary">
+                {linhaSelecionada.nome}
+              </span>
+              {linhaSelecionada.sublinha && (
+                <span className="truncate text-[10px] text-text-secondary leading-tight">
+                  {linhaSelecionada.sublinha}
+                </span>
+              )}
             </span>
             <button
               type="button"
               onClick={() => {
-                const text = `Linha ${linhaSelecionada.linha} — ${linhaSelecionada.nome}`;
+                const text = linhaSelecionada.sublinha
+                  ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
+                  : linhaSelecionada.nome;
                 if (navigator.share) {
                   void navigator.share({ title: linhaSelecionada.nome, text });
                 } else {

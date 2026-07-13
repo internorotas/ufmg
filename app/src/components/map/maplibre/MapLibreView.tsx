@@ -24,6 +24,7 @@ import {
 } from 'react';
 import MapLibreMap, { type MapRef } from 'react-map-gl/maplibre';
 import type { MapaRef } from '@/contexts/RotasSelectionContext';
+import { useAuthContext } from '@/features/auth/context/AuthContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
@@ -105,6 +106,7 @@ export function MapLibreView({
   onOpenSearch,
   ref,
 }: MapLibreViewProps) {
+  const { isAuthenticated } = useAuthContext();
   const analytics = useAnalytics();
   const mapRef = useRef<MapRef>(null);
   const [pitch, setPitch] = useState(0);
@@ -301,7 +303,7 @@ export function MapLibreView({
       >
         <MapLibrePlannerOverlay />
 
-        {rastreioColaborativo?.isActive && linhaSelecionada && (
+        {isAuthenticated && rastreioColaborativo?.isActive && linhaSelecionada && (
           <MapLibreGpsRouteOverlay linha={linhaSelecionada} />
         )}
 
