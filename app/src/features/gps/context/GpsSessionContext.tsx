@@ -18,6 +18,7 @@ import {
 } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAudioKeepAlive } from '@/hooks/useAudioKeepAlive';
+import { addViagem } from '@/hooks/useHistoricoViagens';
 import { useWakeLock } from '@/hooks/useWakeLock';
 
 interface CompletedSession {
@@ -238,6 +239,22 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
             snapshots: stats.snapshotsCount,
             linha_id: linhaSelecionada.idRota,
           },
+        });
+
+        const endedAt = new Date().toISOString();
+        const startedAt = new Date(Date.now() - stats.durationMs).toISOString();
+        addViagem({
+          linhaId: linhaSelecionada.idRota,
+          linhaNome: linhaSelecionada.sublinha
+            ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
+            : linhaSelecionada.nome,
+          linhaCorHex: linhaSelecionada.corHex,
+          startedAt,
+          endedAt,
+          distanceKm: stats.distanceKm,
+          durationMs: stats.durationMs,
+          snapshotsCount: stats.snapshotsCount,
+          motivoEncerramento: stopReason,
         });
 
         setCompletedSession({
