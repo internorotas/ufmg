@@ -1,4 +1,4 @@
-import { Turnstile } from '@marsidev/react-turnstile';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import {
   createContext,
   type ReactNode,
@@ -52,6 +52,7 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
 
   const fallbackAttemptedRef = useRef(false);
   const binaryLoadedRef = useRef(false);
+  const turnstileRef = useRef<TurnstileInstance>(null);
   const isMounted = useMounted();
 
   const transitSession = useTransitSession();
@@ -162,6 +163,10 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
     void loadFallback();
   }, [hasApiData, hasApiError, isApiLoading, isMounted]);
 
+  useEffect(() => {
+    turnstileRef.current?.execute();
+  }, []);
+
   const linhasData = useMemo(() => rotasService.getTodasLinhas(), [rotasService]);
   const todasParadas = useMemo(() => rotasService.getTodasParadas(), [rotasService]);
 
@@ -193,8 +198,9 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
     <RotasDataContext.Provider value={contextValue}>
       {TURNSTILE_SITE_KEY && !transitSession.disabled && (
         <Turnstile
+          ref={turnstileRef}
           siteKey={TURNSTILE_SITE_KEY}
-          options={{ size: 'invisible', execution: 'render' }}
+          options={{ size: 'invisible', execution: 'execute' }}
           onSuccess={(token) => {
             void transitSession.onTurnstileSuccess(token);
           }}
