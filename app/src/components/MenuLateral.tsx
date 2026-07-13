@@ -220,6 +220,9 @@ export const MenuLateral = React.memo(function MenuLateral({
   );
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
   const [partnerSpotlight, setPartnerSpotlight] = useState<PartnerSpotlight | null>(null);
+  const [vacationBannerDismissed, setVacationBannerDismissed] = useState(false);
+  const [infoBannerDismissed, setInfoBannerDismissed] = useState(false);
+  const [disclaimerBannerDismissed, setDisclaimerBannerDismissed] = useState(false);
   const selectedRouteId = usePlannerStore((state) => state.selectedRouteId);
   const plannerMode = usePlannerStore((state) => state.mode);
   const openPlanner = usePlannerStore((state) => state.openPlanner);
@@ -610,11 +613,12 @@ export const MenuLateral = React.memo(function MenuLateral({
           aria-label={t('list.aria')}
           hidden={isPlannerOpen}
         >
-          {specialPeriod ? (
+          {specialPeriod && !vacationBannerDismissed ? (
             <SystemBanner
               variant="warning"
               icon={<Info aria-hidden="true" />}
               title={specialPeriod.name}
+              onDismiss={() => setVacationBannerDismissed(true)}
               description={
                 <>
                   <p>
@@ -637,17 +641,20 @@ export const MenuLateral = React.memo(function MenuLateral({
             />
           ) : null}
 
-          <SystemBanner
-            variant="info"
-            icon={<Info aria-hidden="true" />}
-            description={
-              <Trans
-                i18nKey="info.description"
-                ns="system-banner"
-                components={{ strong: <strong /> }}
-              />
-            }
-          />
+          {!infoBannerDismissed && (
+            <SystemBanner
+              variant="info"
+              icon={<Info aria-hidden="true" />}
+              onDismiss={() => setInfoBannerDismissed(true)}
+              description={
+                <Trans
+                  i18nKey="info.description"
+                  ns="system-banner"
+                  components={{ strong: <strong /> }}
+                />
+              }
+            />
+          )}
 
           {partnerSpotlight ? (
             <PartnerSpotlightCard
@@ -726,7 +733,12 @@ export const MenuLateral = React.memo(function MenuLateral({
                 <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
               )}
 
-          <DisclaimerBanner isOffline={isOffline} />
+          {!disclaimerBannerDismissed && (
+            <DisclaimerBanner
+              isOffline={isOffline}
+              onDismiss={() => setDisclaimerBannerDismissed(true)}
+            />
+          )}
         </nav>
 
         <div className="shrink-0 border-t border-card-border bg-background p-4 md:hidden">

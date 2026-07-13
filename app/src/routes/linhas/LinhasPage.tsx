@@ -41,6 +41,8 @@ export function LinhasPage() {
 
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
   const [filtroAtivo, setFiltroAtivo] = useState<'todas' | 'favoritas'>('todas');
+  const [vacationBannerDismissed, setVacationBannerDismissed] = useState(false);
+  const [infoBannerDismissed, setInfoBannerDismissed] = useState(false);
   const [movimentoPorId, setMovimentoPorId] = useState<Record<string, 'up' | 'down'>>({});
   const previousFavoritosRef = useRef<Set<string>>(new Set());
 
@@ -218,11 +220,12 @@ export function LinhasPage() {
           className="flex-1 overflow-y-auto bg-background p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-4 lg:max-w-120 lg:shrink-0 lg:border-r lg:border-card-border"
           aria-label="Lista de linhas"
         >
-          {specialPeriod ? (
+          {specialPeriod && !vacationBannerDismissed ? (
             <SystemBanner
               variant="warning"
               icon={<Info aria-hidden="true" />}
               title={specialPeriod.name}
+              onDismiss={() => setVacationBannerDismissed(true)}
               description={
                 <>
                   <p>
@@ -245,17 +248,20 @@ export function LinhasPage() {
             />
           ) : null}
 
-          <SystemBanner
-            variant="info"
-            icon={<Info aria-hidden="true" />}
-            description={
-              <Trans
-                i18nKey="info.description"
-                ns="system-banner"
-                components={{ strong: <strong /> }}
-              />
-            }
-          />
+          {!infoBannerDismissed && (
+            <SystemBanner
+              variant="info"
+              icon={<Info aria-hidden="true" />}
+              onDismiss={() => setInfoBannerDismissed(true)}
+              description={
+                <Trans
+                  i18nKey="info.description"
+                  ns="system-banner"
+                  components={{ strong: <strong /> }}
+                />
+              }
+            />
+          )}
 
           {filtroAtivo === 'favoritas' ? (
             hasFavoritas ? (

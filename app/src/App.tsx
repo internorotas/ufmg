@@ -192,6 +192,9 @@ function AppContent() {
   const [infoBannerDismissed, setInfoBannerDismissed] = useState(
     () => sessionStorage.getItem('info-banner-dismissed') === '1',
   );
+  const [vacationBannerDismissed, setVacationBannerDismissed] = useState(
+    () => sessionStorage.getItem('vacation-banner-dismissed') === '1',
+  );
   const [gpsWarning, setGpsWarning] = useState<{
     distanceMeters: number;
     linha: Linha;
@@ -504,6 +507,11 @@ function AppContent() {
     setInfoBannerDismissed(true);
   }, []);
 
+  const handleVacationBannerDismiss = useCallback(() => {
+    sessionStorage.setItem('vacation-banner-dismissed', '1');
+    setVacationBannerDismissed(true);
+  }, []);
+
   // Validação dos dados
   if (isLoadingData) {
     return (
@@ -565,7 +573,9 @@ function AppContent() {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AnalyticsConsentBanner />
         <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
-        <VacationBanner className="mx-3 mt-2" />
+        {!vacationBannerDismissed && (
+          <VacationBanner className="mx-3 mt-2" onDismiss={handleVacationBannerDismiss} />
+        )}
         {!infoBannerDismissed && (
           <InfoBanner className="mx-3 mt-2" onDismiss={handleInfoBannerDismiss} />
         )}

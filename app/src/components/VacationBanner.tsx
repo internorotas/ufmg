@@ -9,7 +9,9 @@ import { useTranslation } from 'react-i18next';
 import { getCurrentSpecialPeriod, isWeekday } from '../config/specialPeriods';
 import { SystemBanner } from './SystemBanner';
 
-export interface VacationBannerProps extends ComponentProps<'div'> {}
+export interface VacationBannerProps extends ComponentProps<'div'> {
+  onDismiss?: () => void;
+}
 
 /**
  * Banner informativo durante períodos de férias e recessos.
@@ -20,7 +22,7 @@ export interface VacationBannerProps extends ComponentProps<'div'> {}
  * <VacationBanner />
  * ```
  */
-export function VacationBanner({ className, ...props }: VacationBannerProps) {
+export function VacationBanner({ className, onDismiss, ...props }: VacationBannerProps) {
   const { t } = useTranslation('system-banner');
   const specialPeriod = getCurrentSpecialPeriod();
 
@@ -37,6 +39,7 @@ export function VacationBanner({ className, ...props }: VacationBannerProps) {
       className={className}
       icon={<Info aria-hidden="true" />}
       title={specialPeriod.name}
+      onDismiss={onDismiss}
       description={
         <>
           <p>

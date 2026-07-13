@@ -24,6 +24,7 @@ export const contactButtonVariants = tv({
 
 export interface DisclaimerBannerProps extends ComponentProps<'div'> {
   isOffline?: boolean;
+  onDismiss?: () => void;
 }
 
 /**
@@ -37,6 +38,7 @@ export interface DisclaimerBannerProps extends ComponentProps<'div'> {
 export function DisclaimerBanner({
   className,
   isOffline = false,
+  onDismiss,
   ...props
 }: DisclaimerBannerProps) {
   const contactActions =
@@ -67,6 +69,7 @@ export function DisclaimerBanner({
       variant="warning"
       className={className}
       icon={<AlertTriangle className="size-4.5" aria-hidden="true" />}
+      onDismiss={onDismiss}
       description={
         <>
           {isOffline && (
