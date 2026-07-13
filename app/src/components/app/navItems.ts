@@ -1,4 +1,4 @@
-import { Bus, LayoutGrid, Map as MapIcon, Trophy, UserCircle2 } from 'lucide-react';
+import { Bus, LayoutGrid, Map as MapIcon, Navigation, Trophy, UserCircle2 } from 'lucide-react';
 import type { ComponentType, SVGProps } from 'react';
 
 export interface NavItem {
@@ -14,6 +14,13 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', icon: MapIcon, label: 'Mapa' },
   { to: '/linhas', icon: Bus, label: 'Linhas', matchPrefix: '/linhas', hideOnDesktop: true },
+  {
+    to: '/proximos',
+    icon: Navigation,
+    label: 'Próximos',
+    matchPrefix: '/proximos',
+    hideOnDesktop: true,
+  },
   { to: '/ranking', icon: Trophy, label: 'Ranking', matchPrefix: '/ranking' },
   {
     to: '/perfil',

@@ -107,6 +107,9 @@ const MorePage = lazy(() =>
 const ProfilePage = lazy(() =>
   import('./routes/profile/ProfilePage').then((m) => ({ default: m.ProfilePage })),
 );
+const ProximosPage = lazy(() =>
+  import('./routes/proximos/ProximosPage').then((m) => ({ default: m.ProximosPage })),
+);
 const RankingPage = lazy(() =>
   import('./routes/ranking/RankingPage').then((m) => ({ default: m.RankingPage })),
 );
@@ -755,6 +758,7 @@ function AuthenticatedAppShell() {
                       <Route path="/perfil" element={<ProfilePage />} />
                       <Route path="/ranking" element={<RankingPage />} />
                       <Route path="/linhas" element={<LinhasPage />} />
+                      <Route path="/proximos" element={<ProximosPage />} />
                       <Route path="/mais" element={<MorePage />} />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
