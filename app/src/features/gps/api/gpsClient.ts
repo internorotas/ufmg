@@ -68,3 +68,20 @@ export async function finishGpsSession(sessionId: string, motivo: string): Promi
     keepalive: true,
   });
 }
+
+export interface ViagemHistoryItem {
+  id: string;
+  linhaId: string;
+  linhaNome: string | null;
+  linhaCorHex: string | null;
+  iniciadoAt: string;
+  encerradoAt: string;
+  motivoEncerramento: string | null;
+  snapshotsCount: number | null;
+  displacementKm: number | null;
+}
+
+export async function getViagemHistory(): Promise<ViagemHistoryItem[]> {
+  const response = await fetchGps('/v1/gps/viagens');
+  return response.json() as Promise<ViagemHistoryItem[]>;
+}
