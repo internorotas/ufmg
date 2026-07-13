@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { Bus, Heart, MapPin, Timer, Trophy } from 'lucide-react';
 import {
   createContext,
@@ -18,7 +19,7 @@ import {
 } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAudioKeepAlive } from '@/hooks/useAudioKeepAlive';
-import { addViagem } from '@/hooks/useHistoricoViagens';
+import { VIAGENS_QUERY_KEY } from '@/hooks/useHistoricoViagens';
 import { useWakeLock } from '@/hooks/useWakeLock';
 
 interface CompletedSession {
@@ -140,6 +141,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   const { linhaSelecionada } = useRotasSelection();
   const { ultimaLeitura, heading } = useLocationContext();
   const { trackEvent } = useAnalytics();
+  const queryClient = useQueryClient();
 
   const rastreio = useGpsTrackingSession({
     enabled: isAuthenticated,
@@ -241,21 +243,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
           },
         });
 
-        const endedAt = new Date().toISOString();
-        const startedAt = new Date(Date.now() - stats.durationMs).toISOString();
-        addViagem({
-          linhaId: linhaSelecionada.idRota,
-          linhaNome: linhaSelecionada.sublinha
-            ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
-            : linhaSelecionada.nome,
-          linhaCorHex: linhaSelecionada.corHex,
-          startedAt,
-          endedAt,
-          distanceKm: stats.distanceKm,
-          durationMs: stats.durationMs,
-          snapshotsCount: stats.snapshotsCount,
-          motivoEncerramento: stopReason,
-        });
+        void queryClient.invalidateQueries({ queryKey: VIAGENS_QUERY_KEY });
 
         setCompletedSession({
           ...stats,
@@ -274,7 +262,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     }
 
     prevIsActiveRef.current = isActive;
-  }, [isActive, status, linhaSelecionada, trackEvent]);
+  }, [isActive, status, linhaSelecionada, trackEvent, queryClient]);
 
   const dismissCompleted = useCallback(() => {
     setCompletedSession(null);
