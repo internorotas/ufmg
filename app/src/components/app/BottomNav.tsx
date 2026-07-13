@@ -54,16 +54,16 @@ export function BottomNav() {
                 }}
                 className={cn(
                   'relative flex min-h-14 flex-col items-center justify-center gap-1 px-2 py-2 text-xs font-medium',
-                  'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+                  'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:focus-visible:ring-brand-accent',
                   active
-                    ? 'bg-brand-primary/10 text-brand-primary'
+                    ? 'bg-brand-primary/10 text-brand-primary dark:bg-brand-accent/10 dark:text-brand-accent'
                     : 'text-text-secondary hover:text-text-primary',
                 )}
               >
                 <span
                   aria-hidden="true"
                   className={cn(
-                    'pointer-events-none absolute inset-x-4 top-0 h-0.75 rounded-none bg-brand-primary transition-opacity',
+                    'pointer-events-none absolute inset-x-4 top-0 h-0.75 rounded-none bg-brand-primary dark:bg-brand-accent transition-opacity',
                     active ? 'opacity-100' : 'opacity-0',
                   )}
                 />

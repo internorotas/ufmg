@@ -607,7 +607,7 @@ function AppContent() {
           >
             <div
               aria-live="polite"
-              className="pointer-events-none absolute inset-x-3 top-3 z-1100 flex flex-col gap-2"
+              className="pointer-events-none absolute left-16 right-3 top-3 z-1100 flex flex-col gap-2"
             >
               {!vacationBannerDismissed && (
                 <div className="pointer-events-auto">
