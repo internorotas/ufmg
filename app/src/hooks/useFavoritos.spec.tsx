@@ -1,9 +1,21 @@
 /* @vitest-environment jsdom */
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AuthProvider } from '@/features/auth/context/AuthContext';
 import type { CategoriaLinhas } from '@/types/data.types';
 import { useFavoritos } from './useFavoritos';
+
+function wrapper({ children }: { children: ReactNode }) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return (
+    <QueryClientProvider client={client}>
+      <AuthProvider>{children}</AuthProvider>
+    </QueryClientProvider>
+  );
+}
 
 const mockTrackEvent = vi.fn();
 
@@ -93,7 +105,7 @@ describe('useFavoritos', () => {
   });
 
   it('adiciona favorito e persiste em favoritos_v1', () => {
-    const { result } = renderHook(() => useFavoritos());
+    const { result } = renderHook(() => useFavoritos(), { wrapper });
 
     act(() => {
       result.current.toggleFavorito('rota-1', 'Circular Principal');
@@ -104,7 +116,7 @@ describe('useFavoritos', () => {
   });
 
   it('toggle em item existente remove favorito', () => {
-    const { result } = renderHook(() => useFavoritos());
+    const { result } = renderHook(() => useFavoritos(), { wrapper });
 
     act(() => {
       result.current.toggleFavorito('rota-1', 'Circular Principal');
@@ -118,13 +130,13 @@ describe('useFavoritos', () => {
   it('hidrata favoritos a partir do localStorage ao montar', () => {
     window.localStorage.setItem('favoritos_v1', JSON.stringify(['rota-x']));
 
-    const { result } = renderHook(() => useFavoritos());
+    const { result } = renderHook(() => useFavoritos(), { wrapper });
 
     expect(result.current.isFavorito('rota-x')).toBe(true);
   });
 
   it('buscarEmFavoritas filtra por categoria e termo', () => {
-    const { result } = renderHook(() => useFavoritos());
+    const { result } = renderHook(() => useFavoritos(), { wrapper });
 
     act(() => {
       result.current.toggleFavorito('rota-1', 'Circular Principal');
@@ -138,7 +150,7 @@ describe('useFavoritos', () => {
   });
 
   it('sincroniza estado com evento storage entre abas', () => {
-    const { result } = renderHook(() => useFavoritos());
+    const { result } = renderHook(() => useFavoritos(), { wrapper });
 
     act(() => {
       window.localStorage.setItem('favoritos_v1', JSON.stringify(['rota-y']));
@@ -154,8 +166,8 @@ describe('useFavoritos', () => {
   });
 
   it('compartilha atualizações ao vivo entre múltiplos hooks sem recarregar', () => {
-    const hookA = renderHook(() => useFavoritos());
-    const hookB = renderHook(() => useFavoritos());
+    const hookA = renderHook(() => useFavoritos(), { wrapper });
+    const hookB = renderHook(() => useFavoritos(), { wrapper });
 
     act(() => {
       hookA.result.current.toggleFavorito('rota-live', 'Linha Live');

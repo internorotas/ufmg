@@ -92,21 +92,33 @@ export function useFavoritos(): UseFavoritosReturn {
 
   const toggleFavorito = useCallback(
     (idRota: string, nomeLinha?: string) => {
-      const currentlyFavorite = favoritosIds.includes(idRota);
-      const newIds = currentlyFavorite
-        ? favoritosIds.filter((id) => id !== idRota)
-        : [...favoritosIds, idRota];
+      // Lê a fonte viva (não o `favoritosIds` capturado no closure) — evita que
+      // dois toggles síncronos no mesmo idRota (ex: duplo clique) operem sobre
+      // o mesmo estado "stale" e cancelem um ao outro incorretamente.
+      let currentlyFavorite: boolean;
+      let newIds: string[];
 
       if (isAuthenticated) {
+        const currentIds =
+          queryClient.getQueryData<UserProfile>(PROFILE_QUERY_KEY)?.favoriteLineIds ?? [];
+        currentlyFavorite = currentIds.includes(idRota);
+        newIds = currentlyFavorite
+          ? currentIds.filter((id) => id !== idRota)
+          : [...currentIds, idRota];
+
         queryClient.setQueryData<UserProfile>(PROFILE_QUERY_KEY, (prev) =>
           prev ? { ...prev, favoriteLineIds: newIds } : prev,
         );
         void updateProfile({ favoriteLineIds: newIds }).catch(() => {
           queryClient.setQueryData<UserProfile>(PROFILE_QUERY_KEY, (prev) =>
-            prev ? { ...prev, favoriteLineIds: favoritosIds } : prev,
+            prev ? { ...prev, favoriteLineIds: currentIds } : prev,
           );
         });
       } else {
+        currentlyFavorite = localCache.includes(idRota);
+        newIds = currentlyFavorite
+          ? localCache.filter((id) => id !== idRota)
+          : [...localCache, idRota];
         setLocalCache(newIds);
       }
 
@@ -124,7 +136,7 @@ export function useFavoritos(): UseFavoritosReturn {
         },
       );
     },
-    [favoritosIds, isAuthenticated, queryClient, trackEvent],
+    [isAuthenticated, queryClient, trackEvent],
   );
 
   const getLinhasFavoritas = useCallback(
