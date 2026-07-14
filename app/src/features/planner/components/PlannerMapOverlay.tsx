@@ -38,7 +38,10 @@ function sliceTraj(
   const e = nearestIdx(traj, end);
   if (s === e) return [start, end];
   if (s < e) return traj.slice(s, e + 1);
-  return traj.slice(e, s + 1).reverse();
+  // s > e: a rota é de sentido único (o ônibus nunca anda de trás pra
+  // frente) — nunca reverter o trecho. Continua até o fim do array e, se a
+  // linha for um loop de volta à origem, retoma do início até "e".
+  return [...traj.slice(s), ...traj.slice(0, e + 1)];
 }
 
 // ---------------------------------------------------------------------------
