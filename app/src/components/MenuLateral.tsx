@@ -216,8 +216,10 @@ export const MenuLateral = React.memo(function MenuLateral({
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth < 768 : false,
   );
-  // Inicializa a partir de linhaSelecionada para restaurar o painel ao voltar de outra tela
-  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(linhaSelecionada);
+  // Não inicializar a partir de linhaSelecionada: selecionar uma linha (clique no card,
+  // ou vindo de outra tela via navigate) só deve destacá-la no mapa — o modal de
+  // detalhes (horários/itinerário) só abre explicitamente via "Ver Detalhes".
+  const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
 
   // Fecha o painel quando a seleção for limpa externamente (ex: X no chip do mapa)
   useEffect(() => {
