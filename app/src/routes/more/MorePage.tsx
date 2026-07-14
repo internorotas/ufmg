@@ -9,6 +9,7 @@
 import {
   ArrowUpRight,
   BarChart3,
+  Clock,
   ExternalLink,
   FileText,
   Heart,
@@ -16,6 +17,7 @@ import {
   LifeBuoy,
   LogIn,
   LogOut,
+  RefreshCw,
   ScrollText,
   ShieldCheck,
   SunMoon,
@@ -29,6 +31,7 @@ import { AppShell } from '@/components/app/AppShell';
 import { Badge } from '@/components/ui/Badge';
 import { Switch } from '@/components/ui/Switch';
 import { GA_MEASUREMENT_ID } from '@/config/analytics';
+import { useRotas } from '@/contexts/RotasContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { useLogout } from '@/features/auth/hooks/useLogout';
@@ -223,9 +226,20 @@ function renderItem(item: MoreItem, key: string): ReactNode {
 
 const appVersion = import.meta.env.VITE_APP_VERSION;
 
+function formatarUltimaAtualizacao(updatedAt?: string): string {
+  if (!updatedAt) return 'Indisponível no momento';
+  return new Date(updatedAt).toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 export function MorePage() {
   const navigate = useNavigate();
   const { isAuthenticated, authStatus } = useAuthContext();
+  const { dataSource, dataUpdatedAt } = useRotas();
   const { logout, isPending: isLogoutPending } = useLogout();
   const { theme, toggleTheme } = useTheme();
   const { trackPageView, trackEvent } = useAnalytics();
@@ -405,7 +419,7 @@ export function MorePage() {
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="hidden min-h-11 items-center justify-center rounded-(--shape-sm) border-2 border-brand-primary bg-background px-4 text-sm font-semibold text-text-primary shadow-[2px_2px_0_var(--color-brand-primary)] transition-all hover:shadow-none hover:translate-x-px hover:translate-y-px sm:inline-flex"
+          className="hidden min-h-11 items-center justify-center rounded-(--shape-sm) border border-brand-primary bg-background px-4 text-sm font-semibold text-brand-primary shadow-(--elevation-1) transition-all hover:shadow-(--elevation-2) sm:inline-flex"
         >
           Ir ao mapa
         </button>
@@ -441,6 +455,42 @@ export function MorePage() {
         <Section title="Preferências" description="Ajustes de aparência e experiência.">
           {preferencias.map((item, index) => renderItem(item, `preferencias-${index}`))}
         </Section>
+
+        <section className="space-y-3">
+          <header>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-text-tertiary">
+              Como funciona
+            </h2>
+          </header>
+
+          <div className="surface-card-sm flex items-center gap-3 bg-card p-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-(--shape-md) bg-success-bg text-success-text">
+              <RefreshCw size={18} aria-hidden="true" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-text-primary">
+                Última atualização dos dados
+              </p>
+              <p className="mt-0.5 text-xs text-text-secondary">
+                {formatarUltimaAtualizacao(dataUpdatedAt)}
+                {dataSource === 'source-fallback' && ' · usando dados locais de segurança'}
+              </p>
+            </div>
+          </div>
+
+          <div className="surface-card-sm bg-card p-4 text-sm text-text-secondary">
+            <p className="mb-2 flex items-center gap-2 font-semibold text-text-primary">
+              <Clock size={16} aria-hidden="true" className="text-brand-primary" />
+              Frequência de atualização
+            </p>
+            <ul className="list-disc space-y-1 pl-5">
+              <li>Previsões de chegada: a cada 15 segundos</li>
+              <li>
+                Posição de quem compartilha GPS: a cada 5 segundos em movimento, 30 segundos parado
+              </li>
+            </ul>
+          </div>
+        </section>
       </div>
 
       <footer className="pt-4 text-center">
