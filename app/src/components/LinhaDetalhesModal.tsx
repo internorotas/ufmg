@@ -88,13 +88,28 @@ type TabType = 'itinerario' | 'horarios';
 function FitBounds({ coords }: { coords: [number, number][] }) {
   const map = useMap();
   React.useEffect(() => {
-    if (coords.length > 1) {
+    if (coords.length <= 1) return;
+
+    // O mapa nasce dentro de um modal/aba — o container pode ainda não ter o
+    // tamanho final no primeiro paint (animação de entrada, layout do Tabs
+    // ainda assentando). Sem invalidateSize(), Leaflet calcula o fitBounds
+    // contra um viewport errado e a polyline acaba projetada fora da área
+    // visível, embora os tiles do basemap pareçam normais.
+    map.invalidateSize();
+    const applyFitBounds = () =>
       map.fitBounds(coords as [number, number][], {
         padding: [20, 20],
         maxZoom: 16,
         animate: false,
       });
-    }
+    applyFitBounds();
+
+    const timer = window.setTimeout(() => {
+      map.invalidateSize();
+      applyFitBounds();
+    }, 250);
+
+    return () => window.clearTimeout(timer);
   }, [map, coords]);
   return null;
 }
