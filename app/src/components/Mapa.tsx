@@ -19,6 +19,7 @@ import { LoginBenefitsBanner } from './LoginBenefitsBanner';
 import { FavoritasWidget } from './map/FavoritasWidget';
 import { MapLibreView } from './map/maplibre';
 import { PesquisaParadas } from './map/PesquisaParadas';
+import { WeatherChip } from './map/WeatherChip';
 
 // Re-exporta para callers que importam MapaRef de Mapa.tsx
 export type { MapaRef };
@@ -141,6 +142,11 @@ export function Mapa({
           </div>
         </div>
       )}
+
+      {/* Chip de clima — canto superior direito, não conflita com busca/chip de linha */}
+      <div className="pointer-events-none absolute right-3 top-3 z-1005">
+        <WeatherChip />
+      </div>
 
       <MapLibreView
         ref={ref}
