@@ -28,6 +28,7 @@ import { useAuthContext } from '@/features/auth/context/AuthContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
+import { buildParadaShareUrl } from '@/lib/shareLinks';
 import { cn } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
 import { MapPitchHint } from '../MapPitchHint';
@@ -407,10 +408,16 @@ export function MapLibreView({
                 type="button"
                 onClick={() => {
                   const text = paradaAberta.nome;
+                  const url = buildParadaShareUrl(paradaAberta.idParada);
+                  analytics.trackEvent({
+                    category: 'engagement',
+                    action: 'share_stop',
+                    label: paradaAberta.nome,
+                  });
                   if (navigator.share) {
-                    void navigator.share({ title: text, text });
+                    void navigator.share({ title: text, text, url });
                   } else {
-                    void navigator.clipboard?.writeText(text);
+                    void navigator.clipboard?.writeText(url);
                   }
                 }}
                 aria-label={`Compartilhar parada ${paradaAberta.nome}`}

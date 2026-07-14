@@ -229,6 +229,39 @@ function AppContent() {
     }
   }, [location.pathname, location.state, navigate]);
 
+  // Deep link de compartilhamento (?linha=idRota / ?parada=idParada — ver lib/shareLinks.ts).
+  // Consome uma única vez, assim que os dados carregarem, e limpa a query da URL.
+  useEffect(() => {
+    if (todasParadas.length === 0 && linhasData.categoriasDias.length === 0) return;
+
+    const params = new URLSearchParams(location.search);
+    const linhaId = params.get('linha');
+    const paradaId = params.get('parada');
+    if (!linhaId && !paradaId) return;
+
+    if (linhaId) {
+      const linha = linhasData.categoriasDias
+        .flatMap((categoria) => categoria.linhas)
+        .find((l) => l.idRota === linhaId);
+      if (linha) selecionarLinha(linha);
+    }
+
+    if (paradaId) {
+      const parada = todasParadas.find((p) => p.idParada === paradaId);
+      if (parada) selecionarParada(parada);
+    }
+
+    navigate(location.pathname, { replace: true });
+  }, [
+    linhasData,
+    todasParadas,
+    location.search,
+    location.pathname,
+    navigate,
+    selecionarLinha,
+    selecionarParada,
+  ]);
+
   // Hook de localização do usuário (via LocationContext — persiste em todas as rotas)
   const {
     localizacao,

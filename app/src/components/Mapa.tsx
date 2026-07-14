@@ -14,6 +14,7 @@ import type { MapaRef } from '@/contexts/RotasSelectionContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { buildLinhaShareUrl } from '../lib/shareLinks';
 import type { Linha, Parada } from '../types/data.types';
 import { LoginBenefitsBanner } from './LoginBenefitsBanner';
 import { FavoritasWidget } from './map/FavoritasWidget';
@@ -59,7 +60,7 @@ export function Mapa({
   onAlternarRastreioColaborativo,
   ref,
 }: MapaProps) {
-  const { trackTiming } = useAnalytics();
+  const { trackTiming, trackEvent } = useAnalytics();
   const { limparSelecao } = useRotasSelection();
   const { isAuthenticated } = useAuthContext();
   const mapLoadStartRef = useRef<number>(0);
@@ -120,10 +121,16 @@ export function Mapa({
                 const text = linhaSelecionada.sublinha
                   ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
                   : linhaSelecionada.nome;
+                const url = buildLinhaShareUrl(linhaSelecionada.idRota);
+                trackEvent({
+                  category: 'engagement',
+                  action: 'share_line',
+                  label: linhaSelecionada.nome,
+                });
                 if (navigator.share) {
-                  void navigator.share({ title: linhaSelecionada.nome, text });
+                  void navigator.share({ title: linhaSelecionada.nome, text, url });
                 } else {
-                  void navigator.clipboard?.writeText(text);
+                  void navigator.clipboard?.writeText(url);
                 }
               }}
               aria-label={`Compartilhar linha ${linhaSelecionada.nome}`}
