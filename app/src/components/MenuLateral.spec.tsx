@@ -8,6 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RotasSelectionProvider } from '@/contexts/RotasSelectionContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { AuthProvider } from '@/features/auth/context/AuthContext';
 import { setAnalyticsService } from '@/hooks/useAnalytics';
 import { ga4Analytics, type IAnalyticsService } from '@/services/analytics';
 import { MenuLateral } from './MenuLateral';
@@ -87,24 +88,26 @@ describe('MenuLateral', () => {
     act(() => {
       root.render(
         <QueryClientProvider client={client}>
-          <BrowserRouter>
-            <ThemeProvider>
-              <RotasSelectionProvider>
-                <MenuLateral
-                  linhasData={linhasDataMock as Parameters<typeof MenuLateral>[0]['linhasData']}
-                  todasParadas={[]}
-                  onLinhaSelect={vi.fn()}
-                  onParadaClick={vi.fn()}
-                  linhaSelecionada={null}
-                  isOffline={false}
-                  authStatus="anonymous"
-                  isAuthenticated={false}
-                  onAuthAction={vi.fn()}
-                  userScore={null}
-                />
-              </RotasSelectionProvider>
-            </ThemeProvider>
-          </BrowserRouter>
+          <AuthProvider>
+            <BrowserRouter>
+              <ThemeProvider>
+                <RotasSelectionProvider>
+                  <MenuLateral
+                    linhasData={linhasDataMock as Parameters<typeof MenuLateral>[0]['linhasData']}
+                    todasParadas={[]}
+                    onLinhaSelect={vi.fn()}
+                    onParadaClick={vi.fn()}
+                    linhaSelecionada={null}
+                    isOffline={false}
+                    authStatus="anonymous"
+                    isAuthenticated={false}
+                    onAuthAction={vi.fn()}
+                    userScore={null}
+                  />
+                </RotasSelectionProvider>
+              </ThemeProvider>
+            </BrowserRouter>
+          </AuthProvider>
         </QueryClientProvider>,
       );
     });
@@ -128,49 +131,55 @@ describe('MenuLateral', () => {
       ),
     );
 
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
     await act(async () => {
       root.render(
-        <BrowserRouter>
-          <ThemeProvider>
-            <RotasSelectionProvider>
-              <MenuLateral
-                linhasData={{
-                  categoriasDias: [
-                    {
-                      id: 1,
-                      categoriaDia: 'diasUteis',
-                      displayName: 'Dias úteis',
-                      linhas: [
+        <QueryClientProvider client={client}>
+          <AuthProvider>
+            <BrowserRouter>
+              <ThemeProvider>
+                <RotasSelectionProvider>
+                  <MenuLateral
+                    linhasData={{
+                      categoriasDias: [
                         {
-                          idRota: 'DU10',
-                          linha: 10,
-                          nome: 'Linha DU10',
-                          tipo: 'circular',
-                          sublinha: null,
+                          id: 1,
                           categoriaDia: 'diasUteis',
-                          corHex: '#2563eb',
-                          descricao: 'Linha de teste',
-                          horarios: ['08:00', '09:00'],
-                          itinerarioParadasIds: [],
-                          coordenadasTrajeto: [],
+                          displayName: 'Dias úteis',
+                          linhas: [
+                            {
+                              idRota: 'DU10',
+                              linha: 10,
+                              nome: 'Linha DU10',
+                              tipo: 'circular',
+                              sublinha: null,
+                              categoriaDia: 'diasUteis',
+                              corHex: '#2563eb',
+                              descricao: 'Linha de teste',
+                              horarios: ['08:00', '09:00'],
+                              itinerarioParadasIds: [],
+                              coordenadasTrajeto: [],
+                            },
+                          ],
                         },
                       ],
-                    },
-                  ],
-                }}
-                todasParadas={[]}
-                onLinhaSelect={vi.fn()}
-                onParadaClick={vi.fn()}
-                linhaSelecionada={null}
-                isOffline={false}
-                authStatus="anonymous"
-                isAuthenticated={false}
-                onAuthAction={vi.fn()}
-                userScore={null}
-              />
-            </RotasSelectionProvider>
-          </ThemeProvider>
-        </BrowserRouter>,
+                    }}
+                    todasParadas={[]}
+                    onLinhaSelect={vi.fn()}
+                    onParadaClick={vi.fn()}
+                    linhaSelecionada={null}
+                    isOffline={false}
+                    authStatus="anonymous"
+                    isAuthenticated={false}
+                    onAuthAction={vi.fn()}
+                    userScore={null}
+                  />
+                </RotasSelectionProvider>
+              </ThemeProvider>
+            </BrowserRouter>
+          </AuthProvider>
+        </QueryClientProvider>,
       );
     });
 
