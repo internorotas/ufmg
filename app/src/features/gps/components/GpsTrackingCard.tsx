@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
+import { numLinha } from '@/features/gps/lib/markerUtils';
 import type { Linha } from '@/types/data.types';
 
 interface GpsTrackingCardProps {
@@ -66,7 +67,7 @@ export function GpsTrackingCard({
         >
           <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
           <span className="text-[11px] font-bold tabular-nums" style={{ color: linha.corHex }}>
-            {linha.linha}
+            {numLinha(linha)}
           </span>
           <ChevronUp size={13} className="text-text-secondary" aria-hidden="true" />
         </button>
@@ -114,7 +115,7 @@ export function GpsTrackingCard({
               style={{ backgroundColor: `${linha.corHex}22`, color: linha.corHex }}
               aria-hidden="true"
             >
-              {linha.linha}
+              {numLinha(linha)}
             </span>
             <p className="truncate text-[10px] font-semibold text-text-primary leading-tight">
               {linha.nome}

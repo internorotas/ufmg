@@ -1,6 +1,7 @@
 import { AlertTriangle, MapPin, Radio } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
+import { numLinha } from '@/features/gps/lib/markerUtils';
 import type { Linha } from '@/types/data.types';
 
 interface GpsPositionWarningDialogProps {
@@ -49,7 +50,7 @@ export function GpsPositionWarningDialog({
                   style={{ backgroundColor: `${linha.corHex}22`, color: linha.corHex }}
                   aria-hidden="true"
                 >
-                  {linha.linha}
+                  {numLinha(linha)}
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-text-primary">{linha.nome}</p>
