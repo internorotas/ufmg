@@ -20,6 +20,7 @@ import { Button } from './ui/Button';
 import { SearchEmptyState } from './ui/EmptyState';
 import { SearchInput } from './ui/Input';
 import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
+import { Tooltip } from './ui/Tooltip';
 
 import { VacationBanner } from './VacationBanner';
 
@@ -367,24 +368,25 @@ export const MenuLateral = React.memo(function MenuLateral({
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button
-              data-slot="close"
-              onClick={() => {
-                analytics.trackEvent({
-                  category: 'navigation',
-                  action: 'close_menu',
-                  label: 'header_button',
-                });
-                setMenuVisible(false);
-              }}
-              variant="ghost"
-              size="sm"
-              className="rounded-lg p-2 text-white hover:bg-white/20 md:hidden"
-              aria-label="Fechar menu lateral"
-              title="Fechar menu lateral"
-            >
-              <ArrowLeft size={24} aria-hidden="true" />
-            </Button>
+            <Tooltip content="Fechar menu lateral" position="bottom">
+              <Button
+                data-slot="close"
+                onClick={() => {
+                  analytics.trackEvent({
+                    category: 'navigation',
+                    action: 'close_menu',
+                    label: 'header_button',
+                  });
+                  setMenuVisible(false);
+                }}
+                variant="ghost"
+                size="sm"
+                className="rounded-lg p-2 text-white hover:bg-white/20 md:hidden"
+                aria-label="Fechar menu lateral"
+              >
+                <ArrowLeft size={24} aria-hidden="true" />
+              </Button>
+            </Tooltip>
           </div>
         </header>
 
