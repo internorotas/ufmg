@@ -218,7 +218,7 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
         turnstileWidgetRef.current = null;
       }
     };
-  }, [TURNSTILE_SITE_KEY, transitSession.disabled, handleTurnstileSuccess, transitSession.onTurnstileError]);
+  }, [transitSession.disabled, handleTurnstileSuccess, transitSession.onTurnstileError]);
 
   const linhasData = useMemo(() => rotasService.getTodasLinhas(), [rotasService]);
   const todasParadas = useMemo(() => rotasService.getTodasParadas(), [rotasService]);
