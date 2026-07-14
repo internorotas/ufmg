@@ -29,7 +29,9 @@
     "noFuture": "Não há horários futuros disponíveis para esta linha neste momento.",
     "pastTitle": "Horários Passados ({{count}})",
     "allTitle": "Todos os Horários ({{count}})",
-    "summary": "Total de {{count}} horários"
+    "summary": "Total de {{count}} horários",
+    "showAll": "Ver todos os {{count}} horários",
+    "showLess": "Mostrar menos"
   },
   "lineNotRunning": {
     "warning": "{{text}}"

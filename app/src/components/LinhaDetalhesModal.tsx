@@ -52,6 +52,8 @@ export const stopIconContainerVariants = tv({
   base: ['relative z-10 mt-0.5 shrink-0', 'flex size-6 items-center justify-center rounded'],
 });
 
+const SCHEDULE_COLLAPSE_THRESHOLD = 10;
+
 export const scheduleCardVariants = tv({
   base: 'rounded border bg-card p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
   variants: {
@@ -333,6 +335,7 @@ export function LinhaDetalhesModal({
 }: LinhaDetalhesModalProps) {
   const { t } = useTranslation('line-details');
   const [tabAtiva, setTabAtiva] = useState<TabType>('itinerario');
+  const [mostrarTodosHorarios, setMostrarTodosHorarios] = useState(false);
   const { trackEvent, trackPageView } = useAnalytics();
 
   useSessionTiming(`Linha: ${linha.nome}`, 'engagement');
@@ -341,6 +344,11 @@ export function LinhaDetalhesModal({
     if (!isOpen && !inline) return;
     trackPageView(`/modal/linha-detalhes/${linha.idRota}`);
   }, [isOpen, inline, linha.idRota, trackPageView]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset intencional ao trocar de linha, não usa o valor
+  useEffect(() => {
+    setMostrarTodosHorarios(false);
+  }, [linha.idRota]);
 
   const now = useCurrentTime();
   const currentMinutes = getSaoPauloMinutesOfDay(now);
@@ -574,7 +582,10 @@ export function LinhaDetalhesModal({
               {t('schedules.pastTitle', { count: passados.length })}
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-              {passados.map(({ horario, id }) => (
+              {(mostrarTodosHorarios
+                ? passados
+                : passados.slice(0, SCHEDULE_COLLAPSE_THRESHOLD)
+              ).map(({ horario, id }) => (
                 <button
                   type="button"
                   key={`passado-${id}`}
@@ -586,6 +597,17 @@ export function LinhaDetalhesModal({
                 </button>
               ))}
             </div>
+            {passados.length > SCHEDULE_COLLAPSE_THRESHOLD && (
+              <button
+                type="button"
+                onClick={() => setMostrarTodosHorarios((v) => !v)}
+                className="mt-3 w-full min-h-11 rounded border border-card-border text-sm font-semibold text-brand-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              >
+                {mostrarTodosHorarios
+                  ? t('schedules.showLess')
+                  : t('schedules.showAll', { count: passados.length })}
+              </button>
+            )}
           </div>
         )}
 
@@ -596,12 +618,25 @@ export function LinhaDetalhesModal({
               {t('schedules.allTitle', { count: todos.length })}
             </h3>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-              {todos.map(({ horario, id }) => (
-                <div key={`horario-${id}`} className={scheduleCardVariants({ status: 'passed' })}>
-                  <p className="text-lg font-semibold text-text-secondary">{horario}</p>
-                </div>
-              ))}
+              {(mostrarTodosHorarios ? todos : todos.slice(0, SCHEDULE_COLLAPSE_THRESHOLD)).map(
+                ({ horario, id }) => (
+                  <div key={`horario-${id}`} className={scheduleCardVariants({ status: 'passed' })}>
+                    <p className="text-lg font-semibold text-text-secondary">{horario}</p>
+                  </div>
+                ),
+              )}
             </div>
+            {todos.length > SCHEDULE_COLLAPSE_THRESHOLD && (
+              <button
+                type="button"
+                onClick={() => setMostrarTodosHorarios((v) => !v)}
+                className="mt-3 w-full min-h-11 rounded border border-card-border text-sm font-semibold text-brand-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              >
+                {mostrarTodosHorarios
+                  ? t('schedules.showLess')
+                  : t('schedules.showAll', { count: todos.length })}
+              </button>
+            )}
           </div>
         )}
 
