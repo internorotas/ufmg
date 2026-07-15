@@ -21,6 +21,7 @@ import { FavoritasWidget } from './map/FavoritasWidget';
 import { MapLibreView } from './map/maplibre';
 import { PesquisaParadas } from './map/PesquisaParadas';
 import { WeatherChip } from './map/WeatherChip';
+import { SupportBanner } from './SupportBanner';
 
 // Re-exporta para callers que importam MapaRef de Mapa.tsx
 export type { MapaRef };
@@ -177,6 +178,7 @@ export function Mapa({
       <FavoritasWidget todasParadas={todasParadas} />
 
       {!isAuthenticated && <LoginBenefitsBanner />}
+      {isAuthenticated && <SupportBanner />}
     </div>
   );
 }
