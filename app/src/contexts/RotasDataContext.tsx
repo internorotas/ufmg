@@ -205,7 +205,7 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
 
     const widgetId = tw.render(container, {
       sitekey: TURNSTILE_SITE_KEY,
-      size: 'invisible',
+      size: 'compact',
       callback: handleTurnstileSuccess,
       'error-callback': transitSession.onTurnstileError,
       'expired-callback': transitSession.onTurnstileError,
