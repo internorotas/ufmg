@@ -13,6 +13,7 @@ import { useLocationContext } from '@/contexts/LocationContext';
 import { useRotasSelection } from '@/contexts/RotasContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import { GpsTrackingCard } from '@/features/gps/components/GpsTrackingCard';
+import { TripRatingCard } from '@/features/gps/components/TripRatingCard';
 import {
   type GpsTrackingState,
   useGpsTrackingSession,
@@ -23,6 +24,7 @@ import { VIAGENS_QUERY_KEY } from '@/hooks/useHistoricoViagens';
 import { useWakeLock } from '@/hooks/useWakeLock';
 
 interface CompletedSession {
+  sessionId: string;
   distanceKm: number;
   durationMs: number;
   snapshotsCount: number;
@@ -148,7 +150,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     selectedLine: linhaSelecionada,
   });
 
-  const { isActive, ingestSnapshot, status } = rastreio;
+  const { isActive, ingestSnapshot, status, rateLimitMessage } = rastreio;
 
   // === Manter coleta viva ===
   useWakeLock(isActive);
@@ -169,6 +171,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     durationMs: number;
     snapshotsCount: number;
   }>({ distanceKm: 0, durationMs: 0, snapshotsCount: 0 });
+  const lastActiveSessionIdRef = useRef<string | null>(null);
 
   // Captura o motivo de parada antes do resetSession() zerá-lo
   const capturedStopReasonRef = useRef<string | null>(null);
@@ -179,7 +182,9 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   }, [rastreio.lastStopReason]);
 
   const [completedSession, setCompletedSession] = useState<CompletedSession | null>(null);
+  const [ratedSession, setRatedSession] = useState<CompletedSession | null>(null);
   const [earlyStopReason, setEarlyStopReason] = useState<string | null>(null);
+  const lastCompletedRef = useRef<CompletedSession | null>(null);
   const prevIsActiveRef = useRef(false);
   const prevStatusRef = useRef<string>('idle');
 
@@ -191,8 +196,15 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
         durationMs: rastreio.durationMs,
         snapshotsCount: rastreio.snapshotsCount,
       };
+      lastActiveSessionIdRef.current = rastreio.sessionId;
     }
-  }, [isActive, rastreio.distanceKm, rastreio.durationMs, rastreio.snapshotsCount]);
+  }, [
+    isActive,
+    rastreio.distanceKm,
+    rastreio.durationMs,
+    rastreio.snapshotsCount,
+    rastreio.sessionId,
+  ]);
 
   // === Tracking: sessão iniciada ===
   useEffect(() => {
@@ -245,16 +257,22 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
 
         void queryClient.invalidateQueries({ queryKey: VIAGENS_QUERY_KEY });
 
-        setCompletedSession({
+        const completed: CompletedSession = {
+          sessionId: lastActiveSessionIdRef.current ?? '',
           ...stats,
           linhaNome: linhaSelecionada.sublinha
             ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
             : linhaSelecionada.nome,
           linhaCorHex: linhaSelecionada.corHex,
           stopReason,
-        });
+        };
+        lastCompletedRef.current = completed;
+        setCompletedSession(completed);
 
-        const timeoutId = window.setTimeout(() => setCompletedSession(null), 8000);
+        const timeoutId = window.setTimeout(() => {
+          setCompletedSession(null);
+          setRatedSession(lastCompletedRef.current);
+        }, 8000);
         return () => window.clearTimeout(timeoutId);
       }
 
@@ -266,12 +284,16 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
 
   const dismissCompleted = useCallback(() => {
     setCompletedSession(null);
+    setRatedSession(lastCompletedRef.current);
+    lastCompletedRef.current = null;
     trackEvent({
       event: 'gps_completion_card_dismissed',
       category: 'engagement',
       action: 'gps_completion_card_dismissed',
     });
   }, [trackEvent]);
+
+  const dismissRating = useCallback(() => setRatedSession(null), []);
 
   const [isCardMinimized, setIsCardMinimized] = useState(false);
   const handleToggleMinimize = useCallback(() => setIsCardMinimized((v) => !v), []);
@@ -318,6 +340,17 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
         <GpsSessionCompletedCard session={completedSession} onDismiss={dismissCompleted} />
       )}
 
+      {/* Card de avaliação pós-viagem */}
+      {ratedSession && !completedSession && (
+        <TripRatingCard
+          sessionId={ratedSession.sessionId}
+          linhaNome={ratedSession.linhaNome}
+          linhaCorHex={ratedSession.linhaCorHex}
+          onRated={dismissRating}
+          onDismiss={dismissRating}
+        />
+      )}
+
       {/* Toast para sessões encerradas automaticamente antes de 5s */}
       {earlyStopReason && (
         <div
@@ -330,6 +363,27 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setEarlyStopReason(null)}
+              aria-label="Fechar aviso"
+              className="flex size-5 shrink-0 items-center justify-center rounded text-warning-text/70 hover:text-warning-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-warning-text"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Toast para rate limit (429) */}
+      {rateLimitMessage && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="pointer-events-none fixed inset-0 z-1050 flex items-end justify-start pb-24 pl-3 md:pb-8"
+        >
+          <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg">
+            <span>{rateLimitMessage}</span>
+            <button
+              type="button"
+              onClick={() => rastreio.stop()}
               aria-label="Fechar aviso"
               className="flex size-5 shrink-0 items-center justify-center rounded text-warning-text/70 hover:text-warning-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-warning-text"
             >

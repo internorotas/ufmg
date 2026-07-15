@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   finishGpsSession,
   type GpsPointPayload,
+  RateLimitError,
   startGpsSession,
   submitGpsBatch,
 } from '@/features/gps/api/gpsClient';
@@ -18,6 +19,10 @@ const MAX_SESSION_DURATION_MS = 60 * 60 * 1000;
 const MAX_ROUTE_DISTANCE_KM = 0.2;
 const TERMINAL_DISTANCE_KM = 0.08;
 const OFFLINE_SESSION_STORAGE_KEY = getTenantStorageKey('gps-offline-session');
+
+// Retry config para erros de rate limit (429)
+const MAX_RETRIES = 2;
+const BASE_RETRY_DELAY_MS = 1_000;
 
 export type TrackingStopReason = 'manual' | 'parado' | 'saiu_rota' | 'terminal' | 'timeout';
 
@@ -55,6 +60,7 @@ export interface GpsTrackingState {
   durationMs: number;
   snapshotsCount: number;
   lockedLine: Linha | null;
+  rateLimitMessage: string | null;
   start: (lineOverride?: Linha) => Promise<void>;
   stop: (reason?: TrackingStopReason) => Promise<void>;
   ingestSnapshot: (snapshot: TrackingSnapshot) => Promise<void>;
@@ -202,6 +208,28 @@ function isTerminalPoint(snapshot: TrackingSnapshot, selectedLine: Linha | null)
   );
 }
 
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+async function startSessionWithRetry(
+  linhaId: string,
+  retries = MAX_RETRIES,
+): Promise<{ sessionId: string }> {
+  try {
+    return await startGpsSession({ linhaId });
+  } catch (err) {
+    if (err instanceof RateLimitError && retries > 0) {
+      const delay = err.retryAfterMs ?? BASE_RETRY_DELAY_MS * (MAX_RETRIES - retries + 1);
+      await sleep(delay);
+      return startSessionWithRetry(linhaId, retries - 1);
+    }
+    throw err;
+  }
+}
+
 export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): GpsTrackingState {
   const [status, setStatus] = useState<'idle' | 'starting' | 'active' | 'paused' | 'error'>('idle');
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -209,6 +237,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const [isSyncing, setIsSyncing] = useState(false);
   const [nextCollectionIntervalMs, setNextCollectionIntervalMs] = useState(IDLE_INTERVAL_MS);
   const [lastStopReason, setLastStopReason] = useState<TrackingStopReason | null>(null);
+  const [rateLimitMessage, setRateLimitMessage] = useState<string | null>(null);
   const [distanceKm, setDistanceKm] = useState(0);
   const [durationMs, setDurationMs] = useState(0);
   const [snapshotsCount, setSnapshotsCount] = useState(0);
@@ -228,6 +257,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     setIsSyncing(false);
     setNextCollectionIntervalMs(IDLE_INTERVAL_MS);
     setLastStopReason(null);
+    setRateLimitMessage(null);
     setDistanceKm(0);
     setDurationMs(0);
     setSnapshotsCount(0);
@@ -299,9 +329,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       setStatus('starting');
       try {
         setLastStopReason(null);
-        const response = await startGpsSession({
-          linhaId: effectiveLine.idRota,
-        });
+        const response = await startSessionWithRetry(effectiveLine.idRota);
 
         lockedLineRef.current = effectiveLine;
         sessionStartedAtRef.current = Date.now();
@@ -315,6 +343,9 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       } catch (err) {
         // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
         console.error('[GPS] Falha ao iniciar sessão de rastreio colaborativo:', err);
+        if (err instanceof RateLimitError) {
+          setRateLimitMessage(err.message);
+        }
         setStatus('error');
       }
     },
@@ -507,6 +538,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       durationMs,
       snapshotsCount,
       lockedLine: lockedLineRef.current,
+      rateLimitMessage,
       start,
       stop,
       ingestSnapshot,
@@ -519,6 +551,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       lastStopReason,
       nextCollectionIntervalMs,
       queueSize,
+      rateLimitMessage,
       sessionId,
       snapshotsCount,
       start,

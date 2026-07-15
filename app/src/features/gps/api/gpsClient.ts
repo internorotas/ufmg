@@ -1,6 +1,16 @@
 import { fetchAuthenticatedApi } from '@/features/auth/api/fetchAuthenticatedApi';
 import { resolveApiEndpoint } from '@/services/api/apiClient';
 
+export class RateLimitError extends Error {
+  constructor(
+    message: string,
+    public readonly retryAfterMs: number | null,
+  ) {
+    super(message);
+    this.name = 'RateLimitError';
+  }
+}
+
 export interface GpsPointPayload {
   lat: number;
   lng: number;
@@ -37,6 +47,15 @@ async function fetchGps(pathname: string, init?: RequestInit): Promise<Response>
     },
   });
 
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('Retry-After');
+    const retryAfterMs = retryAfter ? Number.parseInt(retryAfter, 10) * 1000 : null;
+    throw new RateLimitError(
+      'Muitas tentativas. Aguarde alguns minutos e tente novamente.',
+      Number.isFinite(retryAfterMs) ? retryAfterMs : null,
+    );
+  }
+
   if (!response.ok) {
     throw new Error(`Falha na operação GPS: HTTP ${response.status}`);
   }
@@ -66,6 +85,18 @@ export async function finishGpsSession(sessionId: string, motivo: string): Promi
     method: 'POST',
     body: JSON.stringify({ motivo }),
     keepalive: true,
+  });
+}
+
+export interface GpsRatingPayload {
+  rating: number;
+  comment?: string;
+}
+
+export async function rateTrip(sessionId: string, payload: GpsRatingPayload): Promise<void> {
+  await fetchGps(`/v1/gps/sessions/${sessionId}/rating`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
   });
 }
 
