@@ -8,6 +8,7 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { Button } from '@/components/ui/Button';
 import { useRotasData } from '@/contexts/RotasDataContext';
+import { getSaoPauloNow } from '@/lib/time';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import { getCurrentTransitToken } from '@/services/api/transitApi';
 import { decryptGeoPayload } from '@/services/api/transitGeo';
@@ -219,8 +220,9 @@ export function PlannerPanel() {
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [departureTime, setDepartureTime] = useState(() => {
-    const now = new Date();
-    return now.toTimeString().slice(0, 5);
+    // Wall-clock de São Paulo — toTimeString() usaria o fuso do dispositivo.
+    const now = getSaoPauloNow();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
   });
 
   const {
@@ -343,8 +345,13 @@ export function PlannerPanel() {
     const o = origin as PlannerStop;
     const d = destination as PlannerStop;
     resetMutation();
-    const todayIso = new Date().toISOString().slice(0, 10);
-    const departureAt = new Date(`${todayIso}T${departureTime}:00`).toISOString();
+    // Data de hoje em São Paulo + horário escolhido, ancorado no offset fixo do
+    // Brasil (-03:00, sem horário de verão desde 2019). Usar toISOString() com a
+    // data UTC rolava para o dia seguinte à noite (SP UTC-3), gerando departureAt
+    // um dia à frente; e o parse sem offset assumiria o fuso do dispositivo.
+    const spNow = getSaoPauloNow();
+    const todayIso = `${spNow.getFullYear()}-${String(spNow.getMonth() + 1).padStart(2, '0')}-${String(spNow.getDate()).padStart(2, '0')}`;
+    const departureAt = new Date(`${todayIso}T${departureTime}:00-03:00`).toISOString();
     planRoute({ originStopId: o.idParada, destinationStopId: d.idParada, departureAt });
   };
 
