@@ -218,6 +218,8 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const lastSnapshotCoordRef = useRef<{ lat: number; lng: number } | null>(null);
   // Linha capturada no início da sessão — não muda se sidebar mudar a seleção
   const lockedLineRef = useRef<Linha | null>(null);
+  // Contagem de snapshots consecutivos fora do corredor — só encerra após 3 falhas seguidas
+  const outsideRouteCountRef = useRef(0);
 
   const resetSession = useCallback(() => {
     setStatus('idle');
@@ -234,6 +236,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     lastMovementAtRef.current = null;
     lastSnapshotCoordRef.current = null;
     lockedLineRef.current = null;
+    outsideRouteCountRef.current = 0;
     writePersistedSession(null);
   }, []);
 
@@ -387,9 +390,13 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       const trackedLine = lockedLineRef.current ?? options.selectedLine;
 
       if (!isNearLineRoute(snapshot, trackedLine)) {
-        await stop('saiu_rota');
+        outsideRouteCountRef.current++;
+        if (outsideRouteCountRef.current >= 3) {
+          await stop('saiu_rota');
+        }
         return;
       }
+      outsideRouteCountRef.current = 0;
 
       if (isTerminalPoint(snapshot, trackedLine)) {
         await stop('terminal');
