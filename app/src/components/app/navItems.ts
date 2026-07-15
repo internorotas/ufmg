@@ -19,7 +19,6 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Navigation,
     label: 'Próximos',
     matchPrefix: '/proximos',
-    hideOnDesktop: true,
   },
   { to: '/ranking', icon: Trophy, label: 'Ranking', matchPrefix: '/ranking' },
   {
