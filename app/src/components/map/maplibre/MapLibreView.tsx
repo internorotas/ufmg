@@ -32,7 +32,7 @@ import { buildParadaShareUrl } from '@/lib/shareLinks';
 import { cn } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
 import { MapPitchHint } from '../MapPitchHint';
-import { TILE_PROVIDERS, type TileProviderKey } from '../TileSwitcher';
+import { TILE_PROVIDERS, type TileProviderKey } from '../tileProviders';
 import { MapLibreAllBusMarkers } from './MapLibreAllBusMarkers';
 import { MapLibreBhtransMarkers } from './MapLibreBhtransMarkers';
 import { MapLibreGpsLiveBusMarker } from './MapLibreGpsLiveBusMarker';
