@@ -588,7 +588,11 @@ export const MenuLateral = React.memo(function MenuLateral({
             aria-controls="planner-panel"
             aria-label={isPlannerOpen ? 'Fechar planejador de rota' : 'Planejar rota'}
           >
-            <Route size={16} className="shrink-0 text-brand-primary" aria-hidden="true" />
+            <Route
+              size={16}
+              className="shrink-0 text-brand-primary dark:text-brand-accent"
+              aria-hidden="true"
+            />
             <span className="flex-1 text-left">Planejar rota</span>
             {isPlannerOpen && (
               <X size={14} className="shrink-0 text-text-tertiary" aria-hidden="true" />

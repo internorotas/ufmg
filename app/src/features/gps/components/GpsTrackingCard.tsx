@@ -92,7 +92,11 @@ export function GpsTrackingCard({
       <div className="flex items-center gap-1.5 p-2.5 pb-2">
         <div className="flex shrink-0 items-center gap-1">
           {isStarting ? (
-            <Loader2 size={11} className="animate-spin text-brand-primary" aria-hidden="true" />
+            <Loader2
+              size={11}
+              className="animate-spin text-brand-primary dark:text-brand-accent"
+              aria-hidden="true"
+            />
           ) : (
             <span
               className="inline-block size-1.5 animate-pulse rounded-full bg-red-500"
@@ -101,7 +105,7 @@ export function GpsTrackingCard({
           )}
           <span
             className={`text-[9px] font-bold uppercase tracking-widest ${
-              isStarting ? 'text-brand-primary' : 'text-red-500'
+              isStarting ? 'text-brand-primary dark:text-brand-accent' : 'text-red-500'
             }`}
           >
             {isStarting ? 'Iniciando' : 'REC'}

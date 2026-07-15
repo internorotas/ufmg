@@ -16,7 +16,7 @@ export function AnalyticsConsentBanner() {
       role="alertdialog"
       aria-label="Consentimento de analytics"
       aria-live="polite"
-      className="pointer-events-auto fixed inset-x-0 bottom-0 z-[1300] border-t border-(--card-border) bg-card px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:bottom-0 md:px-6"
+      className="pointer-events-auto fixed inset-x-0 bottom-0 z-1300 border-t border-(--card-border) bg-card px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:bottom-0 md:px-6"
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         <div className="flex min-w-0 flex-1 items-start gap-3">
@@ -30,7 +30,7 @@ export function AnalyticsConsentBanner() {
               Nenhum dado pessoal identificável é coletado.{' '}
               <Link
                 to="/privacidade"
-                className="font-medium text-brand-primary underline underline-offset-2"
+                className="font-medium text-brand-primary dark:text-brand-accent underline underline-offset-2"
               >
                 Política de privacidade
               </Link>

@@ -196,7 +196,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
             <h3 className="text-sm font-semibold text-text-primary">Histórico recente</h3>
             <Link
               to="/sobre"
-              className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-brand-primary hover:underline"
+              className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-brand-primary dark:text-brand-accent hover:underline"
             >
               Ver transparência
               <ArrowUpRight size={14} aria-hidden="true" />
@@ -238,7 +238,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
                           href={transaction.receiptUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs font-semibold text-brand-primary hover:underline"
+                          className="text-xs font-semibold text-brand-primary dark:text-brand-accent hover:underline"
                         >
                           Recibo
                         </a>

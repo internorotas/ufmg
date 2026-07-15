@@ -104,7 +104,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
                   className="size-12 rounded-full border border-card-border object-cover"
                 />
               ) : (
-                <div className="flex size-12 items-center justify-center rounded-full border border-card-border bg-background-secondary text-brand-primary">
+                <div className="flex size-12 items-center justify-center rounded-full border border-card-border bg-background-secondary text-brand-primary dark:text-brand-accent">
                   <UserCircle2 size={26} aria-hidden="true" />
                 </div>
               )}

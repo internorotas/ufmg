@@ -227,7 +227,7 @@ export function PlannerSummarySheet({
           type="button"
           data-slot="back-to-results"
           onClick={onBackToResults}
-          className="flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+          className="flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-brand-primary dark:text-brand-accent hover:bg-brand-primary/10 dark:hover:bg-brand-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
           aria-label="Voltar aos resultados"
         >
           <ArrowLeft size={16} aria-hidden="true" />

@@ -203,7 +203,7 @@ export function GpsLinePickerModal({
           {/* Header */}
           <header className="flex shrink-0 items-center justify-between border-b-2 border-card-border bg-background-secondary px-4 py-3">
             <div className="flex items-center gap-2">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary dark:bg-brand-accent/10 dark:text-brand-accent">
                 <Radio size={15} aria-hidden="true" />
               </span>
               <div>

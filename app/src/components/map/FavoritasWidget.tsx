@@ -33,7 +33,11 @@ export function FavoritasWidget({ todasParadas }: FavoritasWidgetProps) {
       <div className="pointer-events-auto overflow-x-auto pb-1 pt-2 px-2">
         <div className="flex gap-2 w-max">
           <span className="flex items-center gap-1 shrink-0 rounded-full bg-card/90 backdrop-blur px-2.5 py-1.5 text-xs font-semibold text-text-secondary ring-1 ring-card-border">
-            <Heart size={11} aria-hidden="true" className="text-brand-primary" />
+            <Heart
+              size={11}
+              aria-hidden="true"
+              className="text-brand-primary dark:text-brand-accent"
+            />
             Favoritas
           </span>
           {favoritas.map((parada) => {

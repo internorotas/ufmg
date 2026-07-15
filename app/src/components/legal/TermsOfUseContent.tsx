@@ -44,7 +44,7 @@ export function TermsOfUseContent() {
           integralmente estes Termos, bem como a{' '}
           <a
             href="/privacidade"
-            className="font-medium text-brand-primary underline-offset-2 hover:underline"
+            className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
           >
             Política de Privacidade
           </a>
@@ -74,7 +74,7 @@ export function TermsOfUseContent() {
             qualquer tempo, o encerramento da conta e a exclusão dos dados pelos canais previstos na{' '}
             <a
               href="/privacidade"
-              className="font-medium text-brand-primary underline-offset-2 hover:underline"
+              className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
             >
               Política de Privacidade
             </a>
@@ -177,7 +177,7 @@ export function TermsOfUseContent() {
               href={tenantConfig.publicRepositoryUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-brand-primary underline-offset-2 hover:underline"
+              className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
             >
               repositório oficial
             </a>
@@ -322,7 +322,7 @@ export function TermsOfUseContent() {
             href="https://forms.gle/5e9MHq9pp1p8T5Px5"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-brand-primary underline-offset-2 hover:underline"
+            className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
           >
             canal de contato
           </a>

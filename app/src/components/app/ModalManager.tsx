@@ -37,7 +37,10 @@ export function ModalManager({
         title={
           <div className="flex items-center gap-2">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary/10">
-              <Navigation aria-hidden="true" className="h-4 w-4 text-brand-primary" />
+              <Navigation
+                aria-hidden="true"
+                className="h-4 w-4 text-brand-primary dark:text-brand-accent"
+              />
             </span>
             <span>Ativar Localização</span>
           </div>

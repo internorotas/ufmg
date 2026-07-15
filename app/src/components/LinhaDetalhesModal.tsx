@@ -616,7 +616,7 @@ export function LinhaDetalhesModal({
               <button
                 type="button"
                 onClick={() => setMostrarTodosHorarios((v) => !v)}
-                className="mt-3 w-full min-h-11 rounded border border-card-border text-sm font-semibold text-brand-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                className="mt-3 w-full min-h-11 rounded border border-card-border text-sm font-semibold text-brand-primary dark:text-brand-accent transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
               >
                 {mostrarTodosHorarios
                   ? t('schedules.showLess')
@@ -645,7 +645,7 @@ export function LinhaDetalhesModal({
               <button
                 type="button"
                 onClick={() => setMostrarTodosHorarios((v) => !v)}
-                className="mt-3 w-full min-h-11 rounded border border-card-border text-sm font-semibold text-brand-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                className="mt-3 w-full min-h-11 rounded border border-card-border text-sm font-semibold text-brand-primary dark:text-brand-accent transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
               >
                 {mostrarTodosHorarios
                   ? t('schedules.showLess')

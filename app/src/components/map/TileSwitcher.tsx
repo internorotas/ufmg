@@ -121,7 +121,7 @@ export function TileSwitcher() {
         <div
           role="listbox"
           aria-label="Selecionar camada do mapa"
-          className="absolute right-0 top-12 min-w-[160px] rounded-sm bg-card shadow-(--elevation-3) ring-1 ring-card-border"
+          className="absolute right-0 top-12 min-w-40 rounded-sm bg-card shadow-(--elevation-3) ring-1 ring-card-border"
         >
           {(Object.keys(TILE_PROVIDERS) as TileProviderKey[]).map((key) => (
             <button
@@ -137,7 +137,7 @@ export function TileSwitcher() {
                 'flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors',
                 'focus-visible:outline-none focus-visible:bg-card-hover',
                 provider === key
-                  ? 'bg-brand-primary/10 font-semibold text-brand-primary'
+                  ? 'bg-brand-primary/10 font-semibold text-brand-primary dark:bg-brand-accent/10 dark:text-brand-accent'
                   : 'text-text-primary hover:bg-card-hover',
               )}
             >

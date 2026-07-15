@@ -62,7 +62,7 @@ export function PrivacyPolicyContent() {
             href="https://forms.gle/5e9MHq9pp1p8T5Px5"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-brand-primary underline-offset-2 hover:underline"
+            className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
           >
             formulário de contato
           </a>
@@ -197,7 +197,7 @@ export function PrivacyPolicyContent() {
               href="https://policies.google.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-brand-primary underline-offset-2 hover:underline"
+              className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
             >
               policies.google.com/privacy
             </a>
@@ -210,7 +210,7 @@ export function PrivacyPolicyContent() {
               href="https://www.mercadopago.com.br/privacidade"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-brand-primary underline-offset-2 hover:underline"
+              className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
             >
               mercadopago.com.br/privacidade
             </a>
@@ -223,7 +223,7 @@ export function PrivacyPolicyContent() {
               href="https://render.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-brand-primary underline-offset-2 hover:underline"
+              className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
             >
               render.com/privacy
             </a>
@@ -236,7 +236,7 @@ export function PrivacyPolicyContent() {
               href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-brand-primary underline-offset-2 hover:underline"
+              className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
             >
               docs.github.com/privacy
             </a>
@@ -249,7 +249,7 @@ export function PrivacyPolicyContent() {
               href="https://www.cloudflare.com/privacypolicy/"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-brand-primary underline-offset-2 hover:underline"
+              className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
             >
               cloudflare.com/privacypolicy
             </a>
@@ -339,7 +339,7 @@ export function PrivacyPolicyContent() {
             href="https://forms.gle/5e9MHq9pp1p8T5Px5"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-brand-primary underline-offset-2 hover:underline"
+            className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
           >
             canal de contato
           </a>{' '}
@@ -433,7 +433,7 @@ export function PrivacyPolicyContent() {
             href="https://forms.gle/5e9MHq9pp1p8T5Px5"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-brand-primary underline-offset-2 hover:underline"
+            className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
           >
             canal oficial
           </a>{' '}
@@ -451,7 +451,7 @@ export function PrivacyPolicyContent() {
             href="https://www.gov.br/anpd/pt-br/canais_atendimento/cidadao/peticao-de-titular"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-brand-primary underline-offset-2 hover:underline"
+            className="font-medium text-brand-primary dark:text-brand-accent underline-offset-2 hover:underline"
           >
             gov.br/anpd
           </a>

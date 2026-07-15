@@ -42,7 +42,10 @@ export function MapPitchHint({ visible }: MapPitchHintProps) {
         className="pointer-events-auto flex items-center gap-2 rounded-full bg-card/95 px-4 py-2.5 shadow-(--elevation-2) ring-1 ring-card-border backdrop-blur focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
         aria-label="Fechar dica de gestos"
       >
-        <Hand className="h-4 w-4 shrink-0 text-brand-primary" aria-hidden="true" />
+        <Hand
+          className="h-4 w-4 shrink-0 text-brand-primary dark:text-brand-accent"
+          aria-hidden="true"
+        />
         <span className="text-xs font-medium text-text-primary">
           Use dois dedos para inclinar e girar
         </span>

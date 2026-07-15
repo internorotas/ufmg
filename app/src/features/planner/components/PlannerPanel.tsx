@@ -115,7 +115,11 @@ function EndpointField({
         <fieldset className={tokenRowVariants()}>
           <legend className="sr-only">{`${label}: ${endpoint.nome}`}</legend>
           {endpoint.kind === 'current-location' ? (
-            <LocateFixed size={15} className="shrink-0 text-brand-primary" aria-hidden="true" />
+            <LocateFixed
+              size={15}
+              className="shrink-0 text-brand-primary dark:text-brand-accent"
+              aria-hidden="true"
+            />
           ) : (
             <MapPin size={15} className="shrink-0 text-text-tertiary" aria-hidden="true" />
           )}
@@ -150,7 +154,7 @@ function EndpointField({
             type="button"
             onClick={onUseLocation}
             disabled={isLocating}
-            className="flex min-h-9 items-center gap-1.5 rounded-md px-2 py-1 text-xs text-brand-primary hover:bg-brand-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex min-h-9 items-center gap-1.5 rounded-md px-2 py-1 text-xs text-brand-primary dark:text-brand-accent hover:bg-brand-primary/10 dark:hover:bg-brand-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLocating ? (
               <Loader2 size={13} className="animate-spin" aria-hidden="true" />
