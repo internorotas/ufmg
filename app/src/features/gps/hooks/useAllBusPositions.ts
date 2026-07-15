@@ -1,21 +1,10 @@
 import { useEffect, useState } from 'react';
 import { calcularPosicaoTeorica, type PosicaoTeorica } from '@/lib/busPosition';
+import { lerOsrmCache } from '@/lib/osrmCache';
 import type { Linha, Parada } from '@/types/data.types';
 
-const OSRM_CACHE_KEY_PREFIX = 'osrm_route_v2_';
-const OSRM_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 // Espelha MIN_POINTS_FOR_REAL_ROUTE de useOsrmRoute.ts.
 const MIN_POINTS_FOR_REAL_ROUTE = 30;
-
-function lerOsrmCache(lineId: string): [number, number][] | null {
-  try {
-    const raw = localStorage.getItem(OSRM_CACHE_KEY_PREFIX + lineId);
-    if (!raw) return null;
-    const entry = JSON.parse(raw) as { ts: number; data: [number, number][] };
-    if (Date.now() - entry.ts < OSRM_CACHE_TTL_MS && entry.data.length > 0) return entry.data;
-  } catch {}
-  return null;
-}
 
 function calcularTodasPosicoes(
   linhas: Linha[],
