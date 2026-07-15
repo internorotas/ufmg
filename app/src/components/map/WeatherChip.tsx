@@ -75,7 +75,7 @@ export function WeatherChip() {
       aria-label={`Temperatura atual: ${data.temperaturaC} graus`}
       className="pointer-events-none flex items-center gap-1.5 rounded-full bg-card/95 px-3 py-1.5 text-xs font-semibold text-text-primary shadow-(--elevation-2) ring-1 ring-card-border backdrop-blur"
     >
-      <Icon size={14} aria-hidden="true" className="text-brand-primary" />
+      <Icon size={14} aria-hidden="true" className="text-brand-primary dark:text-brand-accent" />
       {data.temperaturaC}°
     </div>
   );

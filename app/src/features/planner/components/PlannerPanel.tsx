@@ -8,6 +8,7 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { tv } from 'tailwind-variants';
 import { Button } from '@/components/ui/Button';
 import { useRotasData } from '@/contexts/RotasDataContext';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { getSaoPauloNow } from '@/lib/time';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import { getCurrentTransitToken } from '@/services/api/transitApi';
@@ -283,10 +284,12 @@ export function PlannerPanel() {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 6000);
           const transitToken = getCurrentTransitToken();
+          const accessToken = useAuthStore.getState().accessToken;
           const url = resolveApiEndpoint(`/v1/stops/nearest?lat=${lat}&lng=${lng}&limit=1`);
           const res = await fetch(url, {
             signal: controller.signal,
             headers: withTenantHeaders({
+              ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
               ...(transitToken ? { 'X-Transit-Token': transitToken } : {}),
             }),
           });

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import { getCurrentTransitToken } from '@/services/api/transitApi';
 import { decryptGeoPayload } from '@/services/api/transitGeo';
@@ -7,9 +8,11 @@ import { transitQueryKeys } from './queryKeys';
 
 async function fetchNearestStops(lat: number, lng: number, limit: number): Promise<Parada[]> {
   const transitToken = getCurrentTransitToken();
+  const accessToken = useAuthStore.getState().accessToken;
   const url = resolveApiEndpoint(`/v1/stops/nearest?lat=${lat}&lng=${lng}&limit=${limit}`);
   const res = await fetch(url, {
     headers: withTenantHeaders({
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...(transitToken ? { 'X-Transit-Token': transitToken } : {}),
     }),
   });

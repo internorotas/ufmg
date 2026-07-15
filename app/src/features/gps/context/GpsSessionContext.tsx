@@ -276,6 +276,19 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   const [isCardMinimized, setIsCardMinimized] = useState(false);
   const handleToggleMinimize = useCallback(() => setIsCardMinimized((v) => !v), []);
 
+  // Linha capturada ao início da sessão — persiste enquanto ativa para que o
+  // card não pisque se linhaSelecionada mudar (ex: usuário navega para outra rota).
+  const linhaAtivaRef = useRef<typeof linhaSelecionada>(null);
+  useEffect(() => {
+    if (isActive && linhaSelecionada) {
+      linhaAtivaRef.current = linhaSelecionada;
+    }
+    if (!isActive) {
+      linhaAtivaRef.current = null;
+    }
+  }, [isActive, linhaSelecionada]);
+  const linhaParaCard = linhaAtivaRef.current ?? linhaSelecionada;
+
   // Restaura ao expandido quando sessão termina
   useEffect(() => {
     if (!isActive) setIsCardMinimized(false);
@@ -285,12 +298,13 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     <GpsSessionContext.Provider value={rastreio}>
       {children}
 
-      {/* Card de rastreio — persistente em qualquer rota */}
-      {isActive && linhaSelecionada && (
-        <div className="pointer-events-none fixed inset-0 z-900">
+      {/* Card de rastreio — persistente em qualquer rota.
+          z-1050: acima do MenuLateral (z-1003) e BottomNav (z-1010). */}
+      {isActive && linhaParaCard && (
+        <div className="pointer-events-none fixed inset-0 z-1050">
           <GpsTrackingCard
             rastreio={rastreio}
-            linha={linhaSelecionada}
+            linha={linhaParaCard}
             speedKmh={ultimaLeitura?.speedKmh}
             accuracyM={ultimaLeitura?.accuracy}
             isMinimized={isCardMinimized}
