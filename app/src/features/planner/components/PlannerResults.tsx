@@ -35,7 +35,7 @@ const cardVariants = tv({
   ],
   variants: {
     selected: {
-      true: 'border-2 border-internoRotas-azul-eletrico shadow-[3px_3px_0_var(--color-internoRotas-azul-eletrico)]',
+      true: 'border-2 border-internoRotas-azul-eletrico shadow-(--elevation-3)',
       false: 'surface-card cursor-pointer hover:bg-card-hover',
     },
   },
@@ -208,9 +208,10 @@ interface AlternativeCardProps {
   alternative: PlannerRoutesResponse['alternatives'][number];
   isSelected: boolean;
   onSelect: () => void;
+  onViewOnMap: () => void;
 }
 
-function AlternativeCard({ alternative, isSelected, onSelect }: AlternativeCardProps) {
+function AlternativeCard({ alternative, isSelected, onSelect, onViewOnMap }: AlternativeCardProps) {
   const legList = alternative.legs;
   const busLegs = legList.filter((l): l is PlannerBusLeg => l.kind === 'bus');
   const hasLive = alternative.etaBadges.some((b) => b.source === 'live');
@@ -306,6 +307,7 @@ function AlternativeCard({ alternative, isSelected, onSelect }: AlternativeCardP
         {isSelected ? (
           <button
             type="button"
+            onClick={onViewOnMap}
             className="flex min-h-9 items-center gap-1.5 rounded-lg bg-internoRotas-azul-eletrico px-3 py-1.5 text-sm font-semibold text-white hover:bg-internoRotas-azul-eletrico/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-label="Ver rota selecionada no mapa"
           >
@@ -336,7 +338,7 @@ interface PlannerResultsProps {
 }
 
 export function PlannerResults({ results }: PlannerResultsProps) {
-  const { selectedRouteId, setSelectedRouteId } = usePlannerStore();
+  const { selectedRouteId, setSelectedRouteId, closePlanner } = usePlannerStore();
 
   const alternatives = results.alternatives.slice(0, 3);
 
@@ -374,6 +376,10 @@ export function PlannerResults({ results }: PlannerResultsProps) {
           alternative={alt}
           isSelected={alt.routeId === activeId}
           onSelect={() => setSelectedRouteId(alt.routeId)}
+          onViewOnMap={() => {
+            setSelectedRouteId(alt.routeId);
+            closePlanner();
+          }}
         />
       ))}
     </div>
