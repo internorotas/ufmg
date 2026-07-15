@@ -1,4 +1,5 @@
 import type { Linha, Parada } from '@/types/data.types';
+import { toSaoPauloDate } from './time';
 import { calcularDistanciaKm } from './utils';
 
 export interface PosicaoTeorica {
@@ -116,10 +117,15 @@ export function calcularPosicaoTeorica(
   if (!trajetoDetalhado || trajetoDetalhado.length < 2) return null;
   if (!horarios || horarios.length === 0) return null;
 
+  // Horários da linha são em America/Sao_Paulo. getHours()/getMinutes() do Date
+  // cru refletem o fuso do dispositivo — um device em fuso diferente calcularia
+  // a posição do ônibus contra o "minuto do dia" errado. Normaliza para SP.
+  // (ms é independente de fuso, então preserva do Date original.)
+  const agoraSp = toSaoPauloDate(agora);
   const agoraMin =
-    agora.getHours() * 60 +
-    agora.getMinutes() +
-    agora.getSeconds() / 60 +
+    agoraSp.getHours() * 60 +
+    agoraSp.getMinutes() +
+    agoraSp.getSeconds() / 60 +
     agora.getMilliseconds() / 60000;
 
   const horariosSorted = [...horarios].sort();
