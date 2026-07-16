@@ -100,7 +100,7 @@ describe('useGpsTrackingSession helpers', () => {
         shouldAutoFinish({
           sessionStartedAt: 0,
           lastMovementAt: 55 * 60 * 1000, // movimento há 4m59s — abaixo do limiar de inatividade
-          now: 59 * 60 * 1000 + 59_000,   // 59m59s — abaixo do timeout de 1h
+          now: 59 * 60 * 1000 + 59_000, // 59m59s — abaixo do timeout de 1h
         }),
       ).toBeNull();
     });
