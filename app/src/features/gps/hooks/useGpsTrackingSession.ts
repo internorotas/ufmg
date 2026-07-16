@@ -249,6 +249,8 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const lockedLineRef = useRef<Linha | null>(null);
   // Contagem de snapshots consecutivos fora do corredor — só encerra após 3 falhas seguidas
   const outsideRouteCountRef = useRef(0);
+  // Guard: evita que cliques duplos no botão de parar disparem múltiplas chamadas concorrentes
+  const isStoppingRef = useRef(false);
   // Refs para leitura de estado reativo em callbacks sem causar recriação por deps instáveis
   const statusRef = useRef(status);
   statusRef.current = status;
@@ -307,10 +309,13 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         if (statusRef.current === 'paused') {
           setStatus('active');
         }
-      } catch {
+      } catch (err) {
         queueRef.current = trimQueue([...batch, ...queueRef.current], MAX_QUEUE_POINTS);
         setQueueSize(queueRef.current.length);
         setStatus('paused');
+        if (err instanceof RateLimitError) {
+          setRateLimitMessage(err.message);
+        }
         writePersistedSession({
           sessionId: sessionIdRef.current,
           linhaId: line.idRota,
@@ -366,22 +371,28 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
 
   const stop = useCallback(
     async (reason: TrackingStopReason = 'manual') => {
-      setLastStopReason(reason);
-      if (queueRef.current.length > 0) {
-        await flushQueue(true);
-      }
-
-      if (sessionIdRef.current) {
-        try {
-          await finishGpsSession(sessionIdRef.current, reason);
-        } catch (err) {
-          // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
-          console.error('[GPS] Falha ao encerrar sessão de rastreio colaborativo:', err);
-          // Não retorna — reseta a sessão mesmo em caso de erro para não bloquear o usuário
+      if (isStoppingRef.current) return;
+      isStoppingRef.current = true;
+      try {
+        setLastStopReason(reason);
+        if (queueRef.current.length > 0) {
+          await flushQueue(true);
         }
-      }
 
-      resetSession();
+        if (sessionIdRef.current) {
+          try {
+            await finishGpsSession(sessionIdRef.current, reason);
+          } catch (err) {
+            // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
+            console.error('[GPS] Falha ao encerrar sessão de rastreio colaborativo:', err);
+            // Não retorna — reseta a sessão mesmo em caso de erro para não bloquear o usuário
+          }
+        }
+
+        resetSession();
+      } finally {
+        isStoppingRef.current = false;
+      }
     },
     [flushQueue, resetSession],
   );

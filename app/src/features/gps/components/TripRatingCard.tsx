@@ -23,6 +23,7 @@ export function TripRatingCard({
   const [comment, setComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
   const { trackEvent } = useAnalytics();
 
   const handleSubmit = useCallback(async () => {
@@ -45,6 +46,7 @@ export function TripRatingCard({
       setTimeout(onRated, 1500);
     } catch {
       setSubmitting(false);
+      setSubmitError(true);
     }
   }, [rating, comment, sessionId, submitting, trackEvent, linhaNome, onRated]);
 
@@ -107,6 +109,12 @@ export function TripRatingCard({
           rows={2}
           className="mb-3 w-full resize-none rounded-lg border border-card-border bg-background-secondary px-3 py-2 text-xs text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
         />
+
+        {submitError && (
+          <p role="alert" className="mb-2 text-[10px] text-danger-text">
+            Falha ao enviar avaliação. Tente novamente.
+          </p>
+        )}
 
         <div className="flex gap-2">
           <button
