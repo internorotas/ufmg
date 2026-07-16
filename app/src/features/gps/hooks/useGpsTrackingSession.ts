@@ -249,6 +249,13 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const lockedLineRef = useRef<Linha | null>(null);
   // Contagem de snapshots consecutivos fora do corredor — só encerra após 3 falhas seguidas
   const outsideRouteCountRef = useRef(0);
+  // Refs para leitura de estado reativo em callbacks sem causar recriação por deps instáveis
+  const statusRef = useRef(status);
+  statusRef.current = status;
+  const sessionIdRef = useRef(sessionId);
+  sessionIdRef.current = sessionId;
+  const selectedLineRef = useRef(options.selectedLine);
+  selectedLineRef.current = options.selectedLine;
 
   const resetSession = useCallback(() => {
     setStatus('idle');
@@ -273,8 +280,8 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const flushQueue = useCallback(
     async (isBatchSubmission: boolean) => {
       // Usa a linha capturada no início da sessão — nunca a seleção atual da sidebar
-      const line = lockedLineRef.current ?? options.selectedLine;
-      if (!sessionId || !line || queueRef.current.length === 0) {
+      const line = lockedLineRef.current ?? selectedLineRef.current;
+      if (!sessionIdRef.current || !line || queueRef.current.length === 0) {
         return;
       }
 
@@ -285,23 +292,27 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         setQueueSize(0);
 
         await submitGpsBatch({
-          sessionId,
+          sessionId: sessionIdRef.current,
           linhaId: line.idRota,
           isBatchSubmission,
           points: batch,
         });
 
         writePersistedSession({
-          sessionId,
+          sessionId: sessionIdRef.current,
           linhaId: line.idRota,
           points: [],
         });
+        // Flush bem-sucedido: recupera status ativo se estava pausado por falha anterior
+        if (statusRef.current === 'paused') {
+          setStatus('active');
+        }
       } catch {
         queueRef.current = trimQueue([...batch, ...queueRef.current], MAX_QUEUE_POINTS);
         setQueueSize(queueRef.current.length);
         setStatus('paused');
         writePersistedSession({
-          sessionId,
+          sessionId: sessionIdRef.current,
           linhaId: line.idRota,
           points: queueRef.current,
         });
@@ -309,7 +320,8 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         setIsSyncing(false);
       }
     },
-    [options.selectedLine, sessionId],
+    // Sem deps reativas — lê estado via refs para evitar recriação de função a cada render
+    [],
   );
 
   const start = useCallback(
@@ -359,9 +371,9 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         await flushQueue(true);
       }
 
-      if (sessionId) {
+      if (sessionIdRef.current) {
         try {
-          await finishGpsSession(sessionId, reason);
+          await finishGpsSession(sessionIdRef.current, reason);
         } catch (err) {
           // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
           console.error('[GPS] Falha ao encerrar sessão de rastreio colaborativo:', err);
@@ -371,12 +383,12 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
 
       resetSession();
     },
-    [flushQueue, resetSession, sessionId],
+    [flushQueue, resetSession],
   );
 
   const ingestSnapshot = useCallback(
     async (snapshot: TrackingSnapshot) => {
-      if (status !== 'active' || !sessionId) {
+      if (statusRef.current !== 'active' || !sessionIdRef.current) {
         return;
       }
 
@@ -405,10 +417,10 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         setDistanceKm((d) => d + seg);
       }
       lastSnapshotCoordRef.current = { lat: snapshot.latitude, lng: snapshot.longitude };
-      const persistLine = lockedLineRef.current ?? options.selectedLine;
+      const persistLine = lockedLineRef.current ?? selectedLineRef.current;
       if (persistLine) {
         writePersistedSession({
-          sessionId,
+          sessionId: sessionIdRef.current,
           linhaId: persistLine.idRota,
           points: queueRef.current,
         });
@@ -418,7 +430,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         lastMovementAtRef.current = snapshot.timestamp;
       }
 
-      const trackedLine = lockedLineRef.current ?? options.selectedLine;
+      const trackedLine = lockedLineRef.current ?? selectedLineRef.current;
 
       if (!isNearLineRoute(snapshot, trackedLine)) {
         outsideRouteCountRef.current++;
@@ -447,10 +459,10 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
 
       if (navigator.onLine && queueRef.current.length > 0) {
         await flushQueue(queueRef.current.length > 1);
-        setStatus('active');
       }
     },
-    [flushQueue, options.selectedLine, sessionId, status, stop],
+    // Removido: options.selectedLine, sessionId, status — lidos via refs; stop e flushQueue são estáveis
+    [flushQueue, stop],
   );
 
   useEffect(() => {
