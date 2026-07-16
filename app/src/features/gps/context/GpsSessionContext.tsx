@@ -23,6 +23,9 @@ import { useAudioKeepAlive } from '@/hooks/useAudioKeepAlive';
 import { VIAGENS_QUERY_KEY } from '@/hooks/useHistoricoViagens';
 import { useWakeLock } from '@/hooks/useWakeLock';
 
+// Tempo sem posição GPS (app em background) para perguntar ao usuário se ainda está viajando
+const STALE_BACKGROUND_THRESHOLD_MS = 10 * 60 * 1000;
+
 interface CompletedSession {
   sessionId: string;
   distanceKm: number;
@@ -156,9 +159,14 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   useWakeLock(isActive);
   useAudioKeepAlive(isActive);
 
+  // === Detecção de "esqueceu de encerrar" (declarado antes do ingest useEffect) ===
+  const lastGpsUpdateRef = useRef<number | null>(null);
+  const [showStillOnTripPrompt, setShowStillOnTripPrompt] = useState(false);
+
   // === Ingestão de snapshots ===
   useEffect(() => {
     if (!ultimaLeitura || !isActive) return;
+    lastGpsUpdateRef.current = Date.now();
     void ingestSnapshot({
       ...ultimaLeitura,
       heading: ultimaLeitura.heading ?? heading,
@@ -298,6 +306,23 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   const [isCardMinimized, setIsCardMinimized] = useState(false);
   const handleToggleMinimize = useCallback(() => setIsCardMinimized((v) => !v), []);
 
+  useEffect(() => {
+    if (!isActive) {
+      setShowStillOnTripPrompt(false);
+      return;
+    }
+    const handleVisibility = () => {
+      if (document.visibilityState !== 'visible') return;
+      const last = lastGpsUpdateRef.current;
+      if (last === null) return;
+      if (Date.now() - last > STALE_BACKGROUND_THRESHOLD_MS) {
+        setShowStillOnTripPrompt(true);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [isActive]);
+
   // Linha capturada ao início da sessão — persiste enquanto ativa para que o
   // card não pisque se linhaSelecionada mudar (ex: usuário navega para outra rota).
   const linhaAtivaRef = useRef<typeof linhaSelecionada>(null);
@@ -368,6 +393,51 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
             >
               ×
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Dialog: usuário voltou ao app com sessão ativa há muito tempo */}
+      {showStillOnTripPrompt && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="still-on-trip-title"
+          className="fixed inset-0 z-2000 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center"
+        >
+          <div className="w-full max-w-sm rounded-t-2xl bg-card p-5 shadow-2xl sm:rounded-2xl">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-warning-bg">
+                <Bus size={20} className="text-warning-text" aria-hidden="true" />
+              </div>
+              <div className="min-w-0">
+                <p id="still-on-trip-title" className="font-semibold text-text-primary">
+                  Ainda em viagem?
+                </p>
+                <p className="text-xs text-text-secondary">
+                  Não detectamos sua posição há mais de 10 minutos.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setShowStillOnTripPrompt(false)}
+                className="w-full rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+              >
+                Ainda estou no ônibus
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowStillOnTripPrompt(false);
+                  void rastreio.stop('manual');
+                }}
+                className="w-full rounded-xl border border-card-border px-4 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+              >
+                Encerrar viagem
+              </button>
+            </div>
           </div>
         </div>
       )}
