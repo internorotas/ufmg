@@ -308,7 +308,7 @@ function AlternativeCard({ alternative, isSelected, onSelect, onViewOnMap }: Alt
           <button
             type="button"
             onClick={onViewOnMap}
-            className="flex min-h-9 items-center gap-1.5 rounded-lg bg-internoRotas-azul-eletrico px-3 py-1.5 text-sm font-semibold text-white hover:bg-internoRotas-azul-eletrico/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="flex min-h-11 items-center gap-1.5 rounded-lg bg-internoRotas-azul-eletrico px-3 py-1.5 text-sm font-semibold text-white hover:bg-internoRotas-azul-eletrico/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-label="Ver rota selecionada no mapa"
           >
             <MapIcon size={14} aria-hidden="true" />
@@ -318,7 +318,7 @@ function AlternativeCard({ alternative, isSelected, onSelect, onViewOnMap }: Alt
           <button
             type="button"
             onClick={onSelect}
-            className="surface-card-interactive flex min-h-9 items-center px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="surface-card-interactive flex min-h-11 items-center px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-label={`Comparar este itinerário: ${alternative.totalMinutes} min`}
           >
             Comparar

@@ -140,7 +140,7 @@ function EndpointField({
             type="search"
             role="combobox"
             className={searchInputVariants()}
-            placeholder={`Buscar parada de ${label.toLowerCase()}…`}
+            placeholder={`Buscar parada, prédio ou local…`}
             value={searchValue}
             onFocus={onActivate}
             onChange={(e) => onSearch(e.target.value)}

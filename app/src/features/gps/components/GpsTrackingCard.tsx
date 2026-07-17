@@ -63,7 +63,7 @@ export function GpsTrackingCard({
           type="button"
           onClick={onToggleMinimize}
           aria-label="Expandir painel de rastreio"
-          className="flex h-full items-center gap-2 px-1"
+          className="flex min-h-11 items-center gap-2 px-1"
         >
           <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
           <span className="text-[11px] font-bold tabular-nums" style={{ color: linha.corHex }}>
@@ -74,7 +74,7 @@ export function GpsTrackingCard({
         <Link
           to="/"
           aria-label="Ver rota no mapa"
-          className="flex h-7 w-7 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary"
+          className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-card-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary"
         >
           <MapIcon size={13} aria-hidden="true" />
         </Link>
@@ -136,7 +136,7 @@ export function GpsTrackingCard({
           type="button"
           onClick={onToggleMinimize}
           aria-label="Minimizar painel"
-          className="pointer-events-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-text-tertiary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary active:scale-90"
+          className="pointer-events-auto flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md text-text-tertiary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary active:scale-90"
         >
           <ChevronDown size={10} aria-hidden="true" />
         </button>
@@ -145,7 +145,7 @@ export function GpsTrackingCard({
           type="button"
           onClick={() => void stop('manual')}
           aria-label="Encerrar rastreio"
-          className="pointer-events-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-warning-bg text-warning-text transition-colors hover:bg-warning-bg/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary active:scale-90"
+          className="pointer-events-auto flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md bg-warning-bg text-warning-text transition-colors hover:bg-warning-bg/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary active:scale-90"
         >
           <Square size={10} fill="currentColor" aria-hidden="true" />
         </button>
