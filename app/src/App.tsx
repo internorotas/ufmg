@@ -10,6 +10,7 @@ import { ModalManager } from './components/app/ModalManager';
 import { NavRail } from './components/app/NavRail';
 import { OfflineToast } from './components/app/OfflineToast';
 import { InactivityWarningDialog } from './components/auth/InactivityWarningDialog';
+import { BetaBanner } from './components/BetaBanner';
 import { CalendarBanner } from './components/CalendarBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { InfoBanner } from './components/InfoBanner';
@@ -609,7 +610,7 @@ function AppContent() {
 
   return (
     <div className="relative flex flex-1 min-h-0 w-full overflow-hidden bg-background pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
-      <OnboardingModal onOpenLegalModal={handleOpenLegalModal} />
+      <OnboardingModal />
       <a
         href="#main-content"
         className="sr-only absolute left-4 top-4 z-1400 rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
@@ -618,6 +619,7 @@ function AppContent() {
       </a>
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AnalyticsConsentBanner />
+        <BetaBanner />
         <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
         <MobileTopBar
           authStatus={authStatus}
