@@ -1,4 +1,5 @@
 import { AlertTriangle, MapPin, Radio } from 'lucide-react';
+import { PrivacyNote } from '@/components/PrivacyNote';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { numLinha } from '@/features/gps/lib/markerUtils';
@@ -77,6 +78,7 @@ export function GpsPositionWarningDialog({
             </div>
 
             {/* Ações */}
+            <PrivacyNote />
             <div className="flex flex-col gap-2">
               <Button type="button" variant="primary" fullWidth onClick={onConfirm}>
                 <span className="flex gap-2 items-center">

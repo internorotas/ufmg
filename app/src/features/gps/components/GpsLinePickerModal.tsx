@@ -1,5 +1,6 @@
 import { ChevronRight, Radio, Search } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { PrivacyNote } from '@/components/PrivacyNote';
 import { Dialog } from '@/components/ui/Dialog';
 import { isLineAvailableToday } from '@/config/specialPeriods';
 import { numLinha } from '@/features/gps/lib/markerUtils';
@@ -216,9 +217,14 @@ export function GpsLinePickerModal({
           </header>
 
           <Dialog.Description className="sr-only">
-            Selecione a linha de ônibus que você está utilizando para contribuir com dados de
+            Selecione a linha de ônibus que você está utilizar para contribuir com dados de
             localização colaborativa.
           </Dialog.Description>
+
+          {/* Privacy note */}
+          <div className="shrink-0 px-4 pt-3">
+            <PrivacyNote />
+          </div>
 
           {/* Search */}
           <div className="shrink-0 bg-background-secondary px-4 pb-3 pt-2">

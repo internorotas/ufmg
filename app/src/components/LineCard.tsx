@@ -22,7 +22,9 @@ import { getLinhaNotRunningMessage, isLineAvailableToday } from '../config/speci
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
 import { useFavoritos } from '../hooks/useFavoritos';
+import { usePrevisaoChegada } from '../hooks/usePrevisaoChegada';
 import { getSaoPauloMinutesOfDay } from '../lib/time';
+import { DataSourceBadge } from './DataSourceBadge';
 import { PrevisaoBadge } from './PrevisaoBadge';
 import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 
@@ -222,6 +224,7 @@ function LineCardComponent({
   const { isFavorito, toggleFavorito } = useFavoritos();
   const now = useCurrentTime();
   const favoritado = isFavorita ?? isFavorito(linha.idRota);
+  const previsao = usePrevisaoChegada(linha, idParada ?? null);
 
   const shouldDisableSchedules = !isLineAvailableToday(linha.categoriaDia);
   const getSuspendedMessage = () => getLinhaNotRunningMessage(linha.categoriaDia);
@@ -353,11 +356,12 @@ function LineCardComponent({
             </div>
           )}
 
-          {idParada ? (
-            <div className="mt-1 flex justify-end">
-              <PrevisaoBadge linha={linha} idParada={idParada} />
+          {!(shouldDisableSchedules || statusLinha.id === 'NAO_CIRCULA_HOJE') && (
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <DataSourceBadge previsao={previsao} />
+              {idParada ? <PrevisaoBadge linha={linha} idParada={idParada} /> : null}
             </div>
-          ) : null}
+          )}
 
           <p id={getLineDescriptionId(linha.idRota)} className="sr-only">
             {t('description.sr', {
