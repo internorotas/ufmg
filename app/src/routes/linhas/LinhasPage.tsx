@@ -4,6 +4,7 @@ import { Trans } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { CalendarBanner } from '@/components/CalendarBanner';
 import { LineCard } from '@/components/LineCard';
+import { LineGroupCard } from '@/components/LineGroupCard';
 import { CategoryTabs } from '@/components/MenuLateral';
 import { SystemBanner } from '@/components/SystemBanner';
 import { EmptyState, SearchEmptyState } from '@/components/ui/EmptyState';
@@ -11,6 +12,7 @@ import { SearchInput } from '@/components/ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { getCurrentCalendarPeriod, initSpecialPeriodsFromApi } from '@/config/specialPeriods';
 import { useRotasData, useRotasSelection } from '@/contexts/RotasContext';
+import { numLinha } from '@/features/gps/lib/markerUtils';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useFavoritos } from '@/hooks/useFavoritos';
 import { useLinhasFilter } from '@/hooks/useLinhasFilter';
@@ -31,6 +33,28 @@ function useIsDesktop() {
     return () => mq.removeEventListener('change', handler);
   }, []);
   return isDesktop;
+}
+
+interface LineGroup {
+  numero: string;
+  principal: Linha;
+  variantes: Linha[];
+}
+
+function groupLinesByNumber(linhas: Linha[]): LineGroup[] {
+  const map = new Map<string, Linha[]>();
+  for (const linha of linhas) {
+    const numero = numLinha(linha);
+    const existing = map.get(numero) ?? [];
+    map.set(numero, [...existing, linha]);
+  }
+  return Array.from(map.entries())
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map(([numero, group]) => ({
+      numero,
+      principal: group[0],
+      variantes: group,
+    }));
 }
 
 export function LinhasPage() {
@@ -70,6 +94,7 @@ export function LinhasPage() {
   const hasFavoritas = linhasFavoritas.length > 0;
   const favoritosIdsSet = useMemo(() => new Set(favoritosIds), [favoritosIds]);
   const linhasRegulares = linhasFiltradas.filter((linha) => !favoritosIdsSet.has(linha.idRota));
+  const groupedRegulares = useMemo(() => groupLinesByNumber(linhasRegulares), [linhasRegulares]);
   const hasRegularResults = linhasRegulares.length > 0;
 
   useEffect(() => {
@@ -324,20 +349,21 @@ export function LinhasPage() {
               )}
 
               {hasRegularResults
-                ? linhasRegulares.map((linha) => (
+                ? groupedRegulares.map((group) => (
                     <div
-                      key={linha.idRota}
+                      key={group.principal.idRota}
                       className={
-                        movimentoPorId[linha.idRota] === 'down'
+                        movimentoPorId[group.principal.idRota] === 'down'
                           ? 'motion-safe:animate-line-favorite-down'
                           : ''
                       }
                     >
-                      <LineCard
-                        linha={linha}
+                      <LineGroupCard
+                        linhas={group.variantes}
+                        linhaPrincipal={group.principal}
                         onClick={handleLinhaClick}
                         onDetailsClick={handleDetailsClick}
-                        isSelected={linhaSelecionada?.idRota === linha.idRota}
+                        selectedId={linhaSelecionada?.idRota}
                         isFavorita={false}
                       />
                     </div>
