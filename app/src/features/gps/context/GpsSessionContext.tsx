@@ -69,7 +69,7 @@ function GpsSessionCompletedCard({
 
   return (
     <div className="pointer-events-none fixed inset-0 z-1050 flex items-end justify-start pb-24 pl-3 md:items-center md:justify-center md:pb-0 md:pl-0">
-      <div className="pointer-events-auto w-56 rounded-2xl border border-success-border bg-card p-4 shadow-xl md:max-w-xs md:w-full md:mx-4">
+      <div className="pointer-events-auto w-56 rounded-lg border border-success-border bg-card p-4 shadow-lg md:max-w-xs md:w-full md:mx-4">
         {/* Cabeçalho */}
         <div className="mb-3 flex items-center gap-2">
           <span
@@ -86,7 +86,7 @@ function GpsSessionCompletedCard({
             type="button"
             onClick={onDismiss}
             aria-label="Fechar"
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-text-tertiary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary"
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md text-text-tertiary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary"
           >
             ×
           </button>
