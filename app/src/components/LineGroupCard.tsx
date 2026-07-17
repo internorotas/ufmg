@@ -59,7 +59,7 @@ function LineGroupCardComponent({
         type="button"
         onClick={handleToggle}
         className={cn(
-          'flex w-full items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-text-secondary transition-colors',
+          'flex min-h-11 w-full items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-text-secondary transition-colors',
           'hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary',
         )}
         aria-expanded={expanded}
@@ -71,26 +71,32 @@ function LineGroupCardComponent({
         </span>
       </button>
 
-      {expanded && (
-        <div
-          className="mt-1 space-y-2 border-l-2 pl-3"
-          style={{ borderColor: `${linhaPrincipal.corHex}40` }}
-        >
-          {linhas
-            .filter((l) => l.idRota !== linhaPrincipal.idRota)
-            .map((linha) => (
-              <LineCard
-                key={linha.idRota}
-                linha={linha}
-                onClick={onClick}
-                onDetailsClick={onDetailsClick}
-                isSelected={selectedId === linha.idRota}
-                isFavorita={isFavorita}
-                onToggleFavorita={onToggleFavorita}
-              />
-            ))}
+      <div
+        className="grid transition-[grid-template-rows] duration-200 ease-in-out"
+        style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}
+        aria-hidden={!expanded}
+      >
+        <div className="overflow-hidden">
+          <div
+            className="mt-1 space-y-2 border-l-2 pl-3"
+            style={{ borderColor: `${linhaPrincipal.corHex}40` }}
+          >
+            {linhas
+              .filter((l) => l.idRota !== linhaPrincipal.idRota)
+              .map((linha) => (
+                <LineCard
+                  key={linha.idRota}
+                  linha={linha}
+                  onClick={onClick}
+                  onDetailsClick={onDetailsClick}
+                  isSelected={selectedId === linha.idRota}
+                  isFavorita={isFavorita}
+                  onToggleFavorita={onToggleFavorita}
+                />
+              ))}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
