@@ -31,7 +31,7 @@ export const TENANT_DEFINITIONS = {
     cityName: 'Belo Horizonte',
     brandColor: '#2c0eeb',
     description:
-      'Planeje seus trajetos no campus Pampulha da UFMG com mapa interativo, linhas, paradas e previsões em tempo real.',
+      'Planeje seus trajetos no campus Pampulha da UFMG com mapa interativo, linhas, paradas e previsões de chegada. Horários, rastreio colaborativo e estimativas em tempo real quando disponíveis.',
     basePath: '/ufmg/',
     campusDisplayName: 'campus Pampulha',
     campusCenter: [-19.87055, -43.96775],
@@ -52,7 +52,7 @@ export const TENANT_DEFINITIONS = {
     cityName: 'São Paulo',
     brandColor: '#8b1d3b',
     description:
-      'Consulte linhas universitárias, paradas e previsões em tempo real com um shell público único do Interno Rotas.',
+      'Consulte linhas universitárias, paradas e previsões de chegada com um shell público único do Interno Rotas.',
     basePath: '/usp-mock/',
     campusDisplayName: 'campus da universidade',
     campusCenter: [-23.559616, -46.731386],

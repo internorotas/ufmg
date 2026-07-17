@@ -16,11 +16,11 @@
     <script src="/cache-recovery.js"></script>
     <script data-cfasync="false" src="https://challenges.cloudflare.com/turnstile/v0/api.js" async></script>
 
-    <title>Interno Rotas | Transporte universitário em tempo real</title>
+    <title>Interno Rotas | Transporte universitário UFMG</title>
 
     <meta
       name="description"
-      content="Planeje seus trajetos no campus com o Interno Rotas. Consulte linhas, paradas e previsões em tempo real do transporte universitário."
+      content="Planeje seus trajetos no campus da UFMG com mapa interativo. Consulte linhas, paradas, horários e previsões de chegada. Rastreio colaborativo quando disponível."
     />
     <meta
       name="keywords"
@@ -49,10 +49,10 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://internorotas.com/" />
-    <meta property="og:title" content="Interno Rotas — Transporte universitário da UFMG em tempo real" />
+    <meta property="og:title" content="Interno Rotas — Transporte universitário da UFMG" />
     <meta
       property="og:description"
-      content="Mapa interativo com linhas, paradas e localização em tempo real dos ônibus universitários da UFMG no campus Pampulha. Gratuito, sem anúncios."
+      content="Mapa interativo com linhas, paradas e previsões de chegada dos ônibus universitários da UFMG no campus Pampulha. Gratuito, sem anúncios."
     />
     <meta property="og:image" content="https://internorotas.com/og-image.svg" />
     <meta property="og:image:secure_url" content="https://internorotas.com/og-image.svg" />
@@ -69,7 +69,7 @@
     <meta property="twitter:title" content="Interno Rotas — Transporte universitário da UFMG" />
     <meta
       property="twitter:description"
-      content="Mapa interativo com linhas, paradas e localização em tempo real dos ônibus universitários da UFMG. Gratuito, sem anúncios."
+      content="Mapa interativo com linhas, paradas e previsões de chegada dos ônibus universitários da UFMG. Gratuito, sem anúncios."
     />
     <meta property="twitter:image" content="https://internorotas.com/android-chrome-512x512.png" />
     <meta property="twitter:image:alt" content="Ícone do Interno Rotas — ônibus universitário da UFMG" />
@@ -129,8 +129,8 @@
           },
           "featureList": [
             "Mapa interativo das linhas de ônibus da UFMG",
-            "Localização em tempo real dos ônibus via GPS",
             "Previsão de chegada nas paradas",
+            "Rastreio colaborativo voluntário com GPS",
             "Integração com linhas BHTrans próximas ao campus",
             "Planejador de trajetos entre pontos do campus",
             "Itinerário detalhado das paradas",
@@ -176,8 +176,22 @@
   <body>
     <div id="root"></div>
     <noscript>
-      <p>Este aplicativo requer JavaScript para funcionar. Por favor, habilite JavaScript no seu navegador.</p>
-      <p><a href="./privacidade/">Política de Privacidade</a></p>
+      <div style="max-width:480px;margin:2rem auto;padding:0 1rem;font-family:system-ui,-apple-system,sans-serif;color:#171717;line-height:1.5">
+        <h1 style="font-size:1.25rem;font-weight:600;margin-bottom:0.5rem">Interno Rotas</h1>
+        <p style="font-size:0.875rem;color:#525252;margin-bottom:1rem">
+          Este aplicativo requer JavaScript para funcionar com mapa interativo, previsões e rastreio colaborativo.
+        </p>
+        <div style="background:#f5f5f5;border-radius:8px;padding:1rem;margin-bottom:1rem">
+          <p style="font-size:0.8125rem;font-weight:600;margin-bottom:0.5rem">Para ver horários e linhas:</p>
+          <ul style="font-size:0.8125rem;color:#525252;padding-left:1.25rem;margin:0">
+            <li><a href="https://www.ufmg.br/transporte/" style="color:#2c0eeb">Site oficial de transportes UFMG</a></li>
+            <li><a href="./privacidade/" style="color:#2c0eeb">Política de Privacidade</a></li>
+          </ul>
+        </div>
+        <p style="font-size:0.75rem;color:#a3a3a3">
+          Algumas funcionalidades como mapa, previsão em tempo real e rastreio colaborativo estão indisponíveis sem JavaScript.
+        </p>
+      </div>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>

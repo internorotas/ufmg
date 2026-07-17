@@ -17,7 +17,7 @@ export function applyTenantDocumentMetadata(): void {
 
   const appUrl = new URL(import.meta.env.BASE_URL, window.location.origin).toString();
   const ogImageUrl = new URL(
-    `${import.meta.env.BASE_URL}og-image.png`,
+    `${import.meta.env.BASE_URL}og-image.svg`,
     window.location.origin,
   ).toString();
 
