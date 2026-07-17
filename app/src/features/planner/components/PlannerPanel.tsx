@@ -127,7 +127,7 @@ function EndpointField({
           <button
             type="button"
             onClick={onClear}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-label={`Remover ${label}`}
           >
             <X size={14} aria-hidden="true" />

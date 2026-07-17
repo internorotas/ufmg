@@ -237,7 +237,7 @@ export function GpsLinePickerModal({
               <input
                 ref={inputRef}
                 type="search"
-                data-autofocus="true"
+                autoFocus
                 placeholder="Buscar por nome, número ou destino…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

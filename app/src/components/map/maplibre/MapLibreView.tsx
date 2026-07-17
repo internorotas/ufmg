@@ -498,6 +498,11 @@ export function MapLibreView({
             type="button"
             onClick={onAlternarRastreioColaborativo}
             aria-pressed={rastreioAtivo}
+            title={
+              rastreioAtivo
+                ? 'Encerrar compartilhamento de posição com outros passageiros.'
+                : 'Compartilhar sua posição para ajudar passageiros a saber quando o ônibus está próximo.'
+            }
             aria-label={
               rastreioAtivo
                 ? `Encerrar ${rastreioColaborativo.label}. Status: ${statusRastreio}`

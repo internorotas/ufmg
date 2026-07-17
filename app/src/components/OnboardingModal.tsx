@@ -61,7 +61,7 @@ export function OnboardingModal() {
             <Dialog.Title className="text-balance text-lg">Para onde você quer ir?</Dialog.Title>
 
             <Dialog.Description className="mt-2 max-w-65 text-pretty text-center">
-              Escolha seu destino para encontrar a linha, a parada de embarque e o próximo horário.
+              Escolha seu destino para encontrar a linha, a parada de embarque e o próximo horário. Busque por prédios — ICB, Reitoria, FALE — ou por nomes de paradas.
             </Dialog.Description>
           </div>
 
