@@ -403,7 +403,7 @@ export function PlannerPanel() {
               swap();
               resetMutation();
             }}
-            className="flex h-8 w-8 items-center justify-center rounded border border-card-border bg-background hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded border border-card-border bg-background hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
             aria-label="Trocar origem e destino"
             title="Trocar origem e destino"
           >

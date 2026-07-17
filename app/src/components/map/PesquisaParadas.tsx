@@ -79,7 +79,7 @@ export function PesquisaParadas({ paradas, isOpen, onClose }: PesquisaParadasPro
           type="button"
           onClick={onClose}
           aria-label="Fechar pesquisa"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+          className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
         >
           <X size={18} aria-hidden="true" />
         </button>
