@@ -3,7 +3,7 @@
  * Design System - Interno Rotas UFMG
  */
 
-import { ArrowLeft, Route, X } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Route, X } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tv, type VariantProps } from 'tailwind-variants';
@@ -583,19 +583,26 @@ export const MenuLateral = React.memo(function MenuLateral({
             type="button"
             data-slot="planner-toggle"
             onClick={() => (isPlannerOpen ? closePlanner() : openPlanner())}
-            className="flex min-h-11 w-full items-center gap-2 rounded-lg border border-card-border bg-card px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="flex min-h-14 w-full items-center gap-3 rounded-(--shape-md) bg-brand-primary px-3 py-2.5 text-left text-text-inverse transition-[transform,box-shadow,background-color] duration-150 hover:brightness-110 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background-secondary"
             aria-expanded={isPlannerOpen}
             aria-controls="planner-panel"
             aria-label={isPlannerOpen ? 'Fechar planejador de rota' : 'Planejar rota'}
           >
-            <Route
-              size={16}
-              className="shrink-0 text-brand-primary dark:text-brand-accent"
-              aria-hidden="true"
-            />
-            <span className="flex-1 text-left">Planejar rota</span>
-            {isPlannerOpen && (
-              <X size={14} className="shrink-0 text-text-tertiary" aria-hidden="true" />
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-(--shape-sm) bg-white/15">
+              <Route size={18} aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-semibold">
+                {isPlannerOpen ? 'Voltar às linhas' : 'Para onde você vai?'}
+              </span>
+              <span className="block truncate text-xs text-white/80">
+                {isPlannerOpen ? 'Fechar planejador' : 'Encontre linha, parada e horário'}
+              </span>
+            </span>
+            {isPlannerOpen ? (
+              <X size={16} className="shrink-0" aria-hidden="true" />
+            ) : (
+              <ChevronRight size={18} className="shrink-0" aria-hidden="true" />
             )}
           </button>
         </div>

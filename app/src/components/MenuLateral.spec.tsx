@@ -213,7 +213,7 @@ describe('MenuLateral', () => {
     ).toBe(true);
   });
 
-  it('exibe o botão "Planejar rota" abaixo da busca', async () => {
+  it('exibe a entrada de planejamento abaixo da busca', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify(null), {
         status: 200,
@@ -225,6 +225,6 @@ describe('MenuLateral', () => {
 
     const plannerToggle = container.querySelector('[data-slot="planner-toggle"]');
     expect(plannerToggle).not.toBeNull();
-    expect(plannerToggle?.textContent).toContain('Planejar rota');
+    expect(plannerToggle?.textContent).toContain('Para onde você vai?');
   });
 });

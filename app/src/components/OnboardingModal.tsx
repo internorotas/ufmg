@@ -1,46 +1,12 @@
-import { Bus, MapPin, Shield } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
+import { usePlannerStore } from '@/features/planner/store/plannerStore';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useOnboardingStore } from '@/stores/onboardingStore';
-import type { LegalModalType } from '@/types/legal.types';
 
-const SLIDE_TONES = {
-  brand: 'bg-brand-primary/10 text-brand-primary',
-  success: 'bg-success-bg text-success-text',
-  accent: 'bg-brand-accent/15 text-brand-accent',
-} as const;
-
-const SLIDES = [
-  {
-    icon: Bus,
-    tone: 'brand',
-    title: 'Bem-vindo ao Interno Rotas',
-    description:
-      'Sem cadastro obrigatório: consulte linhas e paradas da UFMG rapidamente e salve favoritas quando quiser.',
-  },
-  {
-    icon: MapPin,
-    tone: 'success',
-    title: 'GPS Colaborativo',
-    description:
-      'Ajude a comunidade com GPS colaborativo: quando você compartilha posição, mais pessoas recebem previsões melhores.',
-  },
-  {
-    icon: Shield,
-    tone: 'accent',
-    title: 'Seus dados são seus',
-    description: 'Seguimos a LGPD para tratamento de dados de localização e transparência de uso.',
-  },
-] as const;
-
-interface OnboardingModalProps {
-  onOpenLegalModal: (modalType: LegalModalType) => void;
-}
-
-export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
-  const [currentSlide, setCurrentSlide] = useState(0);
+export function OnboardingModal() {
   const [isOpen, setIsOpen] = useState(true);
   const { hasSeenOnboarding, setHasSeenOnboarding } = useOnboardingStore();
   const { trackEvent } = useAnalytics();
@@ -48,12 +14,6 @@ export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
   if (hasSeenOnboarding) {
     return null;
   }
-
-  const handleNext = () => {
-    if (currentSlide < SLIDES.length - 1) {
-      setCurrentSlide((prev) => prev + 1);
-    }
-  };
 
   const handleSkip = () => {
     setIsOpen(false);
@@ -67,16 +27,19 @@ export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
     );
   };
 
-  const handleAccept = () => {
+  const handleStartPlanning = () => {
     setIsOpen(false);
     setHasSeenOnboarding(true);
     trackEvent(
       {
         category: 'onboarding',
-        action: 'completed',
+        action: 'started_planning',
       },
-      { slides_viewed: SLIDES.length },
+      {},
     );
+    const { openMenuFn, openPlanner } = usePlannerStore.getState();
+    openPlanner();
+    openMenuFn?.();
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -85,64 +48,29 @@ export function OnboardingModal({ onOpenLegalModal }: OnboardingModalProps) {
     }
   };
 
-  const isLastSlide = currentSlide === SLIDES.length - 1;
-  const CurrentIcon = SLIDES[currentSlide].icon;
-  const currentTone = SLIDE_TONES[SLIDES[currentSlide].tone];
-
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
         <Dialog.Backdrop />
-        <Dialog.Popup size="sm">
-          <div className="flex flex-col items-center py-6 px-4">
-            <div
-              className={`mb-6 flex h-16 w-16 items-center justify-center surface-card-sm ${currentTone}`}
-            >
-              <CurrentIcon className="h-8 w-8" />
+        <Dialog.Popup size="sm" className="max-w-xs">
+          <div className="flex flex-col items-center px-5 pb-4 pt-6 text-center">
+            <div className="mb-5 flex size-14 items-center justify-center rounded-(--shape-lg) bg-brand-primary/10 text-brand-primary dark:text-brand-accent">
+              <MapPin className="size-7" aria-hidden="true" />
             </div>
 
-            <Dialog.Title className="mb-3 text-center text-xl font-semibold">
-              {SLIDES[currentSlide].title}
-            </Dialog.Title>
+            <Dialog.Title className="text-balance text-lg">Para onde você quer ir?</Dialog.Title>
 
-            <Dialog.Description className="text-center">
-              {SLIDES[currentSlide].description}{' '}
-              {currentSlide === 2 ? (
-                <>
-                  Leia nossa{' '}
-                  <button
-                    type="button"
-                    onClick={() => onOpenLegalModal('privacidade')}
-                    className="font-semibold underline"
-                  >
-                    Política de Privacidade
-                  </button>
-                  .
-                </>
-              ) : null}
+            <Dialog.Description className="mt-2 max-w-65 text-pretty text-center">
+              Escolha seu destino para encontrar a linha, a parada de embarque e o próximo horário.
             </Dialog.Description>
           </div>
 
-          <div className="flex justify-center gap-2 py-2">
-            {SLIDES.map((slide, index) => (
-              <button
-                type="button"
-                key={slide.title}
-                className={`h-2 rounded-sm transition-colors ${
-                  index === currentSlide ? 'w-6 bg-brand-primary' : 'w-2 bg-card-border'
-                }`}
-                aria-label={`Slide ${index + 1}`}
-                onClick={() => setCurrentSlide(index)}
-              />
-            ))}
-          </div>
-
-          <div className="flex justify-between gap-2 p-4">
+          <div className="flex gap-2 border-t border-card-border p-3">
             <Button variant="ghost" onClick={handleSkip}>
-              {isLastSlide ? 'Agora não' : 'Pular'}
+              Ver linhas
             </Button>
-            <Button onClick={isLastSlide ? handleAccept : handleNext}>
-              {isLastSlide ? 'Aceito' : 'Próximo'}
+            <Button className="flex-1" onClick={handleStartPlanning}>
+              Planejar caminho
             </Button>
           </div>
         </Dialog.Popup>

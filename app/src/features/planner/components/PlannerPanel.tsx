@@ -32,7 +32,7 @@ const fieldContainerVariants = tv({
 });
 
 const fieldLabelVariants = tv({
-  base: 'px-1 text-[11px] font-semibold uppercase tracking-wide text-text-tertiary',
+  base: 'px-1 text-xs font-semibold text-text-secondary',
 });
 
 const tokenRowVariants = tv({
@@ -54,7 +54,7 @@ const suggestionItemVariants = tv({
   base: [
     'flex min-h-11 cursor-pointer items-center gap-2 px-3 py-2',
     'text-sm text-text-primary',
-    'hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary',
+    'hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus',
   ],
 });
 
@@ -62,7 +62,7 @@ const searchInputVariants = tv({
   base: [
     'min-h-11 w-full rounded border border-input-border bg-input px-3',
     'text-sm text-text-primary placeholder:text-text-tertiary',
-    'focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary',
+    'focus:border-transparent focus:outline-none focus:ring-2 focus:ring-focus',
   ],
 });
 
@@ -366,42 +366,16 @@ export function PlannerPanel() {
 
   return (
     <section className={panelVariants()} aria-label="Planejar rota">
+      <div>
+        <h2 className="text-balance text-base font-semibold text-text-primary">
+          Monte seu caminho
+        </h2>
+        <p className="mt-1 text-sm text-text-secondary">
+          Comece pelo destino. Depois escolha de onde você parte.
+        </p>
+      </div>
+
       <div className="flex flex-col gap-2">
-        <EndpointField
-          label="Origem"
-          endpoint={origin}
-          searchValue={originSearch}
-          isActive={activeField === 'origin'}
-          isLocating={isLocating}
-          suggestions={originSuggestions}
-          onActivate={() => setActiveField('origin')}
-          onSearch={setOriginSearch}
-          onSelect={handleSelectForField('origin')}
-          onClear={() => {
-            setOrigin(null);
-            setOriginSearch('');
-            resetMutation();
-          }}
-          onUseLocation={handleUseLocation('origin')}
-          inputId={originInputId}
-        />
-
-        {/* Swap */}
-        <div className="flex items-center justify-center">
-          <button
-            type="button"
-            onClick={() => {
-              swap();
-              resetMutation();
-            }}
-            className="flex h-8 w-8 items-center justify-center rounded border border-card-border bg-background hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-            aria-label="Trocar origem e destino"
-            title="Trocar origem e destino"
-          >
-            <ArrowLeftRight size={14} aria-hidden="true" />
-          </button>
-        </div>
-
         <EndpointField
           label="Destino"
           endpoint={destination}
@@ -419,6 +393,41 @@ export function PlannerPanel() {
           }}
           onUseLocation={handleUseLocation('destination')}
           inputId={destInputId}
+        />
+
+        {/* Swap */}
+        <div className="flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              swap();
+              resetMutation();
+            }}
+            className="flex h-8 w-8 items-center justify-center rounded border border-card-border bg-background hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+            aria-label="Trocar origem e destino"
+            title="Trocar origem e destino"
+          >
+            <ArrowLeftRight size={14} aria-hidden="true" />
+          </button>
+        </div>
+
+        <EndpointField
+          label="Origem"
+          endpoint={origin}
+          searchValue={originSearch}
+          isActive={activeField === 'origin'}
+          isLocating={isLocating}
+          suggestions={originSuggestions}
+          onActivate={() => setActiveField('origin')}
+          onSearch={setOriginSearch}
+          onSelect={handleSelectForField('origin')}
+          onClear={() => {
+            setOrigin(null);
+            setOriginSearch('');
+            resetMutation();
+          }}
+          onUseLocation={handleUseLocation('origin')}
+          inputId={originInputId}
         />
       </div>
 
