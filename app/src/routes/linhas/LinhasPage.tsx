@@ -207,7 +207,7 @@ export function LinhasPage() {
           <Link
             to="/"
             aria-label="Voltar ao mapa"
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors"
+            className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors"
           >
             <ArrowLeft size={20} aria-hidden="true" />
           </Link>
