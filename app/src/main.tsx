@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { initSpecialPeriodsFromApi } from '@/config/specialPeriods';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { getTenantStorageKey } from '@/pwa/tenantNamespace';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
@@ -48,8 +47,6 @@ const MANIFEST_URL = new URL(
 ).toString();
 
 applyTenantDocumentMetadata();
-void initSpecialPeriodsFromApi();
-
 function ensureUpdateStatusRegion(): HTMLElement {
   const existingRegion = document.getElementById(UPDATE_STATUS_REGION_ID);
 

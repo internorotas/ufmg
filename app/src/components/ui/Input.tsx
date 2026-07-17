@@ -16,10 +16,10 @@ import { cn } from '../../lib/utils';
 export const inputVariants = tv({
   base: [
     'w-full rounded-(--shape-sm) bg-input',
-    'border border-(--card-border) text-text-primary',
+    'border border-input-border text-text-primary',
     'placeholder:text-text-tertiary',
     'transition-[box-shadow,border-color] duration-100',
-    'focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-1',
+    'focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-1',
     'disabled:cursor-not-allowed disabled:opacity-50',
   ],
   variants: {

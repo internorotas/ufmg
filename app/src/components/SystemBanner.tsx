@@ -10,12 +10,12 @@ const systemBannerVariants = tv({
     header: 'flex items-start gap-2',
     icon: 'mt-0.5 size-5 shrink-0',
     body: 'min-w-0 flex-1',
-    title: 'text-xs font-semibold uppercase tracking-wide',
+    title: 'text-sm font-semibold leading-snug',
     description: 'mt-1 text-xs leading-relaxed lg:text-sm',
     actions: 'mt-3 flex flex-wrap gap-2',
     close: [
       'ml-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-(--shape-sm) border transition-colors',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus',
     ],
   },
   variants: {

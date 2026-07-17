@@ -487,7 +487,7 @@ export function MapLibreView({
             className={cn(
               'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center surface-card transition-all duration-200',
               'bg-card text-text-primary hover:bg-card-hover',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2',
             )}
           >
             <Search className="h-5 w-5" aria-hidden="true" />
@@ -507,7 +507,7 @@ export function MapLibreView({
               'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center surface-card transition-all duration-200',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
               rastreioAtivo
-                ? 'border-success-border bg-success-border text-white'
+                ? 'border-success-border bg-success-solid text-white'
                 : 'bg-card text-text-primary hover:bg-card-hover',
             )}
           >

@@ -16,6 +16,7 @@ export async function fetchSpecialPeriods(): Promise<SpecialPeriodApiItem[]> {
     cache: 'no-store',
     credentials: 'include',
     headers,
+    signal: AbortSignal.timeout(5000),
   });
 
   if (!response.ok) {

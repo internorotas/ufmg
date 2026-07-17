@@ -11,11 +11,19 @@ vi.mock('../lib/time', async (importOriginal) => {
   };
 });
 
+vi.mock('../services/api/specialPeriodsApi', () => ({
+  fetchSpecialPeriods: vi.fn(),
+}));
+
 import * as timeMod from '../lib/time';
+import { fetchSpecialPeriods } from '../services/api/specialPeriodsApi';
 import { CategoriaDia } from '../types/data.types';
 import {
+  getCurrentCalendarPeriod,
   getCurrentSpecialPeriod,
   getLinhaNotRunningMessage,
+  initSpecialPeriodsFromApi,
+  isHolidayToday,
   isLineAvailableToday,
   isWeekday,
   obterCategoriaDiaAtual,
@@ -277,5 +285,27 @@ describe('getLinhaNotRunningMessage', () => {
     expect(getLinhaNotRunningMessage(CategoriaDia.FeriasERecessos)).toBe(
       'Linha não circula em fins de semana',
     );
+  });
+});
+
+describe('initSpecialPeriodsFromApi', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('preserva a data de calendário UTC e expõe o feriado atual', async () => {
+    vi.mocked(fetchSpecialPeriods).mockResolvedValue([
+      {
+        nome: 'Feriado: Independência do Brasil',
+        tipo: 'feriado',
+        dataInicio: '2026-09-07T00:00:00.000Z',
+        dataFim: '2026-09-07T00:00:00.000Z',
+      },
+    ]);
+    vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(makeDay(2026, 9, 7));
+
+    await initSpecialPeriodsFromApi();
+
+    expect(getCurrentCalendarPeriod()?.name).toBe('Feriado: Independência do Brasil');
+    expect(getCurrentSpecialPeriod()).toBeNull();
+    expect(isHolidayToday()).toBe(true);
   });
 });

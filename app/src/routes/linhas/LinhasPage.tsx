@@ -2,13 +2,14 @@ import { ArrowLeft, Info, LayoutList, Star } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
+import { CalendarBanner } from '@/components/CalendarBanner';
 import { LineCard } from '@/components/LineCard';
 import { CategoryTabs } from '@/components/MenuLateral';
 import { SystemBanner } from '@/components/SystemBanner';
 import { EmptyState, SearchEmptyState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { getCurrentSpecialPeriod, isWeekday } from '@/config/specialPeriods';
+import { getCurrentCalendarPeriod, initSpecialPeriodsFromApi } from '@/config/specialPeriods';
 import { useRotasData, useRotasSelection } from '@/contexts/RotasContext';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useFavoritos } from '@/hooks/useFavoritos';
@@ -41,10 +42,13 @@ export function LinhasPage() {
 
   const [linhaDetalhesAberta, setLinhaDetalhesAberta] = useState<Linha | null>(null);
   const [filtroAtivo, setFiltroAtivo] = useState<'todas' | 'favoritas'>('todas');
-  const [vacationBannerDismissed, setVacationBannerDismissed] = useState(false);
+  const [calendarBannerDismissed, setCalendarBannerDismissed] = useState(
+    () => sessionStorage.getItem('calendar-banner-dismissed') === '1',
+  );
   const [infoBannerDismissed, setInfoBannerDismissed] = useState(false);
   const [movimentoPorId, setMovimentoPorId] = useState<Record<string, 'up' | 'down'>>({});
   const previousFavoritosRef = useRef<Set<string>>(new Set());
+  const [, setCalendarVersion] = useState(0);
 
   const {
     searchTerm,
@@ -57,8 +61,7 @@ export function LinhasPage() {
 
   const { favoritosIds, buscarEmFavoritas, getLinhasFavoritas } = useFavoritos();
 
-  const specialPeriod = getCurrentSpecialPeriod();
-  const isWeekdayToday = isWeekday();
+  const calendarPeriod = getCurrentCalendarPeriod();
 
   const categoriaDiaAtiva = categoriaAtual?.categoriaDia ?? '';
   const linhasFavoritas = searchTerm
@@ -72,6 +75,16 @@ export function LinhasPage() {
   useEffect(() => {
     trackPageView('/linhas');
   }, [trackPageView]);
+
+  useEffect(() => {
+    let active = true;
+    void initSpecialPeriodsFromApi().finally(() => {
+      if (active) setCalendarVersion((version) => version + 1);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const previous = previousFavoritosRef.current;
@@ -220,35 +233,17 @@ export function LinhasPage() {
           className="flex-1 overflow-y-auto bg-background p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-4 lg:max-w-120 lg:shrink-0 lg:border-r lg:border-card-border"
           aria-label="Lista de linhas"
         >
-          {specialPeriod && !vacationBannerDismissed ? (
-            <SystemBanner
-              variant="warning"
-              icon={<Info aria-hidden="true" />}
-              title={specialPeriod.name}
-              onDismiss={() => setVacationBannerDismissed(true)}
-              description={
-                <>
-                  <p>
-                    <Trans
-                      i18nKey="vacation.description"
-                      ns="system-banner"
-                      values={{
-                        start: specialPeriod.startDate.toLocaleDateString('pt-BR'),
-                        end: specialPeriod.endDate.toLocaleDateString('pt-BR'),
-                      }}
-                    />
-                  </p>
-                  {!isWeekdayToday && (
-                    <p className="mt-2 font-semibold">
-                      <Trans i18nKey="vacation.weekendWarning" ns="system-banner" />
-                    </p>
-                  )}
-                </>
-              }
+          {calendarPeriod && !calendarBannerDismissed ? (
+            <CalendarBanner
+              period={calendarPeriod}
+              onDismiss={() => {
+                sessionStorage.setItem('calendar-banner-dismissed', '1');
+                setCalendarBannerDismissed(true);
+              }}
             />
           ) : null}
 
-          {!infoBannerDismissed && (
+          {!calendarPeriod && !infoBannerDismissed && (
             <SystemBanner
               variant="info"
               icon={<Info aria-hidden="true" />}

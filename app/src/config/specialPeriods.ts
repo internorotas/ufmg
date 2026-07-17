@@ -5,7 +5,7 @@
  * a manutenção e atualização das datas de férias e recessos.
  */
 
-import { getSaoPauloDayOfWeek, getSaoPauloNow, toSaoPauloDate } from '../lib/time';
+import { getSaoPauloDayOfWeek, getSaoPauloNow } from '../lib/time';
 import { fetchSpecialPeriods } from '../services/api/specialPeriodsApi';
 import { CategoriaDia } from '../types/data.types';
 
@@ -13,6 +13,7 @@ export interface SpecialPeriod {
   startDate: Date;
   endDate: Date;
   name: string;
+  tipo: 'ferias' | 'recesso' | 'feriado';
   description: string;
   isActive: boolean;
 }
@@ -26,6 +27,7 @@ export interface SpecialPeriod {
 export const SPECIAL_PERIODS: SpecialPeriod[] = [
   {
     name: 'Férias de Verão 2025/2026',
+    tipo: 'ferias',
     description: 'Período de férias e recessos',
     startDate: new Date(2025, 11, 15),
     endDate: new Date(2026, 2, 1),
@@ -33,6 +35,7 @@ export const SPECIAL_PERIODS: SpecialPeriod[] = [
   },
   {
     name: 'Recesso de Julho 2026',
+    tipo: 'recesso',
     description: 'Recesso acadêmico de meio de ano',
     startDate: new Date(2026, 6, 5),
     endDate: new Date(2026, 7, 2),
@@ -41,52 +44,46 @@ export const SPECIAL_PERIODS: SpecialPeriod[] = [
 ];
 
 let runtimePeriods: SpecialPeriod[] | null = null;
-let runtimeHolidayDates: Set<string> | null = null;
 
 function currentPeriods(): SpecialPeriod[] {
   return runtimePeriods ?? SPECIAL_PERIODS;
 }
 
+function parseCalendarDate(value: string): Date {
+  const [year, month, day] = value.slice(0, 10).split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
 /**
  * Busca os períodos especiais (férias/recesso) e feriados sincronizados a
  * partir do calendário escolar da UFMG e substitui o fallback estático.
- * Deve ser chamada uma vez na inicialização do app (ver main.tsx). Falhas de
+ * Deve ser chamada uma vez na inicialização do app. Falhas de
  * rede são silenciosas — o fallback hardcoded continua valendo.
  */
 export async function initSpecialPeriodsFromApi(): Promise<void> {
   try {
     const items = await fetchSpecialPeriods();
     const periods: SpecialPeriod[] = [];
-    const holidayDates = new Set<string>();
 
     for (const item of items) {
-      if (item.tipo === 'feriado') {
-        holidayDates.add(item.dataInicio.slice(0, 10));
+      if (item.tipo !== 'ferias' && item.tipo !== 'recesso' && item.tipo !== 'feriado') {
         continue;
       }
-      if (item.tipo === 'ferias' || item.tipo === 'recesso') {
-        periods.push({
-          name: item.nome,
-          description: item.nome,
-          startDate: new Date(item.dataInicio),
-          endDate: new Date(item.dataFim),
-          isActive: true,
-        });
-      }
+
+      periods.push({
+        name: item.nome,
+        tipo: item.tipo,
+        description: item.nome,
+        startDate: parseCalendarDate(item.dataInicio),
+        endDate: parseCalendarDate(item.dataFim),
+        isActive: true,
+      });
     }
 
     runtimePeriods = periods;
-    runtimeHolidayDates = holidayDates;
   } catch {
     // Mantém o fallback estático (SPECIAL_PERIODS / sem feriados isolados).
   }
-}
-
-function formatDateKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
 }
 
 /**
@@ -95,26 +92,20 @@ function formatDateKey(date: Date): string {
  * é um único dia em que as linhas não circulam mesmo sendo dia útil.
  */
 export function isHolidayToday(): boolean {
-  if (!runtimeHolidayDates) return false;
-  return runtimeHolidayDates.has(formatDateKey(getSaoPauloNow()));
+  return getCurrentCalendarPeriod()?.tipo === 'feriado';
 }
 
-/**
- * Verifica se estamos atualmente em um período especial ativo
- * @returns {SpecialPeriod | null} O período especial ativo ou null se não houver nenhum
- */
-export function getCurrentSpecialPeriod(): SpecialPeriod | null {
-  // Cria novo Date para não mutar o objeto retornado por getSaoPauloNow()
+function findCurrentPeriod(periods: SpecialPeriod[]): SpecialPeriod | null {
   const nowSp = getSaoPauloNow();
   const now = new Date(nowSp.getFullYear(), nowSp.getMonth(), nowSp.getDate(), 0, 0, 0, 0);
 
-  for (const period of currentPeriods()) {
+  for (const period of periods) {
     if (!period.isActive) continue;
 
-    const start = toSaoPauloDate(new Date(period.startDate));
+    const start = new Date(period.startDate);
     start.setHours(0, 0, 0, 0);
 
-    const end = toSaoPauloDate(new Date(period.endDate));
+    const end = new Date(period.endDate);
     end.setHours(23, 59, 59, 999);
 
     if (now >= start && now <= end) {
@@ -123,6 +114,21 @@ export function getCurrentSpecialPeriod(): SpecialPeriod | null {
   }
 
   return null;
+}
+
+export function getCurrentCalendarPeriod(): SpecialPeriod | null {
+  const priority = { feriado: 0, recesso: 1, ferias: 2 } as const;
+  return findCurrentPeriod(
+    [...currentPeriods()].sort((a, b) => priority[a.tipo] - priority[b.tipo]),
+  );
+}
+
+/**
+ * Verifica se estamos atualmente em um período especial ativo
+ * @returns {SpecialPeriod | null} O período especial ativo ou null se não houver nenhum
+ */
+export function getCurrentSpecialPeriod(): SpecialPeriod | null {
+  return findCurrentPeriod(currentPeriods().filter((period) => period.tipo !== 'feriado'));
 }
 
 /**

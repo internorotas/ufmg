@@ -37,6 +37,16 @@ test('mapa – canvas MapLibre está presente', async ({ page }) => {
   await page.waitForSelector('.maplibregl-canvas', { timeout: 20_000 });
 });
 
+test('mapa mobile – exibe no máximo um aviso sobre o mapa', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${BASE}/`);
+  await waitForMap(page);
+
+  expect(await page.locator('main [data-slot="system-banner"]').count()).toBeLessThanOrEqual(1);
+  await expect(page.getByText('Posições mais rápidas.')).toHaveCount(0);
+  await expect(page.getByText('Ajude a manter o Interno Rotas.')).toHaveCount(0);
+});
+
 // ---------------------------------------------------------------------------
 // Cards de linha
 // ---------------------------------------------------------------------------

@@ -1,11 +1,13 @@
 {
   "dismiss": "Fechar aviso",
   "info": {
-    "description": "Todas as rotas iniciam e terminam próximas à <strong>Escola de Música</strong>. Os horários indicam a saída dos ônibus deste ponto."
+    "description": "As linhas saem da <strong>Escola de Música</strong>. Os horários mostram a partida desse ponto."
   },
-  "vacation": {
-    "description": "De {{start}} a {{end}}, operam apenas os horários de Férias e Recessos. Não há circulação aos fins de semana e feriados.",
-    "weekendWarning": "Hoje não há circulação de ônibus (apenas em dias úteis)."
+  "calendar": {
+    "vacationTitle": "Horários de férias",
+    "recessTitle": "Recesso escolar",
+    "academicPeriod": "Até {{end}}, use os horários de Férias e Recessos. Não há ônibus em fins de semana e feriados.",
+    "holiday": "Hoje não há circulação dos ônibus internos."
   },
   "disclaimer": {
     "offline": "Conexão perdida. Mapas podem não carregar, mas previsões estáticas continuam funcionando.",

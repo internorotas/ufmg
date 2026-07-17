@@ -38,6 +38,7 @@ body,
   --color-card-border: var(--card-border);
   --color-input: var(--input-background);
   --color-input-border: var(--input-border);
+  --color-focus: var(--focus);
 
   /* Textos */
   --color-text-primary: var(--text-primary);
@@ -49,6 +50,7 @@ body,
   --color-success-bg: var(--success-bg);
   --color-success-border: var(--success-border);
   --color-success-text: var(--success-text);
+  --color-success-solid: var(--success-solid);
 
   /* Status: Informação/Circulando (Azul) */
   --color-info-bg: var(--info-bg);
@@ -101,7 +103,8 @@ body,
   --card-hover: #fafafa; /* Neutral 50 */
   --card-border: #e5e5e5; /* Neutral 200 */
   --input-background: #fafafa; /* Neutral 50 */
-  --input-border: #e5e5e5; /* Neutral 200 */
+  --input-border: #737373; /* Neutral 500 — contraste suficiente no fundo de input */
+  --focus: #2c0eeb;
 
   /* Texto */
   --text-primary: #171717; /* Neutral 900 */
@@ -111,22 +114,23 @@ body,
 
   /* Semantic: Success (Verde) - Ajustado para WCAG */
   --success-bg: #dcfce7; /* Green 100 */
-  --success-border: #86efac; /* Green 300 */
+  --success-border: #15803d; /* Green 700 */
   --success-text: #166534; /* Green 800 */
+  --success-solid: #166534;
 
   /* Semantic: Info (Azul) - Ajustado para WCAG */
   --info-bg: #dbeafe; /* Blue 100 */
-  --info-border: #93c5fd; /* Blue 300 */
+  --info-border: #2563eb; /* Blue 600 */
   --info-text: #1e40af; /* Blue 800 */
 
   /* Semantic: Warning (Amarelo/Laranja) - Ajustado para WCAG */
   --warning-bg: #fef9c3; /* Yellow 100 */
-  --warning-border: #fde047; /* Yellow 300 */
+  --warning-border: #a16207; /* Yellow 700 */
   --warning-text: #854d0e; /* Yellow 800 */
 
   /* Semantic: Neutral (Cinza) */
   --neutral-bg: #f3f4f6; /* Gray 100 */
-  --neutral-border: #d1d5db; /* Gray 300 */
+  --neutral-border: #6b7280; /* Gray 500 */
   --neutral-text: #4b5563; /* Gray 600 */
 
   --gamification-bronze-bg: #f8ede1;
@@ -203,6 +207,7 @@ body,
   --card-border: #262626; /* Neutral 800 */
   --input-background: #262626; /* Neutral 800 */
   --input-border: #404040; /* Neutral 700 */
+  --focus: #8778f7;
 
   /* Texto */
   --text-primary: #fafafa; /* Neutral 50 */
@@ -212,22 +217,23 @@ body,
 
   /* Semantic: Success (Verde) - Dark Mode */
   --success-bg: #064e3b; /* Green 900 */
-  --success-border: #059669; /* Green 600 */
+  --success-border: #34d399; /* Green 400 */
   --success-text: #d1fae5; /* Green 100 */
+  --success-solid: #047857;
 
   /* Semantic: Info (Azul) - Dark Mode */
   --info-bg: #1e3a8a; /* Blue 900 */
-  --info-border: #2563eb; /* Blue 600 */
+  --info-border: #60a5fa; /* Blue 400 */
   --info-text: #dbeafe; /* Blue 100 */
 
   /* Semantic: Warning (Amarelo) - Dark Mode */
   --warning-bg: #422006; /* Yellow 950 */
-  --warning-border: #a16207; /* Yellow 700 */
+  --warning-border: #fbbf24; /* Amber 400 */
   --warning-text: #fef08a; /* Yellow 200 */
 
   /* Semantic: Neutral (Cinza) - Dark Mode */
   --neutral-bg: #374151; /* Gray 700 */
-  --neutral-border: #4b5563; /* Gray 600 */
+  --neutral-border: #9ca3af; /* Gray 400 */
   --neutral-text: #e5e7eb; /* Gray 200 */
 
   --gamification-bronze-bg: #4a2f19;
@@ -713,7 +719,7 @@ body {
    Linguagem visual: borda sutil + sombra gaussiana sem offset (tokens M3
    Expressive shape e elevation, ver bloco :root acima). Substitui o antigo
    Neo-Brutalismo (borda sólida + sombra com offset).
-   Garantem WCAG AA (não alteram contraste de texto).
+   Mantêm contraste de borda e texto através dos tokens de tema.
    ============================================================================ */
 
 .surface-card {

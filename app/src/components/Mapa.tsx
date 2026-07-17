@@ -11,17 +11,14 @@ import { Share2, X } from 'lucide-react';
 import { type Ref, useCallback, useEffect, useRef, useState } from 'react';
 import { useRotasSelection } from '@/contexts/RotasContext';
 import type { MapaRef } from '@/contexts/RotasSelectionContext';
-import { useAuthContext } from '@/features/auth/context/AuthContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { buildLinhaShareUrl } from '../lib/shareLinks';
 import type { Linha, Parada } from '../types/data.types';
-import { LoginBenefitsBanner } from './LoginBenefitsBanner';
 import { FavoritasWidget } from './map/FavoritasWidget';
 import { MapLibreView } from './map/maplibre';
 import { PesquisaParadas } from './map/PesquisaParadas';
 import { WeatherChip } from './map/WeatherChip';
-import { SupportBanner } from './SupportBanner';
 
 // Re-exporta para callers que importam MapaRef de Mapa.tsx
 export type { MapaRef };
@@ -63,7 +60,6 @@ export function Mapa({
 }: MapaProps) {
   const { trackTiming, trackEvent } = useAnalytics();
   const { limparSelecao } = useRotasSelection();
-  const { isAuthenticated } = useAuthContext();
   const mapLoadStartRef = useRef<number>(0);
 
   const [compassEnabled, setCompassEnabled] = useState(false);
@@ -176,9 +172,6 @@ export function Mapa({
 
       {/* Widget de paradas favoritas */}
       <FavoritasWidget todasParadas={todasParadas} />
-
-      {!isAuthenticated && <LoginBenefitsBanner />}
-      {isAuthenticated && <SupportBanner />}
     </div>
   );
 }

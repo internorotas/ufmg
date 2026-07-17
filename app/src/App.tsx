@@ -10,6 +10,7 @@ import { ModalManager } from './components/app/ModalManager';
 import { NavRail } from './components/app/NavRail';
 import { OfflineToast } from './components/app/OfflineToast';
 import { InactivityWarningDialog } from './components/auth/InactivityWarningDialog';
+import { CalendarBanner } from './components/CalendarBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { InfoBanner } from './components/InfoBanner';
 import { LegalModal } from './components/legal/LegalModal';
@@ -17,8 +18,8 @@ import { MenuLateral } from './components/MenuLateral';
 import { OfflineBanner } from './components/OfflineBanner';
 import { OnboardingModal } from './components/OnboardingModal';
 import { ProfileSheet } from './components/profile/ProfileSheet';
-import { VacationBanner } from './components/VacationBanner';
 import { GA_MEASUREMENT_ID } from './config/analytics';
+import { getCurrentCalendarPeriod, initSpecialPeriodsFromApi } from './config/specialPeriods';
 import { LocationProvider, useLocationContext } from './contexts/LocationContext';
 import { NotificacaoProvider } from './contexts/NotificacaoContext';
 import { RotasProvider, useRotas } from './contexts/RotasContext';
@@ -192,15 +193,27 @@ function AppContent() {
   const [infoBannerDismissed, setInfoBannerDismissed] = useState(
     () => sessionStorage.getItem('info-banner-dismissed') === '1',
   );
-  const [vacationBannerDismissed, setVacationBannerDismissed] = useState(
-    () => sessionStorage.getItem('vacation-banner-dismissed') === '1',
+  const [calendarBannerDismissed, setCalendarBannerDismissed] = useState(
+    () => sessionStorage.getItem('calendar-banner-dismissed') === '1',
   );
+  const [isCalendarReady, setIsCalendarReady] = useState(false);
+  const currentCalendarPeriod = getCurrentCalendarPeriod();
   const [gpsWarning, setGpsWarning] = useState<{
     distanceMeters: number;
     linha: Linha;
     pendingAction: () => void;
   } | null>(null);
   const [authFeedbackMessage, setAuthFeedbackMessage] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    void initSpecialPeriodsFromApi().finally(() => {
+      if (active) setIsCalendarReady(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   useEffect(() => {
     const locationState = location.state as {
       authFeedback?: string;
@@ -540,13 +553,13 @@ function AppContent() {
     setInfoBannerDismissed(true);
   }, []);
 
-  const handleVacationBannerDismiss = useCallback(() => {
-    sessionStorage.setItem('vacation-banner-dismissed', '1');
-    setVacationBannerDismissed(true);
+  const handleCalendarBannerDismiss = useCallback(() => {
+    sessionStorage.setItem('calendar-banner-dismissed', '1');
+    setCalendarBannerDismissed(true);
   }, []);
 
   // Validação dos dados
-  if (isLoadingData) {
+  if (isLoadingData || !isCalendarReady) {
     return (
       <DataStatusScreen
         title="Carregando dados..."
@@ -640,14 +653,17 @@ function AppContent() {
           >
             <div
               aria-live="polite"
-              className="pointer-events-none absolute left-16 right-3 top-3 z-1100 flex flex-col gap-2"
+              className="pointer-events-none absolute left-16 right-3 top-3 z-1100 flex flex-col gap-2 md:left-auto md:w-full md:max-w-lg"
             >
-              {!vacationBannerDismissed && (
+              {currentCalendarPeriod && !calendarBannerDismissed && (
                 <div className="pointer-events-auto">
-                  <VacationBanner onDismiss={handleVacationBannerDismiss} />
+                  <CalendarBanner
+                    period={currentCalendarPeriod}
+                    onDismiss={handleCalendarBannerDismiss}
+                  />
                 </div>
               )}
-              {!infoBannerDismissed && (
+              {!currentCalendarPeriod && !infoBannerDismissed && (
                 <div className="pointer-events-auto">
                   <InfoBanner onDismiss={handleInfoBannerDismiss} />
                 </div>
