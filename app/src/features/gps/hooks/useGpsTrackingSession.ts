@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   finishGpsSession,
+  GpsApiError,
   type GpsPointPayload,
   RateLimitError,
   startGpsSession,
@@ -61,6 +62,7 @@ export interface GpsTrackingState {
   snapshotsCount: number;
   lockedLine: Linha | null;
   rateLimitMessage: string | null;
+  startError: string | null;
   start: (lineOverride?: Linha) => Promise<void>;
   stop: (reason?: TrackingStopReason) => Promise<void>;
   ingestSnapshot: (snapshot: TrackingSnapshot) => Promise<void>;
@@ -238,6 +240,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const [nextCollectionIntervalMs, setNextCollectionIntervalMs] = useState(IDLE_INTERVAL_MS);
   const [lastStopReason, setLastStopReason] = useState<TrackingStopReason | null>(null);
   const [rateLimitMessage, setRateLimitMessage] = useState<string | null>(null);
+  const [startError, setStartError] = useState<string | null>(null);
   const [distanceKm, setDistanceKm] = useState(0);
   const [durationMs, setDurationMs] = useState(0);
   const [snapshotsCount, setSnapshotsCount] = useState(0);
@@ -267,6 +270,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     setNextCollectionIntervalMs(IDLE_INTERVAL_MS);
     setLastStopReason(null);
     setRateLimitMessage(null);
+    setStartError(null);
     setDistanceKm(0);
     setDurationMs(0);
     setSnapshotsCount(0);
@@ -343,6 +347,8 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         return;
       }
 
+      if (statusRef.current === 'starting') return;
+
       setStatus('starting');
       try {
         setLastStopReason(null);
@@ -362,8 +368,15 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         console.error('[GPS] Falha ao iniciar sessão de rastreio colaborativo:', err);
         if (err instanceof RateLimitError) {
           setRateLimitMessage(err.message);
+        } else {
+          const msg =
+            err instanceof GpsApiError
+              ? err.message
+              : 'Não foi possível iniciar o rastreio. Tente novamente.';
+          setStartError(msg);
+          window.setTimeout(() => setStartError(null), 5000);
         }
-        setStatus('error');
+        setStatus('idle');
       }
     },
     [options.enabled, options.selectedLine],
@@ -562,6 +575,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       snapshotsCount,
       lockedLine: lockedLineRef.current,
       rateLimitMessage,
+      startError,
       start,
       stop,
       ingestSnapshot,
@@ -575,6 +589,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       nextCollectionIntervalMs,
       queueSize,
       rateLimitMessage,
+      startError,
       sessionId,
       snapshotsCount,
       start,

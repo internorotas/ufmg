@@ -11,6 +11,16 @@ export class RateLimitError extends Error {
   }
 }
 
+export class GpsApiError extends Error {
+  constructor(
+    message: string,
+    public readonly statusCode: number,
+  ) {
+    super(message);
+    this.name = 'GpsApiError';
+  }
+}
+
 export interface GpsPointPayload {
   lat: number;
   lng: number;
@@ -57,6 +67,14 @@ async function fetchGps(pathname: string, init?: RequestInit): Promise<Response>
   }
 
   if (!response.ok) {
+    if (response.status === 400) {
+      const body = (await response.json().catch(() => null)) as { message?: string } | null;
+      const msg =
+        typeof body?.message === 'string'
+          ? body.message
+          : 'Esta linha não está disponível para rastreio no momento.';
+      throw new GpsApiError(msg, 400);
+    }
     throw new Error(`Falha na operação GPS: HTTP ${response.status}`);
   }
 
