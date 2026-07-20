@@ -500,7 +500,7 @@ export function MapLibreView({
             content={
               rastreioAtivo
                 ? 'Encerrar compartilhamento de posição com outros passageiros.'
-                : 'Compartilha sua posição em tempo real para ajudar outros passageiros a saber quando o ônibus está próximo. Usa GPS continuamente enquanto ativo, o que consome mais bateria.'
+                : 'Compartilha sua posição em tempo real para ajudar outros passageiros a saber quando o ônibus está próximo. Usa GPS continuamente enquanto ativo.'
             }
           >
             <button
