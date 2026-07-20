@@ -6,7 +6,7 @@ const STORAGE_KEY = 'beta_banner_dismissed';
 
 function isDismissed(): boolean {
   try {
-    return localStorage.getItem(STORAGE_KEY) === '1';
+    return sessionStorage.getItem(STORAGE_KEY) === '1';
   } catch {
     return false;
   }
@@ -17,7 +17,7 @@ export function BetaBanner() {
 
   const handleDismiss = useCallback(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, '1');
+      sessionStorage.setItem(STORAGE_KEY, '1');
     } catch {
       // ignore
     }
