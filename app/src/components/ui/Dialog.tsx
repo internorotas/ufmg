@@ -46,7 +46,7 @@ function useDialogContext() {
  */
 export const dialogBackdropVariants = tv({
   base: [
-    'fixed inset-0 z-[1999] bg-black/70 cursor-pointer',
+    'fixed inset-0 z-(--z-modal-backdrop) bg-black/70 cursor-pointer',
     'data-[state=open]:animate-fade-in',
     'data-[state=closed]:animate-fade-out',
   ],
@@ -313,7 +313,7 @@ function DialogPopup({ size, className, children, ...props }: DialogPopupProps) 
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-2000 flex items-center justify-center p-4"
+      className="pointer-events-none fixed inset-0 z-(--z-modal) flex items-center justify-center p-4"
       role="presentation"
     >
       <div

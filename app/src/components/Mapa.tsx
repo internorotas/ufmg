@@ -93,7 +93,7 @@ export function Mapa({
 
       {/* Chip da linha selecionada — aparece no topo centralizado */}
       {linhaSelecionada && (
-        <div className="pointer-events-none absolute inset-x-0 top-3 z-2001 flex justify-center px-3">
+        <div className="pointer-events-none absolute inset-x-0 top-3 z-(--z-map-decor) flex justify-center px-3">
           <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full bg-card/95 py-1.5 pl-2 pr-1.5 shadow-(--elevation-2) ring-1 ring-card-border backdrop-blur">
             <span
               className="shrink-0 rounded-full px-2 py-0.5 text-xs font-extrabold text-white"
@@ -148,7 +148,7 @@ export function Mapa({
       )}
 
       {/* Chip de clima — canto superior direito, não conflita com busca/chip de linha */}
-      <div className="pointer-events-none absolute right-3 top-3 z-1005">
+      <div className="pointer-events-none absolute right-3 top-3 z-(--z-map-decor)">
         <WeatherChip />
       </div>
 

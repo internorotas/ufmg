@@ -66,14 +66,20 @@ export function Tooltip({ content, children, className, position = 'top' }: Tool
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: wrapper de tooltip — hover-only, sem captura de eventos de clique/toque nos filhos
-    <div className={cn('relative inline-flex', className)} onMouseEnter={show} onMouseLeave={hide}>
+    <div
+      className={cn('relative inline-flex', className)}
+      onMouseEnter={show}
+      onMouseLeave={hide}
+      onFocus={show}
+      onBlur={hide}
+    >
       {children}
       {visible && (
         <div
           id={id}
           role="tooltip"
           className={cn(
-            'pointer-events-none absolute z-5000 w-max max-w-52 rounded-lg px-3 py-2 text-left shadow-xl',
+            'pointer-events-none absolute z-(--z-tooltip) w-max max-w-52 rounded-lg px-3 py-2 text-left shadow-xl',
             'bg-(--text-primary) text-xs font-medium leading-snug text-(--background)',
             balloonClasses[position],
           )}

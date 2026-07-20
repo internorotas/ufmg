@@ -43,7 +43,7 @@ const PlannerPanel = React.lazy(() =>
  */
 export const sidebarVariants = tv({
   base: [
-    'fixed inset-y-0 left-0 z-[1003] flex flex-col',
+    'fixed inset-y-0 left-0 z-(--z-sidebar) flex flex-col',
     'h-[calc(100dvh-3.5rem-env(safe-area-inset-bottom))] md:h-full',
     'w-screen max-w-none md:relative md:w-1/2 md:max-w-md',
     'border-r border-(--card-border) text-text-primary',
@@ -482,7 +482,7 @@ export const MenuLateral = React.memo(function MenuLateral({
             setMenuVisible(false);
           }}
           aria-label={t('mobile.closeMenu')}
-          className="fixed inset-0 z-1002 animate-fade-in bg-backdrop backdrop-blur-sm cursor-pointer md:hidden"
+          className="fixed inset-0 z-(--z-sidebar-backdrop) animate-fade-in bg-backdrop backdrop-blur-sm cursor-pointer md:hidden"
         />
       )}
 

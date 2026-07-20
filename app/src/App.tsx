@@ -613,7 +613,7 @@ function AppContent() {
       <OnboardingModal />
       <a
         href="#main-content"
-        className="sr-only absolute left-4 top-4 z-1400 rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
+        className="sr-only absolute left-4 top-4 z-(--z-toast) rounded-lg bg-background px-4 py-2 text-sm font-semibold text-text-primary shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
       >
         Pular para o mapa
       </a>
@@ -655,7 +655,7 @@ function AppContent() {
           >
             <div
               aria-live="polite"
-              className="pointer-events-none absolute left-16 right-3 top-3 z-1100 flex flex-col gap-2 md:left-auto md:w-full md:max-w-lg"
+              className="pointer-events-none absolute left-16 right-3 top-3 z-(--z-banner) flex flex-col gap-2 md:left-auto md:w-full md:max-w-lg"
             >
               {currentCalendarPeriod && !calendarBannerDismissed && (
                 <div className="pointer-events-auto">
@@ -794,7 +794,7 @@ function AppContent() {
           <div
             role="status"
             aria-live="polite"
-            className="pointer-events-none absolute bottom-32 left-1/2 z-1400 -translate-x-1/2 rounded-lg border border-success-border bg-success-bg px-3 py-2 text-xs text-success-text shadow-md"
+            className="pointer-events-none absolute bottom-32 left-1/2 z-(--z-toast) -translate-x-1/2 rounded-lg border border-success-border bg-success-bg px-3 py-2 text-xs text-success-text shadow-md"
           >
             {authFeedbackMessage}
           </div>

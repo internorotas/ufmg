@@ -189,6 +189,23 @@ body,
   --state-hover: rgba(44, 14, 235, 0.08);
   --state-pressed: rgba(44, 14, 235, 0.12);
   --state-focused: rgba(44, 14, 235, 0.12);
+
+  /* Escala de profundidade (z-index) — camadas sobrepostas ao mapa (Leaflet legado
+     usa até z-index 1015 internamente em .leaflet-pane/.leaflet-popup-pane, ver
+     abaixo; as camadas abaixo ficam fora do stacking context do mapa e precisam
+     se manter ordenadas em relação a ele e entre si). */
+  --z-map-decor: 1000; /* chips e indicadores flutuando sobre o mapa (clima, linha selecionada, dica de pitch, favoritas) */
+  --z-map-controls: 1010; /* controles interativos sobre o mapa (zoom, FABs, barra inferior) */
+  --z-sidebar-backdrop: 1020; /* overlay escuro atrás do menu lateral mobile */
+  --z-sidebar: 1021; /* menu lateral (desktop e mobile) */
+  --z-bottom-nav: 1030; /* navegação inferior mobile */
+  --z-search-panel: 1040; /* painel de busca de paradas sobre o mapa */
+  --z-sheet: 1100; /* bottom sheets e cards flutuantes (resumo do planner, cartões de sessão GPS) */
+  --z-banner: 1200; /* banners e avisos fixos (fonte de dados, offline) */
+  --z-toast: 1400; /* toasts, skip-link e notificações pontuais */
+  --z-modal-backdrop: 1999; /* fundo escurecido de diálogos e modais */
+  --z-modal: 2000; /* diálogos e modais */
+  --z-tooltip: 5000; /* tooltips — sempre acima de qualquer outra camada */
 }
 
 .dark {
