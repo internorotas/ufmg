@@ -37,7 +37,7 @@ export function PartnerSpotlightCard({ partner, onClick }: PartnerSpotlightCardP
             <Badge variant="primary" size="xs">
               Parceiro
             </Badge>
-            <span className="text-[11px] font-medium text-text-tertiary">Apoio institucional</span>
+            <span className="text-tiny font-medium text-text-tertiary">Apoio institucional</span>
           </div>
 
           <a

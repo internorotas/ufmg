@@ -57,13 +57,13 @@ function renderAchievementCard(achievement: AchievementView, unlocked: boolean) 
               style={{ width: `${achievement.progressPercent}%` }}
             />
           </div>
-          <p className="text-[11px] text-text-tertiary">
+          <p className="text-tiny text-text-tertiary">
             Progresso: {achievement.progressPercent}%
           </p>
         </div>
       ) : null}
       {achievement.isReserved ? (
-        <p className="mt-2 text-[11px] font-medium text-text-tertiary">
+        <p className="mt-2 text-tiny font-medium text-text-tertiary">
           Reservado para fases futuras.
         </p>
       ) : null}

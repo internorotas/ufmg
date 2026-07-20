@@ -320,7 +320,7 @@ function LineCardComponent({
                   <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
                     {favoritado && (
                       <span
-                        className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[11px] font-semibold"
+                        className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-tiny font-semibold"
                         style={{
                           borderColor: hexToRgba(linha.corHex, 0.32),
                           backgroundColor: hexToRgba(linha.corHex, 0.12),

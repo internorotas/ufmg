@@ -226,7 +226,7 @@ export function LoginPage() {
           </div>
 
           {/* Nota de privacidade */}
-          <p className="mt-5 text-center text-[11px] leading-relaxed text-text-tertiary">
+          <p className="mt-5 text-center text-tiny leading-relaxed text-text-tertiary">
             Ao entrar, você concorda com nossa{' '}
             <Link
               to="/privacidade"

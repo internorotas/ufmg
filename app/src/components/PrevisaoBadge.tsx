@@ -68,7 +68,7 @@ export const PrevisaoBadge = memo(function PrevisaoBadge({
       <span
         role="status"
         aria-live="polite"
-        className="rounded px-2 py-0.5 text-[11px] font-medium"
+        className="rounded px-2 py-0.5 text-tiny font-medium"
         style={{
           backgroundColor: 'var(--neutral-bg)',
           color: 'var(--neutral-text)',
@@ -87,7 +87,7 @@ export const PrevisaoBadge = memo(function PrevisaoBadge({
       <span
         role="status"
         aria-live="polite"
-        className="rounded px-2 py-0.5 text-[11px] font-medium"
+        className="rounded px-2 py-0.5 text-tiny font-medium"
         style={{
           backgroundColor: 'var(--neutral-bg)',
           color: 'var(--neutral-text)',
@@ -122,7 +122,7 @@ export const PrevisaoBadge = memo(function PrevisaoBadge({
         </span>
 
         {onibusAnterior && !compacto ? (
-          <span className="text-[11px] text-text-secondary">
+          <span className="text-tiny text-text-secondary">
             Último passou há {onibusAnterior.minutosQuePassou} min
           </span>
         ) : null}
@@ -157,12 +157,12 @@ export const PrevisaoBadge = memo(function PrevisaoBadge({
       </span>
 
       {onibusAnterior && !compacto ? (
-        <span className="text-[11px] text-text-secondary">
+        <span className="text-tiny text-text-secondary">
           Último passou há {onibusAnterior.minutosQuePassou} min
         </span>
       ) : null}
       {atrasoHistorico && !compacto ? (
-        <span className="text-[11px] text-text-secondary">
+        <span className="text-tiny text-text-secondary">
           Histórico desta hora: {atrasoHistorico}
         </span>
       ) : null}

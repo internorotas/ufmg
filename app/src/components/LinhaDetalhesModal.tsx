@@ -235,7 +235,7 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
         </div>
 
         <div className="min-w-0 flex-1 pt-0.5">
-          <h4 className="text-[15px] font-semibold leading-snug text-text-primary group-hover:underline">
+          <h4 className="text-sm-medium font-semibold leading-snug text-text-primary group-hover:underline">
             {parada.nome}
           </h4>
 
@@ -271,18 +271,18 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
               className="mt-1.5 flex flex-col gap-0.5"
             >
               <span
-                className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+                className="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-tiny font-bold"
                 style={badgeStyle}
               >
                 {textoChegada}
               </span>
               {previsao?.onibusAnterior && (
-                <span className="text-[11px] text-text-secondary">
+                <span className="text-tiny text-text-secondary">
                   {t('itinerary.lastPassed', { minutes: previsao.onibusAnterior.minutosQuePassou })}
                 </span>
               )}
               {textoHistorico ? (
-                <span className="text-[11px] text-text-secondary">{textoHistorico}</span>
+                <span className="text-tiny text-text-secondary">{textoHistorico}</span>
               ) : null}
             </div>
           )}

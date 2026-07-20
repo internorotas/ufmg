@@ -237,18 +237,18 @@ function BusPopup({
         <div className="min-w-0 flex-1">
           <p className="truncate font-bold text-text-primary leading-tight">{linha.nome}</p>
           {linha.sublinha && (
-            <p className="truncate text-[10px] text-text-secondary leading-tight">
+            <p className="truncate text-micro text-text-secondary leading-tight">
               {linha.sublinha}
             </p>
           )}
         </div>
         {isLive && !isStale && (
-          <span className="shrink-0 rounded bg-red-500 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-white">
+          <span className="shrink-0 rounded bg-red-500 px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
             AO VIVO
           </span>
         )}
         {isStale && (
-          <span className="shrink-0 rounded bg-amber-500 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-white">
+          <span className="shrink-0 rounded bg-amber-500 px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
             ATRASADO
           </span>
         )}
@@ -286,7 +286,7 @@ function BusPopup({
               </strong>
             </span>
           </div>
-          <p className="mt-0.5 text-[11px] text-text-tertiary">
+          <p className="mt-0.5 text-tiny text-text-tertiary">
             Atualizado {tempoDecorrido(livePos.updatedAt)}
           </p>
         </div>

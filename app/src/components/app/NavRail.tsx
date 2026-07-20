@@ -44,7 +44,7 @@ export function NavRail() {
               to={resolvedTo}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'relative flex flex-col items-center justify-center gap-1 rounded px-2 py-2.5 text-[11px] font-medium',
+                'relative flex flex-col items-center justify-center gap-1 rounded px-2 py-2.5 text-tiny font-medium',
                 'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:focus-visible:ring-brand-accent',
                 active
                   ? 'bg-brand-primary/10 text-brand-primary dark:bg-brand-accent/10 dark:text-brand-accent'

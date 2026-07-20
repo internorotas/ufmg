@@ -84,7 +84,7 @@ export const DataSourceBadge = memo(function DataSourceBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-tight ${toneStyles[badge.tone]} ${className ?? ''}`}
+      className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-micro font-medium leading-tight ${toneStyles[badge.tone]} ${className ?? ''}`}
     >
       <Icon className="size-3 shrink-0" aria-hidden="true" />
       <span>{badge.label}</span>

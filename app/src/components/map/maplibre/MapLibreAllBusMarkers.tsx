@@ -67,7 +67,7 @@ export function BusMarkerPopup({ linha, pos, onVerLinha }: BusMarkerPopupProps) 
         <div className="min-w-0 flex-1">
           <p className="truncate font-bold text-text-primary leading-tight">{linha.nome}</p>
           {linha.sublinha && (
-            <p className="truncate text-[10px] text-text-secondary leading-tight">
+            <p className="truncate text-micro text-text-secondary leading-tight">
               {linha.sublinha}
             </p>
           )}

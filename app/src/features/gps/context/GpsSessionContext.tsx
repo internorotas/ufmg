@@ -80,7 +80,7 @@ function GpsSessionCompletedCard({
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-success-text">{reasonLabel}</p>
-            <p className="truncate text-[10px] text-text-secondary">{session.linhaNome}</p>
+            <p className="truncate text-micro text-text-secondary">{session.linhaNome}</p>
           </div>
           <button
             type="button"
@@ -93,7 +93,7 @@ function GpsSessionCompletedCard({
         </div>
 
         {isAutoStop && (
-          <p className="mb-2 rounded-lg bg-background-secondary px-2.5 py-1.5 text-[10px] text-text-secondary">
+          <p className="mb-2 rounded-lg bg-background-secondary px-2.5 py-1.5 text-micro text-text-secondary">
             O rastreio foi encerrado automaticamente.
           </p>
         )}
@@ -104,26 +104,26 @@ function GpsSessionCompletedCard({
         <div className="mb-3 grid grid-cols-3 gap-2 text-center">
           <div className="rounded-lg bg-background-secondary p-1.5">
             <Timer size={12} className="mx-auto mb-0.5 text-brand-primary" aria-hidden="true" />
-            <p className="text-[9px] text-text-tertiary">Duração</p>
-            <p className="text-[10px] font-bold text-text-primary">
+            <p className="text-micro text-text-tertiary">Duração</p>
+            <p className="text-micro font-bold text-text-primary">
               {formatDuration(session.durationMs)}
             </p>
           </div>
           <div className="rounded-lg bg-background-secondary p-1.5">
             <MapPin size={12} className="mx-auto mb-0.5 text-brand-primary" aria-hidden="true" />
-            <p className="text-[9px] text-text-tertiary">Distância</p>
-            <p className="text-[10px] font-bold text-text-primary">
+            <p className="text-micro text-text-tertiary">Distância</p>
+            <p className="text-micro font-bold text-text-primary">
               {session.distanceKm.toFixed(2)} km
             </p>
           </div>
           <div className="rounded-lg bg-background-secondary p-1.5">
             <Trophy size={12} className="mx-auto mb-0.5 text-brand-primary" aria-hidden="true" />
-            <p className="text-[9px] text-text-tertiary">Pontos</p>
-            <p className="text-[10px] font-bold text-text-primary">~{pontosEstimados}</p>
+            <p className="text-micro text-text-tertiary">Pontos</p>
+            <p className="text-micro font-bold text-text-primary">~{pontosEstimados}</p>
           </div>
         </div>
 
-        <p className="flex items-center justify-center gap-1 text-[10px] text-text-secondary">
+        <p className="flex items-center justify-center gap-1 text-micro text-text-secondary">
           <Heart size={9} className="text-red-500" fill="currentColor" aria-hidden="true" />
           Obrigado por ajudar a comunidade!
         </p>
@@ -153,7 +153,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     selectedLine: linhaSelecionada,
   });
 
-  const { isActive, ingestSnapshot, status, rateLimitMessage } = rastreio;
+  const { isActive, ingestSnapshot, status, rateLimitMessage, startError } = rastreio;
 
   // === Manter coleta viva ===
   useWakeLock(isActive);
@@ -438,6 +438,19 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
                 Encerrar viagem
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast para erro ao iniciar sessão (ex: linha fora de operação) */}
+      {startError && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:pb-8"
+        >
+          <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg">
+            <span>{startError}</span>
           </div>
         </div>
       )}

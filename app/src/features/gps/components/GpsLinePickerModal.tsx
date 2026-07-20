@@ -69,7 +69,7 @@ function GroupedRow({ group, onSelect }: { group: LinhaGroup; onSelect: (l: Linh
           style={{ backgroundColor: first?.corHex }}
           aria-hidden="true"
         />
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">
+        <p className="text-tiny font-semibold uppercase tracking-wide text-text-tertiary">
           Linha {group.numero} — {group.linhas.length} variantes
         </p>
       </div>
@@ -237,7 +237,6 @@ export function GpsLinePickerModal({
               <input
                 ref={inputRef}
                 type="search"
-                autoFocus
                 placeholder="Buscar por nome, número ou destino…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -246,7 +245,7 @@ export function GpsLinePickerModal({
               />
             </div>
             {filtradas.length > 0 && (
-              <p className="mt-1.5 text-[11px] text-text-tertiary">
+              <p className="mt-1.5 text-tiny text-text-tertiary">
                 {filtradas.length === 1
                   ? '1 linha disponível'
                   : `${filtradas.length} linhas disponíveis`}

@@ -79,7 +79,7 @@ export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }:
           <div className="min-w-0 flex-1">
             <p className="truncate font-bold text-text-primary leading-tight">{nome || cfg.nome}</p>
             {nome && (
-              <p className="truncate text-[10px] text-text-secondary leading-tight">
+              <p className="truncate text-micro text-text-secondary leading-tight">
                 {cfg.label} (BHTRANS)
               </p>
             )}

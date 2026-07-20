@@ -107,7 +107,7 @@ export function Mapa({
                 {linhaSelecionada.nome}
               </span>
               {linhaSelecionada.sublinha && (
-                <span className="truncate text-[10px] text-text-secondary leading-tight">
+                <span className="truncate text-micro text-text-secondary leading-tight">
                   {linhaSelecionada.sublinha}
                 </span>
               )}

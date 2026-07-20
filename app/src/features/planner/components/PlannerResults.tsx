@@ -17,7 +17,7 @@ import { JourneyTimelineBar } from './JourneyTimelineBar';
 // ---------------------------------------------------------------------------
 
 const etaBadgeVariants = tv({
-  base: 'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold',
+  base: 'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-tiny font-semibold',
   variants: {
     source: {
       live: 'bg-success-bg text-success-text',

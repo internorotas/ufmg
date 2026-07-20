@@ -66,7 +66,7 @@ export function GpsTrackingCard({
           className="flex min-h-11 items-center gap-2 px-1"
         >
           <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
-          <span className="text-[11px] font-bold tabular-nums" style={{ color: linha.corHex }}>
+          <span className="text-tiny font-bold tabular-nums" style={{ color: linha.corHex }}>
             {numLinha(linha)}
           </span>
           <ChevronUp size={13} className="text-text-secondary" aria-hidden="true" />
@@ -104,7 +104,7 @@ export function GpsTrackingCard({
             />
           )}
           <span
-            className={`text-[9px] font-bold uppercase tracking-widest ${
+            className={`text-micro font-bold uppercase tracking-widest ${
               isStarting ? 'text-brand-primary dark:text-brand-accent' : 'text-red-500'
             }`}
           >
@@ -115,18 +115,18 @@ export function GpsTrackingCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1">
             <span
-              className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-[9px] font-bold tabular-nums"
+              className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-micro font-bold tabular-nums"
               style={{ backgroundColor: `${linha.corHex}22`, color: linha.corHex }}
               aria-hidden="true"
             >
               {numLinha(linha)}
             </span>
-            <p className="truncate text-[10px] font-semibold text-text-primary leading-tight">
+            <p className="truncate text-micro font-semibold text-text-primary leading-tight">
               {linha.nome}
             </p>
           </div>
           {linha.sublinha && (
-            <p className="truncate pl-5 text-[9px] text-text-tertiary leading-tight">
+            <p className="truncate pl-5 text-micro text-text-tertiary leading-tight">
               {linha.sublinha}
             </p>
           )}
@@ -156,7 +156,7 @@ export function GpsTrackingCard({
           <div className="mx-2.5 h-px bg-card-border" />
 
           {/* Métricas linha 1: tempo + distância */}
-          <div className="flex items-center justify-between gap-1 px-2.5 pt-2 text-[10px]">
+          <div className="flex items-center justify-between gap-1 px-2.5 pt-2 text-micro">
             <div className="flex items-center gap-0.5 text-text-secondary">
               <Timer size={9} aria-hidden="true" />
               <span className="tabular-nums">{formatDuration(durationMs)}</span>
@@ -168,7 +168,7 @@ export function GpsTrackingCard({
           </div>
 
           {/* Métricas linha 2: pontos + velocidade */}
-          <div className="flex items-center justify-between gap-1 px-2.5 pb-2 pt-1 text-[10px]">
+          <div className="flex items-center justify-between gap-1 px-2.5 pb-2 pt-1 text-micro">
             <div
               className="flex items-center gap-0.5 text-text-secondary"
               title="Pontos estimados (sujeitos a validação)"
@@ -186,7 +186,7 @@ export function GpsTrackingCard({
           <div className="mx-2.5 h-px bg-card-border" />
 
           {/* Status: sinal GPS + sincronização */}
-          <div className="flex items-center justify-between gap-1 px-2.5 py-1.5 text-[10px]">
+          <div className="flex items-center justify-between gap-1 px-2.5 py-1.5 text-micro">
             <span
               className={signal.ok ? 'text-success-text' : 'text-warning-text'}
               title={`Precisão GPS: ${accuracyM !== undefined ? `±${Math.round(accuracyM)}m` : 'desconhecida'}`}

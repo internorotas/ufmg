@@ -185,7 +185,7 @@ function EndpointField({
                   <span className="flex min-w-0 flex-col items-start">
                     <span className="truncate font-medium">{parada.nome}</span>
                     {parada.linhasAtendidas.length > 0 && (
-                      <span className="truncate text-[11px] text-text-tertiary">
+                      <span className="truncate text-tiny text-text-tertiary">
                         {parada.linhasAtendidas.slice(0, 2).join(' · ')}
                         {parada.linhasAtendidas.length > 2 ? ' …' : ''}
                       </span>

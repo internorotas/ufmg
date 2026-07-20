@@ -74,7 +74,7 @@ export const badgeVariants = tv({
       ghost: ['bg-card-hover text-text-secondary border-transparent'],
     },
     size: {
-      xs: 'h-5 px-1.5 text-[10px]',
+      xs: 'h-5 px-1.5 text-micro',
       sm: 'h-6 px-2 text-xs',
       md: 'h-7 px-2.5 text-sm',
       lg: 'h-8 px-3 text-sm',

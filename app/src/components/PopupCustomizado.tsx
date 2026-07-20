@@ -290,7 +290,7 @@ export function PopupCustomizado({ parada, className, ...props }: PopupCustomiza
                         )}
 
                         {minutosUltimoPassou !== null ? (
-                          <p className="text-[11px] text-text-secondary">
+                          <p className="text-tiny text-text-secondary">
                             Último há {minutosUltimoPassou}min
                           </p>
                         ) : null}

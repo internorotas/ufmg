@@ -74,7 +74,7 @@ export function TripRatingCard({
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-text-primary">Como foi sua viagem?</p>
-            <p className="truncate text-[10px] text-text-secondary">{linhaNome}</p>
+            <p className="truncate text-micro text-text-secondary">{linhaNome}</p>
           </div>
         </div>
 
@@ -111,7 +111,7 @@ export function TripRatingCard({
         />
 
         {submitError && (
-          <p role="alert" className="mb-2 text-[10px] text-danger-text">
+          <p role="alert" className="mb-2 text-micro text-danger-text">
             Falha ao enviar avaliação. Tente novamente.
           </p>
         )}
