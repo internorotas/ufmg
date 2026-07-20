@@ -61,6 +61,7 @@ body,
   --color-warning-bg: var(--warning-bg);
   --color-warning-border: var(--warning-border);
   --color-warning-text: var(--warning-text);
+  --color-warning-solid: var(--warning-solid);
 
   /* Status: Inativo/Neutro (Cinza) */
   --color-neutral-bg: var(--neutral-bg);
@@ -127,6 +128,7 @@ body,
   --warning-bg: #fef9c3; /* Yellow 100 */
   --warning-border: #a16207; /* Yellow 700 */
   --warning-text: #854d0e; /* Yellow 800 */
+  --warning-solid: #a16207;
 
   /* Semantic: Neutral (Cinza) */
   --neutral-bg: #f3f4f6; /* Gray 100 */
@@ -247,6 +249,7 @@ body,
   --warning-bg: #422006; /* Yellow 950 */
   --warning-border: #fbbf24; /* Amber 400 */
   --warning-text: #fef08a; /* Yellow 200 */
+  --warning-solid: #b45309; /* Amber 700 — contraste suficiente com texto branco */
 
   /* Semantic: Neutral (Cinza) - Dark Mode */
   --neutral-bg: #374151; /* Gray 700 */
