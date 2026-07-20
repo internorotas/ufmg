@@ -556,7 +556,7 @@ export function MapLibreView({
           aria-label={
             compassEnabled
               ? 'Desativar bússola e voltar para 2D'
-              : 'Ativar bússola — ir para 3D e girar com o dispositivo'
+              : 'Ativar bússola: muda para o mapa em 3D e gira conforme o dispositivo'
           }
           title={compassEnabled ? 'Desativar bússola' : 'Ativar bússola (3D)'}
           className={cn(

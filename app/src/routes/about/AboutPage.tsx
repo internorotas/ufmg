@@ -187,7 +187,7 @@ export function AboutPage() {
                   href={tenantConfig.publicRepositoryUrl}
                   label="Repositório público"
                   description="Código do frontend, histórico e documentação pública do app."
-                  onClick={() => handleExternalClick('Repositorio publico')}
+                  onClick={() => handleExternalClick('Repositório público')}
                 />
               ) : null}
               <AboutLink

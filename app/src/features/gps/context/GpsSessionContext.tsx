@@ -269,7 +269,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
           sessionId: lastActiveSessionIdRef.current ?? '',
           ...stats,
           linhaNome: linhaSelecionada.sublinha
-            ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
+            ? `${linhaSelecionada.nome} · ${linhaSelecionada.sublinha}`
             : linhaSelecionada.nome,
           linhaCorHex: linhaSelecionada.corHex,
           stopReason,

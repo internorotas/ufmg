@@ -65,7 +65,7 @@ export function GpsPositionWarningDialog({
             <p className="text-sm text-text-secondary">
               Sua localização está{' '}
               <span className="font-semibold text-warning-text">~{distText}</span> do trajeto desta
-              linha. Verifique se selecionou a sublinha correta — trajetos diferentes podem gerar
+              linha. Verifique se selecionou a sublinha correta: trajetos diferentes podem gerar
               dados sobrepostos.
             </p>
 

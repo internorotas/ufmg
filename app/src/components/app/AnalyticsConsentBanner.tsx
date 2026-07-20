@@ -31,7 +31,7 @@ export function AnalyticsConsentBanner() {
 
         <p className="mb-4 text-sm text-text-secondary">
           Usamos cookies para garantir o funcionamento do site e, opcionalmente, para analisar como
-          o app é utilizado — sem coletar dados pessoais identificáveis.{' '}
+          o app é utilizado, sem coletar dados pessoais identificáveis.{' '}
           <Link
             to="/privacidade"
             className="font-medium text-brand-primary dark:text-brand-accent underline underline-offset-2"
@@ -46,7 +46,7 @@ export function AnalyticsConsentBanner() {
             <div>
               <p className="text-xs font-semibold text-text-primary">Essenciais (sempre ativos)</p>
               <p className="text-xs text-text-secondary">
-                Cloudflare Turnstile — proteção contra bots e spam
+                Cloudflare Turnstile: proteção contra bots e spam
               </p>
             </div>
           </div>
@@ -59,7 +59,7 @@ export function AnalyticsConsentBanner() {
             <div>
               <p className="text-xs font-semibold text-text-primary">Análise de uso (opcional)</p>
               <p className="text-xs text-text-secondary">
-                Google Analytics — páginas visitadas e funções mais usadas
+                Google Analytics: páginas visitadas e funções mais usadas
               </p>
             </div>
           </div>

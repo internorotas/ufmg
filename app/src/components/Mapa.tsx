@@ -116,7 +116,7 @@ export function Mapa({
               type="button"
               onClick={() => {
                 const text = linhaSelecionada.sublinha
-                  ? `${linhaSelecionada.nome} — ${linhaSelecionada.sublinha}`
+                  ? `${linhaSelecionada.nome} · ${linhaSelecionada.sublinha}`
                   : linhaSelecionada.nome;
                 const url = buildLinhaShareUrl(linhaSelecionada.idRota);
                 trackEvent({

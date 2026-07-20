@@ -333,7 +333,7 @@ export function MorePage() {
         icon: Heart,
         label: 'Código aberto',
         description: 'Repositório público com o histórico do frontend.',
-        analyticsLabel: 'Repositorio publico',
+        analyticsLabel: 'Repositório público',
       });
     }
 

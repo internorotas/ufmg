@@ -82,12 +82,12 @@ export async function refreshSession(): Promise<RefreshResponse> {
       headers: withTenantHeaders(),
     });
   } catch {
-    throw new AuthRequestError('Falha de rede no refresh de sessao', null);
+    throw new AuthRequestError('Falha de rede no refresh de sessão', null);
   }
 
   if (!response.ok) {
     throw new AuthRequestError(
-      `Falha no refresh de sessao: HTTP ${response.status}`,
+      `Falha no refresh de sessão: HTTP ${response.status}`,
       response.status,
     );
   }

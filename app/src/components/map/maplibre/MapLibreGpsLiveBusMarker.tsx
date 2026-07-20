@@ -265,7 +265,7 @@ function BusPopup({
       {isStale && livePos && (
         <div className="flex items-center gap-1.5 rounded bg-warning-bg px-2 py-1.5 text-xs text-warning-text">
           <AlertTriangle size={12} aria-hidden="true" className="shrink-0" />
-          <span>Posição desatualizada — última há {tempoDecorrido(livePos.updatedAt)}</span>
+          <span>Posição desatualizada, última há {tempoDecorrido(livePos.updatedAt)}</span>
         </div>
       )}
 

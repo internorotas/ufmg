@@ -167,7 +167,7 @@ export function RankingPage() {
           <div className="flex items-center gap-2 text-text-secondary">
             <Trophy size={18} aria-hidden="true" className="shrink-0 text-brand-primary" />
             <p className="text-sm">
-              Top 10 público sem login. Pontos são incentivo — não há paywall funcional.
+              Top 10 público, sem login. Pontos são só incentivo, não há paywall.
             </p>
           </div>
         </header>

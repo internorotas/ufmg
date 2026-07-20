@@ -37,7 +37,7 @@ function SublinhaRow({ linha, onSelect }: { linha: Linha; onSelect: (l: Linha) =
       type="button"
       onClick={() => onSelect(linha)}
       className="flex w-full items-center gap-3 rounded px-2 py-2.5 text-left hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary"
-      aria-label={`Selecionar linha ${numLinha(linha)}${linha.sublinha ? ` — ${linha.sublinha}` : ''}: ${linha.nome}`}
+      aria-label={`Selecionar linha ${numLinha(linha)}${linha.sublinha ? ` (${linha.sublinha})` : ''}: ${linha.nome}`}
     >
       <LineNumberBadge numero={numLinha(linha)} corHex={linha.corHex} />
 
@@ -70,7 +70,7 @@ function GroupedRow({ group, onSelect }: { group: LinhaGroup; onSelect: (l: Linh
           aria-hidden="true"
         />
         <p className="text-tiny font-semibold uppercase tracking-wide text-text-tertiary">
-          Linha {group.numero} — {group.linhas.length} variantes
+          Linha {group.numero}: {group.linhas.length} variantes
         </p>
       </div>
       <div
