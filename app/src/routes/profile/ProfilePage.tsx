@@ -464,7 +464,7 @@ export function ProfilePage() {
                       >
                         <span
                           className="flex size-8 shrink-0 items-center justify-center rounded-full text-white"
-                          style={{ backgroundColor: viagem.linhaCorHex ?? '#6b7280' }}
+                          style={{ backgroundColor: viagem.linhaCorHex ?? 'var(--text-tertiary)' }}
                           aria-hidden="true"
                         >
                           <Bus size={14} />
