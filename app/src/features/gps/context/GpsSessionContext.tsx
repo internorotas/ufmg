@@ -341,6 +341,16 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     if (!isActive) setIsCardMinimized(false);
   }, [isActive]);
 
+  // === Toasts (earlyStop/startError/rateLimit) nunca empilham: mesma posição
+  // fixa na tela, então só um é renderizado por vez, por ordem de prioridade. ===
+  const activeToast = startError
+    ? { kind: 'startError' as const, message: startError }
+    : rateLimitMessage
+      ? { kind: 'rateLimit' as const, message: rateLimitMessage }
+      : earlyStopReason
+        ? { kind: 'earlyStop' as const, message: earlyStopReason }
+        : null;
+
   return (
     <GpsSessionContext.Provider value={rastreio}>
       {children}
@@ -374,27 +384,6 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
           onRated={dismissRating}
           onDismiss={dismissRating}
         />
-      )}
-
-      {/* Toast para sessões encerradas automaticamente antes de 5s */}
-      {earlyStopReason && (
-        <div
-          role="alert"
-          aria-live="polite"
-          className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:pb-8"
-        >
-          <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg">
-            <span>{earlyStopReason}</span>
-            <button
-              type="button"
-              onClick={() => setEarlyStopReason(null)}
-              aria-label="Fechar aviso"
-              className="flex size-5 shrink-0 items-center justify-center rounded text-warning-text/70 hover:text-warning-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-warning-text"
-            >
-              ×
-            </button>
-          </div>
-        </div>
       )}
 
       {/* Dialog: usuário voltou ao app com sessão ativa há muito tempo */}
@@ -442,36 +431,35 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      {/* Toast para erro ao iniciar sessão (ex: linha fora de operação) */}
-      {startError && (
+      {/* Toast único para earlyStop/startError/rateLimit — nunca mais de um por vez (ver activeToast) */}
+      {activeToast && (
         <div
           role="alert"
-          aria-live="assertive"
+          aria-live={activeToast.kind === 'startError' ? 'assertive' : 'polite'}
           className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:pb-8"
         >
           <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg">
-            <span>{startError}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Toast para rate limit (429) */}
-      {rateLimitMessage && (
-        <div
-          role="alert"
-          aria-live="polite"
-          className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:pb-8"
-        >
-          <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg">
-            <span>{rateLimitMessage}</span>
-            <button
-              type="button"
-              onClick={() => rastreio.stop()}
-              aria-label="Fechar aviso"
-              className="flex size-5 shrink-0 items-center justify-center rounded text-warning-text/70 hover:text-warning-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-warning-text"
-            >
-              ×
-            </button>
+            <span>{activeToast.message}</span>
+            {activeToast.kind === 'earlyStop' && (
+              <button
+                type="button"
+                onClick={() => setEarlyStopReason(null)}
+                aria-label="Fechar aviso"
+                className="flex size-5 shrink-0 items-center justify-center rounded text-warning-text/70 hover:text-warning-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-warning-text"
+              >
+                ×
+              </button>
+            )}
+            {activeToast.kind === 'rateLimit' && (
+              <button
+                type="button"
+                onClick={() => rastreio.stop()}
+                aria-label="Fechar aviso"
+                className="flex size-5 shrink-0 items-center justify-center rounded text-warning-text/70 hover:text-warning-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-warning-text"
+              >
+                ×
+              </button>
+            )}
           </div>
         </div>
       )}
