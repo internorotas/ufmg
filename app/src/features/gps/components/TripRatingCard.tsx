@@ -111,7 +111,7 @@ export function TripRatingCard({
         />
 
         {submitError && (
-          <p role="alert" className="mb-2 text-micro text-danger-text">
+          <p role="alert" className="mb-2 text-micro text-warning-text">
             Falha ao enviar avaliação. Tente novamente.
           </p>
         )}
