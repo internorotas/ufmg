@@ -23,6 +23,7 @@ import {
   useState,
 } from 'react';
 import MapLibreMap, { type MapRef } from 'react-map-gl/maplibre';
+import { Tooltip } from '@/components/ui/Tooltip';
 import type { MapaRef } from '@/contexts/RotasSelectionContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
@@ -340,7 +341,7 @@ export function MapLibreView({
       </MapLibreMap>
 
       {/* Controles de zoom e visão — lado esquerdo */}
-      <div className="pointer-events-none absolute left-2 top-2 z-1200 flex flex-col items-center">
+      <div className="pointer-events-none absolute left-2 top-2 z-(--z-map-controls) flex flex-col items-center">
         <button
           type="button"
           onClick={() => mapRef.current?.zoomIn()}
@@ -390,7 +391,7 @@ export function MapLibreView({
       {paradaAberta && (
         // biome-ignore lint/a11y/noStaticElementInteractions: clicar na área transparente ao redor do card fecha-o
         <div
-          className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center"
+          className="pointer-events-auto absolute inset-x-0 bottom-0 z-(--z-sheet) flex justify-center"
           role="presentation"
           onClick={() => openParada(null)}
           onKeyDown={(e) => e.key === 'Escape' && openParada(null)}
@@ -446,7 +447,7 @@ export function MapLibreView({
       {predioAberto && (
         // biome-ignore lint/a11y/noStaticElementInteractions: clicar na área transparente ao redor do card fecha-o
         <div
-          className="pointer-events-auto absolute inset-x-0 bottom-0 z-1001 flex justify-center"
+          className="pointer-events-auto absolute inset-x-0 bottom-0 z-(--z-sheet) flex justify-center"
           role="presentation"
           onClick={() => openPredio(null)}
           onKeyDown={(e) => e.key === 'Escape' && openPredio(null)}
@@ -477,7 +478,7 @@ export function MapLibreView({
       )}
 
       {/* FABs — fora do <Map> mas dentro do container relativo */}
-      <div className="pointer-events-none fixed bottom-24 right-4 z-1000 flex flex-col items-end gap-2 mb-[env(safe-area-inset-bottom)] md:bottom-6 md:mb-0">
+      <div className="pointer-events-none fixed bottom-24 right-4 z-(--z-map-controls) flex flex-col items-end gap-2 mb-[env(safe-area-inset-bottom)] md:bottom-6 md:mb-0">
         {onOpenSearch ? (
           <button
             type="button"
@@ -494,34 +495,43 @@ export function MapLibreView({
           </button>
         ) : null}
         {rastreioColaborativo && onAlternarRastreioColaborativo ? (
-          <button
-            type="button"
-            onClick={onAlternarRastreioColaborativo}
-            aria-pressed={rastreioAtivo}
-            title={
+          <Tooltip
+            position="left"
+            content={
               rastreioAtivo
                 ? 'Encerrar compartilhamento de posição com outros passageiros.'
-                : 'Compartilhar sua posição para ajudar passageiros a saber quando o ônibus está próximo.'
+                : 'Compartilha sua posição em tempo real para ajudar outros passageiros a saber quando o ônibus está próximo. Usa GPS continuamente enquanto ativo, o que consome mais bateria.'
             }
-            aria-label={
-              rastreioAtivo
-                ? `Encerrar ${rastreioColaborativo.label}. Status: ${statusRastreio}`
-                : `Iniciar ${rastreioColaborativo.label}`
-            }
-            className={cn(
-              'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center surface-card transition-all duration-200',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
-              rastreioAtivo
-                ? 'border-success-border bg-success-solid text-white'
-                : 'bg-card text-text-primary hover:bg-card-hover',
-            )}
           >
-            {rastreioAtivo ? (
-              <Square className="h-5 w-5" aria-hidden="true" />
-            ) : (
-              <Radio className="h-5 w-5" aria-hidden="true" />
-            )}
-          </button>
+            <button
+              type="button"
+              onClick={onAlternarRastreioColaborativo}
+              aria-pressed={rastreioAtivo}
+              title={
+                rastreioAtivo
+                  ? 'Encerrar compartilhamento de posição com outros passageiros.'
+                  : 'Compartilhar sua posição para ajudar passageiros a saber quando o ônibus está próximo.'
+              }
+              aria-label={
+                rastreioAtivo
+                  ? `Encerrar ${rastreioColaborativo.label}. Status: ${statusRastreio}`
+                  : `Iniciar ${rastreioColaborativo.label}`
+              }
+              className={cn(
+                'pointer-events-auto flex h-12 w-12 cursor-pointer items-center justify-center surface-card transition-all duration-200',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+                rastreioAtivo
+                  ? 'border-success-border bg-success-solid text-white'
+                  : 'bg-card text-text-primary hover:bg-card-hover',
+              )}
+            >
+              {rastreioAtivo ? (
+                <Square className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <Radio className="h-5 w-5" aria-hidden="true" />
+              )}
+            </button>
+          </Tooltip>
         ) : null}
 
         <button
