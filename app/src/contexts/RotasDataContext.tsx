@@ -138,7 +138,7 @@ export function RotasDataProvider({ children }: RotasDataProviderProps) {
     }
 
     setRotasService(RotasServiceImpl.fromData(linhasQuery.data, paradasQuery.data));
-    setDataSource('api');
+    setDataSource('source-fallback');
     setDataVersion('v1');
     setDataUpdatedAt(new Date().toISOString());
     setDataError(null);

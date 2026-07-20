@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import localLinhas from '@/data/linhas';
 import localParadas from '@/data/paradas';
-import { fetchTransitDataBinary } from '@/services/api/transitApi';
 import type { CategoriaLinhas, Parada } from '@/types/data.types';
 import { transitQueryKeys } from './queryKeys';
 
@@ -18,11 +17,7 @@ function getTransitRetryDelay(attemptIndex: number) {
 }
 
 export async function fetchTransitBinary(): Promise<TransitBinaryData> {
-  try {
-    return await fetchTransitDataBinary();
-  } catch {
-    return { linhas: localLinhas, paradas: localParadas.paradas };
-  }
+  return { linhas: localLinhas, paradas: localParadas.paradas };
 }
 
 export function useTransitDataQuery(enabled: boolean) {
