@@ -369,9 +369,11 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         if (err instanceof RateLimitError) {
           setRateLimitMessage(err.message);
         } else {
+          // Nunca exibe err.message do backend direto na UI (pode vazar detalhe
+          // interno de validação) — mapeia para uma mensagem própria e controlada.
           const msg =
             err instanceof GpsApiError
-              ? err.message
+              ? 'Esta linha não tem horários programados para agora, por isso não é possível iniciar o rastreio.'
               : 'Não foi possível iniciar o rastreio. Tente novamente.';
           setStartError(msg);
           window.setTimeout(() => setStartError(null), 5000);
