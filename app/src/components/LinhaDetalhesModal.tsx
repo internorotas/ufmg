@@ -14,10 +14,11 @@ import {
   Route,
   X,
 } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CircleMarker, MapContainer, Polyline, TileLayer, useMap } from 'react-leaflet';
+import MapLibreMap, { type MapRef, Layer, Source } from 'react-map-gl/maplibre';
 import { tv } from 'tailwind-variants';
+import { TILE_PROVIDERS } from './map/tileProviders';
 import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
@@ -85,38 +86,97 @@ export interface LinhaDetalhesModalProps {
 
 type TabType = 'itinerario' | 'horarios';
 
-function FitBounds({ coords }: { coords: [number, number][] }) {
-  const map = useMap();
-  React.useEffect(() => {
-    if (coords.length <= 1) return;
-
-    // O mapa nasce dentro de um modal/aba — o container pode ainda não ter o
-    // tamanho final no primeiro paint (animação de entrada, layout do Tabs
-    // ainda assentando). Sem invalidateSize(), Leaflet calcula o fitBounds
-    // contra um viewport errado e a polyline acaba projetada fora da área
-    // visível, embora os tiles do basemap pareçam normais.
-    map.invalidateSize();
-    const applyFitBounds = () =>
-      map.fitBounds(coords as [number, number][], {
-        padding: [20, 20],
-        maxZoom: 16,
-        animate: false,
-      });
-    applyFitBounds();
-
-    const timer = window.setTimeout(() => {
-      map.invalidateSize();
-      applyFitBounds();
-    }, 250);
-
-    return () => window.clearTimeout(timer);
-  }, [map, coords]);
-  return null;
+// Divide o padrão {s} do tile URL em 3 subdomínios reais — MapLibre GL não
+// resolve o placeholder {s} do Leaflet, precisa das URLs já expandidas.
+function toMaplibreTiles(leafletUrl: string): string[] {
+  const base = leafletUrl.replace('{r}', '');
+  if (base.includes('{s}')) {
+    return ['a', 'b', 'c'].map((s) => base.replace('{s}.', `${s}.`).replace('{s}', s));
+  }
+  return [base];
 }
 
 function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
   const { t } = useTranslation('line-details');
+  const mapRef = useRef<MapRef>(null);
   const hasRoute = linha.coordenadasTrajeto && linha.coordenadasTrajeto.length > 1;
+
+  const mapStyle = useMemo(() => {
+    const provider = TILE_PROVIDERS.osm;
+    return {
+      version: 8 as const,
+      sources: {
+        'raster-tiles': {
+          type: 'raster' as const,
+          tiles: toMaplibreTiles(provider.url),
+          tileSize: 256,
+          attribution: provider.attribution,
+        },
+      },
+      layers: [{ id: 'raster-tiles', type: 'raster' as const, source: 'raster-tiles' }],
+    };
+  }, []);
+
+  // [lat, lng] (convenção do projeto) → [lng, lat] (GeoJSON/MapLibre)
+  const routeGeojson = useMemo(
+    () => ({
+      type: 'Feature' as const,
+      properties: {},
+      geometry: {
+        type: 'LineString' as const,
+        coordinates: hasRoute
+          ? linha.coordenadasTrajeto.map(([lat, lng]) => [lng, lat])
+          : [],
+      },
+    }),
+    [hasRoute, linha.coordenadasTrajeto],
+  );
+
+  const paradasGeojson = useMemo(
+    () => ({
+      type: 'FeatureCollection' as const,
+      features: paradas.map((p) => ({
+        type: 'Feature' as const,
+        properties: {},
+        geometry: { type: 'Point' as const, coordinates: [p.coordenadas[1], p.coordenadas[0]] },
+      })),
+    }),
+    [paradas],
+  );
+
+  const bounds = useMemo(() => {
+    if (!hasRoute) return null;
+    const lngs = linha.coordenadasTrajeto.map(([, lng]) => lng);
+    const lats = linha.coordenadasTrajeto.map(([lat]) => lat);
+    return {
+      minLng: Math.min(...lngs),
+      maxLng: Math.max(...lngs),
+      minLat: Math.min(...lats),
+      maxLat: Math.max(...lats),
+    };
+  }, [hasRoute, linha.coordenadasTrajeto]);
+
+  const fitToRoute = useCallback(() => {
+    if (!bounds || !mapRef.current) return;
+    mapRef.current.resize();
+    mapRef.current.fitBounds(
+      [
+        [bounds.minLng, bounds.minLat],
+        [bounds.maxLng, bounds.maxLat],
+      ],
+      { padding: 20, maxZoom: 16, animate: false },
+    );
+  }, [bounds]);
+
+  const handleMapLoad = useCallback(() => {
+    fitToRoute();
+    // O mapa nasce dentro de um modal/aba — o container pode ainda não ter o
+    // tamanho final no primeiro paint (animação de entrada, layout do Tabs
+    // ainda assentando). Sem um resize()+fitBounds() atrasados, o mapa calcula
+    // contra um viewport errado e o trajeto acaba projetado fora da área visível.
+    const timer = window.setTimeout(fitToRoute, 250);
+    return () => window.clearTimeout(timer);
+  }, [fitToRoute]);
 
   if (!hasRoute) {
     return <FeedbackBanner message={t('miniMap.unavailable')} />;
@@ -128,34 +188,47 @@ function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
       role="img"
       aria-label="Mapa do itinerário da linha"
     >
-      <MapContainer
-        center={linha.coordenadasTrajeto[0]}
-        zoom={15}
-        className="h-52 w-full"
-        scrollWheelZoom={false}
-        dragging={false}
-        zoomControl={false}
+      <MapLibreMap
+        key={linha.idRota}
+        ref={mapRef}
+        initialViewState={{
+          longitude: linha.coordenadasTrajeto[0][1],
+          latitude: linha.coordenadasTrajeto[0][0],
+          zoom: 15,
+        }}
+        style={{ height: '13rem', width: '100%' }}
+        mapStyle={mapStyle}
+        dragPan={false}
+        dragRotate={false}
+        scrollZoom={false}
         doubleClickZoom={false}
+        touchZoomRotate={false}
+        touchPitch={false}
         keyboard={false}
+        onLoad={handleMapLoad}
       >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        <FitBounds coords={linha.coordenadasTrajeto} />
-        <Polyline
-          positions={linha.coordenadasTrajeto}
-          pathOptions={{ color: linha.corHex, weight: 3, opacity: 0.65 }}
-        />
-        {paradas.map((parada) => (
-          <CircleMarker
-            key={parada.idParada}
-            center={parada.coordenadas}
-            pathOptions={{ color: linha.corHex, fillColor: linha.corHex, fillOpacity: 0.9 }}
-            radius={5}
+        <Source id="mini-rota" type="geojson" data={routeGeojson}>
+          <Layer
+            id="mini-rota-line"
+            type="line"
+            layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+            paint={{ 'line-color': linha.corHex, 'line-width': 3, 'line-opacity': 0.65 }}
           />
-        ))}
-      </MapContainer>
+        </Source>
+        <Source id="mini-paradas" type="geojson" data={paradasGeojson}>
+          <Layer
+            id="mini-paradas-circle"
+            type="circle"
+            paint={{
+              'circle-radius': 5,
+              'circle-color': linha.corHex,
+              'circle-opacity': 0.9,
+              'circle-stroke-color': linha.corHex,
+              'circle-stroke-width': 1,
+            }}
+          />
+        </Source>
+      </MapLibreMap>
     </div>
   );
 }
