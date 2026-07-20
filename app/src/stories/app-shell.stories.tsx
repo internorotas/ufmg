@@ -2,7 +2,6 @@
  * Stories for app-level layout and status components:
  * - AppShell
  * - DataStatusScreen
- * - DataSourceBanner
  * - OfflineToast
  * - SystemBanner
  * - ThemeToggle
@@ -15,7 +14,6 @@ import { useState } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
 import { BottomNav } from '@/components/app/BottomNav';
-import { DataSourceBanner } from '@/components/app/DataSourceBanner';
 import { DataStatusScreen } from '@/components/app/DataStatusScreen';
 import { MobileTopBar } from '@/components/app/MobileTopBar';
 import { NavRail } from '@/components/app/NavRail';
@@ -247,48 +245,6 @@ export const DataStatusScreenWarningWithActions: Story = () => (
           </button>
         </div>
       }
-    />
-  </div>
-);
-
-// ---------------------------------------------------------------------------
-// DataSourceBanner
-// ---------------------------------------------------------------------------
-
-export const DataSourceBannerHidden: Story = () => (
-  <div className="relative p-4 bg-background-secondary min-h-32">
-    <p className="text-text-secondary text-sm">
-      Banner não visível (isVisible=false). Nenhum banner deve aparecer acima deste texto.
-    </p>
-    <DataSourceBanner isVisible={false} source="source-fallback" />
-  </div>
-);
-
-export const DataSourceBannerApiSource: Story = () => (
-  <div className="relative p-4 bg-background-secondary min-h-32">
-    <p className="text-text-secondary text-sm">
-      Fonte é 'api' — banner nunca é exibido independente de isVisible.
-    </p>
-    <DataSourceBanner isVisible={true} source="api" />
-  </div>
-);
-
-export const DataSourceBannerSourceFallback: Story = () => (
-  <div className="relative pt-24 p-4 bg-background-secondary min-h-48">
-    <p className="text-text-secondary text-sm">Fonte: fallback local de segurança (sem data).</p>
-    <DataSourceBanner isVisible={true} source="source-fallback" />
-  </div>
-);
-
-export const DataSourceBannerSourceFallbackWithTimestamp: Story = () => (
-  <div className="relative pt-24 p-4 bg-background-secondary min-h-48">
-    <p className="text-text-secondary text-sm">
-      Fonte: fallback local de segurança (com timestamp).
-    </p>
-    <DataSourceBanner
-      isVisible={true}
-      source="source-fallback"
-      updatedAt="2024-08-15T09:05:00.000Z"
     />
   </div>
 );
@@ -662,11 +618,6 @@ export const ComposedOfflineScenario: Story = () => (
             title="Conexão perdida"
             icon={<AlertTriangle size={16} />}
             description="Você está offline. Exibindo rotas do cache local. Algumas previsões podem estar desatualizadas."
-          />
-          <DataSourceBanner
-            isVisible={true}
-            source="source-fallback"
-            updatedAt="2024-08-15T11:45:00.000Z"
           />
           <div className="surface-card bg-card p-4 rounded">
             <p className="text-text-secondary text-sm">Conteúdo da página em modo offline.</p>

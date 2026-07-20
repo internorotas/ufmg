@@ -3,7 +3,6 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-
 import { AnalyticsConsentBanner } from './components/app/AnalyticsConsentBanner';
 import { AnalyticsProvider } from './components/app/AnalyticsProvider';
 import { BottomNav } from './components/app/BottomNav';
-import { DataSourceBanner } from './components/app/DataSourceBanner';
 import { DataStatusScreen } from './components/app/DataStatusScreen';
 import { MobileTopBar } from './components/app/MobileTopBar';
 import { ModalManager } from './components/app/ModalManager';
@@ -172,7 +171,6 @@ function AppContent() {
     todasParadas,
     isLoadingData,
     dataError,
-    dataSource,
     dataUpdatedAt,
     isOfflineDataFallback,
     linhaSelecionada,
@@ -620,7 +618,10 @@ function AppContent() {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AnalyticsConsentBanner />
         <BetaBanner />
-        <OfflineBanner isOffline={isOffline || isOfflineDataFallback} />
+        <OfflineBanner
+          isOffline={isOffline || isOfflineDataFallback}
+          updatedAt={isOfflineDataFallback ? dataUpdatedAt : undefined}
+        />
         <MobileTopBar
           authStatus={authStatus}
           isAuthenticated={isAuthenticated}
@@ -641,11 +642,6 @@ function AppContent() {
             onPlannerRouteSelected={handlePlannerRouteSelected}
             onRegisterMenuOpen={handleRegisterMenuOpen}
             onAuthAction={handleAuthAction}
-          />
-          <DataSourceBanner
-            isVisible={isOfflineDataFallback}
-            source={dataSource}
-            updatedAt={dataUpdatedAt}
           />
           <main
             id="main-content"
