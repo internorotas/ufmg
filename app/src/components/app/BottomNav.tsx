@@ -29,7 +29,7 @@ export function BottomNav() {
     <nav
       aria-label="Navegação principal"
       className={cn(
-        'fixed inset-x-0 bottom-0 z-1010 w-full border-t border-(--card-border) bg-sidebar shadow-[0_-1px_4px_rgba(0,0,0,0.06)] md:hidden',
+        'fixed inset-x-0 bottom-0 z-(--z-bottom-nav) w-full border-t border-(--card-border) bg-sidebar shadow-[0_-1px_4px_rgba(0,0,0,0.06)] md:hidden',
         'pb-[env(safe-area-inset-bottom)]',
       )}
     >

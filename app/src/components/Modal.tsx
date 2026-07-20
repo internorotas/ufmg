@@ -24,7 +24,7 @@ export const modalHeaderVariants = tv({
 export { dialogPopupVariants as modalContentVariants };
 
 export const modalOverlayVariants = tv({
-  base: 'fixed inset-0 z-[2000] flex items-center justify-center p-4',
+  base: 'fixed inset-0 z-(--z-modal) flex items-center justify-center p-4',
 });
 
 export const modalBackdropVariants = tv({

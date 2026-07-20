@@ -16,7 +16,7 @@ export function AnalyticsConsentBanner() {
       role="dialog"
       aria-modal="true"
       aria-label="Consentimento de privacidade e cookies"
-      className="fixed inset-0 z-2000 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-(--z-modal) flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center"
     >
       <div className="w-full max-w-md rounded-t-2xl bg-card p-6 shadow-2xl sm:rounded-2xl">
         <div className="mb-4 flex items-center gap-3">

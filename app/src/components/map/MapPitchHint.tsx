@@ -34,7 +34,7 @@ export function MapPitchHint({ visible }: MapPitchHintProps) {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none absolute inset-x-0 bottom-36 z-1000 flex justify-center px-4"
+      className="pointer-events-none absolute inset-x-0 bottom-36 z-(--z-map-decor) flex justify-center px-4"
     >
       <button
         type="button"

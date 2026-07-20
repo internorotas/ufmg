@@ -22,7 +22,7 @@ export function DataSourceBanner({ isVisible, source, updatedAt }: DataSourceBan
       role="status"
       aria-live="polite"
       aria-atomic="true"
-      className="fixed left-4 right-18 top-20 z-1199 surface-card-sm border-warning-border bg-warning-bg px-4 py-3 text-sm font-medium text-warning-text sm:left-auto sm:right-4 sm:max-w-md"
+      className="fixed left-4 right-18 top-20 z-(--z-banner) surface-card-sm border-warning-border bg-warning-bg px-4 py-3 text-sm font-medium text-warning-text sm:left-auto sm:right-4 sm:max-w-md"
     >
       {resolveBannerMessage(updatedAt)}
     </div>

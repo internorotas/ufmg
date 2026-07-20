@@ -35,7 +35,7 @@ export function AppShell({
     <div className="flex flex-1 min-h-0 overflow-hidden bg-background-secondary text-text-primary">
       <a
         href="#shell-main"
-        className="sr-only absolute left-4 top-4 z-1400 bg-background px-4 py-2 text-sm font-semibold text-text-primary surface-card focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
+        className="sr-only absolute left-4 top-4 z-(--z-toast) bg-background px-4 py-2 text-sm font-semibold text-text-primary surface-card focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
       >
         Pular para conteúdo
       </a>

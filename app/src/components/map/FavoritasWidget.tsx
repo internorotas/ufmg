@@ -27,7 +27,7 @@ export function FavoritasWidget({ todasParadas }: FavoritasWidgetProps) {
 
   return (
     <section
-      className="pointer-events-none absolute inset-x-0 bottom-14 z-800 md:bottom-0"
+      className="pointer-events-none absolute inset-x-0 bottom-14 z-(--z-map-decor) md:bottom-0"
       aria-label="Paradas favoritas"
     >
       <div className="pointer-events-auto overflow-x-auto pb-1 pt-2 px-2">

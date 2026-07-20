@@ -258,7 +258,7 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         <div
           role="status"
           aria-live="polite"
-          className="pointer-events-none fixed right-4 bottom-24 z-[1500] max-w-80 rounded-lg border border-info-border bg-card px-3 py-2 text-xs text-text-primary shadow-lg"
+          className="pointer-events-none fixed right-4 bottom-24 z-(--z-toast) max-w-80 rounded-lg border border-info-border bg-card px-3 py-2 text-xs text-text-primary shadow-lg"
         >
           {collaborativeFeedback}
         </div>
