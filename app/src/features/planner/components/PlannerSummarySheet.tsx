@@ -14,7 +14,7 @@ import { JourneyTimelineBar } from './JourneyTimelineBar';
 
 const sheetVariants = tv({
   base: [
-    'fixed bottom-0 left-0 right-0 z-[1100]',
+    'fixed bottom-0 left-0 right-0 z-(--z-sheet)',
     'max-h-[75vh] overflow-y-auto',
     'rounded-t-xl border-t border-card-border bg-modal',
     'focus-visible:outline-none',

@@ -368,7 +368,7 @@ export function PlannerPanel() {
     <section className={panelVariants()} aria-label="Planejar rota">
       <div>
         <h2 className="text-balance text-base font-semibold text-text-primary">
-          Monte seu caminho
+          Planeje sua viagem
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
           Comece pelo destino. Depois escolha de onde você parte.

@@ -68,7 +68,7 @@ function GpsSessionCompletedCard({
   const isAutoStop = session.stopReason !== 'manual';
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-1050 flex items-end justify-start pb-24 pl-3 md:items-center md:justify-center md:pb-0 md:pl-0">
+    <div className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:items-center md:justify-center md:pb-0 md:pl-0">
       <div className="pointer-events-auto w-56 rounded-lg border border-success-border bg-card p-4 shadow-lg md:max-w-xs md:w-full md:mx-4">
         {/* Cabeçalho */}
         <div className="mb-3 flex items-center gap-2">
@@ -346,9 +346,9 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
       {children}
 
       {/* Card de rastreio — persistente em qualquer rota.
-          z-1050: acima do MenuLateral (z-1003) e BottomNav (z-1010). */}
+          --z-sheet: acima do MenuLateral (--z-sidebar) e BottomNav (--z-bottom-nav). */}
       {isActive && linhaParaCard && (
-        <div className="pointer-events-none fixed inset-0 z-1050">
+        <div className="pointer-events-none fixed inset-0 z-(--z-sheet)">
           <GpsTrackingCard
             rastreio={rastreio}
             linha={linhaParaCard}
@@ -381,7 +381,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
         <div
           role="alert"
           aria-live="polite"
-          className="pointer-events-none fixed inset-0 z-1050 flex items-end justify-start pb-24 pl-3 md:pb-8"
+          className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:pb-8"
         >
           <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg">
             <span>{earlyStopReason}</span>
@@ -403,7 +403,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="still-on-trip-title"
-          className="fixed inset-0 z-2000 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center"
+          className="fixed inset-0 z-(--z-modal) flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center"
         >
           <div className="w-full max-w-sm rounded-t-2xl bg-card p-5 shadow-2xl sm:rounded-2xl">
             <div className="mb-4 flex items-center gap-3">
@@ -447,7 +447,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
         <div
           role="alert"
           aria-live="polite"
-          className="pointer-events-none fixed inset-0 z-1050 flex items-end justify-start pb-24 pl-3 md:pb-8"
+          className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:pb-8"
         >
           <div className="pointer-events-auto flex items-center gap-3 rounded-xl border border-warning-border bg-warning-bg px-3 py-2.5 text-sm text-warning-text shadow-lg">
             <span>{rateLimitMessage}</span>

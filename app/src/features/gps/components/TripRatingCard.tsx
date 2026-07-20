@@ -52,8 +52,8 @@ export function TripRatingCard({
 
   if (submitted) {
     return (
-      <div className="pointer-events-none fixed inset-0 z-1050 flex items-end justify-start pb-24 pl-3 md:items-center md:justify-center md:pb-0 md:pl-0">
-        <div className="pointer-events-auto w-56 rounded-lg border border-brand-primary/20 bg-brand-primary/5 p-4 shadow-lg backdrop-blur-sm md:max-w-xs md:w-full md:mx-4">
+      <div className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:items-center md:justify-center md:pb-0 md:pl-0">
+        <div className="pointer-events-auto w-56 rounded-(--shape-md) border border-brand-primary/20 bg-brand-primary/5 p-4 shadow-(--elevation-2) backdrop-blur-sm md:max-w-xs md:w-full md:mx-4">
           <p className="text-center text-sm font-semibold text-brand-primary">
             Obrigado pela avaliação!
           </p>
@@ -63,8 +63,8 @@ export function TripRatingCard({
   }
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-1050 flex items-end justify-start pb-24 pl-3 md:items-center md:justify-center md:pb-0 md:pl-0">
-      <div className="pointer-events-auto w-56 rounded-lg border border-card-border bg-card p-4 shadow-lg md:max-w-xs md:w-full md:mx-4">
+    <div className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:items-center md:justify-center md:pb-0 md:pl-0">
+      <div className="pointer-events-auto w-56 rounded-(--shape-md) border border-card-border bg-card p-4 shadow-(--elevation-2) md:max-w-xs md:w-full md:mx-4">
         <div className="mb-3 flex items-center gap-2">
           <span
             className="flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold"
