@@ -113,7 +113,7 @@ describe('MenuLateral', () => {
     });
   }
 
-  it('renderiza o slot Parceiro antes da lista de linhas mesmo sem auth', async () => {
+  it('renderiza o slot Parceiro depois da lista de linhas mesmo sem auth', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
         JSON.stringify({
@@ -208,7 +208,7 @@ describe('MenuLateral', () => {
 
     expect(
       Boolean(
-        partnerSpotlight.compareDocumentPosition(lineButton) & Node.DOCUMENT_POSITION_FOLLOWING,
+        lineButton.compareDocumentPosition(partnerSpotlight) & Node.DOCUMENT_POSITION_FOLLOWING,
       ),
     ).toBe(true);
   });

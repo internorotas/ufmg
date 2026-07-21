@@ -629,23 +629,10 @@ export const MenuLateral = React.memo(function MenuLateral({
           aria-label={t('list.aria')}
           hidden={isPlannerOpen}
         >
-          {partnerSpotlight ? (
-            <PartnerSpotlightCard
-              partner={partnerSpotlight}
-              onClick={() => {
-                trackEvent({
-                  category: 'navigation',
-                  action: 'click_partner_spotlight',
-                  label: partnerSpotlight.slug,
-                });
-              }}
-            />
-          ) : null}
-
           {hasFavoritas && (
             <section aria-label="Linhas favoritas" data-slot="favorites-section">
               <p
-                className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary"
+                className="mb-2 text-xs font-semibold text-text-secondary"
                 data-slot="section-label"
               >
                 Favoritas
@@ -705,6 +692,19 @@ export const MenuLateral = React.memo(function MenuLateral({
             : !hasFavoritas && (
                 <SearchEmptyState searchTerm={searchTerm} onClear={() => setSearchTerm('')} />
               )}
+
+          {partnerSpotlight ? (
+            <PartnerSpotlightCard
+              partner={partnerSpotlight}
+              onClick={() => {
+                trackEvent({
+                  category: 'navigation',
+                  action: 'click_partner_spotlight',
+                  label: partnerSpotlight.slug,
+                });
+              }}
+            />
+          ) : null}
 
           {!disclaimerBannerDismissed && (
             <DisclaimerBanner
