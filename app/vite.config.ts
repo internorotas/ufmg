@@ -49,7 +49,6 @@ export default defineConfig(({ mode }) => {
           // Inclui JSON para manter dados de linhas/paradas disponíveis offline.
           globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2,json}'],
           globIgnores: ['_worker.js'],
-          globIgnores: ['_worker.js'],
         },
 
         // Não sobrescreve o site.webmanifest existente em public/
