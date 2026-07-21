@@ -63,6 +63,12 @@ body,
   --color-warning-text: var(--warning-text);
   --color-warning-solid: var(--warning-solid);
 
+  /* Status: Ao vivo/Gravação (Vermelho) */
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-border: var(--danger-border);
+  --color-danger-text: var(--danger-text);
+  --color-danger-solid: var(--danger-solid);
+
   /* Status: Inativo/Neutro (Cinza) */
   --color-neutral-bg: var(--neutral-bg);
   --color-neutral-border: var(--neutral-border);
@@ -130,6 +136,12 @@ body,
   --warning-text: #854d0e; /* Yellow 800 */
   --warning-solid: #a16207;
 
+  /* Semantic: Danger/Ao vivo (Vermelho) - Ajustado para WCAG */
+  --danger-bg: #fee2e2; /* Red 100 */
+  --danger-border: #b91c1c; /* Red 700 */
+  --danger-text: #991b1b; /* Red 800 */
+  --danger-solid: #dc2626; /* Red 600 */
+
   /* Semantic: Neutral (Cinza) */
   --neutral-bg: #f3f4f6; /* Gray 100 */
   --neutral-border: #6b7280; /* Gray 500 */
@@ -192,10 +204,9 @@ body,
   --state-pressed: rgba(44, 14, 235, 0.12);
   --state-focused: rgba(44, 14, 235, 0.12);
 
-  /* Escala de profundidade (z-index) — camadas sobrepostas ao mapa (Leaflet legado
-     usa até z-index 1015 internamente em .leaflet-pane/.leaflet-popup-pane, ver
-     abaixo; as camadas abaixo ficam fora do stacking context do mapa e precisam
-     se manter ordenadas em relação a ele e entre si). */
+  /* Escala de profundidade (z-index) — camadas sobrepostas ao mapa MapLibre e
+     ao conteúdo das páginas internas; mantidas ordenadas entre si. */
+  --z-content-header: 900; /* cabeçalho fixo de páginas internas (AppShell) acima do conteúdo rolável */
   --z-map-decor: 1000; /* chips e indicadores flutuando sobre o mapa (clima, linha selecionada, dica de pitch, favoritas) */
   --z-map-controls: 1010; /* controles interativos sobre o mapa (zoom, FABs, barra inferior) */
   --z-sidebar-backdrop: 1020; /* overlay escuro atrás do menu lateral mobile */
@@ -250,6 +261,12 @@ body,
   --warning-border: #fbbf24; /* Amber 400 */
   --warning-text: #fef08a; /* Yellow 200 */
   --warning-solid: #b45309; /* Amber 700 — contraste suficiente com texto branco */
+
+  /* Semantic: Danger/Ao vivo (Vermelho) - Dark Mode */
+  --danger-bg: #450a0a; /* Red 950 */
+  --danger-border: #f87171; /* Red 400 */
+  --danger-text: #fecaca; /* Red 200 */
+  --danger-solid: #dc2626; /* Red 600 — contraste suficiente com texto branco */
 
   /* Semantic: Neutral (Cinza) - Dark Mode */
   --neutral-bg: #374151; /* Gray 700 */

@@ -90,7 +90,7 @@ export function GpsTrackingCard({
           aria-label="Expandir painel de rastreio"
           className="flex min-h-11 items-center gap-2 px-1"
         >
-          <span className="size-2 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
+          <span className="size-2 animate-pulse rounded-full bg-danger-solid" aria-hidden="true" />
           <span className="text-tiny font-bold tabular-nums" style={{ color: linha.corHex }}>
             {numLinha(linha)}
           </span>
@@ -129,13 +129,13 @@ export function GpsTrackingCard({
             />
           ) : (
             <span
-              className="inline-block size-1.5 animate-pulse rounded-full bg-red-500"
+              className="inline-block size-1.5 animate-pulse rounded-full bg-danger-solid"
               aria-hidden="true"
             />
           )}
           <span
-            className={`text-micro font-bold uppercase tracking-widest ${
-              isStarting ? 'text-brand-primary dark:text-brand-accent' : 'text-red-500'
+            className={`text-micro font-bold ${
+              isStarting ? 'text-brand-primary dark:text-brand-accent' : 'text-danger-solid'
             }`}
           >
             {isStarting ? 'Iniciando' : 'REC'}

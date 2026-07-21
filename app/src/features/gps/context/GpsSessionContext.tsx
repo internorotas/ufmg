@@ -127,7 +127,7 @@ function GpsSessionCompletedCard({
         </div>
 
         <p className="flex items-center justify-center gap-1 text-micro text-text-secondary">
-          <Heart size={9} className="text-red-500" fill="currentColor" aria-hidden="true" />
+          <Heart size={9} className="text-danger-solid" fill="currentColor" aria-hidden="true" />
           Obrigado por ajudar a comunidade!
         </p>
       </div>

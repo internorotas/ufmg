@@ -243,12 +243,12 @@ function BusPopup({
           )}
         </div>
         {isLive && !isStale && (
-          <span className="shrink-0 rounded bg-red-500 px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
+          <span className="shrink-0 rounded bg-danger-solid px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
             AO VIVO
           </span>
         )}
         {isStale && (
-          <span className="shrink-0 rounded bg-amber-500 px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
+          <span className="shrink-0 rounded bg-warning-solid px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
             ATRASADO
           </span>
         )}
