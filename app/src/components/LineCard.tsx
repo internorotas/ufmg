@@ -39,7 +39,7 @@ export const lineCardVariants = tv({
   ],
   variants: {
     selected: {
-      true: ['border-2 border-brand-primary shadow-[4px_4px_0_var(--color-brand-primary)]'],
+      true: ['border-2 border-brand-primary ring-1 ring-brand-primary/30'],
       false: [],
     },
   },

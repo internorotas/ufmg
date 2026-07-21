@@ -199,7 +199,7 @@ export function RankingPage() {
                       onClick={() => setPeriod(item.value)}
                       className={`min-h-10 rounded-(--shape-sm) border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
                         period === item.value
-                          ? 'border-brand-primary bg-brand-primary text-text-inverse shadow-[2px_2px_0_var(--color-brand-primary)]'
+                          ? 'border-brand-primary bg-brand-primary text-text-inverse'
                           : 'border-card-border bg-background text-text-secondary hover:bg-card-hover hover:text-text-primary'
                       }`}
                     >
