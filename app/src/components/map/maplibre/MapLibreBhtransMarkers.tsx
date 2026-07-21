@@ -1,5 +1,5 @@
 import { Bus, Clock, Radio } from 'lucide-react';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Marker, Popup } from 'react-map-gl/maplibre';
 import { getBhtransLineConfig } from '@/features/gps/config/bhtransLines';
 import { useBhtransLivePositions } from '@/features/gps/hooks/useBhtransLivePositions';
@@ -62,7 +62,7 @@ export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }:
       {/* Barra de título: light=escuro sobre branco, dark=cinza médio sobre card escuro.
           pr-9 reserva espaço para o botão × do MapLibre (24px + 6px gap). */}
       <div className="bg-brand-dark dark:bg-neutral-bg px-3 pr-9 py-1.5">
-        <span className="text-xs font-bold tracking-wide uppercase text-text-inverse dark:text-text-primary">
+        <span className="text-xs font-bold text-text-inverse dark:text-text-primary">
           BHTRANS (AO VIVO)
         </span>
       </div>
@@ -116,7 +116,7 @@ export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }:
   );
 }
 
-export function MapLibreBhtransMarkers() {
+export const MapLibreBhtransMarkers = memo(function MapLibreBhtransMarkers() {
   const { positions, fetchedAt } = useBhtransLivePositions();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -164,4 +164,4 @@ export function MapLibreBhtransMarkers() {
       )}
     </>
   );
-}
+});

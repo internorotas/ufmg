@@ -1,6 +1,6 @@
 import { AlertTriangle, Bus, Clock, Radar, Target } from 'lucide-react';
 import maplibregl from 'maplibre-gl';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Popup, useMap } from 'react-map-gl/maplibre';
 import { useBusPosition } from '@/features/gps/hooks/useBusPosition';
 import {
@@ -77,7 +77,10 @@ interface PopupState {
   lat: number;
 }
 
-export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiveBusMarkerProps) {
+export const MapLibreGpsLiveBusMarker = memo(function MapLibreGpsLiveBusMarker({
+  linha,
+  todasParadas,
+}: MapLibreGpsLiveBusMarkerProps) {
   const { current: mapInstance } = useMap();
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -204,7 +207,7 @@ export function MapLibreGpsLiveBusMarker({ linha, todasParadas }: MapLibreGpsLiv
       />
     </Popup>
   );
-}
+});
 
 interface BusPopupProps {
   linha: Linha;

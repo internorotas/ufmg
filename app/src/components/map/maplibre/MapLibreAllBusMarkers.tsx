@@ -1,5 +1,5 @@
 import { Bus, Clock } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Marker, Popup } from 'react-map-gl/maplibre';
 import { useRotasSelection } from '@/contexts/RotasContext';
 import { useAllBusPositions } from '@/features/gps/hooks/useAllBusPositions';
@@ -98,7 +98,7 @@ export function BusMarkerPopup({ linha, pos, onVerLinha }: BusMarkerPopupProps) 
   );
 }
 
-export function MapLibreAllBusMarkers({
+export const MapLibreAllBusMarkers = memo(function MapLibreAllBusMarkers({
   linhas,
   todasParadas,
   linhaNumeroExcluido,
@@ -170,4 +170,4 @@ export function MapLibreAllBusMarkers({
       )}
     </>
   );
-}
+});
