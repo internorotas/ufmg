@@ -43,6 +43,7 @@ import { COORDENADAS_CAMPUS } from './hooks/useLocalizacaoUsuario';
 import { useMapAutoCenter } from './hooks/useMapAutoCenter';
 import { calcularDistanciaKm } from './lib/utils';
 import { ga4Analytics } from './services/analytics';
+import { useOnboardingStore } from './stores/onboardingStore';
 import type { Linha, Parada } from './types/data.types';
 import type { LegalModalType } from './types/legal.types';
 
@@ -183,6 +184,7 @@ function AppContent() {
   const { trackEvent, trackPageView } = useAnalytics();
   const { authStatus, isAuthenticated } = useAuthContext();
   const { isOffline, showOfflineToast } = useAppConnectivity();
+  const hasSeenOnboarding = useOnboardingStore((state) => state.hasSeenOnboarding);
   const { feedbackMessage, executeProtectedAction } = useConsentGate();
   const pendingGpsLinhaRef = useRef<Linha | null>(null);
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
@@ -616,16 +618,23 @@ function AppContent() {
         Pular para o mapa
       </a>
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <AnalyticsConsentBanner />
-        {/* Conectividade tem prioridade sobre o aviso de beta — mostrar os dois ao
-            mesmo tempo é ruído redundante no topo da tela antes do usuário ver o mapa. */}
-        {isOffline || isOfflineDataFallback ? (
-          <OfflineBanner
-            isOffline={isOffline || isOfflineDataFallback}
-            updatedAt={isOfflineDataFallback ? dataUpdatedAt : undefined}
-          />
-        ) : (
-          <BetaBanner />
+        {/* Banners de baixo risco esperam o onboarding ser visto/dispensado — mostrar
+            tudo de uma vez assim que o modal fecha é a mesma parede de avisos, só que
+            sequenciada em vez de empilhada atrás do backdrop. */}
+        {hasSeenOnboarding && (
+          <>
+            <AnalyticsConsentBanner />
+            {/* Conectividade tem prioridade sobre o aviso de beta — mostrar os dois ao
+                mesmo tempo é ruído redundante no topo da tela antes do usuário ver o mapa. */}
+            {isOffline || isOfflineDataFallback ? (
+              <OfflineBanner
+                isOffline={isOffline || isOfflineDataFallback}
+                updatedAt={isOfflineDataFallback ? dataUpdatedAt : undefined}
+              />
+            ) : (
+              <BetaBanner />
+            )}
+          </>
         )}
         <MobileTopBar
           authStatus={authStatus}
@@ -658,7 +667,7 @@ function AppContent() {
               aria-live="polite"
               className="pointer-events-none absolute left-16 right-3 top-3 z-(--z-banner) flex flex-col gap-2 md:left-auto md:w-full md:max-w-lg"
             >
-              {currentCalendarPeriod && !calendarBannerDismissed && (
+              {hasSeenOnboarding && currentCalendarPeriod && !calendarBannerDismissed && (
                 <div className="pointer-events-auto">
                   <CalendarBanner
                     period={currentCalendarPeriod}
@@ -666,7 +675,7 @@ function AppContent() {
                   />
                 </div>
               )}
-              {!currentCalendarPeriod && !infoBannerDismissed && (
+              {hasSeenOnboarding && !currentCalendarPeriod && !infoBannerDismissed && (
                 <div className="pointer-events-auto">
                   <InfoBanner onDismiss={handleInfoBannerDismiss} />
                 </div>
