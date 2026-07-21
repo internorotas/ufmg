@@ -64,8 +64,8 @@ export const badgeVariants = tv({
 
       // Brand badges
       primary: [
-        'bg-internoRotas-azul-eletrico/20 text-internoRotas-azul-eletrico dark:text-brand-accent',
-        'border-internoRotas-azul-eletrico/30 dark:border-brand-accent/30',
+        'bg-brand-primary/20 text-brand-primary dark:text-brand-accent',
+        'border-brand-primary/30 dark:border-brand-accent/30',
       ],
       secondary: ['bg-warning-bg text-warning-text', 'border-warning-border'],
 

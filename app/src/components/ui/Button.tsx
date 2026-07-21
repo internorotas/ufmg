@@ -59,7 +59,7 @@ export const buttonVariants = tv({
         'focus-visible:ring-focus',
       ],
       link: [
-        'bg-transparent text-internoRotas-azul-eletrico underline-offset-4 border-transparent dark:text-brand-accent',
+        'bg-transparent text-brand-primary underline-offset-4 border-transparent dark:text-brand-accent',
         'hover:underline',
         'focus-visible:ring-focus',
       ],

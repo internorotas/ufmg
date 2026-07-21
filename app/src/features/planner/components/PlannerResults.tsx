@@ -35,7 +35,7 @@ const cardVariants = tv({
   ],
   variants: {
     selected: {
-      true: 'border-2 border-internoRotas-azul-eletrico shadow-(--elevation-3)',
+      true: 'border-2 border-brand-primary shadow-(--elevation-3)',
       false: 'surface-card cursor-pointer hover:bg-card-hover',
     },
   },
@@ -251,7 +251,7 @@ function AlternativeCard({ alternative, isSelected, onSelect, onViewOnMap }: Alt
           <button
             type="button"
             onClick={onViewOnMap}
-            className="flex min-h-11 items-center gap-1.5 rounded-lg bg-internoRotas-azul-eletrico px-3 py-1.5 text-sm font-semibold text-white hover:bg-internoRotas-azul-eletrico/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="flex min-h-11 items-center gap-1.5 rounded-lg bg-brand-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             aria-label="Ver rota selecionada no mapa"
           >
             <MapIcon size={14} aria-hidden="true" />

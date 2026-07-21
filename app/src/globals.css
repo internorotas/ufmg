@@ -82,13 +82,6 @@ body,
   --color-brand-dark: #1a1819; /* Preto Carvão */
   --color-brand-gray: #3a3b3c; /* Cinza Grafite */
 
-  /* Aliases para compatibilidade ou uso específico */
-  --color-internoRotas-azul-eletrico: #2c0eeb;
-  --color-internoRotas-bege-areia: #ecdcc4;
-  --color-internoRotas-laranja-ambar: #ffa400;
-  --color-internoRotas-preto-carvao: #1a1819;
-  --color-internoRotas-cinza-grafite: #3a3b3c;
-
   /* Fontes */
   --font-family-sans: "Poppins", sans-serif;
   --font-sans: "Poppins", sans-serif;

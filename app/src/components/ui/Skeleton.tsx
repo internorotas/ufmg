@@ -235,7 +235,7 @@ export function SkeletonMap({ className }: { className?: string }) {
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="size-2 animate-pulse rounded-full bg-internoRotas-azul-eletrico"
+              className="size-2 animate-pulse rounded-full bg-brand-primary"
               style={{ animationDelay: `${i * 0.15}s` }}
             />
           ))}
