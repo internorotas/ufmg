@@ -49,6 +49,24 @@ export default defineConfig(({ mode }) => {
         // Não sobrescreve o site.webmanifest existente em public/
         manifest: false,
       }),
+      // Rocket Loader (Cloudflare) reescreve <script type="module"> e quebra
+      // dynamic imports (lazy chunks retornam text/html → MIME error → tela branca).
+      // data-cfasync="false" instrui o Rocket Loader a ignorar o script.
+      // Vite reescreve o <script> do index.html durante o build, descartando o
+      // data-cfasync="false" colocado na fonte — por isso este plugin re-adiciona
+      // o atributo no HTML gerado.
+      {
+        name: 'cloudflare-cfasync-false',
+        transformIndexHtml: {
+          order: 'post' as const,
+          handler(html: string): string {
+            return html.replace(
+              /<script type="module"/g,
+              '<script data-cfasync="false" type="module"',
+            );
+          },
+        },
+      },
     ],
     base: basePath,
     resolve: {

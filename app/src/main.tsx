@@ -89,9 +89,10 @@ function triggerSingleReloadForUpdatedServiceWorker(): void {
   sessionStorage.setItem(SW_RELOAD_GUARD_KEY, import.meta.env.VITE_BUILD_ID);
   ensureUpdateStatusRegion().textContent = 'Nova versão disponível. Atualizando o aplicativo.';
 
-  window.setTimeout(() => {
-    window.location.reload();
-  }, 150);
+  // Reload imediato: o delay de 150ms criava uma janela onde o React tentava
+  // carregar lazy chunks do build antigo enquanto o novo SW já controlava a
+  // página — os chunks não existiam no novo deploy → MIME error → tela branca.
+  window.location.reload();
 }
 
 async function forceServiceWorkerUpdate(): Promise<void> {
