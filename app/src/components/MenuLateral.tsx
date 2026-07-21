@@ -47,7 +47,7 @@ export const sidebarVariants = tv({
     'h-[calc(100dvh-3.5rem-env(safe-area-inset-bottom))] md:h-full',
     'w-screen max-w-none md:relative md:w-1/2 md:max-w-md',
     'border-r border-(--card-border) text-text-primary',
-    'bg-sidebar/95 backdrop-blur-xl backdrop-saturate-150',
+    'bg-sidebar',
     'shadow-none',
     'overflow-hidden',
     'transform transition-transform duration-300',
