@@ -1,11 +1,17 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const distDir = resolve('dist');
 const indexPath = resolve(distDir, 'index.html');
+const workerPath = resolve(distDir, '_worker.js');
 
 if (!existsSync(indexPath)) {
   throw new Error('dist/index.html não foi gerado.');
+}
+
+if (!existsSync(workerPath)) {
+  throw new Error('dist/_worker.js não foi gerado.');
 }
 
 const missing = new Set();
@@ -43,4 +49,20 @@ if (missing.size > 0) {
   throw new Error(`Assets ausentes no build: ${[...missing].sort().join(', ')}`);
 }
 
-console.log(`Verificados ${visited.size} módulos e assets referenciados em dist/index.html.`);
+const { default: worker } = await import(pathToFileURL(workerPath).href);
+const fallbackResponse = await worker.fetch(new Request('https://internorotas.com/assets/ausente.js'), {
+  ASSETS: {
+    fetch: async () =>
+      new Response('<!doctype html>', { headers: { 'content-type': 'text/html; charset=utf-8' } }),
+  },
+});
+
+if (
+  fallbackResponse.status !== 404 ||
+  fallbackResponse.headers.get('cache-control') !== 'no-store' ||
+  !fallbackResponse.headers.get('content-type')?.startsWith('text/plain')
+) {
+  throw new Error('dist/_worker.js não protege assets ausentes contra fallback HTML.');
+}
+
+console.log(`Verificados ${visited.size} módulos/assets e o Worker do Cloudflare Pages.`);

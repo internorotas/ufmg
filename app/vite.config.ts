@@ -48,6 +48,8 @@ export default defineConfig(({ mode }) => {
         injectManifest: {
           // Inclui JSON para manter dados de linhas/paradas disponíveis offline.
           globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2,json}'],
+          globIgnores: ['_worker.js'],
+          globIgnores: ['_worker.js'],
         },
 
         // Não sobrescreve o site.webmanifest existente em public/
@@ -117,6 +119,9 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_API_VERSION': JSON.stringify(env.VITE_API_VERSION || 'v1'),
     },
     build: {
+      // Cada release usa URLs de assets novas. Assim um HTML devolvido por engano
+      // para um chunk antigo não pode contaminar o cache de uma release futura.
+      assetsDir: `assets/${buildId.replace(/[^a-zA-Z0-9._-]/g, '-')}`,
       // MapLibre GL (~1 MB) não pode ser dividido — é uma lib WebGL monolítica.
       // Já isolado em vendor-maplibre; levantamos o limite para suprimir o aviso.
       chunkSizeWarningLimit: 1100,
