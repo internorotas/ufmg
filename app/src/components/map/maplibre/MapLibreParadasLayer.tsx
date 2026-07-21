@@ -379,7 +379,7 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
           <div className="mb-2 flex items-center gap-2">
             <span
               aria-hidden="true"
-              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-orange-500 text-white shadow-sm"
+              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-accent text-white shadow-sm"
             >
               <Bus size={14} />
             </span>
@@ -388,7 +388,7 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
           <ul className="flex flex-wrap gap-1.5" aria-label="Linhas BHTrans">
             {parada.bhtransLinhas.map((linha) => (
               <li key={linha}>
-                <span className="rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-semibold text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                <span className="rounded-full bg-brand-accent/20 px-2.5 py-0.5 text-xs font-semibold text-brand-accent">
                   {linha}
                 </span>
               </li>
