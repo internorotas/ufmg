@@ -23,8 +23,11 @@ import { useAudioKeepAlive } from '@/hooks/useAudioKeepAlive';
 import { VIAGENS_QUERY_KEY } from '@/hooks/useHistoricoViagens';
 import { useWakeLock } from '@/hooks/useWakeLock';
 
-// Tempo sem posição GPS (app em background) para perguntar ao usuário se ainda está viajando
-const STALE_BACKGROUND_THRESHOLD_MS = 10 * 60 * 1000;
+// Tempo sem posição GPS (app em background) para o primeiro aviso, não-bloqueante —
+// celular no bolso durante uma viagem normal é comportamento comum, não merece
+// interromper a tela na volta. Só escala pra modal bloqueante se continuar parado.
+const STALE_BACKGROUND_NUDGE_MS = 10 * 60 * 1000;
+const STALE_BACKGROUND_BLOCK_MS = 20 * 60 * 1000;
 
 interface CompletedSession {
   sessionId: string;
@@ -161,7 +164,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
 
   // === Detecção de "esqueceu de encerrar" (declarado antes do ingest useEffect) ===
   const lastGpsUpdateRef = useRef<number | null>(null);
-  const [showStillOnTripPrompt, setShowStillOnTripPrompt] = useState(false);
+  const [staleTripLevel, setStaleTripLevel] = useState<'none' | 'nudge' | 'blocking'>('none');
 
   // === Ingestão de snapshots ===
   useEffect(() => {
@@ -308,15 +311,18 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isActive) {
-      setShowStillOnTripPrompt(false);
+      setStaleTripLevel('none');
       return;
     }
     const handleVisibility = () => {
       if (document.visibilityState !== 'visible') return;
       const last = lastGpsUpdateRef.current;
       if (last === null) return;
-      if (Date.now() - last > STALE_BACKGROUND_THRESHOLD_MS) {
-        setShowStillOnTripPrompt(true);
+      const elapsed = Date.now() - last;
+      if (elapsed > STALE_BACKGROUND_BLOCK_MS) {
+        setStaleTripLevel('blocking');
+      } else if (elapsed > STALE_BACKGROUND_NUDGE_MS) {
+        setStaleTripLevel((prev) => (prev === 'blocking' ? prev : 'nudge'));
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
@@ -386,8 +392,48 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
         />
       )}
 
-      {/* Dialog: usuário voltou ao app com sessão ativa há muito tempo */}
-      {showStillOnTripPrompt && (
+      {/* Aviso não-bloqueante: primeira vez que a posição fica parada por muito tempo.
+          Celular no bolso durante uma viagem normal é comum — não interrompe a tela,
+          só oferece a opção de encerrar. Só vira modal bloqueante se persistir (abaixo). */}
+      {staleTripLevel === 'nudge' && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="pointer-events-none fixed inset-x-0 bottom-24 z-(--z-sheet) flex justify-center px-3 md:bottom-6"
+        >
+          <div className="pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-xl border border-card-border bg-card p-3 shadow-lg">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-warning-bg">
+              <Bus size={18} className="text-warning-text" aria-hidden="true" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-text-primary">Ainda em viagem?</p>
+              <p className="text-xs text-text-secondary">Sem posição há mais de 10 min.</p>
+            </div>
+            <div className="flex shrink-0 gap-1.5">
+              <button
+                type="button"
+                onClick={() => setStaleTripLevel('none')}
+                className="rounded-lg px-2.5 py-2 text-xs font-semibold text-text-secondary hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              >
+                Sim
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setStaleTripLevel('none');
+                  void rastreio.stop('manual');
+                }}
+                className="rounded-lg px-2.5 py-2 text-xs font-semibold text-warning-text hover:bg-warning-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              >
+                Encerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal bloqueante: só depois de um segundo período parado (20min) sem resposta ao nudge. */}
+      {staleTripLevel === 'blocking' && (
         <div
           role="dialog"
           aria-modal="true"
@@ -404,14 +450,14 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
                   Ainda em viagem?
                 </p>
                 <p className="text-xs text-text-secondary">
-                  Não detectamos sua posição há mais de 10 minutos.
+                  Não detectamos sua posição há mais de 20 minutos.
                 </p>
               </div>
             </div>
             <div className="flex flex-col gap-2">
               <button
                 type="button"
-                onClick={() => setShowStillOnTripPrompt(false)}
+                onClick={() => setStaleTripLevel('none')}
                 className="w-full rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
               >
                 Ainda estou no ônibus
@@ -419,7 +465,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => {
-                  setShowStillOnTripPrompt(false);
+                  setStaleTripLevel('none');
                   void rastreio.stop('manual');
                 }}
                 className="w-full rounded-xl border border-card-border px-4 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
