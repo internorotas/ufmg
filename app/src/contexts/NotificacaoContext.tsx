@@ -2,8 +2,8 @@
  * NotificacaoContext — estado global de alarmes de aproximação
  *
  * Centraliza o useNotificacao para que qualquer componente
- * (LinhaDetalhesModal, PopupCustomizado, etc.) compartilhe o mesmo
- * conjunto de alarmes e o fluxo de permissão seja executado uma única vez.
+ * (ex: LinhaDetalhesModal) compartilhe o mesmo conjunto de alarmes e
+ * o fluxo de permissão seja executado uma única vez.
  */
 
 import {

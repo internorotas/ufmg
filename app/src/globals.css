@@ -667,21 +667,6 @@ body {
   }
 }
 
-/* Leaflet Ant Path Animation */
-@keyframes leaflet-ant-path-animation {
-  from {
-    stroke-dashoffset: 100%;
-  }
-  to {
-    stroke-dashoffset: 0%;
-  }
-}
-
-path.leaflet-ant-path {
-  fill: none;
-  animation: linear infinite leaflet-ant-path-animation;
-}
-
 /* Marcador destacado — pisca para chamar atenção do usuário após selecionar
    uma parada no modal de itinerário. A animação combina escala e opacidade
    para um efeito natural sem causar layout shift. */
