@@ -18,7 +18,6 @@ import {
   LogIn,
   LogOut,
   RefreshCw,
-  ScrollText,
   ShieldCheck,
   SunMoon,
   Trophy,
@@ -85,16 +84,26 @@ interface SectionProps {
   title: string;
   description?: string;
   children: ReactNode;
+  /** Seção de identidade/conta: layout de coluna única, destacada das grades informativas. */
+  emphasized?: boolean;
 }
 
-function Section({ title, description, children }: SectionProps) {
+function Section({ title, description, children, emphasized = false }: SectionProps) {
   return (
     <section className="space-y-3">
       <header>
         <h2 className="text-xs font-bold text-text-tertiary">{title}</h2>
         {description ? <p className="mt-1 text-sm text-text-secondary">{description}</p> : null}
       </header>
-      <div className="grid grid-cols-1 gap-2 overflow-hidden sm:grid-cols-2">{children}</div>
+      <div
+        className={
+          emphasized
+            ? 'grid grid-cols-1 gap-2 overflow-hidden'
+            : 'grid grid-cols-1 gap-2 overflow-hidden sm:grid-cols-2'
+        }
+      >
+        {children}
+      </div>
     </section>
   );
 }
@@ -307,7 +316,7 @@ export function MorePage() {
     [],
   );
 
-  const sobre: MoreItem[] = useMemo(() => {
+  const sobreELegal: MoreItem[] = useMemo(() => {
     const baseItems: MoreItem[] = [
       {
         kind: 'link',
@@ -316,32 +325,6 @@ export function MorePage() {
         label: 'Sobre o projeto',
         description: 'Como o app funciona, monetização e privacidade.',
       },
-      {
-        kind: 'external',
-        href: 'https://forms.gle/5e9MHq9pp1p8T5Px5',
-        icon: LifeBuoy,
-        label: 'Reportar problema',
-        description: 'Canal direto de feedback, dúvidas e relatos.',
-        analyticsLabel: 'Contato',
-      },
-    ];
-
-    if (tenantConfig.publicRepositoryUrl) {
-      baseItems.push({
-        kind: 'external',
-        href: tenantConfig.publicRepositoryUrl,
-        icon: Heart,
-        label: 'Código aberto',
-        description: 'Repositório público com o histórico do frontend.',
-        analyticsLabel: 'Repositório público',
-      });
-    }
-
-    return baseItems;
-  }, []);
-
-  const legal: MoreItem[] = useMemo(
-    () => [
       {
         kind: 'link',
         to: '/privacidade',
@@ -359,14 +342,26 @@ export function MorePage() {
       {
         kind: 'external',
         href: 'https://forms.gle/5e9MHq9pp1p8T5Px5',
-        icon: ScrollText,
-        label: 'Dúvidas legais',
-        description: 'Entre em contato sobre privacidade, dados ou direitos LGPD.',
-        analyticsLabel: 'Duvidas legais',
+        icon: LifeBuoy,
+        label: 'Reportar problema',
+        description: 'Canal direto de feedback, dúvidas e relatos legais.',
+        analyticsLabel: 'Contato',
       },
-    ],
-    [],
-  );
+    ];
+
+    if (tenantConfig.publicRepositoryUrl) {
+      baseItems.push({
+        kind: 'external',
+        href: tenantConfig.publicRepositoryUrl,
+        icon: Heart,
+        label: 'Código aberto',
+        description: 'Repositório público com o histórico do frontend.',
+        analyticsLabel: 'Repositório público',
+      });
+    }
+
+    return baseItems;
+  }, []);
 
   const preferencias: MoreItem[] = useMemo(() => {
     const items: MoreItem[] = [
@@ -433,6 +428,7 @@ export function MorePage() {
               ? 'Gerencie perfil, privacidade e sessão.'
               : 'Faça login para contribuir com GPS colaborativo e aparecer no ranking.'
           }
+          emphasized
         >
           {identidade.map((item, index) => renderItem(item, `identidade-${index}`))}
         </Section>
@@ -444,16 +440,12 @@ export function MorePage() {
           {engajamento.map((item, index) => renderItem(item, `engajamento-${index}`))}
         </Section>
 
-        <Section title="Sobre" description="Tudo sobre o projeto, contato e código.">
-          {sobre.map((item, index) => renderItem(item, `sobre-${index}`))}
-        </Section>
-
-        <Section title="Legal" description="Documentos legais e compromissos do projeto.">
-          {legal.map((item, index) => renderItem(item, `legal-${index}`))}
-        </Section>
-
         <Section title="Preferências" description="Ajustes de aparência e experiência.">
           {preferencias.map((item, index) => renderItem(item, `preferencias-${index}`))}
+        </Section>
+
+        <Section title="Sobre e legal" description="Projeto, contato, privacidade e termos de uso.">
+          {sobreELegal.map((item, index) => renderItem(item, `sobre-legal-${index}`))}
         </Section>
 
         <section className="space-y-3">
