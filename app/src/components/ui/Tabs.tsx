@@ -68,7 +68,7 @@ export const tabsListVariants = tv({
 export const tabsTriggerVariants = tv({
   base: [
     'inline-flex min-w-0 items-center justify-center cursor-pointer',
-    'font-medium transition-all duration-150 ease-out',
+    'font-medium transition duration-150 ease-out',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
     'disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed',
     'active:scale-[0.97]',

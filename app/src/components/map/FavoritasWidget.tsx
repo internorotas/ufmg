@@ -48,7 +48,7 @@ export function FavoritasWidget({ todasParadas }: FavoritasWidgetProps) {
                 type="button"
                 onClick={() => handleSelect(parada)}
                 aria-pressed={isSelected}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
+                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
                   isSelected
                     ? 'bg-brand-primary text-white ring-brand-primary'
                     : 'bg-card/90 backdrop-blur text-text-primary ring-card-border hover:bg-card hover:ring-brand-primary'

@@ -71,7 +71,7 @@ export const categoryTabVariants = tv({
     'flex-1 min-h-11 rounded px-2 py-1.5 lg:py-2.5',
     'text-[0.75rem] sm:text-xs lg:text-sm font-medium leading-tight text-center',
     'whitespace-normal break-words overflow-visible text-clip',
-    'cursor-pointer transition-all duration-150 ease-out',
+    'cursor-pointer transition duration-150 ease-out',
     'active:scale-[0.97]',
     'data-[state=active]:bg-brand-primary data-[state=active]:text-white',
     'data-[state=inactive]:bg-background-secondary data-[state=inactive]:text-text-secondary',
@@ -661,10 +661,7 @@ export const MenuLateral = React.memo(function MenuLateral({
           )}
 
           {hasFavoritas && hasRegularResults && (
-            <p
-              className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary"
-              data-slot="section-label"
-            >
+            <p className="mb-2 text-xs font-semibold text-text-secondary" data-slot="section-label">
               Todas as Linhas
             </p>
           )}

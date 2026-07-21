@@ -34,7 +34,7 @@ import { LineStatusBadge, type LineStatusType } from './ui/Badge';
 export const lineCardVariants = tv({
   base: [
     'relative overflow-hidden rounded-(--shape-sm) border border-card-border bg-card shadow-(--elevation-1)',
-    'hover:shadow-(--elevation-2) hover:-translate-y-px transition-all duration-150',
+    'hover:shadow-(--elevation-2) hover:-translate-y-px transition duration-150',
     'focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-primary focus-within:ring-offset-2',
   ],
   variants: {
@@ -55,7 +55,7 @@ export const detailsButtonVariants = tv({
   base: [
     'w-full rounded-(--shape-xs) border border-transparent bg-background px-4 py-3 font-semibold cursor-pointer',
     'text-sm',
-    'hover:bg-card-hover hover:border-(--card-border) active:scale-[0.97] transition-all duration-150',
+    'hover:bg-card-hover hover:border-(--card-border) active:scale-[0.97] transition duration-150',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
   ],
 });
@@ -387,7 +387,7 @@ function LineCardComponent({
           }
           aria-pressed={favoritado}
           className={cn(
-            'flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg border p-3 transition-all duration-150 hover:bg-card-hover active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+            'flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg border p-3 transition duration-150 hover:bg-card-hover active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
             favoritado && 'shadow-sm',
           )}
           style={{

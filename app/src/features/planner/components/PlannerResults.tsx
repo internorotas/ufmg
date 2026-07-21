@@ -30,7 +30,7 @@ const etaBadgeVariants = tv({
 
 const cardVariants = tv({
   base: [
-    'rounded-(--shape-sm) bg-card p-4 transition-all duration-200',
+    'rounded-(--shape-sm) bg-card p-4 transition duration-200',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
   ],
   variants: {

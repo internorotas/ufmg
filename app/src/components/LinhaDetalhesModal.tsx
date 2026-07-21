@@ -56,7 +56,7 @@ export const stopIconContainerVariants = tv({
 const SCHEDULE_COLLAPSE_THRESHOLD = 10;
 
 export const scheduleCardVariants = tv({
-  base: 'rounded border bg-card p-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+  base: 'rounded border bg-card p-3 text-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
   variants: {
     status: {
       upcoming:

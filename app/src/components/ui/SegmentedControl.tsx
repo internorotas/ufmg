@@ -55,7 +55,7 @@ export function SegmentedControl<T extends string = string>({
             disabled={disabled}
             onClick={() => onChange(option.value)}
             className={cn(
-              'flex-1 rounded px-3 py-1.5 text-xs font-semibold transition-all duration-150',
+              'flex-1 rounded px-3 py-1.5 text-xs font-semibold transition duration-150',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background-secondary',
               isActive
                 ? 'bg-brand-primary text-text-inverse shadow-(--elevation-2)'

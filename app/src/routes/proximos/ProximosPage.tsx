@@ -30,7 +30,7 @@ function ParadaCard({
   onClick: () => void;
 }) {
   return (
-    <div className="surface-card flex w-full items-center gap-2 p-4 transition-all hover:-translate-y-px hover:shadow-(--elevation-2)">
+    <div className="surface-card flex w-full items-center gap-2 p-4 transition hover:-translate-y-px hover:shadow-(--elevation-2)">
       <button
         type="button"
         onClick={onClick}
@@ -107,7 +107,7 @@ export function ProximosPage() {
           <section aria-labelledby="favoritas-heading">
             <h2
               id="favoritas-heading"
-              className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-text-secondary"
+              className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-text-secondary"
             >
               <Heart size={12} aria-hidden="true" className="text-brand-primary" />
               Paradas favoritas
@@ -128,10 +128,7 @@ export function ProximosPage() {
 
         {/* Seção de paradas próximas */}
         <section aria-labelledby="proximas-heading">
-          <h2
-            id="proximas-heading"
-            className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary"
-          >
+          <h2 id="proximas-heading" className="mb-2 text-xs font-semibold text-text-secondary">
             Próximas de você
           </h2>
 
