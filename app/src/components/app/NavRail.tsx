@@ -7,19 +7,9 @@
  */
 
 import { Link, useLocation } from 'react-router-dom';
-import { NAV_ITEMS, type NavItem } from '@/components/app/navItems';
+import { isNavItemActive, NAV_ITEMS } from '@/components/app/navItems';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { cn } from '@/lib/utils';
-
-function isItemActive(currentPath: string, item: NavItem, resolvedTo: string): boolean {
-  if (item.matchPrefix) {
-    if (currentPath === item.matchPrefix || currentPath.startsWith(`${item.matchPrefix}/`)) {
-      return true;
-    }
-  }
-  const targets = [item.to, resolvedTo].filter(Boolean);
-  return targets.some((t) => currentPath === t || currentPath.startsWith(`${t}/`));
-}
 
 export function NavRail() {
   const location = useLocation();
@@ -37,7 +27,7 @@ export function NavRail() {
         {NAV_ITEMS.filter((item) => !item.hideOnDesktop).map((item) => {
           const Icon = item.icon;
           const resolvedTo = !isAuthenticated && item.anonymousTo ? item.anonymousTo : item.to;
-          const active = isItemActive(location.pathname, item, resolvedTo);
+          const active = isNavItemActive(location.pathname, item, resolvedTo);
           return (
             <Link
               key={item.to}

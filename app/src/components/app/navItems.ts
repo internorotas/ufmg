@@ -11,6 +11,17 @@ export interface NavItem {
   hideOnDesktop?: boolean;
 }
 
+/** Decide se um item de navegação corresponde à rota atual — usado por NavRail e BottomNav. */
+export function isNavItemActive(currentPath: string, item: NavItem, resolvedTo: string): boolean {
+  if (item.matchPrefix) {
+    if (currentPath === item.matchPrefix || currentPath.startsWith(`${item.matchPrefix}/`)) {
+      return true;
+    }
+  }
+  const targets = [item.to, resolvedTo].filter(Boolean);
+  return targets.some((t) => currentPath === t || currentPath.startsWith(`${t}/`));
+}
+
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', icon: MapIcon, label: 'Mapa' },
   { to: '/linhas', icon: Bus, label: 'Linhas', matchPrefix: '/linhas', hideOnDesktop: true },
