@@ -13,7 +13,6 @@
     <meta name="google-site-verification" content="udp8Mm0bqOKj_IvRSVDX-WAy2NAgPWyLlbsmYGAicSE" />
 
 
-    <script data-cfasync="false" src="/cache-recovery.js"></script>
     <script data-cfasync="false" src="https://challenges.cloudflare.com/turnstile/v0/api.js" async></script>
 
     <title>Interno Rotas | Transporte universitário UFMG</title>
@@ -174,6 +173,26 @@
   </head>
 
   <body>
+    <div
+      id="startup-fallback"
+      role="status"
+      aria-live="polite"
+      style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;background:#f7f7fb;color:#1f1f2e;font-family:system-ui,sans-serif;text-align:center"
+    >
+      <div style="max-width:360px">
+        <h1 style="font-size:1.25rem;margin:0 0 .75rem">Carregando Interno Rotas</h1>
+        <p id="startup-fallback-message" style="margin:0 0 1rem;color:#52525b">
+          Estamos preparando a versão mais recente do aplicativo.
+        </p>
+        <button
+          type="button"
+          onclick="window.location.reload()"
+          style="border:0;border-radius:8px;padding:.7rem 1rem;background:#2c0eeb;color:white;font:inherit;font-weight:600;cursor:pointer"
+        >
+          Recarregar
+        </button>
+      </div>
+    </div>
     <div id="root"></div>
     <noscript>
       <div style="max-width:480px;margin:2rem auto;padding:0 1rem;font-family:system-ui,-apple-system,sans-serif;color:#171717;line-height:1.5">

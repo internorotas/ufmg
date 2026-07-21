@@ -4,12 +4,16 @@ import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import packageJson from '../package.json';
+import { resolveBuildVersion } from './src/pwa/buildVersion';
 import { resolveTenantDefinition } from './src/tenants/tenantDefinitions';
-
-const buildId = new Date().toISOString();
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const buildId = resolveBuildVersion({
+    cfPagesCommitSha: process.env.CF_PAGES_COMMIT_SHA,
+    viteBuildId: process.env.VITE_BUILD_ID ?? env.VITE_BUILD_ID,
+    appVersion: packageJson.version,
+  });
   const devProxyTarget =
     env.VITE_DEV_PROXY_TARGET?.trim() ||
     process.env.VITE_DEV_PROXY_TARGET?.trim() ||

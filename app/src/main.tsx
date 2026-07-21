@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { installChunkPreloadRecovery } from '@/pwa/chunkRecovery';
 import { getTenantStorageKey } from '@/pwa/tenantNamespace';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import { applyTenantDocumentMetadata } from '@/tenants/tenantConfig';
@@ -47,6 +48,31 @@ const MANIFEST_URL = new URL(
 ).toString();
 
 applyTenantDocumentMetadata();
+
+function getStartupFallback(): HTMLElement | null {
+  return document.getElementById('startup-fallback');
+}
+
+function hideStartupFallback(): void {
+  const fallback = getStartupFallback();
+  if (fallback) fallback.hidden = true;
+}
+
+function showPersistentChunkFailure(): void {
+  const fallback = getStartupFallback();
+  const message = document.getElementById('startup-fallback-message');
+
+  if (message) {
+    message.textContent =
+      'Não foi possível concluir a atualização. Recarregue para tentar novamente.';
+  }
+  if (fallback) fallback.hidden = false;
+
+  Sentry.captureMessage('Falha persistente ao carregar atualização do aplicativo', {
+    level: 'warning',
+  });
+}
+
 function ensureUpdateStatusRegion(): HTMLElement {
   const existingRegion = document.getElementById(UPDATE_STATUS_REGION_ID);
 
@@ -95,17 +121,17 @@ function triggerSingleReloadForUpdatedServiceWorker(): void {
   window.location.reload();
 }
 
-async function forceServiceWorkerUpdate(): Promise<void> {
-  if (!('serviceWorker' in navigator)) {
-    triggerSingleReloadForUpdatedServiceWorker();
-    return;
-  }
+async function requestServiceWorkerUpdate(): Promise<void> {
+  if (!('serviceWorker' in navigator)) return;
 
   const registration = await navigator.serviceWorker.getRegistration(SERVICE_WORKER_SCOPE);
   if (registration) {
     await registration.update();
   }
+}
 
+async function forceServiceWorkerUpdate(): Promise<void> {
+  await requestServiceWorkerUpdate();
   triggerSingleReloadForUpdatedServiceWorker();
 }
 
@@ -248,25 +274,28 @@ if (!rootElement) {
   throw new Error('Elemento #root não encontrado para inicializar a aplicação.');
 }
 
-// Se o forceCacheRecovery (inline em index.html) está em andamento, não monta
-// o React. O script vai redirecionar a página após limpar SW + caches antigos.
-// Isso evita o "Invalid hook call" causado por assets de builds misturados.
-if (document.documentElement.getAttribute('data-cache-recovery') !== 'in-progress') {
-  createRoot(rootElement).render(
-    <StrictMode>
-      <AppQueryProvider>
-        <BrowserRouter
-          basename={import.meta.env.BASE_URL}
-          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-        >
-          <App />
-        </BrowserRouter>
-      </AppQueryProvider>
-    </StrictMode>,
-  );
+installChunkPreloadRecovery({
+  buildId: import.meta.env.VITE_BUILD_ID,
+  updateServiceWorker: requestServiceWorkerUpdate,
+  reload: () => window.location.reload(),
+  onPersistentFailure: showPersistentChunkFailure,
+});
 
-  window.addEventListener('internorotas:api-version-mismatch', handleApiVersionMismatch);
+createRoot(rootElement).render(
+  <StrictMode>
+    <AppQueryProvider>
+      <BrowserRouter
+        basename={import.meta.env.BASE_URL}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <App />
+      </BrowserRouter>
+    </AppQueryProvider>
+  </StrictMode>,
+);
+hideStartupFallback();
 
-  ensureManifestLink();
-  registerAppServiceWorker();
-}
+window.addEventListener('internorotas:api-version-mismatch', handleApiVersionMismatch);
+
+ensureManifestLink();
+registerAppServiceWorker();

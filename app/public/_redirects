@@ -1,7 +1,0 @@
-# Assets (JS, CSS, fonts, imagens) nunca devem receber fallback HTML.
-# Se um chunk não existe no deploy (hash antigo em index.html cacheado),
-# deve retornar 404, não index.html — MIME type de módulo exige JS, não HTML.
-/assets/*  404
-
-# SPA: todas as outras rotas servem index.html (navegação client-side via React Router).
-/*  /index.html  200
