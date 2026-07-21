@@ -607,9 +607,9 @@ export function ProfilePage() {
                 />
 
                 <div className="surface-card-sm bg-background px-3 py-2 text-xs text-text-secondary">
-                  Ao usar o app, você contribui com dados de localização por padrão. Isso melhora
-                  as informações em tempo real para todos os usuários. Você pode desativar a
-                  qualquer momento usando o botão acima.
+                  Ao usar o app, você contribui com dados de localização por padrão. Isso melhora as
+                  informações em tempo real para todos os usuários. Você pode desativar a qualquer
+                  momento usando o botão acima.
                 </div>
 
                 <SwitchRow

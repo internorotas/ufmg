@@ -16,9 +16,8 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import MapLibreMap, { type MapRef, Layer, Source } from 'react-map-gl/maplibre';
+import MapLibreMap, { Layer, type MapRef, Source } from 'react-map-gl/maplibre';
 import { tv } from 'tailwind-variants';
-import { TILE_PROVIDERS } from './map/tileProviders';
 import { useNotificacaoContext } from '../contexts/NotificacaoContext';
 import { useAnalytics, useSessionTiming } from '../hooks/useAnalytics';
 import { useCurrentTime } from '../hooks/useCurrentTime';
@@ -34,6 +33,7 @@ import {
 } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { Modal } from './Modal';
+import { TILE_PROVIDERS } from './map/tileProviders';
 import { FeedbackBanner } from './ui/FeedbackBanner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
 
@@ -124,9 +124,7 @@ function MiniRouteMap({ linha, paradas }: { linha: Linha; paradas: Parada[] }) {
       properties: {},
       geometry: {
         type: 'LineString' as const,
-        coordinates: hasRoute
-          ? linha.coordenadasTrajeto.map(([lat, lng]) => [lng, lat])
-          : [],
+        coordinates: hasRoute ? linha.coordenadasTrajeto.map(([lat, lng]) => [lng, lat]) : [],
       },
     }),
     [hasRoute, linha.coordenadasTrajeto],
