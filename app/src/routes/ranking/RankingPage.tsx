@@ -190,9 +190,7 @@ export function RankingPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                  Período
-                </p>
+                <p className="text-xs font-semibold text-text-tertiary">Período</p>
                 <div className="flex flex-wrap gap-2">
                   {PERIOD_OPTIONS.map((item) => (
                     <button

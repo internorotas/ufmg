@@ -69,7 +69,7 @@ function GroupedRow({ group, onSelect }: { group: LinhaGroup; onSelect: (l: Linh
           style={{ backgroundColor: first?.corHex }}
           aria-hidden="true"
         />
-        <p className="text-tiny font-semibold uppercase tracking-wide text-text-tertiary">
+        <p className="text-tiny font-semibold text-text-tertiary">
           Linha {group.numero}: {group.linhas.length} variantes
         </p>
       </div>

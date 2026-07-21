@@ -317,9 +317,7 @@ export function LinhasPage() {
             <>
               {hasFavoritas && (
                 <section aria-label="Linhas favoritas">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
-                    Favoritas
-                  </p>
+                  <p className="mb-2 text-xs font-semibold text-text-secondary">Favoritas</p>
                   {linhasFavoritas.map((linha) => (
                     <div
                       key={linha.idRota}
@@ -343,9 +341,7 @@ export function LinhasPage() {
               )}
 
               {hasFavoritas && hasRegularResults && (
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
-                  Todas as Linhas
-                </p>
+                <p className="mb-2 text-xs font-semibold text-text-secondary">Todas as Linhas</p>
               )}
 
               {hasRegularResults

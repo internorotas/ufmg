@@ -30,7 +30,7 @@ export function TermsOfUseContent() {
   return (
     <article className="space-y-6 text-sm leading-relaxed text-text-secondary">
       <header className="space-y-1">
-        <p className="text-xs uppercase tracking-wide text-text-tertiary">
+        <p className="text-xs text-text-tertiary">
           Última atualização: {LAST_UPDATED} · Vigência: {EFFECTIVE_DATE}
         </p>
         <p>

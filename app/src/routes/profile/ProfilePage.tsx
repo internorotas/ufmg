@@ -315,14 +315,14 @@ export function ProfilePage() {
               <p className="text-lg font-bold text-text-primary tabular-nums">
                 {profile.gamification.totalPoints}
               </p>
-              <p className="text-xs uppercase tracking-wide text-text-secondary">pts</p>
+              <p className="text-xs text-text-secondary">pts</p>
             </div>
             <div className="w-px bg-card-border" />
             <div>
               <p className="text-lg font-bold text-text-primary tabular-nums">
                 {profile.gamification.streakCurrentDays}
               </p>
-              <p className="text-xs uppercase tracking-wide text-text-secondary">streak</p>
+              <p className="text-xs text-text-secondary">streak</p>
             </div>
           </div>
         </header>
@@ -363,23 +363,17 @@ export function ProfilePage() {
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-3">
                 <div className="surface-card-sm bg-background px-3 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                    Pontos totais
-                  </p>
+                  <p className="text-xs font-semibold text-text-tertiary">Pontos totais</p>
                   <p className="mt-2 text-2xl font-bold text-text-primary">
                     {profile.gamification.totalPoints}
                   </p>
                 </div>
                 <div className="surface-card-sm bg-background px-3 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                    Ranking semanal
-                  </p>
+                  <p className="text-xs font-semibold text-text-tertiary">Ranking semanal</p>
                   <p className="mt-2 text-sm font-semibold text-text-primary">{weeklyRankLabel}</p>
                 </div>
                 <div className="surface-card-sm bg-background px-3 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                    Streak
-                  </p>
+                  <p className="text-xs font-semibold text-text-tertiary">Streak</p>
                   <p className="mt-2 text-sm font-semibold text-text-primary">
                     {profile.gamification.streakCurrentDays} dias agora
                   </p>
@@ -574,9 +568,7 @@ export function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="space-y-1.5">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                    Perfil de notificação
-                  </p>
+                  <p className="text-xs font-semibold text-text-tertiary">Perfil de notificação</p>
                   <select
                     value={profile.notificationProfile}
                     onChange={(e) =>

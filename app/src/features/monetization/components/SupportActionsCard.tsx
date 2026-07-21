@@ -132,27 +132,21 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
 
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="surface-card-sm bg-background px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-              Última doação
-            </p>
+            <p className="text-xs font-semibold text-text-tertiary">Última doação</p>
             <p className="mt-2 text-sm font-semibold text-text-primary">
               {formatDatePtBr(monetization.lastDonationAt)}
             </p>
           </div>
 
           <div className="surface-card-sm bg-background px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-              Próximo pagamento
-            </p>
+            <p className="text-xs font-semibold text-text-tertiary">Próximo pagamento</p>
             <p className="mt-2 text-sm font-semibold text-text-primary">
               {formatDatePtBr(monetization.nextPaymentAt)}
             </p>
           </div>
 
           <div className="surface-card-sm bg-background px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-              Recorrência atual
-            </p>
+            <p className="text-xs font-semibold text-text-tertiary">Recorrência atual</p>
             <p className="mt-2 text-sm font-semibold text-text-primary">
               {monetization.activeSubscription
                 ? `${formatCurrency(monetization.activeSubscription.amountCents)} por mês`

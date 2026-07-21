@@ -103,9 +103,7 @@ export function ResearchDashboardPage() {
             <CardContent className="space-y-3 text-sm text-text-secondary">
               <p>{resumo}</p>
               <label className="block space-y-1">
-                <span className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                  Linha (opcional)
-                </span>
+                <span className="text-xs font-semibold text-text-tertiary">Linha (opcional)</span>
                 <input
                   value={linhaId}
                   onChange={(event) => setLinhaId(event.target.value)}
@@ -114,9 +112,7 @@ export function ResearchDashboardPage() {
                 />
               </label>
               <label className="block space-y-1">
-                <span className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                  Período
-                </span>
+                <span className="text-xs font-semibold text-text-tertiary">Período</span>
                 <select
                   value={period}
                   onChange={(event) => setPeriod(event.target.value)}
@@ -139,7 +135,7 @@ export function ResearchDashboardPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <label className="block space-y-1">
-                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+                <span className="flex items-center gap-2 text-xs font-semibold text-text-tertiary">
                   <Mail size={14} aria-hidden="true" />
                   Email
                 </span>

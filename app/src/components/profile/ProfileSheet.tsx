@@ -127,9 +127,7 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
             ) : null}
 
             <div className="surface-card bg-card p-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
-                Consentimento LGPD
-              </p>
+              <p className="mb-2 text-xs font-semibold text-text-tertiary">Consentimento LGPD</p>
               <p className="text-sm text-text-secondary">
                 GPS:{' '}
                 {profile ? formatConsent(profile.consentGpsAt) : isLoading ? 'Carregando...' : '—'}
