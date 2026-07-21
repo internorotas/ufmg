@@ -617,11 +617,16 @@ function AppContent() {
       </a>
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AnalyticsConsentBanner />
-        <BetaBanner />
-        <OfflineBanner
-          isOffline={isOffline || isOfflineDataFallback}
-          updatedAt={isOfflineDataFallback ? dataUpdatedAt : undefined}
-        />
+        {/* Conectividade tem prioridade sobre o aviso de beta — mostrar os dois ao
+            mesmo tempo é ruído redundante no topo da tela antes do usuário ver o mapa. */}
+        {isOffline || isOfflineDataFallback ? (
+          <OfflineBanner
+            isOffline={isOffline || isOfflineDataFallback}
+            updatedAt={isOfflineDataFallback ? dataUpdatedAt : undefined}
+          />
+        ) : (
+          <BetaBanner />
+        )}
         <MobileTopBar
           authStatus={authStatus}
           isAuthenticated={isAuthenticated}
