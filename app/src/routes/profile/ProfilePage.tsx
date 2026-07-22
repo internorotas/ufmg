@@ -5,11 +5,11 @@ import {
   Bell,
   Bus,
   Eye,
-  EyeOff,
   MapPin,
   Medal,
   Route,
   Settings,
+  Trash2,
   Trophy,
   UserCircle2,
 } from 'lucide-react';
@@ -657,9 +657,7 @@ export function ProfilePage() {
                   className="min-h-11"
                   disabled={isLogoutPending || isDeletingAccount}
                   onClick={() => setIsDeleteDialogOpen(true)}
-                  leftIcon={
-                    profile.profilePublic ? <EyeOff size={16} aria-hidden="true" /> : undefined
-                  }
+                  leftIcon={<Trash2 size={16} aria-hidden="true" />}
                 >
                   Solicitar exclusão de conta
                 </Button>
