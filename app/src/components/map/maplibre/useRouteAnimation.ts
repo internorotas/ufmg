@@ -35,17 +35,28 @@ export function useRouteAnimation(layerId: string, active: boolean): void {
     const map = mapInstance.getMap();
     if (!map) return;
 
-    let step = 0;
-
-    const id = setInterval(() => {
-      step = (step + 1) % DASH_SEQUENCE.length;
+    const setDash = (dash: number[]) => {
       try {
         if (map.getLayer(layerId)) {
-          map.setPaintProperty(layerId, 'line-dasharray', DASH_SEQUENCE[step]);
+          map.setPaintProperty(layerId, 'line-dasharray', dash);
         }
       } catch {
         // layer ainda não foi adicionado ao estilo — ignora silenciosamente
       }
+    };
+
+    // prefers-reduced-motion: fixa um traço estático em vez de animar — o
+    // guard global (@media prefers-reduced-motion em globals.css) só cobre
+    // transition/animation CSS, não paint properties do MapLibre via JS.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDash(DASH_SEQUENCE[0]);
+      return;
+    }
+
+    let step = 0;
+    const id = setInterval(() => {
+      step = (step + 1) % DASH_SEQUENCE.length;
+      setDash(DASH_SEQUENCE[step]);
     }, 80);
 
     return () => clearInterval(id);
