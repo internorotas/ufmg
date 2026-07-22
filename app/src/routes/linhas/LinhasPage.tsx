@@ -1,7 +1,8 @@
-import { ArrowLeft, Info, LayoutList, Star } from 'lucide-react';
+import { Info, LayoutList, Star } from 'lucide-react';
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { AppShell } from '@/components/app/AppShell';
 import { CalendarBanner } from '@/components/CalendarBanner';
 import { LineCard } from '@/components/LineCard';
 import { LineGroupCard } from '@/components/LineGroupCard';
@@ -200,21 +201,7 @@ export function LinhasPage() {
   }, [linhaDetalhesAberta, trackEvent]);
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col overflow-hidden text-text-primary">
-      {/* Header */}
-      <header className="shrink-0 bg-brand-primary px-3 py-2 shadow-(--elevation-2)">
-        <div className="flex items-center gap-3">
-          <Link
-            to="/"
-            aria-label="Voltar ao mapa"
-            className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors"
-          >
-            <ArrowLeft size={20} aria-hidden="true" />
-          </Link>
-          <h1 className="text-sm font-semibold text-white">Linhas e paradas</h1>
-        </div>
-      </header>
-
+    <AppShell title="Linhas e paradas" fullBleed>
       {/* Search */}
       <div className="shrink-0 border-b border-card-border bg-background-secondary p-2 lg:p-3">
         <SearchInput
@@ -414,6 +401,6 @@ export function LinhasPage() {
           />
         </Suspense>
       )}
-    </div>
+    </AppShell>
   );
 }

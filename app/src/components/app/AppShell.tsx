@@ -20,6 +20,12 @@ export interface AppShellProps {
   actions?: ReactNode;
   children: ReactNode;
   contentClassName?: string;
+  /**
+   * Para páginas com layout próprio de rolagem/colunas (ex: lista + painel de
+   * detalhes lado a lado). Remove o padding e o `max-w` centralizado do main,
+   * deixando os filhos controlarem sua própria altura/rolagem.
+   */
+  fullBleed?: boolean;
 }
 
 export function AppShell({
@@ -30,6 +36,7 @@ export function AppShell({
   actions,
   children,
   contentClassName,
+  fullBleed = false,
 }: AppShellProps) {
   return (
     <div className="flex flex-1 min-h-0 overflow-hidden bg-background-secondary text-text-primary">
@@ -61,16 +68,26 @@ export function AppShell({
           </div>
         </header>
 
-        <main
-          id="shell-main"
-          tabIndex={-1}
-          className={cn(
-            'min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 pt-5 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 md:pb-5',
-            contentClassName,
-          )}
-        >
-          <div className="mx-auto w-full max-w-5xl">{children}</div>
-        </main>
+        {fullBleed ? (
+          <main
+            id="shell-main"
+            tabIndex={-1}
+            className={cn('flex min-h-0 flex-1 flex-col overflow-hidden', contentClassName)}
+          >
+            {children}
+          </main>
+        ) : (
+          <main
+            id="shell-main"
+            tabIndex={-1}
+            className={cn(
+              'min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 pt-5 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:px-6 md:pb-5',
+              contentClassName,
+            )}
+          >
+            <div className="mx-auto w-full max-w-5xl">{children}</div>
+          </main>
+        )}
       </div>
     </div>
   );
