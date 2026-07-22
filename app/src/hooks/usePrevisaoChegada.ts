@@ -6,6 +6,7 @@ import {
   type PrevisaoChegadaResultado,
 } from '@/features/eta/domain/calculateEta';
 import type { Linha } from '../types/data.types';
+import { useApiAvailability } from './useApiAvailability';
 import { useCurrentTime } from './useCurrentTime';
 
 export interface PrevisaoChegadaRemota {
@@ -34,6 +35,7 @@ export function usePrevisaoChegada(
 ): PrevisaoChegadaComposta | null {
   const dataAtual = useCurrentTime();
   const linhaId = linha?.idRota ?? null;
+  const { apiStatus } = useApiAvailability();
   const { data: remoto } = useQuery({
     queryKey: ['live-eta', linhaId, idParadaAtual],
     queryFn: async () => {
@@ -43,7 +45,7 @@ export function usePrevisaoChegada(
 
       return fetchLiveEta(linhaId, idParadaAtual);
     },
-    enabled: Boolean(linhaId && idParadaAtual),
+    enabled: Boolean(linhaId && idParadaAtual) && apiStatus !== 'offline',
     staleTime: 15_000,
     gcTime: 5 * 60 * 1000,
     retry: 1,

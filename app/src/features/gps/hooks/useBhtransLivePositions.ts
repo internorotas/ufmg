@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { getApiStatus } from '@/hooks/useApiAvailability';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import { UFMG_BHTRANS_LINE_IDS } from '../config/bhtransLines';
 
@@ -30,6 +31,7 @@ export function useBhtransLivePositions(): BhtransLiveState {
     let cancelled = false;
 
     const poll = async () => {
+      if (getApiStatus() === 'offline') return;
       try {
         const { accessToken } = useAuthStore.getState();
         const headers = withTenantHeaders();

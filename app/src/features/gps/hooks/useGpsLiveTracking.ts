@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { getApiStatus } from '@/hooks/useApiAvailability';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 import { tenantSlug } from '@/tenants/tenantConfig';
 
@@ -95,6 +96,7 @@ export function useGpsLiveTracking(linhaId: string | null): GpsLiveState {
     // Anonymous: poll HTTP endpoint
     consecutiveFailuresRef.current = 0;
     const poll = async () => {
+      if (getApiStatus() === 'offline') return;
       try {
         const url = resolveApiEndpoint(`/v1/gps/location/${encodeURIComponent(linhaId)}`);
         const res = await fetch(url, { headers: withTenantHeaders() });
