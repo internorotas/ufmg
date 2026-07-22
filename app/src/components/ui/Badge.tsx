@@ -26,7 +26,7 @@ export const badgeVariants = tv({
       success: ['bg-success-bg text-success-text border-success-border'],
       info: ['bg-info-bg text-info-text border-info-border'],
       warning: ['bg-warning-bg text-warning-text border-warning-border'],
-      danger: ['bg-warning-bg text-warning-text border-warning-border'],
+      danger: ['bg-danger-bg text-danger-text border-danger-border'],
       neutral: ['bg-neutral-bg text-neutral-text border-neutral-border'],
       bronze: [
         'bg-[var(--gamification-bronze-bg)] text-[var(--gamification-bronze-text)] border-[var(--gamification-bronze-border)]',
@@ -67,7 +67,10 @@ export const badgeVariants = tv({
         'bg-brand-primary/20 text-brand-primary dark:text-brand-accent',
         'border-brand-primary/30 dark:border-brand-accent/30',
       ],
-      secondary: ['bg-warning-bg text-warning-text', 'border-warning-border'],
+      secondary: [
+        'bg-brand-accent/20 text-brand-dark dark:text-brand-accent',
+        'border-brand-accent/30',
+      ],
 
       // Minimal badges
       outline: ['bg-transparent text-text-secondary border-card-border'],

@@ -21,7 +21,7 @@ export function FeedbackBanner({
         'rounded-(--shape-sm) border px-4 py-3 text-sm',
         type === 'success'
           ? 'border-success-border bg-success-bg text-success-text'
-          : 'border-warning-border bg-warning-bg text-warning-text',
+          : 'border-danger-border bg-danger-bg text-danger-text',
         className,
       )}
     >

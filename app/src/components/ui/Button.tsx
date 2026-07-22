@@ -41,10 +41,10 @@ export const buttonVariants = tv({
         'focus-visible:ring-focus',
       ],
       danger: [
-        'bg-warning-solid text-white shadow-(--elevation-1)',
+        'bg-danger-solid text-white shadow-(--elevation-1)',
         'hover:shadow-(--elevation-2) hover:brightness-110',
         'active:shadow-none active:scale-[0.98]',
-        'focus-visible:ring-warning-solid',
+        'focus-visible:ring-danger-solid',
       ],
       ghost: [
         'bg-transparent text-text-primary border border-transparent',
