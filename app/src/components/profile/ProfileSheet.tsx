@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, Globe, LogOut, ShieldAlert, UserCircle2 } from 'lucide-react';
-import { useId, useMemo, useState } from 'react';
+import { useId, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -15,6 +15,7 @@ import {
   updateProfile,
 } from '@/features/profile/api/profileClient';
 import { PROFILE_QUERY_KEY, useProfileQuery } from '@/features/profile/queries/useProfileQuery';
+import { useSwipeToDismissSheet } from '@/hooks/useSwipeToDismissSheet';
 import { formatConsent } from '@/lib/formatters';
 
 interface ProfileSheetProps {
@@ -32,6 +33,10 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
   const [isTogglingPublic, setIsTogglingPublic] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const headingId = useId();
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
+
+  useSwipeToDismissSheet(sheetRef, handleRef, () => onOpenChange(false));
 
   const userDisplay = useMemo(() => {
     if (profile) {
@@ -84,10 +89,16 @@ export function ProfileSheet({ isOpen, onOpenChange }: ProfileSheetProps) {
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Popup
+          ref={sheetRef}
           size="sm"
           className="fixed inset-x-0 bottom-0 top-auto max-h-[88dvh] w-full max-w-none rounded-b-none rounded-t-2xl"
           aria-labelledby={headingId}
         >
+          {/* Handle — arraste para baixo para fechar */}
+          <div ref={handleRef} className="flex touch-none justify-center pt-2" aria-hidden="true">
+            <div className="h-1 w-10 rounded-full bg-card-border" />
+          </div>
+
           <div className="flex items-center justify-between border-b border-card-border bg-background-secondary px-4 py-3">
             <h2 id={headingId} className="text-base font-semibold text-text-primary">
               Perfil rápido

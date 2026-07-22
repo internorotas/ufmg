@@ -2,6 +2,7 @@ import { ArrowLeft, Bus, Clock, Footprints, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { tv } from 'tailwind-variants';
+import { useSwipeToDismissSheet } from '@/hooks/useSwipeToDismissSheet';
 import { formatMinutes, formatTimeSP } from '@/lib/formatters';
 import { usePlannerStore } from '../store/plannerStore';
 import type { PlannerBusLeg } from '../types';
@@ -61,6 +62,9 @@ export function PlannerSummarySheet({
   const plannerResults = usePlannerStore((state) => state.plannerResults);
   const selectedRouteId = usePlannerStore((state) => state.selectedRouteId);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
+
+  useSwipeToDismissSheet(sheetRef, handleRef, onClose);
 
   const route =
     plannerResults && selectedRouteId
@@ -160,8 +164,8 @@ export function PlannerSummarySheet({
       tabIndex={-1}
       className={sheetVariants()}
     >
-      {/* Handle */}
-      <div className="flex justify-center pb-1 pt-3" aria-hidden="true">
+      {/* Handle — arraste para baixo para fechar */}
+      <div ref={handleRef} className="flex touch-none justify-center pb-1 pt-3" aria-hidden="true">
         <div className="h-1 w-10 rounded-full bg-card-border" />
       </div>
 

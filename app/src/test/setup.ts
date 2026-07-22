@@ -40,6 +40,26 @@ if (typeof window !== 'undefined') {
   });
 }
 
+// jsdom não implementa matchMedia. Sempre retorna "não corresponde" (matches:
+// false) — suficiente para os hooks que só verificam breakpoint/preferência
+// sem depender do valor real em teste.
+if (typeof window !== 'undefined' && !window.matchMedia) {
+  Object.defineProperty(window, 'matchMedia', {
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+    writable: true,
+    configurable: true,
+  });
+}
+
 const _require = createRequire(import.meta.url);
 
 type Internals = Record<string, unknown>;
