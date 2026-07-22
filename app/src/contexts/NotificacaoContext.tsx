@@ -96,9 +96,15 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   const [mostrarModalIos, setMostrarModalIos] = useState(false);
   const [collaborativeFeedback, setCollaborativeFeedback] = useState<string | null>(null);
   const [pointEvent, setPointEvent] = useState<RecentPointEvent | null>(null);
-  const { executeProtectedAction } = useConsentGate();
+  const [permissionDeniedFeedback, setPermissionDeniedFeedback] = useState<string | null>(null);
+  const { executeProtectedAction, feedbackMessage: consentFeedback } = useConsentGate();
   const collaborativeFeedbackTimeoutRef = useRef<number | null>(null);
   const pointEventTimeoutRef = useRef<number | null>(null);
+
+  // feedbackMessage de useConsentGate() é local a esta instância do hook — sem
+  // renderizar aqui, "Ativar alarme" sem login falha silenciosamente (a
+  // instância exibida em App.tsx é outra, com seu próprio estado).
+  const alarmFeedback = consentFeedback ?? permissionDeniedFeedback;
 
   useEffect(() => {
     return () => {
@@ -198,6 +204,7 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
   );
 
   const handleConfirmar = useCallback(async () => {
+    setPermissionDeniedFeedback(null);
     await confirmarPermissao();
     if (pendingRef.current && Notification.permission === 'granted') {
       const { linha, parada, minutos, horarioChegada } = pendingRef.current;
@@ -222,6 +229,9 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
     } else {
       pendingRef.current = null;
       if (Notification.permission === 'denied') {
+        setPermissionDeniedFeedback(
+          'Notificações estão bloqueadas neste navegador. Libere nas configurações do site para receber alarmes.',
+        );
         trackEvent({
           event: 'notification_permission_denied',
           category: 'preferences',
@@ -254,6 +264,15 @@ export function NotificacaoProvider({ children }: { children: ReactNode }) {
         onConfirmar={handleConfirmar}
       />
       <IosInstallModal isOpen={mostrarModalIos} onClose={() => setMostrarModalIos(false)} />
+      {alarmFeedback ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="pointer-events-none fixed right-4 bottom-24 z-(--z-toast) max-w-80 rounded-lg border border-warning-border bg-warning-bg px-3 py-2 text-xs text-warning-text shadow-lg"
+        >
+          {alarmFeedback}
+        </div>
+      ) : null}
       {collaborativeFeedback ? (
         <div
           role="status"
