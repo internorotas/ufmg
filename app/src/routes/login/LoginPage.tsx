@@ -15,10 +15,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
-import {
-  AuthRequestError,
-  startGoogleLoginFlow,
-} from '@/features/auth/api/authClient';
+import { AuthRequestError, startGoogleLoginFlow } from '@/features/auth/api/authClient';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { tenantConfig } from '@/tenants/tenantConfig';
