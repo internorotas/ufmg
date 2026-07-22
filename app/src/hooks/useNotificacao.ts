@@ -116,7 +116,7 @@ async function dispararNotificacaoSistema(opts: OpcaoAviso): Promise<void> {
   //  - Desktop Safari, iOS PWA (≥16.4 instalado), Firefox sem SW
   //  - Não funciona em background no mobile; no desktop funciona bem
   try {
-    new Notification(titulo, opcoes); // eslint-disable-line no-new
+    new Notification(titulo, opcoes);
   } catch {
     // Navegadores que não suportam new Notification() diretamente (ex: alguns iOS)
     if (import.meta.env.DEV) {

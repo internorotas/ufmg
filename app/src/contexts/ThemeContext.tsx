@@ -71,7 +71,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
  * @throws {Error} Se o hook for usado fora de um `ThemeProvider`.
  * @returns {ThemeContextType} O contexto do tema, contendo o tema atual e uma função para alterná-lo.
  */
-// eslint-disable-next-line react-refresh/only-export-components
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {

@@ -171,7 +171,6 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
           minutosUltimoPassou: previsao?.onibusAnterior?.minutosQuePassou ?? null,
         };
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [parada.idParada, parada.linhasAtendidas, rotasService, currentTime],
   );
 
