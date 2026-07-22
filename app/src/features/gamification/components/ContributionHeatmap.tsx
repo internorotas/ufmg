@@ -6,16 +6,16 @@ interface ContributionHeatmapProps {
 
 function resolveHeatLevel(points: number): string {
   if (points >= 50) {
-    return 'bg-[var(--gamification-rarity-legendary-bg)] border-[var(--gamification-rarity-legendary-border)]';
+    return 'bg-[var(--heatmap-level-4-bg)] border-[var(--heatmap-level-4-border)]';
   }
   if (points >= 20) {
-    return 'bg-[var(--gamification-rarity-epic-bg)] border-[var(--gamification-rarity-epic-border)]';
+    return 'bg-[var(--heatmap-level-3-bg)] border-[var(--heatmap-level-3-border)]';
   }
   if (points >= 10) {
-    return 'bg-[var(--gamification-rarity-rare-bg)] border-[var(--gamification-rarity-rare-border)]';
+    return 'bg-[var(--heatmap-level-2-bg)] border-[var(--heatmap-level-2-border)]';
   }
   if (points > 0) {
-    return 'bg-[var(--gamification-rarity-common-bg)] border-[var(--gamification-rarity-common-border)]';
+    return 'bg-[var(--heatmap-level-1-bg)] border-[var(--heatmap-level-1-border)]';
   }
   return 'bg-background border-card-border';
 }

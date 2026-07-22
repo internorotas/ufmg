@@ -140,6 +140,18 @@ body,
   --neutral-border: #6b7280; /* Gray 500 */
   --neutral-text: #4b5563; /* Gray 600 */
 
+  /* Escala sequencial de intensidade (heatmap de contribuição) — dedicada,
+     não compartilha os tokens de raridade de emblema (gamification-rarity-*),
+     que representam um conceito diferente (raridade de conquista). */
+  --heatmap-level-1-bg: #eef0fd;
+  --heatmap-level-1-border: #d6d9f8;
+  --heatmap-level-2-bg: #c3c2f7;
+  --heatmap-level-2-border: #a8a5f0;
+  --heatmap-level-3-bg: #7469f0;
+  --heatmap-level-3-border: #5a4de8;
+  --heatmap-level-4-bg: #2c0eeb;
+  --heatmap-level-4-border: #2409c2;
+
   --gamification-bronze-bg: #f8ede1;
   --gamification-bronze-border: #ddb892;
   --gamification-bronze-text: #8c5a2b;
@@ -265,6 +277,16 @@ body,
   --neutral-bg: #374151; /* Gray 700 */
   --neutral-border: #9ca3af; /* Gray 400 */
   --neutral-text: #e5e7eb; /* Gray 200 */
+
+  /* Escala sequencial de intensidade (heatmap de contribuição) - Dark Mode */
+  --heatmap-level-1-bg: #1e2150;
+  --heatmap-level-1-border: #2b2f6b;
+  --heatmap-level-2-bg: #322f7a;
+  --heatmap-level-2-border: #453fa0;
+  --heatmap-level-3-bg: #5c50c9;
+  --heatmap-level-3-border: #6f61e0;
+  --heatmap-level-4-bg: #8778f7;
+  --heatmap-level-4-border: #a396fa;
 
   --gamification-bronze-bg: #4a2f19;
   --gamification-bronze-border: #9b6b3f;
