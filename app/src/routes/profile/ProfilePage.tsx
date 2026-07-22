@@ -97,7 +97,7 @@ export function ProfilePage() {
   }, [profile]);
 
   const handleProfileUpdate = useCallback(
-    async (payload: ProfileUpdatePayload) => {
+    async (payload: ProfileUpdatePayload, onError?: (message: string) => void) => {
       if (!profile || isUpdatingProfile) {
         return;
       }
@@ -112,7 +112,11 @@ export function ProfilePage() {
         setFeedback({ type: 'success', message: 'Preferências de perfil atualizadas.' });
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Falha ao atualizar perfil.';
-        setFeedback({ type: 'error', message });
+        if (onError) {
+          onError(message);
+        } else {
+          setFeedback({ type: 'error', message });
+        }
       } finally {
         setIsUpdatingProfile(false);
       }
@@ -121,9 +125,11 @@ export function ProfilePage() {
   );
 
   const nicknameChanged = nicknameInput !== (profile?.nickname ?? '');
+  const [nicknameError, setNicknameError] = useState<string | null>(null);
 
   const handleSaveNickname = useCallback(async () => {
-    await handleProfileUpdate({ nickname: nicknameInput.trim() || null });
+    setNicknameError(null);
+    await handleProfileUpdate({ nickname: nicknameInput.trim() || null }, setNicknameError);
   }, [handleProfileUpdate, nicknameInput]);
 
   const handleToggleProfilePublic = useCallback(() => {
@@ -499,13 +505,18 @@ export function ProfilePage() {
                 <div className="flex gap-2">
                   <Input
                     value={nicknameInput}
-                    onChange={(e) => setNicknameInput(e.target.value)}
+                    onChange={(e) => {
+                      setNicknameInput(e.target.value);
+                      setNicknameError(null);
+                    }}
                     placeholder="sem nickname"
                     maxLength={40}
                     leftIcon={<AtSign size={14} aria-hidden="true" />}
                     disabled={isUpdatingProfile}
                     aria-label="Nickname"
                     className="flex-1"
+                    error={Boolean(nicknameError)}
+                    errorMessage={nicknameError ?? undefined}
                   />
                   <Button
                     type="button"
