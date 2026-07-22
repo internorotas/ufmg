@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   finishGpsSession,
+  GPS_GENERIC_ERROR_MESSAGE,
   GpsApiError,
   type GpsPointPayload,
   RateLimitError,
@@ -24,6 +25,20 @@ const OFFLINE_SESSION_STORAGE_KEY = getTenantStorageKey('gps-offline-session');
 // Retry config para erros de rate limit (429)
 const MAX_RETRIES = 2;
 const BASE_RETRY_DELAY_MS = 1_000;
+
+// Loga apenas campos seguros (nunca o corpo bruto do backend/stack) — o
+// backend é a única fonte de detalhe de erro sensível; a UI só repassa code/
+// requestId, úteis para correlacionar com logs do servidor sem vazar texto livre.
+function logGpsError(context: string, err: unknown): void {
+  const safeDetail =
+    err instanceof GpsApiError
+      ? { code: err.code, statusCode: err.statusCode, requestId: err.requestId }
+      : err instanceof RateLimitError
+        ? { code: 'GPS_RATE_LIMITED' }
+        : { name: err instanceof Error ? err.name : typeof err };
+  // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
+  console.error(`[GPS] Falha ao ${context}`, safeDetail);
+}
 
 export type TrackingStopReason = 'manual' | 'parado' | 'saiu_rota' | 'terminal' | 'timeout';
 
@@ -218,15 +233,16 @@ async function sleep(ms: number): Promise<void> {
 
 async function startSessionWithRetry(
   linhaId: string,
+  idempotencyKey: string,
   retries = MAX_RETRIES,
-): Promise<{ sessionId: string }> {
+): Promise<{ sessionId: string; scheduleMatchStatus: 'matched' | 'unmatched' }> {
   try {
-    return await startGpsSession({ linhaId });
+    return await startGpsSession({ linhaId, idempotencyKey });
   } catch (err) {
     if (err instanceof RateLimitError && retries > 0) {
       const delay = err.retryAfterMs ?? BASE_RETRY_DELAY_MS * (MAX_RETRIES - retries + 1);
       await sleep(delay);
-      return startSessionWithRetry(linhaId, retries - 1);
+      return startSessionWithRetry(linhaId, idempotencyKey, retries - 1);
     }
     throw err;
   }
@@ -352,7 +368,8 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       setStatus('starting');
       try {
         setLastStopReason(null);
-        const response = await startSessionWithRetry(effectiveLine.idRota);
+        const idempotencyKey = crypto.randomUUID();
+        const response = await startSessionWithRetry(effectiveLine.idRota, idempotencyKey);
 
         lockedLineRef.current = effectiveLine;
         sessionStartedAtRef.current = Date.now();
@@ -364,17 +381,14 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
           points: [],
         });
       } catch (err) {
-        // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
-        console.error('[GPS] Falha ao iniciar sessão de rastreio colaborativo:', err);
+        logGpsError('iniciar sessão de rastreio colaborativo', err);
         if (err instanceof RateLimitError) {
           setRateLimitMessage(err.message);
         } else {
-          // Nunca exibe err.message do backend direto na UI (pode vazar detalhe
-          // interno de validação) — mapeia para uma mensagem própria e controlada.
-          const msg =
-            err instanceof GpsApiError
-              ? 'Esta linha não tem horários programados para agora, por isso não é possível iniciar o rastreio.'
-              : 'Não foi possível iniciar o rastreio. Tente novamente.';
+          // GpsApiError.message já vem mapeado com segurança a partir do `code`
+          // público (ver GPS_ERROR_CODE_MESSAGES em gpsClient.ts) — nunca é o
+          // texto livre bruto do backend. Erros inesperados usam o fallback genérico.
+          const msg = err instanceof GpsApiError ? err.message : GPS_GENERIC_ERROR_MESSAGE;
           setStartError(msg);
           window.setTimeout(() => setStartError(null), 5000);
         }
@@ -398,8 +412,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
           try {
             await finishGpsSession(sessionIdRef.current, reason);
           } catch (err) {
-            // biome-ignore lint/suspicious/noConsole: log de diagnóstico GPS necessário em produção
-            console.error('[GPS] Falha ao encerrar sessão de rastreio colaborativo:', err);
+            logGpsError('encerrar sessão de rastreio colaborativo', err);
             // Não retorna — reseta a sessão mesmo em caso de erro para não bloquear o usuário
           }
         }

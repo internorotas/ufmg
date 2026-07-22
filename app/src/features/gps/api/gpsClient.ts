@@ -11,14 +11,48 @@ export class RateLimitError extends Error {
   }
 }
 
+// Códigos públicos estáveis do backend (ver backend/src/gps/gps-errors.ts).
+// A UI mapeia por `code`, nunca pelo `message` bruto do backend — texto livre
+// pode mudar sem aviso e não deve ser exibido diretamente ao usuário.
+export const GPS_ERROR_CODE_MESSAGES: Record<string, string> = {
+  GPS_LINE_NOT_FOUND: 'Esta linha não foi encontrada.',
+  GPS_LINE_SUSPENDED: 'Esta linha está temporariamente suspensa.',
+  GPS_SESSION_ALREADY_ACTIVE: 'Você já tem uma sessão de rastreio ativa.',
+  GPS_SESSION_NOT_FOUND: 'Sessão de rastreio não encontrada.',
+  GPS_INVALID_REQUEST: 'Não foi possível processar a solicitação.',
+  GPS_CALENDAR_UNAVAILABLE:
+    'Não foi possível confirmar o calendário agora. Tente novamente em instantes.',
+  GPS_RATE_LIMITED: 'Muitas tentativas. Aguarde alguns minutos e tente novamente.',
+  GPS_INTERNAL_ERROR: 'Não foi possível iniciar o rastreio. Tente novamente.',
+};
+
+export const GPS_GENERIC_ERROR_MESSAGE = 'Não foi possível iniciar o rastreio. Tente novamente.';
+
+interface GpsPublicErrorBody {
+  statusCode?: number;
+  code?: string;
+  message?: string;
+  requestId?: string;
+}
+
 export class GpsApiError extends Error {
   constructor(
     message: string,
     public readonly statusCode: number,
+    public readonly code: string | null = null,
+    public readonly requestId: string | null = null,
   ) {
     super(message);
     this.name = 'GpsApiError';
   }
+}
+
+async function parsePublicErrorBody(response: Response): Promise<GpsPublicErrorBody | null> {
+  return (await response.json().catch(() => null)) as GpsPublicErrorBody | null;
+}
+
+function friendlyMessageFor(code: string | undefined): string {
+  return (code && GPS_ERROR_CODE_MESSAGES[code]) || GPS_GENERIC_ERROR_MESSAGE;
 }
 
 export interface GpsPointPayload {
@@ -42,6 +76,9 @@ export interface GpsBatchPayload {
 
 export interface GpsSessionPayload {
   linhaId: string;
+  // Gerado pelo cliente (ex: crypto.randomUUID()) — reenvio com a mesma chave
+  // retorna a sessão já criada em vez de duplicar (double-click, timeout de rede).
+  idempotencyKey?: string;
 }
 
 function resolveGpsEndpoint(pathname: string): string {
@@ -67,27 +104,30 @@ async function fetchGps(pathname: string, init?: RequestInit): Promise<Response>
   }
 
   if (!response.ok) {
-    if (response.status === 400) {
-      const body = (await response.json().catch(() => null)) as { message?: string } | null;
-      const msg =
-        typeof body?.message === 'string'
-          ? body.message
-          : 'Esta linha não está disponível para rastreio no momento.';
-      throw new GpsApiError(msg, 400);
-    }
-    throw new Error(`Falha na operação GPS: HTTP ${response.status}`);
+    const body = await parsePublicErrorBody(response);
+    throw new GpsApiError(
+      friendlyMessageFor(body?.code),
+      response.status,
+      body?.code ?? null,
+      body?.requestId ?? null,
+    );
   }
 
   return response;
 }
 
-export async function startGpsSession(payload: GpsSessionPayload): Promise<{ sessionId: string }> {
+export async function startGpsSession(
+  payload: GpsSessionPayload,
+): Promise<{ sessionId: string; scheduleMatchStatus: 'matched' | 'unmatched' }> {
   const response = await fetchGps('/v1/gps/sessions', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 
-  return response.json() as Promise<{ sessionId: string }>;
+  return response.json() as Promise<{
+    sessionId: string;
+    scheduleMatchStatus: 'matched' | 'unmatched';
+  }>;
 }
 
 export async function submitGpsBatch(payload: GpsBatchPayload): Promise<void> {
