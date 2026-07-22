@@ -45,7 +45,7 @@ export const emptyStateIconVariants = tv({
       brand: 'bg-brand-primary/12 text-brand-primary',
       accent: 'bg-brand-accent/15 text-brand-accent',
       success: 'bg-success-bg text-success-text',
-      danger: 'bg-warning-bg text-warning-text',
+      danger: 'bg-danger-bg text-danger-text',
     },
   },
   defaultVariants: {
