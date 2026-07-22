@@ -9,12 +9,9 @@ import { useLocationContext } from '@/contexts/LocationContext';
 import { useRotas, useRotasSelection } from '@/contexts/RotasContext';
 import { useNearestStopsQuery } from '@/features/transit-data/queries/useNearestStopsQuery';
 import { useParadasFavoritas } from '@/hooks/useParadasFavoritas';
+import { formatDistanceKm } from '@/lib/formatters';
 import { calcularDistanciaKm } from '@/lib/utils';
 import type { Parada } from '@/types/data.types';
-
-function formatarDistancia(km: number): string {
-  return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
-}
 
 function ParadaCard({
   parada,
@@ -54,7 +51,7 @@ function ParadaCard({
         </div>
         {distanciaKm !== undefined && (
           <Badge variant="outline" size="sm" className="shrink-0">
-            {formatarDistancia(distanciaKm)}
+            {formatDistanceKm(distanciaKm)}
           </Badge>
         )}
       </button>

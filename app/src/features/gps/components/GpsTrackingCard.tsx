@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { numLinha } from '@/features/gps/lib/markerUtils';
+import { formatDurationClock } from '@/lib/formatters';
 import type { Linha } from '@/types/data.types';
 
 const STOP_CONFIRM_WINDOW_MS = 3000;
@@ -26,17 +27,6 @@ interface GpsTrackingCardProps {
   accuracyM?: number;
   isMinimized: boolean;
   onToggleMinimize: () => void;
-}
-
-function formatDuration(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
-  if (h > 0) {
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-  }
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
 function signalLabel(accuracyM: number | undefined): { label: string; ok: boolean } {
@@ -96,7 +86,7 @@ export function GpsTrackingCard({
           </span>
           {!isStarting && (
             <span className="text-tiny tabular-nums text-text-secondary">
-              {formatDuration(durationMs)}
+              {formatDurationClock(durationMs)}
             </span>
           )}
           <ChevronUp size={13} className="text-text-secondary" aria-hidden="true" />
@@ -207,7 +197,7 @@ export function GpsTrackingCard({
           <div className="flex items-center justify-between gap-1 px-2.5 pt-2 text-micro">
             <div className="flex items-center gap-0.5 text-text-secondary">
               <Timer size={9} aria-hidden="true" />
-              <span className="tabular-nums">{formatDuration(durationMs)}</span>
+              <span className="tabular-nums">{formatDurationClock(durationMs)}</span>
             </div>
             <div className="flex items-center gap-0.5 text-text-secondary">
               <MapPin size={9} aria-hidden="true" />

@@ -42,7 +42,7 @@ import {
 import { DeleteAccountDialog } from '@/features/profile/components/DeleteAccountDialog';
 import { PROFILE_QUERY_KEY, useProfileQuery } from '@/features/profile/queries/useProfileQuery';
 import { useHistoricoViagens } from '@/hooks/useHistoricoViagens';
-import { formatDateTimePtBr } from '@/lib/formatters';
+import { formatDateTimePtBr, formatDistanceKm } from '@/lib/formatters';
 
 interface ProfileFeedbackState {
   type: 'success' | 'error';
@@ -441,12 +441,7 @@ export function ProfilePage() {
                       new Date(viagem.iniciadoAt).getTime();
                     const durMin = Math.round(durMs / 60_000);
                     const km = viagem.displacementKm;
-                    const distStr =
-                      km == null
-                        ? null
-                        : km < 1
-                          ? `${Math.round(km * 1000)} m`
-                          : `${km.toFixed(1)} km`;
+                    const distStr = km == null ? null : formatDistanceKm(km);
                     const data = new Date(viagem.encerradoAt);
                     const dataStr = data.toLocaleDateString('pt-BR', {
                       day: '2-digit',

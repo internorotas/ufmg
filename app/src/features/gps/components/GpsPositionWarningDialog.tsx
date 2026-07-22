@@ -3,6 +3,7 @@ import { PrivacyNote } from '@/components/PrivacyNote';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { numLinha } from '@/features/gps/lib/markerUtils';
+import { formatDistance } from '@/lib/formatters';
 import type { Linha } from '@/types/data.types';
 
 interface GpsPositionWarningDialogProps {
@@ -20,8 +21,7 @@ export function GpsPositionWarningDialog({
   onConfirm,
   onCancel,
 }: GpsPositionWarningDialogProps) {
-  const distText =
-    distanceMeters >= 1000 ? `${(distanceMeters / 1000).toFixed(1)} km` : `${distanceMeters} m`;
+  const distText = formatDistance(distanceMeters);
 
   return (
     <Dialog.Root open={open} onOpenChange={(v) => !v && onCancel()}>

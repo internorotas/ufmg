@@ -22,6 +22,7 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAudioKeepAlive } from '@/hooks/useAudioKeepAlive';
 import { VIAGENS_QUERY_KEY } from '@/hooks/useHistoricoViagens';
 import { useWakeLock } from '@/hooks/useWakeLock';
+import { formatDurationHuman } from '@/lib/formatters';
 
 // Tempo sem posição GPS (app em background) para o primeiro aviso, não-bloqueante —
 // celular no bolso durante uma viagem normal é comportamento comum, não merece
@@ -48,16 +49,6 @@ const STOP_REASON_LABELS: Record<string, string> = {
 };
 
 const GpsSessionContext = createContext<GpsTrackingState | null>(null);
-
-function formatDuration(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
-  if (h > 0) return `${h}h ${m}min`;
-  if (m > 0) return `${m}min ${s}s`;
-  return `${s}s`;
-}
 
 function GpsSessionCompletedCard({
   session,
@@ -109,7 +100,7 @@ function GpsSessionCompletedCard({
             <Timer size={12} className="mx-auto mb-0.5 text-brand-primary" aria-hidden="true" />
             <p className="text-micro text-text-tertiary">Duração</p>
             <p className="text-micro font-bold text-text-primary">
-              {formatDuration(session.durationMs)}
+              {formatDurationHuman(session.durationMs)}
             </p>
           </div>
           <div className="rounded-lg bg-background-secondary p-1.5">

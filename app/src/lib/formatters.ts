@@ -48,3 +48,37 @@ export function formatMinutes(totalMinutes: number): string {
   const min = totalMinutes % 60;
   return min > 0 ? `${h}h ${min}min` : `${h}h`;
 }
+
+/** Duração no formato relógio (HH:MM:SS ou MM:SS) — painel de rastreio ao vivo. */
+export function formatDurationClock(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  if (h > 0) {
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+/** Duração em linguagem natural (ex: "1h 23min", "5min 30s") — resumo de sessão encerrada. */
+export function formatDurationHuman(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  if (h > 0) return `${h}h ${m}min`;
+  if (m > 0) return `${m}min ${s}s`;
+  return `${s}s`;
+}
+
+/** Distância em metros/km (ex: "350 m", "1.2 km"). */
+export function formatDistance(meters: number): string {
+  if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km`;
+  return `${Math.round(meters)} m`;
+}
+
+/** Igual a formatDistance, recebendo o valor em quilômetros. */
+export function formatDistanceKm(km: number): string {
+  return formatDistance(km * 1000);
+}

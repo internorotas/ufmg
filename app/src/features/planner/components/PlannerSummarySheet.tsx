@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { tv } from 'tailwind-variants';
 import { useSwipeToDismissSheet } from '@/hooks/useSwipeToDismissSheet';
-import { formatMinutes, formatTimeSP } from '@/lib/formatters';
+import { formatDistance, formatMinutes, formatTimeSP } from '@/lib/formatters';
 import { usePlannerStore } from '../store/plannerStore';
 import type { PlannerBusLeg } from '../types';
 import { ETA_SOURCE_LABEL } from '../types';
@@ -43,11 +43,6 @@ export interface PlannerSummarySheetProps {
   isOpen: boolean;
   onClose: () => void;
   onBackToResults: () => void;
-}
-
-function formatarDistancia(m: number): string {
-  if (m >= 1000) return `${(m / 1000).toFixed(1)} km`;
-  return `${Math.round(m)} m`;
 }
 
 // ---------------------------------------------------------------------------
@@ -267,7 +262,7 @@ export function PlannerSummarySheet({
                     {leg.kind === 'walk' ? (
                       <>
                         <span className="text-sm font-semibold text-text-primary">
-                          Caminhe {leg.minutes} min · {formatarDistancia(leg.distanceMeters)}
+                          Caminhe {leg.minutes} min · {formatDistance(leg.distanceMeters)}
                         </span>
                         <span className="text-xs text-text-secondary">
                           {leg.fromStopName} → {leg.toStopName}
