@@ -155,140 +155,154 @@ export function PlannerSummarySheet({
       : 'scheduled';
 
   return createPortal(
-    <div
-      ref={sheetRef}
-      data-slot="planner-summary-sheet"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Resumo da rota selecionada"
-      tabIndex={-1}
-      className={sheetVariants()}
-    >
-      {/* Handle — arraste para baixo para fechar */}
-      <div ref={handleRef} className="flex touch-none justify-center pb-1 pt-3" aria-hidden="true">
-        <div className="h-1 w-10 rounded-full bg-card-border" />
-      </div>
-
-      {/* Header */}
-      <header className="flex items-center justify-between gap-2 px-4 pb-3 pt-1">
-        <button
-          type="button"
-          data-slot="back-to-results"
-          onClick={onBackToResults}
-          className="flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-brand-primary dark:text-brand-accent hover:bg-brand-primary/10 dark:hover:bg-brand-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-          aria-label="Voltar aos resultados"
+    <>
+      {/* Backdrop — bloqueia interação com o mapa por trás, cumprindo a
+          semântica de aria-modal já declarada no sheet abaixo. */}
+      <button
+        type="button"
+        aria-label="Fechar resumo da rota"
+        onClick={onClose}
+        className="fixed inset-0 z-(--z-sheet) cursor-default bg-black/40"
+      />
+      <div
+        ref={sheetRef}
+        data-slot="planner-summary-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Resumo da rota selecionada"
+        tabIndex={-1}
+        className={sheetVariants()}
+      >
+        {/* Handle — arraste para baixo para fechar */}
+        <div
+          ref={handleRef}
+          className="flex touch-none justify-center pb-1 pt-3"
+          aria-hidden="true"
         >
-          <ArrowLeft size={16} aria-hidden="true" />
-          Voltar aos resultados
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-card-border hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-          aria-label="Fechar resumo"
-        >
-          <X size={16} aria-hidden="true" />
-        </button>
-      </header>
-
-      {/* Resumo da rota */}
-      <div className="border-t border-card-border px-4 pt-4 pb-2">
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-3xl font-bold tabular-nums text-text-primary">
-              {formatMinutes(route.totalMinutes)}
-            </span>
-            <span className="text-xs tabular-nums text-text-secondary">
-              Chegada {formatTimeSP(route.arrivalTime)} · {route.transferCount} troca
-              {route.transferCount !== 1 ? 's' : ''} · {route.walkingMinutes} min a pé
-            </span>
-          </div>
-          <span className={etaBadgeVariants({ source: primarySource })}>
-            <Clock size={11} aria-hidden="true" />
-            {ETA_SOURCE_LABEL[primarySource]}
-          </span>
+          <div className="h-1 w-10 rounded-full bg-card-border" />
         </div>
 
-        {/* Timeline bar */}
-        <JourneyTimelineBar legs={route.legs} totalMinutes={route.totalMinutes} />
-      </div>
+        {/* Header */}
+        <header className="flex items-center justify-between gap-2 px-4 pb-3 pt-1">
+          <button
+            type="button"
+            data-slot="back-to-results"
+            onClick={onBackToResults}
+            className="flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-brand-primary dark:text-brand-accent hover:bg-brand-primary/10 dark:hover:bg-brand-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            aria-label="Voltar aos resultados"
+          >
+            <ArrowLeft size={16} aria-hidden="true" />
+            Voltar aos resultados
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-card-border hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            aria-label="Fechar resumo"
+          >
+            <X size={16} aria-hidden="true" />
+          </button>
+        </header>
 
-      {/* Legs com trilho vertical */}
-      <div className="px-4 py-4">
-        <ul className="relative flex flex-col" aria-label="Segmentos da rota">
-          {/* Linha vertical de fundo */}
-          <li
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 left-3.5 top-3.5 w-px bg-card-border"
-          />
+        {/* Resumo da rota */}
+        <div className="border-t border-card-border px-4 pt-4 pb-2">
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-3xl font-bold tabular-nums text-text-primary">
+                {formatMinutes(route.totalMinutes)}
+              </span>
+              <span className="text-xs tabular-nums text-text-secondary">
+                Chegada {formatTimeSP(route.arrivalTime)} · {route.transferCount} troca
+                {route.transferCount !== 1 ? 's' : ''} · {route.walkingMinutes} min a pé
+              </span>
+            </div>
+            <span className={etaBadgeVariants({ source: primarySource })}>
+              <Clock size={11} aria-hidden="true" />
+              {ETA_SOURCE_LABEL[primarySource]}
+            </span>
+          </div>
 
-          {route.legs.map((leg, idx) => {
-            const legKey = `${route.routeId}:${leg.kind}:${leg.fromStopId}:${leg.toStopId}:${leg.pathStopIds.join('>')}`;
-            const isLast = idx === route.legs.length - 1;
+          {/* Timeline bar */}
+          <JourneyTimelineBar legs={route.legs} totalMinutes={route.totalMinutes} />
+        </div>
 
-            return (
-              <li
-                key={legKey}
-                className={`relative flex items-start gap-3 ${isLast ? '' : 'pb-4'}`}
-              >
-                {/* Ícone / dot */}
-                {leg.kind === 'walk' ? (
-                  <div className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background-secondary ring-2 ring-background">
-                    <Footprints size={13} className="text-text-secondary" aria-hidden="true" />
-                  </div>
-                ) : (
-                  <div
-                    className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ring-2 ring-background"
-                    style={{ backgroundColor: `${(leg as PlannerBusLeg).lineColorHex}20` }}
-                  >
-                    <Bus
-                      size={13}
-                      style={{ color: (leg as PlannerBusLeg).lineColorHex }}
-                      aria-hidden="true"
-                    />
-                  </div>
-                )}
+        {/* Legs com trilho vertical */}
+        <div className="px-4 py-4">
+          <ul className="relative flex flex-col" aria-label="Segmentos da rota">
+            {/* Linha vertical de fundo */}
+            <li
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-0 left-3.5 top-3.5 w-px bg-card-border"
+            />
 
-                {/* Conteúdo */}
-                <div className="flex flex-col gap-0.5 pt-0.5">
+            {route.legs.map((leg, idx) => {
+              const legKey = `${route.routeId}:${leg.kind}:${leg.fromStopId}:${leg.toStopId}:${leg.pathStopIds.join('>')}`;
+              const isLast = idx === route.legs.length - 1;
+
+              return (
+                <li
+                  key={legKey}
+                  className={`relative flex items-start gap-3 ${isLast ? '' : 'pb-4'}`}
+                >
+                  {/* Ícone / dot */}
                   {leg.kind === 'walk' ? (
-                    <>
-                      <span className="text-sm font-semibold text-text-primary">
-                        Caminhe {leg.minutes} min · {formatarDistancia(leg.distanceMeters)}
-                      </span>
-                      <span className="text-xs text-text-secondary">
-                        {leg.fromStopName} → {leg.toStopName}
-                      </span>
-                    </>
+                    <div className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background-secondary ring-2 ring-background">
+                      <Footprints size={13} className="text-text-secondary" aria-hidden="true" />
+                    </div>
                   ) : (
-                    <>
-                      <span
-                        className="text-sm font-bold"
+                    <div
+                      className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ring-2 ring-background"
+                      style={{ backgroundColor: `${(leg as PlannerBusLeg).lineColorHex}20` }}
+                    >
+                      <Bus
+                        size={13}
                         style={{ color: (leg as PlannerBusLeg).lineColorHex }}
-                      >
-                        {(leg as PlannerBusLeg).lineName}
-                      </span>
-                      <span className="text-xs text-text-secondary">
-                        Embarque em <strong>{leg.fromStopName}</strong>
-                        {' · '}
-                        {formatTimeSP((leg as PlannerBusLeg).boardingTime)}
-                      </span>
-                      <span className="text-xs text-text-secondary">
-                        Desça em <strong>{leg.toStopName}</strong>
-                        {' · '}
-                        {formatTimeSP((leg as PlannerBusLeg).arrivalTime)}
-                      </span>
-                    </>
+                        aria-hidden="true"
+                      />
+                    </div>
                   )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
 
-      <div className="h-safe-area-inset-bottom" aria-hidden="true" />
-    </div>,
+                  {/* Conteúdo */}
+                  <div className="flex flex-col gap-0.5 pt-0.5">
+                    {leg.kind === 'walk' ? (
+                      <>
+                        <span className="text-sm font-semibold text-text-primary">
+                          Caminhe {leg.minutes} min · {formatarDistancia(leg.distanceMeters)}
+                        </span>
+                        <span className="text-xs text-text-secondary">
+                          {leg.fromStopName} → {leg.toStopName}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span
+                          className="text-sm font-bold"
+                          style={{ color: (leg as PlannerBusLeg).lineColorHex }}
+                        >
+                          {(leg as PlannerBusLeg).lineName}
+                        </span>
+                        <span className="text-xs text-text-secondary">
+                          Embarque em <strong>{leg.fromStopName}</strong>
+                          {' · '}
+                          {formatTimeSP((leg as PlannerBusLeg).boardingTime)}
+                        </span>
+                        <span className="text-xs text-text-secondary">
+                          Desça em <strong>{leg.toStopName}</strong>
+                          {' · '}
+                          {formatTimeSP((leg as PlannerBusLeg).arrivalTime)}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div className="h-safe-area-inset-bottom" aria-hidden="true" />
+      </div>
+    </>,
     document.body,
   );
 }
