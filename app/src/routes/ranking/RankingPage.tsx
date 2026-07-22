@@ -4,7 +4,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/app/AppShell';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useNotificacaoContext } from '@/contexts/NotificacaoContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
 import {
@@ -231,11 +233,29 @@ export function RankingPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               {isLoading ? (
-                <p className="py-4 text-center text-sm text-text-secondary">Carregando...</p>
+                <div className="space-y-2" aria-label="Carregando ranking" role="status">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <div
+                      // biome-ignore lint/suspicious/noArrayIndexKey: placeholder estático, sem reordenação
+                      key={index}
+                      className="flex items-center justify-between gap-3 rounded-(--shape-sm) border border-card-border bg-background px-3 py-2.5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="size-9" rounded="full" />
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                      <Skeleton className="h-6 w-14" />
+                    </div>
+                  ))}
+                </div>
               ) : entries.length === 0 ? (
-                <p className="py-4 text-center text-sm text-text-secondary">
-                  Nenhuma entrada no ranking ainda.
-                </p>
+                <EmptyState
+                  size="sm"
+                  tone="neutral"
+                  icon={<Trophy size={24} aria-hidden="true" />}
+                  title="Nenhuma entrada no ranking ainda"
+                  description="Contribua com GPS colaborativo para aparecer aqui."
+                />
               ) : (
                 entries.map((entry, index) => (
                   <div

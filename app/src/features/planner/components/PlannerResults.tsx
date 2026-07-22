@@ -1,6 +1,7 @@
 import { ArrowLeftRight, Bus, Footprints, Map as MapIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { tv } from 'tailwind-variants';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { formatMinutes, formatTimeSP } from '@/lib/formatters';
 import { usePlannerStore } from '../store/plannerStore';
 import {
@@ -295,13 +296,12 @@ export function PlannerResults({ results }: PlannerResultsProps) {
 
   if (alternatives.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-2 rounded-(--shape-sm) border border-card-border bg-card px-4 py-8 text-center">
-        <MapIcon size={32} className="text-text-tertiary" aria-hidden="true" />
-        <p className="font-semibold text-text-primary">Nenhuma rota encontrada</p>
-        <p className="max-w-xs text-sm text-text-secondary">
-          Não encontramos combinação viável entre essas paradas. Tente outra origem, destino ou uma
-          parada próxima.
-        </p>
+      <div className="rounded-(--shape-sm) border border-card-border bg-card">
+        <EmptyState
+          icon={<MapIcon size={24} aria-hidden="true" />}
+          title="Nenhuma rota encontrada"
+          description="Não encontramos combinação viável entre essas paradas. Tente outra origem, destino ou uma parada próxima."
+        />
       </div>
     );
   }
