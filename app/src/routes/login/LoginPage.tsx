@@ -18,13 +18,12 @@ import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import {
   AuthRequestError,
   startGoogleLoginFlow,
-  warmupBackend,
 } from '@/features/auth/api/authClient';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { tenantConfig } from '@/tenants/tenantConfig';
 
-type LoadingState = 'idle' | 'warming' | 'redirecting';
+type LoadingState = 'idle' | 'redirecting';
 
 /** Mensagem amigável por código de erro de URL ou status HTTP. */
 function resolveErrorMessage(errorOrCode: unknown): string {
@@ -136,12 +135,9 @@ export function LoginPage() {
 
   async function handleGoogleLogin() {
     trackEvent({ event: 'login_initiated', category: 'engagement', action: 'login_initiated' });
-    setLoadingState('warming');
+    setLoadingState('redirecting');
     setErrorMsg(null);
     try {
-      // Acorda o backend (Render free tier pode estar dormindo).
-      await warmupBackend();
-      setLoadingState('redirecting');
       // O continueUrl é a própria página de login com ?from=... codificado.
       // Isso garante que erros do backend redirecionem de volta para cá,
       // e que o destino final sobreviva ao redirect OAuth.
@@ -165,12 +161,7 @@ export function LoginPage() {
   }
 
   const isLoading = loadingState !== 'idle';
-  const buttonLabel =
-    loadingState === 'warming'
-      ? 'Conectando…'
-      : loadingState === 'redirecting'
-        ? 'Redirecionando…'
-        : 'Entrar com Google';
+  const buttonLabel = loadingState === 'redirecting' ? 'Redirecionando…' : 'Entrar com Google';
 
   return (
     <div className="flex flex-1 min-h-0 overflow-hidden bg-background-secondary text-text-primary">

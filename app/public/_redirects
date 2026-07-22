@@ -1,0 +1,8 @@
+# Cloudflare Pages — regras de roteamento
+#
+# /assets/* nunca deve receber fallback HTML (evita MIME type mismatch para chunks JS/CSS).
+# O _worker.js também cobre isso, mas _redirects garante defesa em profundidade.
+/assets/*  404
+
+# SPA: todas as rotas não mapeadas retornam index.html (navegação client-side React Router).
+/*  /index.html  200
