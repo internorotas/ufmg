@@ -187,6 +187,29 @@ test('security – localStorage não contém tokens JWT em plaintext', async ({ 
   }
 });
 
+test('security – Cache Storage nunca guarda resposta de endpoint privado', async ({ page }) => {
+  await page.goto(`${BASE}/`);
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(2_000);
+
+  const PRIVATE_PATH_RE =
+    /\/v1\/(auth|profile|me|payments|gps|research|admin|notifications|push|gamification\/(rankings\/me|summary))(\/|$)/;
+
+  const cachedUrls: string[] = await page.evaluate(async () => {
+    const cacheNames = await caches.keys();
+    const urls: string[] = [];
+    for (const name of cacheNames) {
+      const cache = await caches.open(name);
+      const requests = await cache.keys();
+      urls.push(...requests.map((req) => req.url));
+    }
+    return urls;
+  });
+
+  const leaked = cachedUrls.filter((url) => PRIVATE_PATH_RE.test(new URL(url).pathname));
+  expect(leaked).toHaveLength(0);
+});
+
 test('security – sessionStorage GPS não vaza dados após fim de sessão', async ({ page }) => {
   await page.goto(`${BASE}/`);
   await page.waitForLoadState('networkidle');

@@ -10,6 +10,7 @@ import {
 } from 'workbox-precaching';
 import { NavigationRoute, registerRoute, setCatchHandler } from 'workbox-routing';
 import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies';
+import { isCacheableApiRequest } from './pwa/apiCachePolicy';
 import { getTenantCacheName, getTenantPushTag, TENANT_CACHE_PREFIX } from './pwa/tenantNamespace';
 import { tenantConfig } from './tenants/tenantConfig';
 
@@ -43,14 +44,8 @@ const NAVIGATION_DENYLIST = [
 // evitando que builds equivalentes criem caches diferentes por causa do horário.
 const BUILD_SLUG = (import.meta.env.VITE_BUILD_ID as string | undefined)?.slice(0, 13) ?? 'dev';
 
-const API_CACHE_NAME = getTenantCacheName('api-v1');
+const API_CACHE_NAME = getTenantCacheName('api-v2');
 
-// Rotas pessoais/autenticadas nunca entram no Cache Storage (persiste em disco):
-// em dispositivo compartilhado, o NetworkFirst poderia servir dado do usuário
-// anterior quando offline/timeout. Defesa no cliente, independente de o backend
-// enviar Cache-Control: no-store.
-const API_PRIVATE_PATH_RE =
-  /^\/v1\/(auth|profile|me|payments|gps|research|admin|notifications|push)(\/|$)/;
 const RUNTIME_CACHE_NAME = getTenantCacheName(`data-${BUILD_SLUG}`);
 const TILES_CACHE_NAME = getTenantCacheName('tiles-v1');
 
@@ -125,10 +120,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url, request }: { url: URL; request: Request }) =>
-    request.method === 'GET' &&
-    url.pathname.startsWith('/v1/') &&
-    !API_PRIVATE_PATH_RE.test(url.pathname),
+  ({ url, request }: { url: URL; request: Request }) => isCacheableApiRequest(url, request),
   new NetworkFirst({
     cacheName: API_CACHE_NAME,
     networkTimeoutSeconds: API_NETWORK_TIMEOUT_SECONDS,
