@@ -1,6 +1,7 @@
-import { Bus, Clock, Radio } from 'lucide-react';
+import { Bus, Clock, Radio, WifiOff } from 'lucide-react';
 import { memo, useState } from 'react';
 import { Marker, Popup } from 'react-map-gl/maplibre';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { getBhtransLineConfig } from '@/features/gps/config/bhtransLines';
 import { useBhtransLivePositions } from '@/features/gps/hooks/useBhtransLivePositions';
 
@@ -117,15 +118,38 @@ export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }:
 }
 
 export const MapLibreBhtransMarkers = memo(function MapLibreBhtransMarkers() {
-  const { positions, fetchedAt } = useBhtransLivePositions();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { status, positions, fetchedAt } = useBhtransLivePositions(isAuthenticated);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  if (positions.length === 0) return null;
+  if (positions.length === 0) {
+    if (status === 'schema_not_ready' || status === 'unavailable') {
+      return (
+        <div
+          role="status"
+          className="pointer-events-none absolute bottom-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-neutral-bg/90 px-2.5 py-1 text-micro text-text-secondary shadow"
+        >
+          <WifiOff size={12} aria-hidden="true" />
+          <span>Ônibus BHTrans indisponíveis no momento</span>
+        </div>
+      );
+    }
+    return null;
+  }
 
   const selected = positions.find((p) => p.vehicleId === selectedId) ?? null;
 
   return (
     <>
+      {status === 'stale' && (
+        <div
+          role="status"
+          className="pointer-events-none absolute bottom-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-neutral-bg/90 px-2.5 py-1 text-micro text-text-secondary shadow"
+        >
+          <WifiOff size={12} aria-hidden="true" />
+          <span>Posições BHTrans desatualizadas</span>
+        </div>
+      )}
       {positions.map((pos) => {
         const { color } = getBhtransLineConfig(pos.linhaId);
         return (

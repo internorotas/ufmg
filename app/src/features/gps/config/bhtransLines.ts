@@ -32,8 +32,6 @@ export const BHTRANS_LINE_CONFIG: Record<string, BhtransLineConfig> = {
   S54: { color: '#efb12d', label: 'Suplementar', nome: 'S54' },
 };
 
-export const UFMG_BHTRANS_LINE_IDS = Object.keys(BHTRANS_LINE_CONFIG);
-
 /** Normaliza o ID de linha BHTrans: strips leading zeros, mantém prefixo letra. */
 export function normalizeBhtransLineId(raw: string): string {
   const s = String(raw).trim();
