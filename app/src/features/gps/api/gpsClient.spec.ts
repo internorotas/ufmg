@@ -117,4 +117,114 @@ describe('gpsClient — mapeamento de erros públicos do backend', () => {
 
     await expect(startGpsSession({ linhaId: '5102' })).rejects.toBeInstanceOf(RateLimitError);
   });
+
+  it('sessao retomada (resumed=true) preserva os campos de contexto da sessao ativa', async () => {
+    vi.doMock('@/features/auth/api/fetchAuthenticatedApi', () => ({
+      fetchAuthenticatedApi: vi.fn().mockResolvedValue(
+        jsonResponse(201, {
+          status: 'success',
+          sessionId: 's-1',
+          scheduleMatchStatus: 'matched',
+          resumed: true,
+          linhaId: '5102',
+          iniciadoAt: '2026-07-28T12:00:00.000Z',
+          snapshotsCount: 12,
+          lastActivityAt: '2026-07-28T12:05:00.000Z',
+          staleCandidate: false,
+        }),
+      ),
+    }));
+
+    const { startGpsSession } = await import('./gpsClient');
+
+    await expect(startGpsSession({ linhaId: '5102' })).resolves.toMatchObject({
+      sessionId: 's-1',
+      resumed: true,
+      snapshotsCount: 12,
+    });
+  });
+
+  it('409 GPS_ACTIVE_SESSION_DIFFERENT_LINE lanca GpsActiveSessionConflictError com dados da sessao', async () => {
+    vi.doMock('@/features/auth/api/fetchAuthenticatedApi', () => ({
+      fetchAuthenticatedApi: vi.fn().mockResolvedValue(
+        jsonResponse(409, {
+          statusCode: 409,
+          status: 'active_session_conflict',
+          code: 'GPS_ACTIVE_SESSION_DIFFERENT_LINE',
+          message: 'Já existe uma sessão de rastreio ativa em outra linha.',
+          requestId: 'req-conflict',
+          session: {
+            sessionId: 's-old',
+            linhaId: '1',
+            requestedLinhaId: '2',
+            lastActivityAt: '2026-07-28T12:05:00.000Z',
+            staleCandidate: true,
+          },
+        }),
+      ),
+    }));
+
+    const { startGpsSession, GpsActiveSessionConflictError } = await import('./gpsClient');
+
+    try {
+      await startGpsSession({ linhaId: '2' });
+      throw new Error('deveria ter lancado');
+    } catch (err) {
+      expect(err).toBeInstanceOf(GpsActiveSessionConflictError);
+      const conflictErr = err as InstanceType<typeof GpsActiveSessionConflictError>;
+      expect(conflictErr.session).toEqual({
+        sessionId: 's-old',
+        linhaId: '1',
+        requestedLinhaId: '2',
+        lastActivityAt: '2026-07-28T12:05:00.000Z',
+        staleCandidate: true,
+      });
+      expect(conflictErr.requestId).toBe('req-conflict');
+    }
+  });
+
+  it('GPS_IDEMPOTENCY_KEY_REUSED mapeia para mensagem propria, nao a generica', async () => {
+    vi.doMock('@/features/auth/api/fetchAuthenticatedApi', () => ({
+      fetchAuthenticatedApi: vi.fn().mockResolvedValue(
+        jsonResponse(409, {
+          statusCode: 409,
+          code: 'GPS_IDEMPOTENCY_KEY_REUSED',
+          message: 'detalhe interno',
+          requestId: 'req-idem',
+        }),
+      ),
+    }));
+
+    const { startGpsSession, GPS_GENERIC_ERROR_MESSAGE } = await import('./gpsClient');
+
+    await expect(startGpsSession({ linhaId: '5102' })).rejects.toMatchObject({
+      code: 'GPS_IDEMPOTENCY_KEY_REUSED',
+      message: expect.not.stringContaining(GPS_GENERIC_ERROR_MESSAGE),
+    });
+  });
+
+  it('getActiveGpsSession retorna sessao ativa ou null', async () => {
+    vi.doMock('@/features/auth/api/fetchAuthenticatedApi', () => ({
+      fetchAuthenticatedApi: vi.fn().mockResolvedValue(jsonResponse(200, { session: null })),
+    }));
+
+    const { getActiveGpsSession } = await import('./gpsClient');
+
+    await expect(getActiveGpsSession()).resolves.toEqual({ session: null });
+  });
+
+  it('abandonGpsSession chama o endpoint de abandono sem lancar em sucesso', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(200, { status: 'success' }));
+    vi.doMock('@/features/auth/api/fetchAuthenticatedApi', () => ({
+      fetchAuthenticatedApi: fetchMock,
+    }));
+
+    const { abandonGpsSession } = await import('./gpsClient');
+
+    await expect(abandonGpsSession('s-1')).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/gps/sessions/s-1/abandon'),
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
 });

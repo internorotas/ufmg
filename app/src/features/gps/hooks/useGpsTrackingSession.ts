@@ -1,9 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  abandonGpsSession,
   finishGpsSession,
   GPS_GENERIC_ERROR_MESSAGE,
+  GpsActiveSessionConflictError,
+  type GpsActiveSessionConflictInfo,
   GpsApiError,
   type GpsPointPayload,
+  type GpsStartSessionResult,
+  getActiveGpsSession,
   RateLimitError,
   startGpsSession,
   submitGpsBatch,
@@ -78,9 +83,14 @@ export interface GpsTrackingState {
   lockedLine: Linha | null;
   rateLimitMessage: string | null;
   startError: string | null;
+  // Sessão ativa do dono em OUTRA linha (409 GPS_ACTIVE_SESSION_DIFFERENT_LINE)
+  // — nunca retomada silenciosamente. UI decide via resolveConflict/dismissConflict.
+  conflict: GpsActiveSessionConflictInfo | null;
   start: (lineOverride?: Linha) => Promise<void>;
   stop: (reason?: TrackingStopReason) => Promise<void>;
   ingestSnapshot: (snapshot: TrackingSnapshot) => Promise<void>;
+  resolveConflict: (action: 'finish' | 'abandon') => Promise<void>;
+  dismissConflict: () => void;
 }
 
 interface UseGpsTrackingSessionOptions {
@@ -235,7 +245,7 @@ async function startSessionWithRetry(
   linhaId: string,
   idempotencyKey: string,
   retries = MAX_RETRIES,
-): Promise<{ sessionId: string; scheduleMatchStatus: 'matched' | 'unmatched' }> {
+): Promise<GpsStartSessionResult> {
   try {
     return await startGpsSession({ linhaId, idempotencyKey });
   } catch (err) {
@@ -257,6 +267,11 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
   const [lastStopReason, setLastStopReason] = useState<TrackingStopReason | null>(null);
   const [rateLimitMessage, setRateLimitMessage] = useState<string | null>(null);
   const [startError, setStartError] = useState<string | null>(null);
+  const [conflict, setConflict] = useState<GpsActiveSessionConflictInfo | null>(null);
+  // Linha que o usuário tentava rastrear quando o conflito apareceu — usada
+  // para retomar a tentativa original depois de encerrar/abandonar a sessão
+  // antiga (resolveConflict), sem pedir pro usuário selecionar a linha de novo.
+  const pendingStartLineRef = useRef<Linha | null>(null);
   const [distanceKm, setDistanceKm] = useState(0);
   const [durationMs, setDurationMs] = useState(0);
   const [snapshotsCount, setSnapshotsCount] = useState(0);
@@ -287,6 +302,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     setLastStopReason(null);
     setRateLimitMessage(null);
     setStartError(null);
+    setConflict(null);
     setDistanceKm(0);
     setDurationMs(0);
     setSnapshotsCount(0);
@@ -368,11 +384,25 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       setStatus('starting');
       try {
         setLastStopReason(null);
+        setConflict(null);
         const idempotencyKey = crypto.randomUUID();
         const response = await startSessionWithRetry(effectiveLine.idRota, idempotencyKey);
 
         lockedLineRef.current = effectiveLine;
-        sessionStartedAtRef.current = Date.now();
+        // P0.2 — sessão retomada (resumed=true) traz contadores reais do
+        // backend; nunca zera como se fosse sessão nova (perderia
+        // duração/pontos já contribuídos antes do reload/crash).
+        if (response.resumed) {
+          sessionStartedAtRef.current = response.iniciadoAt
+            ? new Date(response.iniciadoAt).getTime()
+            : Date.now();
+          setSnapshotsCount(response.snapshotsCount ?? 0);
+          setDurationMs(
+            response.iniciadoAt ? Date.now() - new Date(response.iniciadoAt).getTime() : 0,
+          );
+        } else {
+          sessionStartedAtRef.current = Date.now();
+        }
         setSessionId(response.sessionId);
         setStatus('active');
         writePersistedSession({
@@ -384,11 +414,22 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
         logGpsError('iniciar sessão de rastreio colaborativo', err);
         if (err instanceof RateLimitError) {
           setRateLimitMessage(err.message);
+        } else if (err instanceof GpsActiveSessionConflictError) {
+          // Nunca retoma silenciosamente na linha errada — guarda a linha
+          // pretendida para resolveConflict() poder retomar a tentativa.
+          pendingStartLineRef.current = effectiveLine;
+          setConflict(err.session);
         } else {
           // GpsApiError.message já vem mapeado com segurança a partir do `code`
           // público (ver GPS_ERROR_CODE_MESSAGES em gpsClient.ts) — nunca é o
-          // texto livre bruto do backend. Erros inesperados usam o fallback genérico.
-          const msg = err instanceof GpsApiError ? err.message : GPS_GENERIC_ERROR_MESSAGE;
+          // texto livre bruto do backend. Erros inesperados usam o fallback
+          // genérico, mas com requestId anexado quando disponível para suporte.
+          const msg =
+            err instanceof GpsApiError
+              ? err.requestId && (!err.code || err.code === 'GPS_INTERNAL_ERROR')
+                ? `${err.message} (cód. ${err.requestId.slice(0, 8)})`
+                : err.message
+              : GPS_GENERIC_ERROR_MESSAGE;
           setStartError(msg);
           window.setTimeout(() => setStartError(null), 5000);
         }
@@ -396,6 +437,37 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       }
     },
     [options.enabled, options.selectedLine],
+  );
+
+  const dismissConflict = useCallback(() => {
+    pendingStartLineRef.current = null;
+    setConflict(null);
+  }, []);
+
+  const resolveConflict = useCallback(
+    async (action: 'finish' | 'abandon') => {
+      const activeConflict = conflict;
+      const retryLine = pendingStartLineRef.current;
+      if (!activeConflict) return;
+
+      try {
+        if (action === 'finish') {
+          await finishGpsSession(activeConflict.sessionId, 'manual');
+        } else {
+          await abandonGpsSession(activeConflict.sessionId);
+        }
+        setConflict(null);
+        pendingStartLineRef.current = null;
+        if (retryLine) {
+          await start(retryLine);
+        }
+      } catch (err) {
+        logGpsError(`resolver conflito de sessão ativa (${action})`, err);
+        // Mantém o conflito visível para o usuário tentar de novo — nunca
+        // descarta silenciosamente um erro ao encerrar/abandonar a sessão antiga.
+      }
+    },
+    [conflict, start],
   );
 
   const stop = useCallback(
@@ -529,6 +601,49 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
     }
   }, [sessionId, options.selectedLine]);
 
+  // P0.2/Fase J — consulta a sessão ativa no backend ao abrir o fluxo (uma
+  // única vez por habilitação), nunca só confiando no sessionStorage local:
+  // sessão pode ter sido iniciada em outra aba/dispositivo, ou o storage local
+  // pode estar vazio mas o backend ainda ter uma sessão aberta (crash antes de
+  // persistir). Mesma linha selecionada → retoma direto; linha diferente →
+  // vira conflito para o usuário decidir (nunca retoma silenciosamente).
+  const hasCheckedActiveSessionRef = useRef(false);
+  useEffect(() => {
+    if (!options.enabled || hasCheckedActiveSessionRef.current || sessionIdRef.current !== null) {
+      return;
+    }
+    hasCheckedActiveSessionRef.current = true;
+
+    let cancelled = false;
+    void getActiveGpsSession()
+      .then(({ session }) => {
+        if (cancelled || !session || sessionIdRef.current !== null) return;
+
+        const selected = selectedLineRef.current;
+        if (selected && session.linhaId === selected.idRota) {
+          lockedLineRef.current = selected;
+          sessionStartedAtRef.current = new Date(session.startedAt).getTime();
+          setSnapshotsCount(session.snapshotsCount);
+          setDurationMs(Date.now() - new Date(session.startedAt).getTime());
+          setSessionId(session.sessionId);
+          setStatus('active');
+        } else {
+          setConflict({
+            sessionId: session.sessionId,
+            linhaId: session.linhaId,
+            requestedLinhaId: selected?.idRota ?? '',
+            lastActivityAt: session.lastActivityAt,
+            staleCandidate: session.staleCandidate,
+          });
+        }
+      })
+      .catch((err) => logGpsError('consultar sessão ativa ao abrir o fluxo', err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [options.enabled]);
+
   useEffect(() => {
     const handleOnline = () => {
       void flushQueue(true);
@@ -591,11 +706,16 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       lockedLine: lockedLineRef.current,
       rateLimitMessage,
       startError,
+      conflict,
       start,
       stop,
       ingestSnapshot,
+      resolveConflict,
+      dismissConflict,
     }),
     [
+      conflict,
+      dismissConflict,
       distanceKm,
       durationMs,
       ingestSnapshot,
@@ -604,6 +724,7 @@ export function useGpsTrackingSession(options: UseGpsTrackingSessionOptions): Gp
       nextCollectionIntervalMs,
       queueSize,
       rateLimitMessage,
+      resolveConflict,
       startError,
       sessionId,
       snapshotsCount,

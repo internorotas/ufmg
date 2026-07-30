@@ -18,6 +18,8 @@ export const GPS_ERROR_CODE_MESSAGES: Record<string, string> = {
   GPS_LINE_NOT_FOUND: 'Esta linha não foi encontrada.',
   GPS_LINE_SUSPENDED: 'Esta linha está temporariamente suspensa.',
   GPS_SESSION_ALREADY_ACTIVE: 'Você já tem uma sessão de rastreio ativa.',
+  GPS_ACTIVE_SESSION_DIFFERENT_LINE: 'Já existe uma sessão de rastreio ativa em outra linha.',
+  GPS_IDEMPOTENCY_KEY_REUSED: 'Essa tentativa já foi processada. Tente iniciar novamente.',
   GPS_SESSION_NOT_FOUND: 'Sessão de rastreio não encontrada.',
   GPS_INVALID_REQUEST: 'Não foi possível processar a solicitação.',
   GPS_CALENDAR_UNAVAILABLE:
@@ -44,6 +46,29 @@ export class GpsApiError extends Error {
   ) {
     super(message);
     this.name = 'GpsApiError';
+  }
+}
+
+export interface GpsActiveSessionConflictInfo {
+  sessionId: string;
+  linhaId: string;
+  requestedLinhaId: string;
+  lastActivityAt: string;
+  staleCandidate: boolean;
+}
+
+// 409 GPS_ACTIVE_SESSION_DIFFERENT_LINE nunca deve ser tratado como o
+// GpsApiError genérico — carrega os dados mínimos da sessão ativa em outra
+// linha para a UI oferecer retomar/encerrar/abandonar/cancelar (nunca retomar
+// silenciosamente na linha errada).
+export class GpsActiveSessionConflictError extends GpsApiError {
+  constructor(
+    message: string,
+    requestId: string | null,
+    public readonly session: GpsActiveSessionConflictInfo,
+  ) {
+    super(message, 409, 'GPS_ACTIVE_SESSION_DIFFERENT_LINE', requestId);
+    this.name = 'GpsActiveSessionConflictError';
   }
 }
 
@@ -105,6 +130,19 @@ async function fetchGps(pathname: string, init?: RequestInit): Promise<Response>
 
   if (!response.ok) {
     const body = await parsePublicErrorBody(response);
+
+    if (
+      response.status === 409 &&
+      body?.code === 'GPS_ACTIVE_SESSION_DIFFERENT_LINE' &&
+      isActiveSessionConflictBody(body)
+    ) {
+      throw new GpsActiveSessionConflictError(
+        friendlyMessageFor(body.code),
+        body.requestId ?? null,
+        body.session,
+      );
+    }
+
     throw new GpsApiError(
       friendlyMessageFor(body?.code),
       response.status,
@@ -116,18 +154,64 @@ async function fetchGps(pathname: string, init?: RequestInit): Promise<Response>
   return response;
 }
 
-export async function startGpsSession(
-  payload: GpsSessionPayload,
-): Promise<{ sessionId: string; scheduleMatchStatus: 'matched' | 'unmatched' }> {
+function isActiveSessionConflictBody(
+  body: GpsPublicErrorBody,
+): body is GpsPublicErrorBody & { session: GpsActiveSessionConflictInfo } {
+  const session = (body as { session?: unknown }).session;
+  return (
+    typeof session === 'object' &&
+    session !== null &&
+    typeof (session as GpsActiveSessionConflictInfo).sessionId === 'string' &&
+    typeof (session as GpsActiveSessionConflictInfo).linhaId === 'string'
+  );
+}
+
+export interface GpsStartSessionResult {
+  sessionId: string;
+  scheduleMatchStatus: 'matched' | 'unmatched';
+  // Sessão do mesmo dono/linha retomada em vez de criada — ver
+  // backend/src/gps/gps.service.ts GpsStartSessionResponse. Quando `resumed`,
+  // os campos abaixo vêm preenchidos e substituem o estado local em vez de
+  // resetar contadores como se fosse sessão nova.
+  resumed?: boolean;
+  linhaId?: string;
+  iniciadoAt?: string;
+  snapshotsCount?: number;
+  lastActivityAt?: string;
+  staleCandidate?: boolean;
+}
+
+export async function startGpsSession(payload: GpsSessionPayload): Promise<GpsStartSessionResult> {
   const response = await fetchGps('/v1/gps/sessions', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 
-  return response.json() as Promise<{
-    sessionId: string;
-    scheduleMatchStatus: 'matched' | 'unmatched';
-  }>;
+  return response.json() as Promise<GpsStartSessionResult>;
+}
+
+export interface ActiveGpsSessionInfo {
+  sessionId: string;
+  linhaId: string;
+  startedAt: string;
+  scheduleMatchStatus: 'matched' | 'unmatched';
+  snapshotsCount: number;
+  lastActivityAt: string;
+  staleCandidate: boolean;
+  status: 'active';
+}
+
+// Consultada ao abrir o fluxo de rastreio — mesma resolução de ownership do
+// POST /gps/sessions, então nunca diverge sobre qual sessão está ativa.
+export async function getActiveGpsSession(): Promise<{ session: ActiveGpsSessionInfo | null }> {
+  const response = await fetchGps('/v1/gps/sessions/active');
+  return response.json() as Promise<{ session: ActiveGpsSessionInfo | null }>;
+}
+
+export async function abandonGpsSession(sessionId: string): Promise<void> {
+  await fetchGps(`/v1/gps/sessions/${sessionId}/abandon`, {
+    method: 'POST',
+  });
 }
 
 export async function submitGpsBatch(payload: GpsBatchPayload): Promise<void> {

@@ -12,6 +12,7 @@ import {
 import { useLocationContext } from '@/contexts/LocationContext';
 import { useRotasSelection } from '@/contexts/RotasContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
+import { GpsActiveSessionConflictDialog } from '@/features/gps/components/GpsActiveSessionConflictDialog';
 import { GpsTrackingCard } from '@/features/gps/components/GpsTrackingCard';
 import { TripRatingCard } from '@/features/gps/components/TripRatingCard';
 import {
@@ -147,7 +148,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     selectedLine: linhaSelecionada,
   });
 
-  const { isActive, ingestSnapshot, status, rateLimitMessage, startError } = rastreio;
+  const { isActive, ingestSnapshot, status, rateLimitMessage, startError, conflict } = rastreio;
 
   // === Manter coleta viva ===
   useWakeLock(isActive);
@@ -499,6 +500,16 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
             )}
           </div>
         </div>
+      )}
+
+      {/* Conflito de sessão ativa em outra linha (409 GPS_ACTIVE_SESSION_DIFFERENT_LINE) —
+          nunca retomada silenciosamente; usuário decide encerrar/abandonar/cancelar. */}
+      {conflict && (
+        <GpsActiveSessionConflictDialog
+          conflict={conflict}
+          onResolve={rastreio.resolveConflict}
+          onDismiss={rastreio.dismissConflict}
+        />
       )}
     </GpsSessionContext.Provider>
   );
