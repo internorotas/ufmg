@@ -223,7 +223,7 @@ export function CardPredio({ predio, onClose: _onClose }: CardPredioProps) {
         <header className="flex items-start gap-3">
           <span
             aria-hidden="true"
-            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-primary/15 text-brand-primary shadow-sm"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-primary/15 text-brand-primary shadow-sm dark:bg-brand-accent/15 dark:text-brand-accent"
           >
             <svg
               width="20"

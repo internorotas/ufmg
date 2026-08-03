@@ -81,7 +81,7 @@ export function GpsTrackingCard({
           className="flex min-h-11 items-center gap-2 px-1"
         >
           <span className="size-2 animate-pulse rounded-full bg-danger-solid" aria-hidden="true" />
-          <span className="text-tiny font-bold tabular-nums" style={{ color: linha.corHex }}>
+          <span className="text-tiny font-bold tabular-nums text-text-primary">
             {numLinha(linha)}
           </span>
           {!isStarting && (
@@ -135,8 +135,7 @@ export function GpsTrackingCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1">
             <span
-              className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-micro font-bold tabular-nums"
-              style={{ backgroundColor: `${linha.corHex}22`, color: linha.corHex }}
+              className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-card-hover text-micro font-bold tabular-nums text-text-primary"
               aria-hidden="true"
             >
               {numLinha(linha)}

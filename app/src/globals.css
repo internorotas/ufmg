@@ -6,6 +6,9 @@
 @import "@fontsource/poppins/latin-600.css";
 @import "@fontsource/poppins/latin-700.css";
 @import "tailwindcss";
+
+/* O tema é controlado pelo ThemeProvider através da classe .dark no <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
 /* leaflet.css movido para Mapa.tsx (componente lazy) para não gerar
    preloads das imagens do Leaflet durante o carregamento inicial. */
 
@@ -109,7 +112,7 @@ body,
   /* Texto */
   --text-primary: #171717; /* Neutral 900 */
   --text-secondary: #525252; /* Neutral 600 */
-  --text-tertiary: #737373; /* Neutral 500 */
+  --text-tertiary: #666666; /* Neutral 600 — AA também sobre superfícies neutras */
   --text-inverse: #ffffff;
 
   /* Semantic: Success (Verde) - Ajustado para WCAG */

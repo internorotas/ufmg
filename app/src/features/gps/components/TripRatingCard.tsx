@@ -2,6 +2,7 @@ import { Star } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { rateTrip } from '@/features/gps/api/gpsClient';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { hexToRgba } from '@/lib/utils';
 
 interface TripRatingCardProps {
   sessionId: string;
@@ -54,7 +55,7 @@ export function TripRatingCard({
     return (
       <div className="pointer-events-none fixed inset-0 z-(--z-sheet) flex items-end justify-start pb-24 pl-3 md:items-center md:justify-center md:pb-0 md:pl-0">
         <div className="pointer-events-auto w-56 rounded-(--shape-md) border border-brand-primary/20 bg-brand-primary/5 p-4 shadow-(--elevation-2) backdrop-blur-sm md:max-w-xs md:w-full md:mx-4">
-          <p className="text-center text-sm font-semibold text-brand-primary">
+          <p className="text-center text-sm font-semibold text-brand-primary dark:text-brand-accent">
             Obrigado pela avaliação!
           </p>
         </div>
@@ -67,8 +68,8 @@ export function TripRatingCard({
       <div className="pointer-events-auto w-56 rounded-(--shape-md) border border-card-border bg-card p-4 shadow-(--elevation-2) md:max-w-xs md:w-full md:mx-4">
         <div className="mb-3 flex items-center gap-2">
           <span
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold"
-            style={{ backgroundColor: `${linhaCorHex}22`, color: linhaCorHex }}
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-text-primary"
+            style={{ backgroundColor: hexToRgba(linhaCorHex, 0.12) }}
           >
             <Star size={16} aria-hidden="true" />
           </span>
@@ -93,7 +94,7 @@ export function TripRatingCard({
                 size={24}
                 className={
                   star <= (hoveredStar || rating)
-                    ? 'fill-brand-primary text-brand-primary'
+                    ? 'fill-brand-primary text-brand-primary dark:fill-brand-accent dark:text-brand-accent'
                     : 'text-text-tertiary'
                 }
               />

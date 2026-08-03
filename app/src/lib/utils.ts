@@ -55,6 +55,27 @@ export function hexToRgba(hexColor: string, alpha = 1): string {
 }
 
 /**
+ * Escolhe uma cor de texto que preserve contraste sobre uma cor hexadecimal
+ * opaca. Usado em etiquetas que recebem a cor de uma linha em tempo de execução.
+ */
+export function getContrastingTextColor(hexColor: string): '#000000' | '#ffffff' {
+  const normalizedColor = normalizarHexCor(hexColor) ?? '#2c0eeb';
+  const channels = [0, 2, 4].map((offset) =>
+    Number.parseInt(normalizedColor.slice(offset + 1, offset + 3), 16),
+  );
+  const luminance = channels
+    .map((channel) => {
+      const value = channel / 255;
+      return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    })
+    .reduce((total, value, index) => total + value * [0.2126, 0.7152, 0.0722][index], 0);
+
+  const contrastWithWhite = 1.05 / (luminance + 0.05);
+  const contrastWithBlack = (luminance + 0.05) / 0.05;
+  return contrastWithWhite >= contrastWithBlack ? '#ffffff' : '#000000';
+}
+
+/**
  * Converte horário `HH:MM` em minutos desde meia-noite.
  *
  * @param horaString Horário no formato textual `HH:MM`.

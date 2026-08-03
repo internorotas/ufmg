@@ -128,9 +128,7 @@ function BusLegRow({ leg }: { leg: PlannerBusLeg }) {
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex items-center gap-2">
-          <span className="truncate text-sm font-bold" style={{ color: leg.lineColorHex }}>
-            {leg.lineName}
-          </span>
+          <span className="truncate text-sm font-bold text-text-primary">{leg.lineName}</span>
           <span className={etaBadgeVariants({ source: leg.eta.source })}>{sourceBadgeLabel}</span>
         </div>
         <span className="text-xs text-text-secondary">

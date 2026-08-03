@@ -414,7 +414,7 @@ export function MorePage() {
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="hidden min-h-11 items-center justify-center rounded-(--shape-sm) border border-brand-primary bg-background px-4 text-sm font-semibold text-brand-primary shadow-(--elevation-1) transition hover:shadow-(--elevation-2) sm:inline-flex"
+          className="hidden min-h-11 items-center justify-center rounded-(--shape-sm) border border-brand-primary bg-background px-4 text-sm font-semibold text-brand-primary shadow-(--elevation-1) transition hover:shadow-(--elevation-2) dark:border-brand-accent dark:text-brand-accent sm:inline-flex"
         >
           Ir ao mapa
         </button>
@@ -470,7 +470,11 @@ export function MorePage() {
 
           <div className="surface-card-sm bg-card p-4 text-sm text-text-secondary">
             <p className="mb-2 flex items-center gap-2 font-semibold text-text-primary">
-              <Clock size={16} aria-hidden="true" className="text-brand-primary" />
+              <Clock
+                size={16}
+                aria-hidden="true"
+                className="text-brand-primary dark:text-brand-accent"
+              />
               Frequência de atualização
             </p>
             <ul className="list-disc space-y-1 pl-5">

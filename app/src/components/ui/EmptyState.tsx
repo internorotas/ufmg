@@ -42,7 +42,8 @@ export const emptyStateIconVariants = tv({
     },
     tone: {
       neutral: 'bg-brand-secondary text-text-tertiary',
-      brand: 'bg-brand-primary/12 text-brand-primary',
+      brand:
+        'bg-brand-primary/12 text-brand-primary dark:bg-brand-accent/12 dark:text-brand-accent',
       accent: 'bg-brand-accent/15 text-brand-accent',
       success: 'bg-success-bg text-success-text',
       danger: 'bg-danger-bg text-danger-text',

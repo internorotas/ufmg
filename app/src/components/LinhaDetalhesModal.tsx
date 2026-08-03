@@ -318,18 +318,12 @@ const ParadaItinerarioRow = React.memo(function ParadaItinerarioRow({
           )}
 
           {isFirst && (
-            <span
-              className="mt-1 inline-block px-0 text-xs font-semibold"
-              style={{ color: linha.corHex }}
-            >
+            <span className="mt-1 inline-block px-0 text-xs font-semibold text-text-primary">
               {t('itinerary.departure')}
             </span>
           )}
           {isLast && (
-            <span
-              className="mt-1 inline-block px-0 text-xs font-semibold"
-              style={{ color: linha.corHex }}
-            >
+            <span className="mt-1 inline-block px-0 text-xs font-semibold text-text-primary">
               {t('itinerary.arrival')}
             </span>
           )}
@@ -613,15 +607,12 @@ export function LinhaDetalhesModal({
               {t('schedules.nextHighlight')}
             </p>
             <div className="mt-2 flex items-end justify-between gap-3">
-              <span
-                className="font-bold text-[clamp(2.25rem,8vw,3rem)] leading-none tabular-nums"
-                style={{ color: linha.corHex }}
-              >
+              <span className="font-bold text-[clamp(2.25rem,8vw,3rem)] leading-none tabular-nums text-text-primary">
                 {proximoHorario.horario}
               </span>
               <span
-                className="rounded px-2.5 py-1 text-xs font-semibold"
-                style={{ backgroundColor: hexToRgba(linha.corHex, 0.12), color: linha.corHex }}
+                className="rounded px-2.5 py-1 text-xs font-semibold text-text-primary"
+                style={{ backgroundColor: hexToRgba(linha.corHex, 0.12) }}
               >
                 {t('schedules.nextBadge')}
               </span>

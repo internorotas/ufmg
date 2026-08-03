@@ -25,7 +25,7 @@ export function DataStatusScreen({ title, description, variant = 'info' }: DataS
       >
         <h2
           id="data-status-title"
-          className={`mb-2 text-2xl font-bold ${isWarning ? 'text-warning-text' : 'text-brand-primary'}`}
+          className={`mb-2 text-2xl font-bold ${isWarning ? 'text-warning-text' : 'text-brand-primary dark:text-brand-accent'}`}
         >
           {title}
         </h2>

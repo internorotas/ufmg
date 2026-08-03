@@ -131,7 +131,7 @@ const PageLoading = () => (
   >
     <div
       aria-hidden="true"
-      className="h-12 w-12 animate-spin rounded-full border-b-2 border-brand-primary"
+      className="h-12 w-12 animate-spin rounded-full border-b-2 border-brand-primary dark:border-brand-accent"
     />
   </div>
 );
@@ -146,7 +146,7 @@ const LoadingMap = () => (
   >
     <div
       aria-hidden="true"
-      className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
+      className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary dark:border-brand-accent"
     />
   </div>
 );
@@ -370,6 +370,10 @@ function AppContent() {
 
   const handleRegisterMenuOpen = useCallback((fn: () => void) => {
     usePlannerStore.getState().registerOpenMenu(fn);
+  }, []);
+
+  const handleOpenMenu = useCallback(() => {
+    usePlannerStore.getState().openMenuFn?.();
   }, []);
 
   // Quando GPS permission chega após seleção de linha, inicia o rastreio automaticamente.
@@ -640,6 +644,7 @@ function AppContent() {
           authStatus={authStatus}
           isAuthenticated={isAuthenticated}
           onAuthAction={handleAuthAction}
+          onOpenMenu={handleOpenMenu}
         />
         <div className="flex min-h-0 flex-1 overflow-hidden md:flex-row">
           <MenuLateral

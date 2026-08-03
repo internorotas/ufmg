@@ -19,11 +19,10 @@ interface LinhaGroup {
   linhas: Linha[];
 }
 
-function LineNumberBadge({ numero, corHex }: { numero: string; corHex: string }) {
+function LineNumberBadge({ numero }: { numero: string }) {
   return (
     <div
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded text-sm font-bold tabular-nums"
-      style={{ backgroundColor: `${corHex}22`, color: corHex }}
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-background-secondary text-sm font-bold tabular-nums text-text-primary"
       aria-hidden="true"
     >
       {numero}
@@ -39,7 +38,7 @@ function SublinhaRow({ linha, onSelect }: { linha: Linha; onSelect: (l: Linha) =
       className="flex w-full items-center gap-3 rounded px-2 py-2.5 text-left hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary"
       aria-label={`Selecionar linha ${numLinha(linha)}${linha.sublinha ? ` (${linha.sublinha})` : ''}: ${linha.nome}`}
     >
-      <LineNumberBadge numero={numLinha(linha)} corHex={linha.corHex} />
+      <LineNumberBadge numero={numLinha(linha)} />
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-text-primary">{linha.nome}</p>

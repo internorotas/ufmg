@@ -167,7 +167,11 @@ export function RankingPage() {
       <div className="flex flex-col gap-5">
         <header className="rounded-(--shape-sm) border border-card-border bg-card px-5 py-4 shadow-(--elevation-1)">
           <div className="flex items-center gap-2 text-text-secondary">
-            <Trophy size={18} aria-hidden="true" className="shrink-0 text-brand-primary" />
+            <Trophy
+              size={18}
+              aria-hidden="true"
+              className="shrink-0 text-brand-primary dark:text-brand-accent"
+            />
             <p className="text-sm">
               Top 10 público, sem login. Pontos são só incentivo, não há paywall.
             </p>

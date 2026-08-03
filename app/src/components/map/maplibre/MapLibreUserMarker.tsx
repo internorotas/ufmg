@@ -15,17 +15,17 @@ export function MapLibreUserMarker({ localizacao, heading }: MapLibreUserMarkerP
       <div style={{ position: 'relative', width: 40, height: 40, pointerEvents: 'none' }}>
         {mostrarCone && (
           <div
+            aria-hidden="true"
             style={{
               position: 'absolute',
               top: -20,
               left: '50%',
+              width: 28,
+              height: 36,
               transform: `translateX(-50%) rotate(${rotacao}deg)`,
               transformOrigin: 'center bottom',
-              width: 0,
-              height: 0,
-              borderLeft: '14px solid transparent',
-              borderRight: '14px solid transparent',
-              borderBottom: '36px solid var(--color-info-border)',
+              clipPath: 'polygon(50% 0, 100% 100%, 0 100%)',
+              background: 'var(--color-info-border)',
               opacity: 0.35,
               filter: 'blur(1px)',
             }}

@@ -48,7 +48,7 @@ export const tabsListVariants = tv({
   variants: {
     variant: {
       default: 'gap-1 rounded-(--shape-md) bg-background-secondary p-1',
-      underline: 'gap-2 border-b-2 border-brand-dark',
+      underline: 'gap-2 border-b border-card-border',
       pills: 'gap-2',
     },
     fullWidth: {
@@ -81,7 +81,7 @@ export const tabsTriggerVariants = tv({
         'data-[state=inactive]:text-text-secondary data-[state=inactive]:hover:text-text-primary data-[state=inactive]:hover:bg-card-hover/50',
       ],
       underline: [
-        'min-h-11 rounded border-b-2 border-transparent px-4 py-2 text-sm',
+        'min-h-11 border-b-2 border-transparent px-4 py-2 text-sm',
         'data-[state=active]:border-brand-primary data-[state=active]:text-text-primary',
         'data-[state=inactive]:text-text-secondary data-[state=inactive]:hover:text-text-primary data-[state=inactive]:hover:bg-card-hover/30',
       ],

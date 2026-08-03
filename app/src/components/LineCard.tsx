@@ -54,7 +54,7 @@ export const lineCardVariants = tv({
 export const detailsButtonVariants = tv({
   base: [
     'w-full rounded-(--shape-sm) border border-transparent bg-background px-4 py-3 font-semibold cursor-pointer',
-    'text-sm',
+    'text-sm text-text-primary',
     'hover:bg-card-hover hover:border-(--card-border) active:scale-[0.97] transition duration-150',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
   ],
@@ -327,7 +327,6 @@ function LineCardComponent({
                         style={{
                           borderColor: hexToRgba(linha.corHex, 0.32),
                           backgroundColor: hexToRgba(linha.corHex, 0.12),
-                          color: linha.corHex,
                         }}
                       >
                         <Star className="size-3 fill-current" aria-hidden="true" />
@@ -390,12 +389,12 @@ function LineCardComponent({
           }
           aria-pressed={favoritado}
           className={cn(
-            'flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg border p-3 transition duration-150 hover:bg-card-hover active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
+            'flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg border p-3 text-text-secondary transition duration-150 hover:bg-card-hover active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
             favoritado && 'shadow-sm',
           )}
           style={{
             borderColor: hexToRgba(linha.corHex, 0.35),
-            color: linha.corHex,
+            backgroundColor: favoritado ? hexToRgba(linha.corHex, 0.12) : undefined,
           }}
         >
           <Star
@@ -404,8 +403,8 @@ function LineCardComponent({
               favoritado && 'motion-safe:animate-pop-in',
             )}
             aria-hidden="true"
-            fill={favoritado ? linha.corHex : 'none'}
-            stroke={linha.corHex}
+            fill={favoritado ? 'currentColor' : 'none'}
+            stroke="currentColor"
             strokeWidth={2}
           />
         </button>
@@ -417,7 +416,6 @@ function LineCardComponent({
           className={cn(detailsButtonVariants(), 'flex-1')}
           style={{
             borderColor: hexToRgba(linha.corHex, 0.35),
-            color: linha.corHex,
             minHeight: '44px',
           }}
         >

@@ -270,10 +270,7 @@ export function PlannerSummarySheet({
                       </>
                     ) : (
                       <>
-                        <span
-                          className="text-sm font-bold"
-                          style={{ color: (leg as PlannerBusLeg).lineColorHex }}
-                        >
+                        <span className="text-sm font-bold text-text-primary">
                           {(leg as PlannerBusLeg).lineName}
                         </span>
                         <span className="text-xs text-text-secondary">

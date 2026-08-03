@@ -47,8 +47,7 @@ export function GpsPositionWarningDialog({
             <div className="surface-card bg-card p-3">
               <div className="flex items-center gap-2.5">
                 <span
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold tabular-nums"
-                  style={{ backgroundColor: `${linha.corHex}22`, color: linha.corHex }}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-background-secondary text-xs font-bold tabular-nums text-text-primary"
                   aria-hidden="true"
                 >
                   {numLinha(linha)}

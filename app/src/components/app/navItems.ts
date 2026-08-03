@@ -7,8 +7,6 @@ export interface NavItem {
   label: string;
   matchPrefix?: string;
   anonymousTo?: string;
-  /** Ocultar no NavRail (desktop) — ex: itens já acessíveis via sidebar lateral */
-  hideOnDesktop?: boolean;
 }
 
 /** Decide se um item de navegação corresponde à rota atual — usado por NavRail e BottomNav. */
@@ -24,7 +22,7 @@ export function isNavItemActive(currentPath: string, item: NavItem, resolvedTo: 
 
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', icon: MapIcon, label: 'Mapa' },
-  { to: '/linhas', icon: Bus, label: 'Linhas', matchPrefix: '/linhas', hideOnDesktop: true },
+  { to: '/linhas', icon: Bus, label: 'Linhas', matchPrefix: '/linhas' },
   {
     to: '/proximos',
     icon: Navigation,

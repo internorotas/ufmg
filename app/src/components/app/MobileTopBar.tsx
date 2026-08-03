@@ -6,15 +6,23 @@
  * aberto, então não há conflito com seu próprio header.
  */
 
+import { Bus } from 'lucide-react';
 import logo from '@/assets/logo-horizontal-transparente.svg';
 
 export interface MobileTopBarProps {
   authStatus: 'booting' | 'authenticated' | 'anonymous';
   isAuthenticated: boolean;
   onAuthAction: () => void;
+  /** Abre o menu de linhas e o planejador no mapa mobile. */
+  onOpenMenu?: () => void;
 }
 
-export function MobileTopBar({ authStatus, isAuthenticated, onAuthAction }: MobileTopBarProps) {
+export function MobileTopBar({
+  authStatus,
+  isAuthenticated,
+  onAuthAction,
+  onOpenMenu,
+}: MobileTopBarProps) {
   return (
     <header
       data-slot="mobile-top-bar"
@@ -32,22 +40,36 @@ export function MobileTopBar({ authStatus, isAuthenticated, onAuthAction }: Mobi
           />
         </div>
 
-        {authStatus === 'booting' ? (
-          <span
-            role="status"
-            aria-label="Carregando sessão"
-            className="inline-flex size-10 animate-pulse items-center justify-center rounded-full bg-white/20"
-          />
-        ) : (
-          <button
-            type="button"
-            onClick={onAuthAction}
-            aria-label={isAuthenticated ? 'Abrir seu perfil' : 'Entrar com sua conta'}
-            className="inline-flex min-h-10 items-center justify-center rounded-(--shape-sm) bg-white px-3 text-xs font-semibold text-brand-primary shadow-(--elevation-1) transition-[background-color,transform] hover:bg-white/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary"
-          >
-            {isAuthenticated ? 'Perfil' : 'Entrar'}
-          </button>
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          {onOpenMenu ? (
+            <button
+              type="button"
+              onClick={onOpenMenu}
+              aria-label="Abrir linhas e planejador"
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-(--shape-sm) bg-white px-3 text-xs font-semibold text-brand-primary shadow-(--elevation-1) transition-[background-color,transform] hover:bg-white/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary"
+            >
+              <Bus size={15} aria-hidden="true" />
+              Linhas
+            </button>
+          ) : null}
+
+          {authStatus === 'booting' ? (
+            <span
+              role="status"
+              aria-label="Carregando sessão"
+              className="inline-flex size-10 animate-pulse items-center justify-center rounded-full bg-white/20"
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={onAuthAction}
+              aria-label={isAuthenticated ? 'Abrir seu perfil' : 'Entrar com sua conta'}
+              className="inline-flex min-h-10 items-center justify-center rounded-(--shape-sm) bg-white px-3 text-xs font-semibold text-brand-primary shadow-(--elevation-1) transition-[background-color,transform] hover:bg-white/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary"
+            >
+              {isAuthenticated ? 'Perfil' : 'Entrar'}
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );

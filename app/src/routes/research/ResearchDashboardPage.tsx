@@ -75,7 +75,7 @@ export function ResearchDashboardPage() {
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
         <header className="surface-card bg-card px-5 py-5">
           <div className="flex items-start gap-3">
-            <div className="flex size-12 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
+            <div className="flex size-12 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary dark:bg-brand-accent/10 dark:text-brand-accent">
               <Database size={22} aria-hidden="true" />
             </div>
             <div>

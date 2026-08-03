@@ -60,7 +60,11 @@ export function NotificacaoPermissionModal({
       <div className="flex flex-col items-center gap-5 py-4 text-center">
         {/* Ícone ilustrativo */}
         <div className="flex h-16 w-16 items-center justify-center rounded bg-brand-primary/12">
-          <Bell size={32} className="text-brand-primary" aria-hidden="true" />
+          <Bell
+            size={32}
+            className="text-brand-primary dark:text-brand-accent"
+            aria-hidden="true"
+          />
         </div>
 
         {/* Texto explicativo */}

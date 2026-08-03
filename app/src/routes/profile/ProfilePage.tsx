@@ -43,6 +43,7 @@ import { DeleteAccountDialog } from '@/features/profile/components/DeleteAccount
 import { PROFILE_QUERY_KEY, useProfileQuery } from '@/features/profile/queries/useProfileQuery';
 import { useHistoricoViagens } from '@/hooks/useHistoricoViagens';
 import { formatDateTimePtBr, formatDistanceKm } from '@/lib/formatters';
+import { getContrastingTextColor } from '@/lib/utils';
 
 interface ProfileFeedbackState {
   type: 'success' | 'error';
@@ -301,7 +302,7 @@ export function ProfilePage() {
                 className="size-14 rounded-full border border-card-border object-cover"
               />
             ) : (
-              <div className="flex size-14 items-center justify-center rounded-full border border-card-border bg-background-secondary text-brand-primary">
+              <div className="flex size-14 items-center justify-center rounded-full border border-card-border bg-background-secondary text-brand-primary dark:text-brand-accent">
                 <UserCircle2 size={30} aria-hidden="true" />
               </div>
             )}
@@ -459,7 +460,12 @@ export function ProfilePage() {
                       >
                         <span
                           className="flex size-8 shrink-0 items-center justify-center rounded-full text-white"
-                          style={{ backgroundColor: viagem.linhaCorHex ?? 'var(--text-tertiary)' }}
+                          style={{
+                            backgroundColor: viagem.linhaCorHex ?? 'var(--text-tertiary)',
+                            color: viagem.linhaCorHex
+                              ? getContrastingTextColor(viagem.linhaCorHex)
+                              : 'var(--text-inverse)',
+                          }}
                           aria-hidden="true"
                         >
                           <Bus size={14} />

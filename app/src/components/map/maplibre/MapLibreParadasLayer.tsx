@@ -242,7 +242,7 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
             aria-hidden="true"
             className={
               isFavorita(parada.idParada)
-                ? 'fill-brand-primary text-brand-primary'
+                ? 'fill-brand-primary text-brand-primary dark:fill-brand-accent dark:text-brand-accent'
                 : 'text-text-secondary'
             }
           />
@@ -288,7 +288,7 @@ export function ConteudoPopupParada({ parada, onClose }: ConteudoPopupParadaProp
                     <div className="flex items-center justify-between gap-2">
                       <button
                         type="button"
-                        className="flex min-h-9 flex-1 items-center gap-1.5 truncate rounded px-1 py-0.5 text-left text-xs font-semibold leading-tight text-text-primary transition-colors hover:text-brand-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex min-h-9 flex-1 items-center gap-1.5 truncate rounded px-1 py-0.5 text-left text-xs font-semibold leading-tight text-text-primary transition-colors hover:text-brand-primary dark:hover:text-brand-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
                         title={nomeExibicao}
                         disabled={!linha}
                         aria-label={

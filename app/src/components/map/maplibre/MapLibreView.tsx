@@ -379,7 +379,7 @@ export function MapLibreView({
             'pointer-events-auto flex h-10 w-10 cursor-pointer items-center justify-center surface-card transition duration-200',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2',
             is3d || compassEnabled
-              ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+              ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:border-brand-accent dark:bg-brand-accent/10 dark:text-brand-accent'
               : 'bg-card text-text-primary hover:bg-card-hover',
           )}
         >
@@ -566,7 +566,7 @@ export function MapLibreView({
               ? 'border-brand-primary bg-brand-primary text-white'
               : isNorth
                 ? 'bg-card text-text-secondary'
-                : 'border-brand-primary bg-brand-primary/10 text-brand-primary',
+                : 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:border-brand-accent dark:bg-brand-accent/10 dark:text-brand-accent',
           )}
         >
           <Compass

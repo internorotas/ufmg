@@ -122,7 +122,7 @@ export function LoginPage() {
     return (
       <div className="flex flex-1 items-center justify-center bg-background-secondary">
         <div
-          className="size-7 animate-spin rounded-full border-2 border-brand-primary border-t-transparent"
+          className="size-7 animate-spin rounded-full border-2 border-brand-primary border-t-transparent dark:border-brand-accent"
           role="status"
           aria-label="Carregando"
         />

@@ -67,10 +67,7 @@ function GpsSessionCompletedCard({
       <div className="pointer-events-auto w-56 rounded-lg border border-success-border bg-card p-4 shadow-lg md:max-w-xs md:w-full md:mx-4">
         {/* Cabeçalho */}
         <div className="mb-3 flex items-center gap-2">
-          <span
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold tabular-nums"
-            style={{ backgroundColor: `${session.linhaCorHex}22`, color: session.linhaCorHex }}
-          >
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-background-secondary text-sm font-bold tabular-nums text-text-primary">
             <Bus size={16} aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
@@ -98,21 +95,33 @@ function GpsSessionCompletedCard({
         {/* Estatísticas */}
         <div className="mb-3 grid grid-cols-3 gap-2 text-center">
           <div className="rounded-lg bg-background-secondary p-1.5">
-            <Timer size={12} className="mx-auto mb-0.5 text-brand-primary" aria-hidden="true" />
+            <Timer
+              size={12}
+              className="mx-auto mb-0.5 text-brand-primary dark:text-brand-accent"
+              aria-hidden="true"
+            />
             <p className="text-micro text-text-tertiary">Duração</p>
             <p className="text-micro font-bold text-text-primary">
               {formatDurationHuman(session.durationMs)}
             </p>
           </div>
           <div className="rounded-lg bg-background-secondary p-1.5">
-            <MapPin size={12} className="mx-auto mb-0.5 text-brand-primary" aria-hidden="true" />
+            <MapPin
+              size={12}
+              className="mx-auto mb-0.5 text-brand-primary dark:text-brand-accent"
+              aria-hidden="true"
+            />
             <p className="text-micro text-text-tertiary">Distância</p>
             <p className="text-micro font-bold text-text-primary">
               {session.distanceKm.toFixed(2)} km
             </p>
           </div>
           <div className="rounded-lg bg-background-secondary p-1.5">
-            <Trophy size={12} className="mx-auto mb-0.5 text-brand-primary" aria-hidden="true" />
+            <Trophy
+              size={12}
+              className="mx-auto mb-0.5 text-brand-primary dark:text-brand-accent"
+              aria-hidden="true"
+            />
             <p className="text-micro text-text-tertiary">Pontos</p>
             <p className="text-micro font-bold text-text-primary">~{pontosEstimados}</p>
           </div>

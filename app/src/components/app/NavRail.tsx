@@ -3,7 +3,7 @@
  *
  * Equivalente à BottomNav (mobile), porém adaptada para layout md+: rail
  * vertical fixo à esquerda da viewport. Compartilha o mesmo conjunto de rotas
- * primárias (Mapa, Ranking, Perfil, Mais).
+ * primárias (Mapa, Linhas, Próximos, Ranking, Perfil, Mais).
  */
 
 import { Link, useLocation } from 'react-router-dom';
@@ -24,7 +24,7 @@ export function NavRail() {
       )}
     >
       <nav aria-label="Páginas principais" className="mt-4 flex flex-1 flex-col gap-1 px-2">
-        {NAV_ITEMS.filter((item) => !item.hideOnDesktop).map((item) => {
+        {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const resolvedTo = !isAuthenticated && item.anonymousTo ? item.anonymousTo : item.to;
           const active = isNavItemActive(location.pathname, item, resolvedTo);

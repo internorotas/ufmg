@@ -70,7 +70,11 @@ function ParadaCard({
         <Heart
           size={16}
           aria-hidden="true"
-          className={isFavorita ? 'fill-brand-primary text-brand-primary' : ''}
+          className={
+            isFavorita
+              ? 'fill-brand-primary text-brand-primary dark:fill-brand-accent dark:text-brand-accent'
+              : ''
+          }
         />
       </button>
     </div>
@@ -106,7 +110,11 @@ export function ProximosPage() {
               id="favoritas-heading"
               className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-text-secondary"
             >
-              <Heart size={12} aria-hidden="true" className="text-brand-primary" />
+              <Heart
+                size={12}
+                aria-hidden="true"
+                className="text-brand-primary dark:text-brand-accent"
+              />
               Paradas favoritas
             </h2>
             <div className="space-y-2">

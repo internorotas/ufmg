@@ -55,7 +55,7 @@ export function PartnerSpotlightCard({ partner, onClick }: PartnerSpotlightCardP
                   className="size-12 surface-card-sm bg-card object-cover"
                 />
               ) : (
-                <div className="flex size-12 items-center justify-center surface-card-sm bg-card text-brand-primary">
+                <div className="flex size-12 items-center justify-center surface-card-sm bg-card text-brand-primary dark:text-brand-accent">
                   <Building2 size={18} aria-hidden="true" />
                 </div>
               )}

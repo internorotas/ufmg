@@ -17,7 +17,7 @@ export function PointDeltaToast({ event, onDismiss }: PointDeltaToastProps) {
       aria-live="polite"
       className="animate-gamification-toast fixed bottom-6 right-4 z-(--z-toast) flex max-w-80 items-start gap-3 surface-card-lg bg-card px-4 py-3 text-sm"
     >
-      <div className="surface-card-sm bg-background p-2 text-brand-primary">
+      <div className="surface-card-sm bg-background p-2 text-brand-primary dark:text-brand-accent">
         <Trophy size={16} aria-hidden="true" />
       </div>
       <div className="min-w-0 flex-1">

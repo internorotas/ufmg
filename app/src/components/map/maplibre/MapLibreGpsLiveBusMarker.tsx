@@ -9,7 +9,7 @@ import {
 } from '@/features/gps/hooks/useGpsLiveTracking';
 import { numLinha } from '@/features/gps/lib/markerUtils';
 import { calcularPosicaoTeorica } from '@/lib/busPosition';
-import { hexToRgba } from '@/lib/utils';
+import { getContrastingTextColor, hexToRgba } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
 
 let _gpsPulseStyleInjected = false;
@@ -43,6 +43,7 @@ function criarIconeHtml(
   isStale: boolean,
 ): string {
   const cor = HEX_COLOR_RE.test(corHex) ? corHex : '#6b7280';
+  const corTexto = getContrastingTextColor(cor);
   const rotacao = heading ?? 0;
   const mostrarSeta = heading !== null;
   const bg = isLive ? cor : hexToRgba(cor, 0.7);
@@ -62,12 +63,12 @@ function criarIconeHtml(
           : ''
       }
       <div style="position:absolute;inset:4px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;border:2px solid white;${showPulse ? `animation:gps-pulse 1.8s ease-in-out infinite;` : 'box-shadow:0 2px 6px rgba(0,0,0,0.25);'}">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="${corTexto}" xmlns="http://www.w3.org/2000/svg">
           <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4S4 2.5 4 6v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/>
         </svg>
       </div>
-      ${isLive && !isStale ? `<div style="position:absolute;bottom:-2px;right:-4px;background:#ef4444;color:white;font-size:6px;font-weight:800;font-family:sans-serif;letter-spacing:0.04em;padding:1px 3px;border-radius:var(--shape-xs);border:1px solid white;line-height:1.4;">AO VIVO</div>` : ''}
-      ${isStale ? `<div style="position:absolute;bottom:-2px;right:-4px;background:var(--color-warning-solid);color:white;font-size:6px;font-weight:800;font-family:sans-serif;letter-spacing:0.04em;padding:1px 3px;border-radius:var(--shape-xs);border:1px solid white;line-height:1.4;">ATR.</div>` : ''}
+      ${isLive && !isStale ? `<div style="position:absolute;bottom:-4px;right:-10px;background:var(--color-danger-solid);color:white;font-size:10px;font-weight:800;font-family:Poppins,sans-serif;letter-spacing:0.02em;padding:2px 4px;border-radius:var(--shape-xs);border:1px solid white;line-height:1.2;">AO VIVO</div>` : ''}
+      ${isStale ? `<div style="position:absolute;bottom:-4px;right:-10px;background:var(--color-warning-solid);color:white;font-size:10px;font-weight:800;font-family:Poppins,sans-serif;letter-spacing:0.02em;padding:2px 4px;border-radius:var(--shape-xs);border:1px solid white;line-height:1.2;">ATR.</div>` : ''}
     </div>
   `;
 }
@@ -233,7 +234,7 @@ function BusPopup({
       <div className="flex items-center gap-2">
         <span
           className="shrink-0 rounded px-1.5 py-0.5 text-xs font-extrabold text-white"
-          style={{ background: linha.corHex }}
+          style={{ background: linha.corHex, color: getContrastingTextColor(linha.corHex) }}
         >
           {num}
         </span>

@@ -14,6 +14,7 @@ import type { MapaRef } from '@/contexts/RotasSelectionContext';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { buildLinhaShareUrl } from '../lib/shareLinks';
+import { getContrastingTextColor } from '../lib/utils';
 import type { Linha, Parada } from '../types/data.types';
 import { FavoritasWidget } from './map/FavoritasWidget';
 import { MapLibreView } from './map/maplibre';
@@ -97,7 +98,10 @@ export function Mapa({
           <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full bg-card/95 py-1.5 pl-2 pr-1.5 shadow-(--elevation-2) ring-1 ring-card-border backdrop-blur">
             <span
               className="shrink-0 rounded-full px-2 py-0.5 text-xs font-extrabold text-white"
-              style={{ background: linhaSelecionada.corHex }}
+              style={{
+                background: linhaSelecionada.corHex,
+                color: getContrastingTextColor(linhaSelecionada.corHex),
+              }}
             >
               {linhaSelecionada.nome.replace(/^Linha\s+/i, '').trim() ||
                 String(linhaSelecionada.linha)}

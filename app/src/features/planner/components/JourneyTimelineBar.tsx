@@ -36,10 +36,9 @@ export function JourneyTimelineBar({ legs, totalMinutes }: JourneyTimelineBarPro
           {busLegs.map((leg) => (
             <span
               key={`${leg.lineId}-${leg.fromStopId}`}
-              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-micro font-bold"
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-micro font-bold text-text-primary"
               style={{
                 backgroundColor: `${leg.lineColorHex}18`,
-                color: leg.lineColorHex,
                 border: `1px solid ${leg.lineColorHex}30`,
               }}
             >

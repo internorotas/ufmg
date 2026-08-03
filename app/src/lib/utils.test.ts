@@ -6,6 +6,7 @@ import {
   converterHoraParaMinutos,
   converterMinutosParaHora,
   findScheduleIndex,
+  getContrastingTextColor,
   normalizarNomeLinha,
 } from './utils';
 
@@ -24,6 +25,25 @@ describe('cn', () => {
 
   it('resolve conflitos do Tailwind (último vence)', () => {
     expect(cn('text-red-500', 'text-blue-500')).toBe('text-blue-500');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getContrastingTextColor
+// ---------------------------------------------------------------------------
+
+describe('getContrastingTextColor', () => {
+  it('usa branco sobre cores escuras de linha', () => {
+    expect(getContrastingTextColor('#2c0eeb')).toBe('#ffffff');
+  });
+
+  it('usa preto sobre cores claras de linha', () => {
+    expect(getContrastingTextColor('#00a896')).toBe('#000000');
+    expect(getContrastingTextColor('#e63946')).toBe('#000000');
+  });
+
+  it('usa a cor de marca como fallback para valores inválidos', () => {
+    expect(getContrastingTextColor('cor-invalida')).toBe('#ffffff');
   });
 });
 

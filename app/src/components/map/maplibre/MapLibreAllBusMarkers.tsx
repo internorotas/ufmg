@@ -5,7 +5,7 @@ import { useRotasSelection } from '@/contexts/RotasContext';
 import { useAllBusPositions } from '@/features/gps/hooks/useAllBusPositions';
 import { numLinha } from '@/features/gps/lib/markerUtils';
 import type { PosicaoTeorica } from '@/lib/busPosition';
-import { hexToRgba } from '@/lib/utils';
+import { getContrastingTextColor, hexToRgba } from '@/lib/utils';
 import type { Linha, Parada } from '@/types/data.types';
 
 interface MapLibreAllBusMarkersProps {
@@ -60,7 +60,7 @@ export function BusMarkerPopup({ linha, pos, onVerLinha }: BusMarkerPopupProps) 
       <div className="flex items-center gap-2">
         <span
           className="shrink-0 rounded px-1.5 py-0.5 text-xs font-extrabold text-white"
-          style={{ background: linha.corHex }}
+          style={{ background: linha.corHex, color: getContrastingTextColor(linha.corHex) }}
         >
           {num}
         </span>
