@@ -173,7 +173,7 @@ export function RankingPage() {
               className="shrink-0 text-brand-primary dark:text-brand-accent"
             />
             <p className="text-sm">
-              Top 10 público, sem login. Pontos são só incentivo, não há paywall.
+              Top 10 público, sem login. Pontos são só incentivo e não bloqueiam recursos.
             </p>
           </div>
         </header>

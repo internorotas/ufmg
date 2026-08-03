@@ -108,22 +108,23 @@ export function AboutPage() {
                 Como o projeto se sustenta
               </CardTitle>
               <CardDescription>
-                A receita desta fase combina apoio comunitário e um único slot institucional.
+                O projeto é sustentado por apoio comunitário voluntário e um único slot
+                institucional.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-text-secondary">
               <div className="surface-card-sm bg-background px-3 py-3">
-                <p className="font-semibold text-text-primary">Doação via PIX</p>
+                <p className="font-semibold text-text-primary">Apoio pontual</p>
                 <p className="mt-1">
-                  Apoio pontual com checkout hospedado pela AbacatePay para ajudar custos de
+                  Uma contribuição única, processada pelo Mercado Pago, para ajudar custos de
                   operação e manutenção.
                 </p>
               </div>
               <div className="surface-card-sm bg-background px-3 py-3">
-                <p className="font-semibold text-text-primary">Assinatura Premium</p>
+                <p className="font-semibold text-text-primary">Apoio mensal</p>
                 <p className="mt-1">
-                  Apoio recorrente mensal também via AbacatePay, tratado no MVP como status de
-                  sustentação do projeto e não como paywall funcional.
+                  Cobrança mensal automática processada pelo Mercado Pago, com cancelamento a
+                  qualquer momento e sem desbloquear funcionalidades essenciais.
                 </p>
               </div>
               <div className="surface-card-sm bg-background px-3 py-3">
@@ -162,10 +163,12 @@ export function AboutPage() {
                 </p>
               </div>
               <div className="surface-card-sm bg-background px-3 py-3">
-                <p className="font-semibold text-text-primary">Sem paywall funcional nesta fase</p>
+                <p className="font-semibold text-text-primary">
+                  Funcionalidades essenciais gratuitas
+                </p>
                 <p className="mt-1">
-                  Premium não desbloqueia mapa, ETA, linhas, paradas, GPS colaborativo nem fluxo
-                  core de consulta nesta entrega.
+                  Mapa, ETA, linhas, paradas e GPS colaborativo continuam disponíveis sem depender
+                  de apoio financeiro.
                 </p>
               </div>
             </CardContent>

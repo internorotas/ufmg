@@ -33,9 +33,13 @@ describe('AboutPage', () => {
     });
 
     expect(container.textContent).toContain('Transparência do Interno Rotas');
-    expect(container.textContent).toContain('AbacatePay');
+    expect(container.textContent).toContain('Apoio pontual');
+    expect(container.textContent).toContain('Apoio mensal');
+    expect(container.textContent).toContain('Mercado Pago');
+    expect(container.textContent).toContain('Funcionalidades essenciais gratuitas');
     expect(container.textContent).toContain('sem anúncios intrusivos');
     expect(container.textContent).toContain('sem tracking de terceiros');
-    expect(container.textContent).toContain('Sem paywall funcional nesta fase');
+    expect(container.textContent).not.toContain('Premium');
+    expect(container.textContent).not.toContain('doação via PIX');
   });
 });

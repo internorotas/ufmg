@@ -37,7 +37,7 @@ export interface UserProfile {
 }
 
 export interface UserMonetizationTransaction {
-  kind: 'donation' | 'subscription';
+  kind: 'point' | 'monthly';
   status: 'pending' | 'paid' | 'cancelled' | 'refunded' | 'disputed' | 'active' | 'expired';
   amountCents: number;
   createdAt: string;
@@ -46,18 +46,7 @@ export interface UserMonetizationTransaction {
 }
 
 export interface UserMonetizationSummary {
-  isPremium: boolean;
   supporterBadgeUnlocked: boolean;
-  activeSubscription: {
-    status: 'active';
-    frequency: 'MONTHLY';
-    amountCents: number;
-    startedAt: string | null;
-    nextPaymentAt: string | null;
-    cancelledAt: string | null;
-  } | null;
-  lastDonationAt: string | null;
-  nextPaymentAt: string | null;
   recentTransactions: UserMonetizationTransaction[];
 }
 

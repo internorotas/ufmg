@@ -1,13 +1,18 @@
-import { ArrowUpRight, HeartHandshake, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowUpRight, Check, HeartHandshake, RefreshCw } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
+import { Input } from '@/components/ui/Input';
 import {
-  createDonationCheckout,
-  createSubscriptionCheckout,
+  cancelRecurringSupport,
+  createRecurringSupportCheckout,
+  createSupportCheckout,
+  getSupportOverview,
+  type PaymentsOverview,
+  type SupportPaymentHistoryItem,
 } from '@/features/monetization/api/paymentsClient';
 import type {
   UserMonetizationSummary,
@@ -16,14 +21,14 @@ import type {
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { formatDatePtBr } from '@/lib/formatters';
 
-interface SupportActionsCardProps {
+export interface SupportActionsCardProps {
   monetization: UserMonetizationSummary;
 }
 
-interface SupportFeedbackState {
-  type: 'error';
-  message: string;
-}
+type SupportMode = 'point' | 'monthly';
+type FeedbackState = { type: 'error' | 'success'; message: string };
+
+const AMOUNT_PRESETS = [500, 1000, 2000, 5000] as const;
 
 function formatCurrency(valueInCents: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -32,74 +37,155 @@ function formatCurrency(valueInCents: number): string {
   }).format(valueInCents / 100);
 }
 
-function formatTransactionKind(kind: UserMonetizationTransaction['kind']): string {
-  return kind === 'subscription' ? 'Assinatura Premium' : 'Doação via PIX';
-}
-
-function formatTransactionStatus(status: UserMonetizationTransaction['status']): string {
+function formatStatus(status: SupportPaymentHistoryItem['status'] | 'active' | 'expired') {
   switch (status) {
-    case 'active':
-      return 'ativa';
     case 'paid':
-      return 'pago';
+      return 'confirmado';
+    case 'active':
+      return 'ativo';
     case 'cancelled':
       return 'cancelado';
     case 'refunded':
       return 'reembolsado';
     case 'disputed':
-      return 'contestada';
+      return 'em contestação';
     case 'expired':
-      return 'expirada';
+      return 'encerrado';
     default:
       return 'pendente';
   }
 }
 
-function getStatusBadgeVariant(status: UserMonetizationTransaction['status']) {
+function statusVariant(status: SupportPaymentHistoryItem['status']) {
   switch (status) {
-    case 'active':
     case 'paid':
-      return 'success';
+      return 'success' as const;
     case 'pending':
-      return 'warning';
-    case 'disputed':
-    case 'cancelled':
-    case 'expired':
-    case 'refunded':
-      return 'neutral';
+      return 'warning' as const;
     default:
-      return 'neutral';
+      return 'neutral' as const;
   }
+}
+
+function fallbackSupportHistory(
+  transactions: UserMonetizationTransaction[],
+): SupportPaymentHistoryItem[] {
+  return transactions.map((transaction, index) => ({
+    id: index,
+    kind: transaction.kind,
+    status:
+      transaction.status === 'active' || transaction.status === 'expired'
+        ? 'pending'
+        : transaction.status,
+    valorCents: transaction.amountCents,
+    receiptUrl: transaction.receiptUrl,
+    paidAt: transaction.paidAt,
+    cancelledAt: null,
+    createdAt: transaction.createdAt,
+    updatedAt: transaction.createdAt,
+  }));
+}
+
+function selectedAmountFromCustom(value: string): number | null {
+  const amountCents = Math.round(Number(value.replace(',', '.')) * 100);
+  return Number.isInteger(amountCents) && amountCents >= 500 && amountCents <= 50_000
+    ? amountCents
+    : null;
+}
+
+function getFeedbackError(error: unknown): FeedbackState {
+  return {
+    type: 'error',
+    message:
+      error instanceof Error ? error.message : 'Não foi possível iniciar o apoio. Tente novamente.',
+  };
 }
 
 export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
   const { trackEvent } = useAnalytics();
-  const [pendingAction, setPendingAction] = useState<'donation' | 'subscription' | null>(null);
-  const [feedback, setFeedback] = useState<SupportFeedbackState | null>(null);
+  const [mode, setMode] = useState<SupportMode>('point');
+  const [amountCents, setAmountCents] = useState<number>(1000);
+  const [customAmount, setCustomAmount] = useState('');
+  const [billingEmail, setBillingEmail] = useState('');
+  const [pendingAction, setPendingAction] = useState<'checkout' | 'cancel' | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackState | null>(null);
+  const [overview, setOverview] = useState<PaymentsOverview | null>(null);
 
-  const handleCheckout = async (kind: 'donation' | 'subscription') => {
-    if (pendingAction) {
+  useEffect(() => {
+    let active = true;
+    void getSupportOverview()
+      .then((data) => {
+        if (active) setOverview(data);
+      })
+      .catch(() => {
+        // O card continua útil com o resumo do perfil; o detalhe é atualizado
+        // novamente após uma operação de apoio.
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const effectiveAmountCents = customAmount ? selectedAmountFromCustom(customAmount) : amountCents;
+  const history = overview?.supports ?? fallbackSupportHistory(monetization.recentTransactions);
+  const recurringSupport = overview?.recurringSupport ?? null;
+  const recurringIsActive = overview?.recurringSupportActive === true;
+
+  const refreshOverview = async () => {
+    try {
+      setOverview(await getSupportOverview());
+    } catch {
+      setFeedback({
+        type: 'error',
+        message: 'O apoio foi processado, mas não foi possível atualizar o estado agora.',
+      });
+    }
+  };
+
+  const handleCheckout = async () => {
+    if (pendingAction || effectiveAmountCents === null) {
       return;
     }
 
-    setPendingAction(kind);
+    if (mode === 'monthly' && !billingEmail.trim()) {
+      setFeedback({ type: 'error', message: 'Informe um email de cobrança válido.' });
+      return;
+    }
+
+    setPendingAction('checkout');
     setFeedback(null);
 
     try {
       const checkout =
-        kind === 'donation' ? await createDonationCheckout() : await createSubscriptionCheckout();
+        mode === 'point'
+          ? await createSupportCheckout(effectiveAmountCents)
+          : await createRecurringSupportCheckout(effectiveAmountCents, billingEmail.trim());
 
       trackEvent({
         category: 'engagement',
-        action: kind === 'donation' ? 'start_pix_support' : 'start_premium_support',
+        action: mode === 'point' ? 'start_support_point' : 'start_support_monthly',
         label: checkout.provider,
       });
-
       window.location.assign(checkout.checkoutUrl);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Falha ao iniciar checkout hospedado.';
-      setFeedback({ type: 'error', message });
+      setFeedback(getFeedbackError(error));
+      setPendingAction(null);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (pendingAction) return;
+
+    setPendingAction('cancel');
+    setFeedback(null);
+    try {
+      await cancelRecurringSupport();
+      setFeedback({ type: 'success', message: 'O apoio mensal foi cancelado.' });
+      await refreshOverview();
+    } catch (error) {
+      setFeedback(getFeedbackError(error));
+    } finally {
       setPendingAction(null);
     }
   };
@@ -107,132 +193,260 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <HeartHandshake size={18} aria-hidden="true" />
-          Apoio ao projeto
-        </CardTitle>
-        <CardDescription>
-          Checkout hospedado pelo Mercado Pago, com transparência sobre apoio pontual, Premium e
-          histórico recente.
-        </CardDescription>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <HeartHandshake size={18} aria-hidden="true" />
+              Apoio ao projeto
+            </CardTitle>
+            <CardDescription>
+              Apoio pontual ou mensal, processado pelo Mercado Pago. As funcionalidades essenciais
+              continuam gratuitas.
+            </CardDescription>
+          </div>
+          {monetization.supporterBadgeUnlocked ? (
+            <Badge variant="primary" leftIcon={<Check size={12} aria-hidden="true" />}>
+              Apoiador
+            </Badge>
+          ) : null}
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          <Badge variant={monetization.isPremium ? 'success' : 'neutral'}>
-            {monetization.isPremium ? 'Premium ativo' : 'Premium opcional'}
-          </Badge>
-          <Badge variant={monetization.supporterBadgeUnlocked ? 'primary' : 'outline'}>
-            {monetization.supporterBadgeUnlocked ? 'Apoiador' : 'Apoio comunitário'}
-          </Badge>
+
+      <CardContent className="space-y-5">
+        {feedback ? <FeedbackBanner message={feedback.message} type={feedback.type} /> : null}
+
+        <div className="grid gap-2 sm:grid-cols-2" role="tablist" aria-label="Modalidade de apoio">
+          {(
+            [
+              ['point', 'Apoio pontual', 'Uma contribuição única'],
+              ['monthly', 'Apoio mensal', 'Cobrança automática todo mês'],
+            ] as const
+          ).map(([value, title, description]) => (
+            <button
+              key={value}
+              type="button"
+              role="tab"
+              aria-selected={mode === value}
+              onClick={() => {
+                setMode(value);
+                setFeedback(null);
+              }}
+              className={`rounded-(--shape-sm) border px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+                mode === value
+                  ? 'border-focus bg-brand-primary/10 text-text-primary'
+                  : 'border-card-border bg-background text-text-secondary hover:bg-card-hover'
+              }`}
+            >
+              <span className="block text-sm font-semibold">{title}</span>
+              <span className="mt-1 block text-xs">{description}</span>
+            </button>
+          ))}
         </div>
 
-        {feedback ? (
-          <FeedbackBanner message={feedback.message} className="px-3 py-2 text-sm" />
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-semibold text-text-primary">Escolha o valor</legend>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {AMOUNT_PRESETS.map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                aria-pressed={!customAmount && amountCents === preset}
+                onClick={() => {
+                  setAmountCents(preset);
+                  setCustomAmount('');
+                }}
+                className={`min-h-10 rounded-(--shape-sm) border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+                  !customAmount && amountCents === preset
+                    ? 'border-focus bg-brand-primary text-text-inverse'
+                    : 'border-card-border bg-background text-text-primary hover:bg-card-hover'
+                }`}
+              >
+                {formatCurrency(preset)}
+              </button>
+            ))}
+          </div>
+          <label
+            className="block text-xs font-medium text-text-secondary"
+            htmlFor="support-custom-amount"
+          >
+            Outro valor (de R$ 5 a R$ 500)
+          </label>
+          <Input
+            id="support-custom-amount"
+            type="number"
+            min="5"
+            max="500"
+            step="0.01"
+            inputMode="decimal"
+            placeholder="Ex.: 15,00"
+            value={customAmount}
+            onChange={(event) => setCustomAmount(event.target.value)}
+            aria-describedby="support-amount-help"
+          />
+          <p id="support-amount-help" className="text-xs text-text-tertiary">
+            O valor é enviado em centavos para validação segura.
+          </p>
+        </fieldset>
+
+        {mode === 'monthly' ? (
+          <div className="space-y-3 rounded-(--shape-sm) border border-card-border bg-background px-4 py-4">
+            <div>
+              <label
+                className="text-sm font-semibold text-text-primary"
+                htmlFor="support-billing-email"
+              >
+                Email de cobrança
+              </label>
+              <p className="mt-1 text-xs leading-5 text-text-secondary">
+                Usado somente para criar a cobrança mensal no Mercado Pago. Não altera sua conta no
+                Interno Rotas.
+              </p>
+            </div>
+            <Input
+              id="support-billing-email"
+              type="email"
+              autoComplete="email"
+              placeholder="voce@exemplo.com"
+              value={billingEmail}
+              onChange={(event) => setBillingEmail(event.target.value)}
+              required
+            />
+            <p className="text-xs leading-5 text-text-tertiary">
+              A cobrança é mensal automática e pode ser cancelada a qualquer momento.
+            </p>
+          </div>
         ) : null}
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="surface-card-sm bg-background px-3 py-3">
-            <p className="text-xs font-semibold text-text-tertiary">Última doação</p>
-            <p className="mt-2 text-sm font-semibold text-text-primary">
-              {formatDatePtBr(monetization.lastDonationAt)}
-            </p>
-          </div>
-
-          <div className="surface-card-sm bg-background px-3 py-3">
-            <p className="text-xs font-semibold text-text-tertiary">Próximo pagamento</p>
-            <p className="mt-2 text-sm font-semibold text-text-primary">
-              {formatDatePtBr(monetization.nextPaymentAt)}
-            </p>
-          </div>
-
-          <div className="surface-card-sm bg-background px-3 py-3">
-            <p className="text-xs font-semibold text-text-tertiary">Recorrência atual</p>
-            <p className="mt-2 text-sm font-semibold text-text-primary">
-              {monetization.activeSubscription
-                ? `${formatCurrency(monetization.activeSubscription.amountCents)} por mês`
-                : 'Sem assinatura ativa'}
-            </p>
-          </div>
-        </div>
-
-        <div className="surface-card-sm bg-background px-3 py-3 text-sm text-text-secondary">
-          <p className="font-medium text-text-primary">Sem paywall funcional no MVP</p>
-          <p className="mt-1">
-            Apoiar o projeto não desbloqueia funcionalidades core como mapa, ETA, linhas, paradas ou
-            GPS colaborativo nesta fase.
+        <div className="rounded-(--shape-sm) border border-card-border bg-background px-4 py-3 text-sm text-text-secondary">
+          <p className="font-semibold text-text-primary">Reconhecimento simbólico</p>
+          <p className="mt-1 leading-5">
+            Um primeiro pagamento aprovado libera o emblema Apoiador. Apoiar não libera recursos
+            essenciais: mapa, linhas, paradas, ETA e colaboração seguem disponíveis gratuitamente.
           </p>
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-2">
-          <Button
-            type="button"
-            className="min-h-11"
-            loading={pendingAction === 'donation'}
-            onClick={() => void handleCheckout('donation')}
-            leftIcon={<HeartHandshake size={16} aria-hidden="true" />}
-          >
-            Fazer doação via PIX
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="min-h-11"
-            loading={pendingAction === 'subscription'}
-            onClick={() => void handleCheckout('subscription')}
-            leftIcon={<Sparkles size={16} aria-hidden="true" />}
-          >
-            Assinar Premium
-          </Button>
+        <Button
+          type="button"
+          className="min-h-11 w-full"
+          loading={pendingAction === 'checkout'}
+          disabled={effectiveAmountCents === null}
+          onClick={() => void handleCheckout()}
+          leftIcon={
+            mode === 'monthly' ? (
+              <RefreshCw size={16} aria-hidden="true" />
+            ) : (
+              <HeartHandshake size={16} aria-hidden="true" />
+            )
+          }
+        >
+          {mode === 'monthly' ? 'Continuar com apoio mensal' : 'Continuar com apoio pontual'}
+        </Button>
+
+        <div className="rounded-(--shape-sm) border border-card-border bg-background px-4 py-3 text-xs leading-5 text-text-secondary">
+          <p>Processamento financeiro pelo Mercado Pago.</p>
+          <p>
+            Projeto independente da UFMG. O apoio é voluntário e não muda a identidade da conta.
+          </p>
         </div>
 
-        <div className="space-y-3 surface-card-sm bg-background px-3 py-3">
+        {overview ? (
+          <section
+            className="space-y-3 rounded-(--shape-sm) border border-card-border bg-background px-4 py-4"
+            aria-labelledby="support-management-title"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 id="support-management-title" className="text-sm font-semibold text-text-primary">
+                Gerenciamento do apoio mensal
+              </h3>
+              {recurringSupport ? (
+                <Badge variant={recurringIsActive ? 'success' : 'neutral'}>
+                  {formatStatus(recurringSupport.status)}
+                </Badge>
+              ) : null}
+            </div>
+            {recurringSupport ? (
+              <div className="grid gap-3 text-sm sm:grid-cols-3">
+                <div>
+                  <p className="text-xs text-text-tertiary">Valor mensal</p>
+                  <p className="mt-1 font-semibold text-text-primary">
+                    {formatCurrency(recurringSupport.amountCents)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-text-tertiary">Próxima cobrança</p>
+                  <p className="mt-1 font-semibold text-text-primary">
+                    {formatDatePtBr(recurringSupport.nextPaymentAt)}
+                  </p>
+                </div>
+                <div className="flex items-end justify-start sm:justify-end">
+                  {recurringIsActive ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      loading={pendingAction === 'cancel'}
+                      onClick={() => void handleCancel()}
+                    >
+                      Cancelar apoio mensal
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-text-secondary">
+                Nenhum apoio mensal ativo. Você pode iniciar um a qualquer momento.
+              </p>
+            )}
+          </section>
+        ) : null}
+
+        <section
+          className="space-y-3 rounded-(--shape-sm) border border-card-border bg-background px-4 py-4"
+          aria-labelledby="support-history-title"
+        >
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold text-text-primary">Histórico recente</h3>
+            <h3 id="support-history-title" className="text-sm font-semibold text-text-primary">
+              Histórico de apoios
+            </h3>
             <Link
               to="/sobre"
-              className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-brand-primary dark:text-brand-accent hover:underline"
+              className="inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-brand-primary hover:underline dark:text-brand-accent"
             >
-              Ver transparência
+              Transparência
               <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
           </div>
 
-          {monetization.recentTransactions.length > 0 ? (
+          {history.length > 0 ? (
             <div className="space-y-2">
-              {monetization.recentTransactions.map((transaction) => (
+              {history.map((item) => (
                 <div
-                  key={`${transaction.kind}-${transaction.createdAt}-${transaction.amountCents}`}
-                  className="surface-card-sm bg-card px-3 py-3"
+                  key={`${item.id}-${item.createdAt}`}
+                  className="rounded-(--shape-sm) border border-card-border bg-card px-3 py-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <p className="text-sm font-semibold text-text-primary">
-                        {formatTransactionKind(transaction.kind)}
+                        {item.kind === 'monthly' ? 'Apoio mensal' : 'Apoio pontual'}
                       </p>
                       <p className="mt-1 text-xs text-text-secondary">
-                        {formatTransactionStatus(transaction.status)} em{' '}
-                        {formatDatePtBr(transaction.paidAt ?? transaction.createdAt)}
+                        {formatStatus(item.status)} em{' '}
+                        {formatDatePtBr(item.paidAt ?? item.createdAt)}
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-2">
-                      <Badge
-                        variant={transaction.kind === 'subscription' ? 'info' : 'primary'}
-                        size="xs"
-                      >
-                        {transaction.kind === 'subscription' ? 'Premium' : 'PIX'}
-                      </Badge>
-                      <Badge variant={getStatusBadgeVariant(transaction.status)} size="xs">
-                        {formatTransactionStatus(transaction.status)}
+                    <div className="flex items-center gap-2">
+                      <Badge variant={statusVariant(item.status)} size="xs">
+                        {formatStatus(item.status)}
                       </Badge>
                       <span className="text-xs font-semibold text-text-primary">
-                        {formatCurrency(transaction.amountCents)}
+                        {formatCurrency(item.valorCents)}
                       </span>
-                      {transaction.receiptUrl ? (
+                      {item.receiptUrl ? (
                         <a
-                          href={transaction.receiptUrl}
+                          href={item.receiptUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs font-semibold text-brand-primary dark:text-brand-accent hover:underline"
+                          className="text-xs font-semibold text-brand-primary hover:underline dark:text-brand-accent"
                         >
                           Recibo
                         </a>
@@ -244,11 +458,10 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
             </div>
           ) : (
             <p className="text-sm text-text-secondary">
-              Nenhuma transação recente ainda. Quando houver apoio via PIX ou Premium, ele aparece
-              aqui de forma resumida.
+              Nenhum apoio registrado ainda. Sua contribuição voluntária ajuda a manter o projeto.
             </p>
           )}
-        </div>
+        </section>
       </CardContent>
     </Card>
   );

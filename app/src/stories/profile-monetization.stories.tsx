@@ -61,29 +61,10 @@ const MOCK_PROFILE_PUBLIC = {
     recentPointEvents: [],
   },
   monetization: {
-    isPremium: true,
     supporterBadgeUnlocked: true,
-    activeSubscription: {
-      status: 'active' as const,
-      frequency: 'MONTHLY' as const,
-      amountCents: 990,
-      startedAt: '2026-01-01T00:00:00Z',
-      nextPaymentAt: '2026-07-01T00:00:00Z',
-      cancelledAt: null,
-    },
-    lastDonationAt: '2026-05-10T14:30:00Z',
-    nextPaymentAt: '2026-07-01T00:00:00Z',
     recentTransactions: [
       {
-        kind: 'subscription' as const,
-        status: 'active' as const,
-        amountCents: 990,
-        createdAt: '2026-06-01T00:00:00Z',
-        paidAt: '2026-06-01T00:00:00Z',
-        receiptUrl: 'https://example.com/recibo/abc123',
-      },
-      {
-        kind: 'donation' as const,
+        kind: 'point' as const,
         status: 'paid' as const,
         amountCents: 2000,
         createdAt: '2026-05-10T14:30:00Z',
@@ -211,22 +192,11 @@ export const ProfileSheetAnonymousUser: Story = () => {
 // Monetization fixtures
 // ---------------------------------------------------------------------------
 
-const MONETIZATION_PREMIUM_WITH_TRANSACTIONS: UserMonetizationSummary = {
-  isPremium: true,
+const MONETIZATION_MONTHLY_WITH_TRANSACTIONS: UserMonetizationSummary = {
   supporterBadgeUnlocked: true,
-  activeSubscription: {
-    status: 'active',
-    frequency: 'MONTHLY',
-    amountCents: 1490,
-    startedAt: '2026-01-15T00:00:00Z',
-    nextPaymentAt: '2026-07-15T00:00:00Z',
-    cancelledAt: null,
-  },
-  lastDonationAt: '2026-04-22T09:00:00Z',
-  nextPaymentAt: '2026-07-15T00:00:00Z',
   recentTransactions: [
     {
-      kind: 'subscription',
+      kind: 'monthly',
       status: 'active',
       amountCents: 1490,
       createdAt: '2026-06-15T00:00:00Z',
@@ -234,7 +204,7 @@ const MONETIZATION_PREMIUM_WITH_TRANSACTIONS: UserMonetizationSummary = {
       receiptUrl: 'https://example.com/recibo/sub-jun',
     },
     {
-      kind: 'donation',
+      kind: 'point',
       status: 'paid',
       amountCents: 5000,
       createdAt: '2026-04-22T09:00:00Z',
@@ -242,7 +212,7 @@ const MONETIZATION_PREMIUM_WITH_TRANSACTIONS: UserMonetizationSummary = {
       receiptUrl: null,
     },
     {
-      kind: 'subscription',
+      kind: 'monthly',
       status: 'paid',
       amountCents: 1490,
       createdAt: '2026-05-15T00:00:00Z',
@@ -250,7 +220,7 @@ const MONETIZATION_PREMIUM_WITH_TRANSACTIONS: UserMonetizationSummary = {
       receiptUrl: 'https://example.com/recibo/sub-mai',
     },
     {
-      kind: 'donation',
+      kind: 'point',
       status: 'refunded',
       amountCents: 1000,
       createdAt: '2026-03-10T12:00:00Z',
@@ -258,7 +228,7 @@ const MONETIZATION_PREMIUM_WITH_TRANSACTIONS: UserMonetizationSummary = {
       receiptUrl: null,
     },
     {
-      kind: 'subscription',
+      kind: 'monthly',
       status: 'cancelled',
       amountCents: 990,
       createdAt: '2025-12-01T00:00:00Z',
@@ -269,23 +239,15 @@ const MONETIZATION_PREMIUM_WITH_TRANSACTIONS: UserMonetizationSummary = {
 };
 
 const MONETIZATION_FREE_NO_HISTORY: UserMonetizationSummary = {
-  isPremium: false,
   supporterBadgeUnlocked: false,
-  activeSubscription: null,
-  lastDonationAt: null,
-  nextPaymentAt: null,
   recentTransactions: [],
 };
 
 const MONETIZATION_FREE_WITH_PAST_DONATION: UserMonetizationSummary = {
-  isPremium: false,
   supporterBadgeUnlocked: true,
-  activeSubscription: null,
-  lastDonationAt: '2026-02-14T18:00:00Z',
-  nextPaymentAt: null,
   recentTransactions: [
     {
-      kind: 'donation',
+      kind: 'point',
       status: 'paid',
       amountCents: 3000,
       createdAt: '2026-02-14T18:00:00Z',
@@ -296,14 +258,10 @@ const MONETIZATION_FREE_WITH_PAST_DONATION: UserMonetizationSummary = {
 };
 
 const MONETIZATION_DISPUTED: UserMonetizationSummary = {
-  isPremium: false,
   supporterBadgeUnlocked: false,
-  activeSubscription: null,
-  lastDonationAt: '2026-05-01T00:00:00Z',
-  nextPaymentAt: null,
   recentTransactions: [
     {
-      kind: 'donation',
+      kind: 'point',
       status: 'disputed',
       amountCents: 2500,
       createdAt: '2026-05-01T00:00:00Z',
@@ -311,7 +269,7 @@ const MONETIZATION_DISPUTED: UserMonetizationSummary = {
       receiptUrl: null,
     },
     {
-      kind: 'subscription',
+      kind: 'monthly',
       status: 'expired',
       amountCents: 990,
       createdAt: '2026-04-01T00:00:00Z',
@@ -319,7 +277,7 @@ const MONETIZATION_DISPUTED: UserMonetizationSummary = {
       receiptUrl: null,
     },
     {
-      kind: 'donation',
+      kind: 'point',
       status: 'pending',
       amountCents: 1500,
       createdAt: '2026-05-31T23:59:00Z',
@@ -333,9 +291,9 @@ const MONETIZATION_DISPUTED: UserMonetizationSummary = {
 // SupportActionsCard stories
 // ---------------------------------------------------------------------------
 
-export const SupportActionsCardPremiumActive: Story = () => (
+export const SupportActionsCardMonthlyActive: Story = () => (
   <div className="max-w-2xl p-4">
-    <SupportActionsCard monetization={MONETIZATION_PREMIUM_WITH_TRANSACTIONS} />
+    <SupportActionsCard monetization={MONETIZATION_MONTHLY_WITH_TRANSACTIONS} />
   </div>
 );
 
@@ -360,21 +318,10 @@ export const SupportActionsCardDisputedAndExpiredTransactions: Story = () => (
 /** Shows all possible transaction status badge variants in one card. */
 export const SupportActionsCardAllStatusVariants: Story = () => {
   const allStatuses: UserMonetizationSummary = {
-    isPremium: true,
     supporterBadgeUnlocked: true,
-    activeSubscription: {
-      status: 'active',
-      frequency: 'MONTHLY',
-      amountCents: 990,
-      startedAt: '2026-01-01T00:00:00Z',
-      nextPaymentAt: '2026-07-01T00:00:00Z',
-      cancelledAt: null,
-    },
-    lastDonationAt: '2026-06-01T00:00:00Z',
-    nextPaymentAt: '2026-07-01T00:00:00Z',
     recentTransactions: [
       {
-        kind: 'subscription',
+        kind: 'monthly',
         status: 'active',
         amountCents: 990,
         createdAt: '2026-06-01T00:00:00Z',
@@ -382,7 +329,7 @@ export const SupportActionsCardAllStatusVariants: Story = () => {
         receiptUrl: 'https://example.com/r1',
       },
       {
-        kind: 'donation',
+        kind: 'point',
         status: 'paid',
         amountCents: 2000,
         createdAt: '2026-05-01T00:00:00Z',
@@ -390,7 +337,7 @@ export const SupportActionsCardAllStatusVariants: Story = () => {
         receiptUrl: null,
       },
       {
-        kind: 'donation',
+        kind: 'point',
         status: 'pending',
         amountCents: 500,
         createdAt: '2026-06-18T00:00:00Z',
@@ -398,7 +345,7 @@ export const SupportActionsCardAllStatusVariants: Story = () => {
         receiptUrl: null,
       },
       {
-        kind: 'subscription',
+        kind: 'monthly',
         status: 'cancelled',
         amountCents: 990,
         createdAt: '2025-12-01T00:00:00Z',
@@ -406,7 +353,7 @@ export const SupportActionsCardAllStatusVariants: Story = () => {
         receiptUrl: null,
       },
       {
-        kind: 'donation',
+        kind: 'point',
         status: 'refunded',
         amountCents: 1000,
         createdAt: '2026-03-01T00:00:00Z',
@@ -414,7 +361,7 @@ export const SupportActionsCardAllStatusVariants: Story = () => {
         receiptUrl: null,
       },
       {
-        kind: 'subscription',
+        kind: 'monthly',
         status: 'disputed',
         amountCents: 990,
         createdAt: '2026-04-01T00:00:00Z',
@@ -422,7 +369,7 @@ export const SupportActionsCardAllStatusVariants: Story = () => {
         receiptUrl: null,
       },
       {
-        kind: 'subscription',
+        kind: 'monthly',
         status: 'expired',
         amountCents: 990,
         createdAt: '2025-11-01T00:00:00Z',
@@ -441,11 +388,7 @@ export const SupportActionsCardAllStatusVariants: Story = () => {
 
 export const SupportActionsCardNoActiveSubscription: Story = () => {
   const data: UserMonetizationSummary = {
-    isPremium: false,
     supporterBadgeUnlocked: false,
-    activeSubscription: null,
-    lastDonationAt: null,
-    nextPaymentAt: null,
     recentTransactions: [],
   };
 

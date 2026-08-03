@@ -1,52 +1,39 @@
 import { getAuthHeaders } from '@/features/auth/api/authClient';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 
-type PaymentsEndpointPath =
-  | '/v1/payments/donations/checkout'
-  | '/v1/payments/subscriptions/checkout'
-  | '/v1/payments/me';
-
-type DonationStatus = 'pending' | 'paid' | 'cancelled' | 'refunded' | 'disputed';
-type SubscriptionStatus = 'pending' | 'active' | 'cancelled' | 'expired';
+type SupportStatus = 'pending' | 'paid' | 'cancelled' | 'refunded' | 'disputed';
+type RecurringSupportStatus = 'pending' | 'active' | 'cancelled' | 'expired';
 
 export interface CreatedCheckoutResponse {
   id: number;
   provider: 'mercadopago';
-  kind: 'donation' | 'subscription';
-  status: DonationStatus | SubscriptionStatus;
+  kind: 'support' | 'recurring_support' | 'donation' | 'subscription';
+  status: SupportStatus | RecurringSupportStatus;
   checkoutUrl: string;
+}
+
+export interface SupportPaymentHistoryItem {
+  id: number;
+  kind: 'point' | 'monthly';
+  status: SupportStatus;
+  valorCents: number;
+  receiptUrl: string | null;
+  paidAt: string | null;
+  cancelledAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaymentsOverview {
   provider: 'mercadopago';
-  donations: Array<{
-    id: number;
-    status: DonationStatus;
-    valorCents: number;
-    checkoutUrl: string;
-    receiptUrl: string | null;
-    paidAt: string | null;
-    cancelledAt: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  subscriptions: Array<{
-    id: number;
-    status: SubscriptionStatus;
-    valorCents: number;
-    frequency: 'MONTHLY';
-    checkoutUrl: string;
-    receiptUrl: string | null;
-    startedAt: string | null;
+  recurringSupportActive: boolean;
+  recurringSupport: {
+    status: RecurringSupportStatus;
+    amountCents: number;
     nextPaymentAt: string | null;
     cancelledAt: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-}
-
-function resolvePaymentsEndpoint(pathname: PaymentsEndpointPath): string {
-  return resolveApiEndpoint(pathname);
+  } | null;
+  supports: SupportPaymentHistoryItem[];
 }
 
 function buildAuthenticatedHeaders(extraHeaders?: HeadersInit): HeadersInit {
@@ -61,48 +48,86 @@ function buildAuthenticatedHeaders(extraHeaders?: HeadersInit): HeadersInit {
   });
 }
 
-async function createCheckout(
-  pathname: '/v1/payments/donations/checkout' | '/v1/payments/subscriptions/checkout',
-): Promise<CreatedCheckoutResponse> {
+function safePaymentError(status: number): Error {
+  if (status === 400) {
+    return new Error('Confira o valor e os dados informados para o apoio.');
+  }
+  if (status === 401 || status === 403) {
+    return new Error('Entre novamente para gerenciar seus apoios.');
+  }
+  if (status === 410 || status === 503) {
+    return new Error('Este tipo de apoio está temporariamente indisponível.');
+  }
+  return new Error('Não foi possível concluir a operação de apoio. Tente novamente.');
+}
+
+async function postJson<T>(pathname: string, body?: unknown): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(resolvePaymentsEndpoint(pathname), {
+    response = await fetch(resolveApiEndpoint(pathname), {
       method: 'POST',
       cache: 'no-store',
-      headers: buildAuthenticatedHeaders({
-        'Content-Type': 'application/json',
-      }),
-      body: '{}',
+      headers: buildAuthenticatedHeaders(
+        body === undefined ? undefined : { 'Content-Type': 'application/json' },
+      ),
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
   } catch {
-    throw new Error('Falha de rede ao iniciar checkout');
+    throw new Error('Falha de rede ao processar o apoio.');
   }
 
   if (!response.ok) {
-    throw new Error(`Falha ao iniciar checkout: HTTP ${response.status}`);
+    throw safePaymentError(response.status);
   }
 
-  return response.json() as Promise<CreatedCheckoutResponse>;
+  return response.json() as Promise<T>;
 }
 
-export function createDonationCheckout(): Promise<CreatedCheckoutResponse> {
-  return createCheckout('/v1/payments/donations/checkout');
-}
-
-export function createSubscriptionCheckout(): Promise<CreatedCheckoutResponse> {
-  return createCheckout('/v1/payments/subscriptions/checkout');
-}
-
-export async function getPaymentOverview(): Promise<PaymentsOverview> {
-  const response = await fetch(resolvePaymentsEndpoint('/v1/payments/me'), {
-    method: 'GET',
-    cache: 'no-store',
-    headers: buildAuthenticatedHeaders(),
-  });
+async function getJson<T>(pathname: string): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(resolveApiEndpoint(pathname), {
+      method: 'GET',
+      cache: 'no-store',
+      headers: buildAuthenticatedHeaders(),
+    });
+  } catch {
+    throw new Error('Falha de rede ao carregar os apoios.');
+  }
 
   if (!response.ok) {
-    throw new Error(`Falha ao carregar histórico financeiro: HTTP ${response.status}`);
+    throw safePaymentError(response.status);
   }
 
-  return response.json() as Promise<PaymentsOverview>;
+  return response.json() as Promise<T>;
+}
+
+export function createSupportCheckout(amountCents: number): Promise<CreatedCheckoutResponse> {
+  return postJson('/v1/payments/support/checkout', { amountCents });
+}
+
+export function createRecurringSupportCheckout(
+  amountCents: number,
+  billingEmail: string,
+): Promise<CreatedCheckoutResponse> {
+  return postJson('/v1/payments/support/recurring/checkout', { amountCents, billingEmail });
+}
+
+export function getSupportOverview(): Promise<PaymentsOverview> {
+  return getJson('/v1/payments/support/me');
+}
+
+export function cancelRecurringSupport(): Promise<{
+  recurringSupportActive: boolean;
+  status: RecurringSupportStatus | null;
+  amountCents: number | null;
+  nextPaymentAt: string | null;
+  cancelledAt: string | null;
+}> {
+  return postJson('/v1/payments/support/recurring/cancel');
+}
+
+/** Compatibilidade para consumidores internos que ainda usam o nome antigo. */
+export function getPaymentOverview(): Promise<PaymentsOverview> {
+  return getSupportOverview();
 }

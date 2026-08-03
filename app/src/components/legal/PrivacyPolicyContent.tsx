@@ -99,7 +99,7 @@ export function PrivacyPolicyContent() {
               Tutela da saúde, exercício regular de direitos e proteção do crédito (art. 7º, VIII e
               art. 11):
             </strong>{' '}
-            processamento de doações e contribuições financeiras voluntárias.
+            processamento de apoios pontuais e mensais voluntários.
           </li>
         </ul>
       </Section>
@@ -139,7 +139,7 @@ export function PrivacyPolicyContent() {
           <li>
             <strong>Dados de pagamento (quando aplicável):</strong> identificador de transação
             (token opaco), valor, status, data e modalidade. O Interno Rotas{' '}
-            <strong>não armazena</strong> dados de cartão, chave PIX ou credencial bancária; estes
+            <strong>não armazena</strong> dados completos de cartão ou credenciais bancárias; estes
             são tratados exclusivamente pelo operador de pagamento.
           </li>
           <li>
@@ -204,8 +204,8 @@ export function PrivacyPolicyContent() {
             .
           </li>
           <li>
-            <strong>Mercado Pago (Ebazar.com Ltda.)</strong> – processamento de doações PIX, quando
-            aplicável. Política:{' '}
+            <strong>Mercado Pago (Ebazar.com Ltda.)</strong> – processamento de apoios pontuais e
+            mensais, quando aplicável. Política:{' '}
             <a
               href="https://www.mercadopago.com.br/privacidade"
               target="_blank"

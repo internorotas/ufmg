@@ -207,11 +207,10 @@ export function TermsOfUseContent() {
         </p>
       </Section>
 
-      <Section id="pagamentos" title="8. Doações e contribuições financeiras">
+      <Section id="pagamentos" title="8. Apoios e contribuições financeiras">
         <p>
-          O Interno Rotas pode oferecer canais voluntários de apoio financeiro (doação única ou
-          contribuição recorrente) operados por meio de provedor de pagamentos certificado
-          (atualmente Mercado Pago). Tais contribuições:
+          O Interno Rotas pode oferecer canais voluntários de apoio financeiro (apoio pontual ou
+          mensal) operados por meio do Mercado Pago. Tais contribuições:
         </p>
         <ul className="list-inside list-disc space-y-1">
           <li>
@@ -220,7 +219,7 @@ export function TermsOfUseContent() {
           </li>
           <li>não geram vínculo contratual de prestação de serviço pago;</li>
           <li>
-            são tratadas conforme termos do operador de pagamento e legislação tributária aplicável;
+            são tratadas conforme os termos do operador de pagamento e a legislação aplicável;
           </li>
           <li>
             podem ser objeto de estorno ou solicitação de chargeback nos termos da legislação

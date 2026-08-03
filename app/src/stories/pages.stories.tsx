@@ -118,7 +118,7 @@ const MOCK_PROFILE: UserProfile = {
         rarity: 'epic',
         category: 'supporter',
         isReserved: false,
-        criteriaText: 'Realize uma doação.',
+        criteriaText: 'Tenha um apoio pontual ou mensal confirmado.',
         progressPercent: 100,
         unlockedAt: '2025-06-01T14:00:00Z',
       },
@@ -174,21 +174,10 @@ const MOCK_PROFILE: UserProfile = {
     ],
   },
   monetization: {
-    isPremium: true,
     supporterBadgeUnlocked: true,
-    activeSubscription: {
-      status: 'active',
-      frequency: 'MONTHLY',
-      amountCents: 990,
-      startedAt: '2025-12-01T00:00:00Z',
-      nextPaymentAt: '2026-07-01T00:00:00Z',
-      cancelledAt: null,
-    },
-    lastDonationAt: '2025-11-15T00:00:00Z',
-    nextPaymentAt: '2026-07-01T00:00:00Z',
     recentTransactions: [
       {
-        kind: 'subscription',
+        kind: 'monthly',
         status: 'active',
         amountCents: 990,
         createdAt: '2025-12-01T00:00:00Z',
@@ -196,7 +185,7 @@ const MOCK_PROFILE: UserProfile = {
         receiptUrl: 'https://example.com/recibo/001',
       },
       {
-        kind: 'donation',
+        kind: 'point',
         status: 'paid',
         amountCents: 2000,
         createdAt: '2025-11-15T10:00:00Z',
@@ -218,11 +207,7 @@ const MOCK_PROFILE_NO_AVATAR: UserProfile = {
     achievementsUnlocked: [],
   },
   monetization: {
-    isPremium: false,
     supporterBadgeUnlocked: false,
-    activeSubscription: null,
-    lastDonationAt: null,
-    nextPaymentAt: null,
     recentTransactions: [],
   },
 };
@@ -939,7 +924,7 @@ export const ProfileSettingsTab: Story = () => {
   );
 };
 
-/** ProfilePage — Apoio tab, Premium user with active subscription and transactions. */
+/** ProfilePage — Apoio tab, apoiador com histórico de apoios. */
 function SupportTabActivator({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -983,8 +968,8 @@ export const ProfileSupportTab: Story = () => {
   );
 };
 
-/** ProfilePage — Apoio tab, non-premium user with no transactions. */
-export const ProfileSupportTabNoPremium: Story = () => {
+/** ProfilePage — Apoio tab, usuário sem histórico de apoios. */
+export const ProfileSupportTabNoSupport: Story = () => {
   const qc = React.useMemo(makeQueryClient, []);
 
   useEffect(() => {
