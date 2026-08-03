@@ -33,7 +33,7 @@ import { LineStatusBadge, type LineStatusType } from './ui/Badge';
  */
 export const lineCardVariants = tv({
   base: [
-    'relative overflow-hidden rounded-(--shape-sm) border border-card-border bg-card shadow-(--elevation-1)',
+    'relative overflow-hidden rounded-(--shape-md) border border-card-border bg-card shadow-(--elevation-1)',
     'hover:shadow-(--elevation-2) hover:-translate-y-px transition duration-150',
     'focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-primary focus-within:ring-offset-2',
   ],
@@ -53,7 +53,7 @@ export const lineCardVariants = tv({
  */
 export const detailsButtonVariants = tv({
   base: [
-    'w-full rounded-(--shape-xs) border border-transparent bg-background px-4 py-3 font-semibold cursor-pointer',
+    'w-full rounded-(--shape-sm) border border-transparent bg-background px-4 py-3 font-semibold cursor-pointer',
     'text-sm',
     'hover:bg-card-hover hover:border-(--card-border) active:scale-[0.97] transition duration-150',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-primary',
@@ -141,7 +141,7 @@ const LineIcon = memo(function LineIcon({ color }: LineIconProps) {
   return (
     <div
       data-slot="icon"
-      className="flex size-12 shrink-0 items-center justify-center rounded-lg border shadow-sm"
+      className="flex size-12 shrink-0 items-center justify-center rounded-(--shape-md) border shadow-sm"
       style={containerStyle}
     >
       <Bus className="size-6 drop-shadow-sm" style={iconStyle} aria-hidden="true" />
@@ -161,7 +161,10 @@ interface ScheduleDisplayProps {
 
 function ScheduleDisplay({ label, time, highlight }: ScheduleDisplayProps) {
   return (
-    <div data-slot="schedule" className="rounded-lg bg-background-secondary/50 p-2 text-center">
+    <div
+      data-slot="schedule"
+      className="rounded-(--shape-sm) bg-background-secondary/50 p-2 text-center"
+    >
       <p className="mb-1 flex items-center justify-center gap-1 text-xs text-text-secondary">
         <Clock className="size-3.5" aria-hidden="true" />
         {label}
@@ -188,7 +191,7 @@ function SuspendedNotice({ message }: SuspendedNoticeProps) {
       data-slot="notice"
       role="alert"
       aria-live="polite"
-      className="mb-4 rounded-lg border border-warning-border bg-warning-bg p-3 text-center"
+      className="mb-4 rounded-(--shape-sm) border border-warning-border bg-warning-bg p-3 text-center"
     >
       <p className="text-xs font-semibold text-warning-text md:text-sm">{message}</p>
     </div>

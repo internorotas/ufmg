@@ -19,17 +19,17 @@ export function BottomNav() {
     <nav
       aria-label="Navegação principal"
       className={cn(
-        'fixed inset-x-0 bottom-0 z-(--z-bottom-nav) w-full border-t border-(--card-border) bg-sidebar shadow-[0_-1px_4px_rgba(0,0,0,0.06)] md:hidden',
+        'fixed inset-x-0 bottom-0 z-(--z-bottom-nav) w-full border-t border-(--card-border) bg-sidebar shadow-[0_-4px_16px_rgba(0,0,0,0.12)] md:hidden',
         'pb-[env(safe-area-inset-bottom)]',
       )}
     >
-      <ul className="mx-auto flex w-full max-w-5xl items-stretch justify-around">
+      <ul className="mx-auto flex w-full max-w-5xl items-stretch justify-around gap-1 p-1">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const resolvedTo = !isAuthenticated && item.anonymousTo ? item.anonymousTo : item.to;
           const active = isNavItemActive(location.pathname, item, resolvedTo);
           return (
-            <li key={item.to} className="flex-1">
+            <li key={item.to} className="min-w-0 flex-1">
               <Link
                 to={resolvedTo}
                 aria-current={active ? 'page' : undefined}
@@ -43,20 +43,13 @@ export function BottomNav() {
                     });
                 }}
                 className={cn(
-                  'relative flex min-h-14 flex-col items-center justify-center gap-1 px-2 py-2 text-xs font-medium',
+                  'flex min-h-14 flex-col items-center justify-center gap-1 rounded-(--shape-md) px-2 py-2 text-xs font-medium',
                   'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:focus-visible:ring-brand-accent',
                   active
-                    ? 'bg-brand-primary/10 text-brand-primary dark:bg-brand-accent/10 dark:text-brand-accent'
+                    ? 'bg-brand-primary/12 text-brand-primary shadow-(--elevation-1) dark:bg-brand-accent/12 dark:text-brand-accent'
                     : 'text-text-secondary hover:text-text-primary',
                 )}
               >
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    'pointer-events-none absolute inset-x-4 top-0 h-0.75 rounded-none bg-brand-primary dark:bg-brand-accent transition-opacity',
-                    active ? 'opacity-100' : 'opacity-0',
-                  )}
-                />
                 <Icon size={22} aria-hidden="true" />
                 <span>{item.label}</span>
               </Link>

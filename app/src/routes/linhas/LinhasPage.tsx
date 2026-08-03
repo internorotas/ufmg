@@ -201,7 +201,11 @@ export function LinhasPage() {
   }, [linhaDetalhesAberta, trackEvent]);
 
   return (
-    <AppShell title="Linhas e paradas" fullBleed>
+    <AppShell
+      title="Linhas e paradas"
+      description="Consulte horários, itinerários e favoritas"
+      fullBleed
+    >
       {/* Search */}
       <div className="shrink-0 border-b border-card-border bg-background-secondary p-2 lg:p-3">
         <SearchInput
@@ -360,7 +364,7 @@ export function LinhasPage() {
 
         {/* Right: inline details panel (desktop only) */}
         {isDesktop && (
-          <aside className="flex flex-1 flex-col overflow-hidden bg-background border-l border-card-border">
+          <aside className="flex flex-1 flex-col overflow-hidden bg-background-secondary">
             {linhaDetalhesAberta ? (
               <Suspense fallback={null}>
                 <LinhaDetalhesModal
@@ -374,15 +378,19 @@ export function LinhasPage() {
               </Suspense>
             ) : (
               <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
-                <div className="flex size-14 items-center justify-center rounded-(--shape-lg) bg-background-secondary text-text-tertiary">
-                  <LayoutList size={24} aria-hidden="true" />
+                <div className="flex max-w-sm flex-col items-center gap-3 rounded-(--shape-xl) border border-card-border bg-card px-8 py-7 shadow-(--elevation-1)">
+                  <div className="flex size-14 items-center justify-center rounded-(--shape-lg) bg-background-secondary text-text-tertiary">
+                    <LayoutList size={24} aria-hidden="true" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-text-secondary">
+                      Selecione uma linha para ver itinerário e horários
+                    </p>
+                    <p className="text-xs text-text-tertiary">
+                      Clique em “Detalhes” em qualquer linha da lista
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm font-medium text-text-secondary">
-                  Selecione uma linha para ver itinerário e horários
-                </p>
-                <p className="text-xs text-text-tertiary">
-                  Clique em "Detalhes" em qualquer linha da lista
-                </p>
               </div>
             )}
           </aside>

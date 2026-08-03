@@ -34,20 +34,13 @@ export function NavRail() {
               to={resolvedTo}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'relative flex flex-col items-center justify-center gap-1 rounded px-2 py-2.5 text-tiny font-medium',
+                'flex flex-col items-center justify-center gap-1 rounded-(--shape-md) px-2 py-3 text-tiny font-medium',
                 'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:focus-visible:ring-brand-accent',
                 active
-                  ? 'bg-brand-primary/10 text-brand-primary dark:bg-brand-accent/10 dark:text-brand-accent'
+                  ? 'bg-brand-primary/12 text-brand-primary shadow-(--elevation-1) dark:bg-brand-accent/12 dark:text-brand-accent'
                   : 'text-text-secondary hover:bg-card-hover hover:text-text-primary',
               )}
             >
-              <span
-                aria-hidden="true"
-                className={cn(
-                  'pointer-events-none absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-none bg-brand-primary dark:bg-brand-accent transition-opacity',
-                  active ? 'opacity-100' : 'opacity-0',
-                )}
-              />
               <Icon size={22} aria-hidden="true" />
               <span>{item.label}</span>
             </Link>

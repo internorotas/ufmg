@@ -39,7 +39,7 @@ export function AppShell({
   fullBleed = false,
 }: AppShellProps) {
   return (
-    <div className="flex flex-1 min-h-0 overflow-hidden bg-background-secondary text-text-primary">
+    <div className="flex min-h-0 flex-1 overflow-hidden bg-background text-text-primary">
       <a
         href="#shell-main"
         className="sr-only absolute left-4 top-4 z-(--z-toast) bg-background px-4 py-2 text-sm font-semibold text-text-primary surface-card focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-brand-primary"
@@ -48,20 +48,22 @@ export function AppShell({
       </a>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="sticky top-0 z-(--z-content-header) border-b border-(--card-border) bg-card shadow-(--elevation-1)">
-          <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-4 py-3 sm:px-6">
+        <header className="sticky top-0 z-(--z-content-header) border-b border-(--card-border) bg-background">
+          <div className="mx-auto flex min-h-16 w-full max-w-5xl items-center gap-4 px-4 py-3 sm:px-6">
             <Link
               to={backTo}
               aria-label={backLabel}
               title={backLabel}
-              className="surface-card-interactive flex items-center justify-center size-11 shrink-0 bg-background text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              className="surface-card-interactive flex size-11 shrink-0 items-center justify-center bg-card text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             >
               <ArrowLeft size={20} aria-hidden="true" />
             </Link>
             <div className="min-w-0 flex-1">
-              <h1 className="truncate text-base font-semibold sm:text-lg">{title}</h1>
+              <h1 className="truncate text-base font-semibold leading-tight sm:text-lg">{title}</h1>
               {description ? (
-                <p className="truncate text-xs text-text-secondary sm:text-sm">{description}</p>
+                <p className="mt-0.5 truncate text-xs text-text-secondary sm:text-sm">
+                  {description}
+                </p>
               ) : null}
             </div>
             {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}

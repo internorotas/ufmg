@@ -354,6 +354,16 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
 /* Scrollbar Personalizada */
 * {
   scrollbar-width: thin;
