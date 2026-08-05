@@ -42,14 +42,11 @@ export function normalizeBhtransLineId(raw: string): string {
 }
 
 export function getBhtransLineConfig(linhaId: string): BhtransLineConfig {
-  const known = BHTRANS_LINE_CONFIG[linhaId];
-  if (known) return known;
-
-  // Linhas puramente numéricas (sem prefixo S de suplementar) seguem a cor
-  // Municipal padrão da BHTrans, mesmo sem estar no mapa acima.
-  if (/^\d+$/.test(linhaId)) {
-    return { color: '#0066af', label: 'Municipal', nome: linhaId };
-  }
-
-  return { color: '#94a3b8', label: 'BHTrans', nome: `Linha ${linhaId}` };
+  return (
+    BHTRANS_LINE_CONFIG[linhaId] ?? {
+      color: '#94a3b8',
+      label: 'BHTrans',
+      nome: linhaId,
+    }
+  );
 }
