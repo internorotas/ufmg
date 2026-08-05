@@ -230,7 +230,7 @@ function BusPopup({
   theoreticalPos,
 }: BusPopupProps) {
   return (
-    <div className="flex flex-col gap-2.5 font-sans text-sm">
+    <div className="flex flex-col gap-2 p-3 font-sans text-sm">
       <div className="flex items-center gap-2">
         <span
           className="shrink-0 rounded px-1.5 py-0.5 text-xs font-extrabold text-white"

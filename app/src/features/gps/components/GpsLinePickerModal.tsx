@@ -5,6 +5,7 @@ import { Dialog } from '@/components/ui/Dialog';
 import { isLineAvailableToday } from '@/config/specialPeriods';
 import { numLinha } from '@/features/gps/lib/markerUtils';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { getContrastingTextColor } from '@/lib/utils';
 import type { CategoriaLinhas, Linha } from '@/types/data.types';
 
 interface GpsLinePickerModalProps {
@@ -19,10 +20,11 @@ interface LinhaGroup {
   linhas: Linha[];
 }
 
-function LineNumberBadge({ numero }: { numero: string }) {
+function LineNumberBadge({ numero, corHex }: { numero: string; corHex: string }) {
   return (
     <div
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-background-secondary text-sm font-bold tabular-nums text-text-primary"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded text-sm font-bold tabular-nums"
+      style={{ background: corHex, color: getContrastingTextColor(corHex) }}
       aria-hidden="true"
     >
       {numero}
@@ -38,7 +40,7 @@ function SublinhaRow({ linha, onSelect }: { linha: Linha; onSelect: (l: Linha) =
       className="flex w-full items-center gap-3 rounded px-2 py-2.5 text-left hover:bg-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary"
       aria-label={`Selecionar linha ${numLinha(linha)}${linha.sublinha ? ` (${linha.sublinha})` : ''}: ${linha.nome}`}
     >
-      <LineNumberBadge numero={numLinha(linha)} />
+      <LineNumberBadge numero={numLinha(linha)} corHex={linha.corHex} />
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-text-primary">{linha.nome}</p>
