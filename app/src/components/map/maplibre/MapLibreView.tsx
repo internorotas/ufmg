@@ -281,6 +281,11 @@ export function MapLibreView({
   const statusRastreio = rastreioColaborativo?.status ?? 'idle';
   const rastreioAtivo = Boolean(rastreioColaborativo?.isActive);
 
+  // Linha travada pela sessão GPS ativa nunca muda com navegação, troca de
+  // seleção na sidebar ou limpeza da seleção — só encerrando a sessão. Fora
+  // de uma sessão ativa, a visualização normal usa a linha selecionada.
+  const linhaGpsAtiva = rastreioColaborativo?.lockedLine ?? linhaSelecionada;
+
   return (
     <div className="relative h-full w-full">
       <MapPitchHint visible={true} />
@@ -305,8 +310,8 @@ export function MapLibreView({
       >
         <MapLibrePlannerOverlay />
 
-        {isAuthenticated && rastreioColaborativo?.isActive && linhaSelecionada && (
-          <MapLibreGpsRouteOverlay linha={linhaSelecionada} />
+        {isAuthenticated && rastreioColaborativo?.isActive && linhaGpsAtiva && (
+          <MapLibreGpsRouteOverlay linha={linhaGpsAtiva} />
         )}
 
         <MapLibrePrediosLayer pitch={pitch} onPredioClicado={openPredio} />
@@ -322,15 +327,15 @@ export function MapLibreView({
         <MapLibreAllBusMarkers
           linhas={linhasAtivas}
           todasParadas={todasParadas}
-          linhaNumeroExcluido={linhaSelecionada?.linha ?? null}
+          linhaNumeroExcluido={linhaGpsAtiva?.linha ?? null}
         />
 
         <MapLibreBhtransMarkers />
 
-        {linhaSelecionada && (
+        {linhaGpsAtiva && (
           <MapLibreGpsLiveBusMarker
-            key={linhaSelecionada.idRota}
-            linha={linhaSelecionada}
+            key={linhaGpsAtiva.idRota}
+            linha={linhaGpsAtiva}
             todasParadas={todasParadas}
           />
         )}
