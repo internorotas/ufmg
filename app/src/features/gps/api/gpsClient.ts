@@ -1,5 +1,5 @@
 import { fetchAuthenticatedApi } from '@/features/auth/api/fetchAuthenticatedApi';
-import { resolveApiEndpoint } from '@/services/api/apiClient';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
 
 export class RateLimitError extends Error {
   constructor(
@@ -257,4 +257,91 @@ export interface ViagemHistoryItem {
 export async function getViagemHistory(): Promise<ViagemHistoryItem[]> {
   const response = await fetchGps('/v1/gps/viagens');
   return response.json() as Promise<ViagemHistoryItem[]>;
+}
+
+export interface GpsShareInfo {
+  token: string;
+  expiresAt: string;
+}
+
+export async function createGpsShare(sessionId: string): Promise<GpsShareInfo> {
+  const response = await fetchGps(`/v1/gps/sessions/${sessionId}/share`, { method: 'POST' });
+  return response.json() as Promise<GpsShareInfo>;
+}
+
+export async function revokeGpsShare(sessionId: string): Promise<void> {
+  await fetchGps(`/v1/gps/sessions/${sessionId}/share`, { method: 'DELETE' });
+}
+
+// ---------------------------------------------------------------------------
+// Viagem compartilhada — página pública (/viagem/:token), sem JWT.
+// ---------------------------------------------------------------------------
+
+export type SharedTripStatus =
+  | 'active'
+  | 'waiting_for_position'
+  | 'stale'
+  | 'finished'
+  | 'expired'
+  | 'revoked'
+  | 'not_found';
+
+export interface SharedTripLastPosition {
+  lat: number;
+  lng: number;
+  updatedAt: string;
+  heading?: number | null;
+}
+
+export interface SharedTripResponse {
+  status: SharedTripStatus;
+  linhaId?: string;
+  lastPosition?: SharedTripLastPosition | null;
+}
+
+const SHARED_TRIP_STATUSES: readonly SharedTripStatus[] = [
+  'active',
+  'waiting_for_position',
+  'stale',
+  'finished',
+  'expired',
+  'revoked',
+  'not_found',
+];
+
+function isValidSharedTripResponse(body: unknown): body is SharedTripResponse {
+  if (typeof body !== 'object' || body === null) return false;
+  const status = (body as { status?: unknown }).status;
+  if (typeof status !== 'string' || !SHARED_TRIP_STATUSES.includes(status as SharedTripStatus)) {
+    return false;
+  }
+  const lastPosition = (body as { lastPosition?: unknown }).lastPosition;
+  if (lastPosition !== undefined && lastPosition !== null) {
+    if (typeof lastPosition !== 'object') return false;
+    const { lat, lng, updatedAt } = lastPosition as Record<string, unknown>;
+    if (typeof lat !== 'number' || typeof lng !== 'number' || typeof updatedAt !== 'string') {
+      return false;
+    }
+  }
+  return true;
+}
+
+// Público — sem JWT obrigatório, mas sempre envia X-Tenant-Slug (o backend
+// isola o token por tenant). Nunca expõe mensagem bruta do backend: qualquer
+// resposta inesperada vira not_found, e a estrutura é validada antes de
+// devolver ao chamador.
+export async function getSharedTrip(token: string): Promise<SharedTripResponse> {
+  try {
+    const url = resolveApiEndpoint(`/v1/shared-trips/${encodeURIComponent(token)}`);
+    const response = await fetch(url, { headers: withTenantHeaders() });
+    const body: unknown = await response.json().catch(() => null);
+
+    if (!isValidSharedTripResponse(body)) {
+      return { status: 'not_found' };
+    }
+
+    return body;
+  } catch {
+    return { status: 'not_found' };
+  }
 }

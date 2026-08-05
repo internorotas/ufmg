@@ -227,4 +227,84 @@ describe('gpsClient — mapeamento de erros públicos do backend', () => {
       expect.objectContaining({ method: 'POST' }),
     );
   });
+
+  it('createGpsShare chama POST /gps/sessions/:id/share e retorna token/expiresAt', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse(201, { token: 'tok-1', expiresAt: '2026-01-01T00:00:00Z' }));
+    vi.doMock('@/features/auth/api/fetchAuthenticatedApi', () => ({
+      fetchAuthenticatedApi: fetchMock,
+    }));
+
+    const { createGpsShare } = await import('./gpsClient');
+
+    await expect(createGpsShare('s-1')).resolves.toEqual({
+      token: 'tok-1',
+      expiresAt: '2026-01-01T00:00:00Z',
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/gps/sessions/s-1/share'),
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('revokeGpsShare chama DELETE /gps/sessions/:id/share', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(200, { status: 'success' }));
+    vi.doMock('@/features/auth/api/fetchAuthenticatedApi', () => ({
+      fetchAuthenticatedApi: fetchMock,
+    }));
+
+    const { revokeGpsShare } = await import('./gpsClient');
+
+    await expect(revokeGpsShare('s-1')).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/gps/sessions/s-1/share'),
+      expect.objectContaining({ method: 'DELETE' }),
+    );
+  });
+
+  it('getSharedTrip retorna o corpo quando a estrutura é válida (sem exigir JWT)', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        jsonResponse(200, {
+          status: 'active',
+          linhaId: '5102',
+          lastPosition: { lat: -19.87, lng: -43.96, updatedAt: '2026-01-01T00:00:00Z' },
+        }),
+      ),
+    );
+
+    const { getSharedTrip } = await import('./gpsClient');
+
+    await expect(getSharedTrip('tok-abc')).resolves.toMatchObject({
+      status: 'active',
+      linhaId: '5102',
+    });
+  });
+
+  it.each([
+    'finished',
+    'expired',
+    'revoked',
+    'not_found',
+    'waiting_for_position',
+    'stale',
+  ])('getSharedTrip aceita o status %s', async (status) => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(200, { status })));
+    const { getSharedTrip } = await import('./gpsClient');
+    await expect(getSharedTrip('tok-abc')).resolves.toEqual({ status });
+  });
+
+  it('getSharedTrip nunca propaga corpo malformado — cai em not_found', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(200, { garbage: true })));
+    const { getSharedTrip } = await import('./gpsClient');
+    await expect(getSharedTrip('tok-abc')).resolves.toEqual({ status: 'not_found' });
+  });
+
+  it('getSharedTrip nunca lança em falha de rede — cai em not_found', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')));
+    const { getSharedTrip } = await import('./gpsClient');
+    await expect(getSharedTrip('tok-abc')).resolves.toEqual({ status: 'not_found' });
+  });
 });

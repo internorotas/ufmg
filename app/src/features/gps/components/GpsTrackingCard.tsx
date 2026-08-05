@@ -6,6 +6,7 @@ import {
   Map as MapIcon,
   MapPin,
   Radio,
+  Share2,
   Square,
   Timer,
   Wifi,
@@ -13,12 +14,28 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { createGpsShare, revokeGpsShare } from '@/features/gps/api/gpsClient';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { numLinha } from '@/features/gps/lib/markerUtils';
 import { formatDurationClock } from '@/lib/formatters';
 import type { Linha } from '@/types/data.types';
 
 const STOP_CONFIRM_WINDOW_MS = 3000;
+const SHARE_FEEDBACK_TIMEOUT_MS = 4000;
+
+type ShareFeedback =
+  | { kind: 'created'; expiresAt: string }
+  | { kind: 'copied' }
+  | { kind: 'error' }
+  | { kind: 'stopped' };
+
+function formatExpiresAt(iso: string): string {
+  try {
+    return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+}
 
 interface GpsTrackingCardProps {
   rastreio: GpsTrackingState;
@@ -44,7 +61,8 @@ export function GpsTrackingCard({
   isMinimized,
   onToggleMinimize,
 }: GpsTrackingCardProps) {
-  const { distanceKm, durationMs, snapshotsCount, queueSize, isSyncing, status, stop } = rastreio;
+  const { sessionId, distanceKm, durationMs, snapshotsCount, queueSize, isSyncing, status, stop } =
+    rastreio;
   const isStarting = status === 'starting';
   const pontosEstimados = Math.max(1, Math.floor(snapshotsCount / 2));
   const signal = signalLabel(accuracyM);
@@ -53,12 +71,68 @@ export function GpsTrackingCard({
   const [stopArmed, setStopArmed] = useState(false);
   const stopArmedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Token mantido só em memória (nunca localStorage) — o link já foi
+  // copiado/compartilhado; persistir o segredo em disco não traz benefício e
+  // amplia a janela de exposição caso o dispositivo seja comprometido.
+  const [shareToken, setShareToken] = useState<string | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState<ShareFeedback | null>(null);
+  const shareFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(
     () => () => {
       if (stopArmedTimeoutRef.current) clearTimeout(stopArmedTimeoutRef.current);
+      if (shareFeedbackTimeoutRef.current) clearTimeout(shareFeedbackTimeoutRef.current);
     },
     [],
   );
+
+  const showShareFeedback = useCallback((feedback: ShareFeedback) => {
+    setShareFeedback(feedback);
+    if (shareFeedbackTimeoutRef.current) clearTimeout(shareFeedbackTimeoutRef.current);
+    shareFeedbackTimeoutRef.current = setTimeout(
+      () => setShareFeedback(null),
+      SHARE_FEEDBACK_TIMEOUT_MS,
+    );
+  }, []);
+
+  const handleShareTrip = useCallback(async () => {
+    if (!sessionId || isSharing) return;
+    setIsSharing(true);
+    try {
+      const { token, expiresAt } = await createGpsShare(sessionId);
+      setShareToken(token);
+      const base = import.meta.env.BASE_URL || '/';
+      const url = `${window.location.origin}${base}viagem/${token}`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Acompanhe minha viagem ao vivo', url });
+          showShareFeedback({ kind: 'created', expiresAt });
+        } catch {
+          // Usuário cancelou o share sheet — não é erro.
+        }
+      } else {
+        await navigator.clipboard?.writeText(url);
+        showShareFeedback({ kind: 'copied' });
+      }
+    } catch {
+      showShareFeedback({ kind: 'error' });
+    } finally {
+      setIsSharing(false);
+    }
+  }, [sessionId, isSharing, showShareFeedback]);
+
+  const handleStopSharing = useCallback(async () => {
+    if (!sessionId) return;
+    try {
+      await revokeGpsShare(sessionId);
+      setShareToken(null);
+      showShareFeedback({ kind: 'stopped' });
+    } catch {
+      showShareFeedback({ kind: 'error' });
+    }
+  }, [sessionId, showShareFeedback]);
 
   const handleStopClick = useCallback(() => {
     if (stopArmed) {
@@ -247,6 +321,53 @@ export function GpsTrackingCard({
               </div>
             )}
           </div>
+
+          <div className="mx-2.5 h-px bg-card-border" />
+
+          {/* Compartilhamento público da viagem — distinto do botão "Compartilhar
+              linha" do mapa: aqui compartilha a localização ao vivo desta sessão. */}
+          <div className="flex items-center gap-1.5 px-2.5 py-2">
+            {shareToken ? (
+              <button
+                type="button"
+                onClick={() => void handleStopSharing()}
+                className="pointer-events-auto flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-md bg-card-hover text-micro font-semibold text-text-secondary transition-colors hover:bg-warning-bg hover:text-warning-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary"
+              >
+                <Square size={10} fill="currentColor" aria-hidden="true" />
+                Parar compartilhamento
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void handleShareTrip()}
+                disabled={isSharing || !sessionId}
+                aria-busy={isSharing}
+                className="pointer-events-auto flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-md bg-brand-primary/10 text-micro font-semibold text-brand-primary transition-colors hover:bg-brand-primary/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60 dark:text-brand-accent"
+              >
+                {isSharing ? (
+                  <Loader2 size={10} className="animate-spin" aria-hidden="true" />
+                ) : (
+                  <Share2 size={10} aria-hidden="true" />
+                )}
+                Compartilhar viagem ao vivo
+              </button>
+            )}
+          </div>
+
+          {shareFeedback && (
+            <p
+              role="status"
+              aria-live="polite"
+              className="px-2.5 pb-2 text-micro text-text-secondary"
+            >
+              {shareFeedback.kind === 'created' &&
+                `Link criado — expira às ${formatExpiresAt(shareFeedback.expiresAt)}.`}
+              {shareFeedback.kind === 'copied' && 'Link copiado para a área de transferência.'}
+              {shareFeedback.kind === 'stopped' && 'Compartilhamento encerrado.'}
+              {shareFeedback.kind === 'error' &&
+                'Não foi possível compartilhar a viagem agora. Tente novamente.'}
+            </p>
+          )}
         </>
       )}
     </div>

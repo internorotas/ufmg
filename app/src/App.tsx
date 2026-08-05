@@ -120,6 +120,9 @@ const ResearchDashboardPage = lazy(() =>
     default: m.ResearchDashboardPage,
   })),
 );
+const SharedTripPage = lazy(() =>
+  import('./routes/viagem/SharedTripPage').then((m) => ({ default: m.SharedTripPage })),
+);
 
 // Fallback genérico de carregamento de página (rotas lazy fora do mapa).
 const PageLoading = () => (
@@ -879,6 +882,7 @@ export function App() {
           <Routes>
             <Route path="/admin/*" element={<FakeAdminLoginPage />} />
             <Route path="/pesquisa" element={<ResearchDashboardPage />} />
+            <Route path="/viagem/:token" element={<SharedTripPage />} />
             <Route path="/*" element={<AppAuthenticatedRoutes />} />
           </Routes>
         </Suspense>
