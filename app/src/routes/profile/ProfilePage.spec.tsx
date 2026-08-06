@@ -213,12 +213,12 @@ describe('ProfilePage', () => {
     expect(container.textContent).toContain('Pioneiro da Linha 2004A');
     expect(container.textContent).toContain('Centenario');
     expect(container.textContent).toContain('Viagem encerrada automaticamente');
-    expect(container.textContent).toContain('Apoio pontual');
-    expect(container.textContent).toContain('Apoio mensal');
+    expect(container.textContent).toContain('Apoiar uma vez');
+    expect(container.textContent).toContain('Apoiar todo mês');
     expect(container.textContent).not.toContain('Premium');
     expect(container.textContent).not.toContain('doação via PIX');
     expect(container.textContent).toContain('Histórico de apoios');
-    expect(container.textContent).toContain('funcionalidades essenciais');
+    expect(container.textContent).toContain('recursos essenciais');
     expect(container.textContent).toContain('Solicitar exclusão de conta');
   });
 });
