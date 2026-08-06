@@ -1,10 +1,69 @@
-import type { MapLayerMouseEvent } from 'maplibre-gl';
+import type { ExpressionSpecification, MapLayerMouseEvent } from 'maplibre-gl';
 import React, { useCallback, useEffect } from 'react';
 import { Layer, Source, useMap } from 'react-map-gl/maplibre';
 import { useUfmPrediosQuery } from '@/features/transit-data/queries/useUfmPrediosQuery';
 
 const MIN_ZOOM = 14;
 const PITCH_EXTRUDE_THRESHOLD = 20;
+
+// Metros por andar — estimativa padrão quando só `buildingLevels` está
+// disponível (sem `height` explícito).
+const METERS_PER_LEVEL = 3;
+const DEFAULT_FALLBACK_HEIGHT_M = 12;
+
+// Altura de fallback por categoria (metros) — usada só quando o prédio não
+// tem `height` nem `buildingLevels` em `properties`. Não é medição real,
+// é uma estimativa visual razoável por tipo de uso.
+export const FALLBACK_HEIGHT_BY_AMENITY_M: Record<string, number> = {
+  university: 20,
+  hospital: 20,
+  conference_centre: 15,
+  research_institute: 15,
+  school: 12,
+  library: 12,
+  theatre: 12,
+  arts_centre: 12,
+  cinema: 12,
+  place_of_worship: 12,
+  gymnasium: 10,
+  sports_centre: 10,
+  clinic: 10,
+  bank: 8,
+  post_office: 8,
+  pharmacy: 6,
+  veterinary: 6,
+  restaurant: 6,
+  food_court: 6,
+  parking: 4,
+  toilets: 4,
+  atm: 3,
+  drinking_water: 2,
+};
+
+const FALLBACK_HEIGHT_EXPRESSION: ExpressionSpecification = [
+  'match',
+  ['get', 'amenity'],
+  ...Object.entries(FALLBACK_HEIGHT_BY_AMENITY_M).flat(),
+  DEFAULT_FALLBACK_HEIGHT_M,
+] as unknown as ExpressionSpecification;
+
+// Prioridade: `height` explícito (metros) > `buildingLevels` * altura/andar
+// > fallback por categoria. Nunca um valor fixo único para todo prédio.
+export const BUILDING_HEIGHT_EXPRESSION: ExpressionSpecification = [
+  'case',
+  ['all', ['has', 'height'], ['>', ['to-number', ['get', 'height'], 0], 0]],
+  ['to-number', ['get', 'height'], 0],
+  ['all', ['has', 'buildingLevels'], ['>', ['to-number', ['get', 'buildingLevels'], 0], 0]],
+  ['*', ['to-number', ['get', 'buildingLevels'], 0], METERS_PER_LEVEL],
+  FALLBACK_HEIGHT_EXPRESSION,
+] as unknown as ExpressionSpecification;
+
+export const BUILDING_BASE_EXPRESSION: ExpressionSpecification = [
+  'case',
+  ['all', ['has', 'minHeight'], ['>=', ['to-number', ['get', 'minHeight'], 0], 0]],
+  ['to-number', ['get', 'minHeight'], 0],
+  0,
+] as unknown as ExpressionSpecification;
 
 const LAYER_IDS = ['predios-3d', 'predios-flat', 'predios-flat-outline'] as const;
 
@@ -217,8 +276,8 @@ export const MapLibrePrediosLayer = React.memo(function MapLibrePrediosLayer({
         layout={{ visibility: extruding ? 'visible' : 'none' }}
         paint={{
           'fill-extrusion-color': '#4a90d9',
-          'fill-extrusion-height': 18,
-          'fill-extrusion-base': 0,
+          'fill-extrusion-height': BUILDING_HEIGHT_EXPRESSION,
+          'fill-extrusion-base': BUILDING_BASE_EXPRESSION,
           'fill-extrusion-opacity': 0.75,
         }}
       />
