@@ -26,6 +26,7 @@ import MapLibreMap, { type MapRef } from 'react-map-gl/maplibre';
 import { Tooltip } from '@/components/ui/Tooltip';
 import type { MapaRef } from '@/contexts/RotasSelectionContext';
 import { useAuthContext } from '@/features/auth/context/AuthContext';
+import { useAllLiveGpsPositions } from '@/features/gps/hooks/useAllLiveGpsPositions';
 import type { GpsTrackingState } from '@/features/gps/hooks/useGpsTrackingSession';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { CAMPUS_DISPLAY_NAME, COORDENADAS_CAMPUS } from '@/hooks/useLocalizacaoUsuario';
@@ -39,6 +40,7 @@ import { MapLibreBhtransMarkers } from './MapLibreBhtransMarkers';
 import { MapLibreGpsLiveBusMarker } from './MapLibreGpsLiveBusMarker';
 import { MapLibreGpsRouteOverlay } from './MapLibreGpsRouteOverlay';
 import { MapLibreLegend } from './MapLibreLegend';
+import { MapLibreLiveGpsMarkers } from './MapLibreLiveGpsMarkers';
 import { ConteudoPopupParada, MapLibreParadasLayer } from './MapLibreParadasLayer';
 import { MapLibrePlannerOverlay } from './MapLibrePlannerOverlay';
 import { CardPredio, MapLibrePrediosLayer, type PredioInfo } from './MapLibrePrediosLayer';
@@ -287,6 +289,21 @@ export function MapLibreView({
   // de uma sessão ativa, a visualização normal usa a linha selecionada.
   const linhaGpsAtiva = rastreioColaborativo?.lockedLine ?? linhaSelecionada;
 
+  // Linhas com GPS ao vivo (mapa colaborativo) nunca aparecem também como
+  // estimativa teórica — cada linha some do MapLibreAllBusMarkers assim que
+  // vira um marcador "AO VIVO" em MapLibreLiveGpsMarkers/MapLibreGpsLiveBusMarker.
+  const posicoesAoVivo = useAllLiveGpsPositions();
+  const linhasComGpsAoVivo = useMemo(() => {
+    const linhaMap = new Map(linhasAtivas.map((l) => [l.idRota, l]));
+    const excluidas = new Set<number>();
+    if (linhaGpsAtiva) excluidas.add(linhaGpsAtiva.linha);
+    for (const linhaId of posicoesAoVivo.keys()) {
+      const linha = linhaMap.get(linhaId);
+      if (linha) excluidas.add(linha.linha);
+    }
+    return excluidas;
+  }, [linhasAtivas, linhaGpsAtiva, posicoesAoVivo]);
+
   return (
     <div className="relative h-full w-full">
       <MapPitchHint visible={true} />
@@ -328,7 +345,12 @@ export function MapLibreView({
         <MapLibreAllBusMarkers
           linhas={linhasAtivas}
           todasParadas={todasParadas}
-          linhaNumeroExcluido={linhaGpsAtiva?.linha ?? null}
+          linhasNumeroExcluidas={linhasComGpsAoVivo}
+        />
+
+        <MapLibreLiveGpsMarkers
+          linhas={linhasAtivas}
+          linhaExcluidaId={linhaGpsAtiva?.idRota ?? null}
         />
 
         <MapLibreBhtransMarkers />

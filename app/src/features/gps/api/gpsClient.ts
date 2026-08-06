@@ -274,6 +274,38 @@ export async function revokeGpsShare(sessionId: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Lote de posições GPS ao vivo (mapa colaborativo — todas as linhas de uma vez).
+// ---------------------------------------------------------------------------
+
+export interface LiveGpsBatchItem {
+  linhaId: string;
+  lat: number;
+  lng: number;
+  heading: number | null;
+  confidence: number;
+  updatedAt: string;
+  delayed: boolean;
+  // Opaco/derivado (HMAC) — nunca sessionId/userId/ownerKey. Só identifica o
+  // marcador entre re-renders, não a pessoa por trás dele.
+  vehicleKey: string;
+}
+
+// GET /v1/gps/live — autenticado usa fetchAuthenticatedApi (sem atraso);
+// anônimo usa fetch simples (backend aplica atraso de 60s via
+// X-Gps-Delay-Seconds), mesmo contrato de useGpsLiveTracking.
+export async function getAllLiveGpsPositions(
+  accessToken: string | null,
+): Promise<LiveGpsBatchItem[]> {
+  const url = resolveApiEndpoint('/v1/gps/live');
+  const response = accessToken
+    ? await fetchAuthenticatedApi(url)
+    : await fetch(url, { headers: withTenantHeaders() });
+
+  if (!response.ok) return [];
+  return (await response.json().catch(() => [])) as LiveGpsBatchItem[];
+}
+
+// ---------------------------------------------------------------------------
 // Viagem compartilhada — página pública (/viagem/:token), sem JWT.
 // ---------------------------------------------------------------------------
 

@@ -1,6 +1,7 @@
 export { MapLibreAllBusMarkers } from './MapLibreAllBusMarkers';
 export { MapLibreGpsLiveBusMarker } from './MapLibreGpsLiveBusMarker';
 export { MapLibreGpsRouteOverlay } from './MapLibreGpsRouteOverlay';
+export { MapLibreLiveGpsMarkers } from './MapLibreLiveGpsMarkers';
 export { MapLibreParadasLayer } from './MapLibreParadasLayer';
 export { MapLibrePlannerOverlay } from './MapLibrePlannerOverlay';
 export { MapLibrePrediosLayer } from './MapLibrePrediosLayer';
