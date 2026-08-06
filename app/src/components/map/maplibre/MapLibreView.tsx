@@ -38,6 +38,7 @@ import { MapLibreAllBusMarkers } from './MapLibreAllBusMarkers';
 import { MapLibreBhtransMarkers } from './MapLibreBhtransMarkers';
 import { MapLibreGpsLiveBusMarker } from './MapLibreGpsLiveBusMarker';
 import { MapLibreGpsRouteOverlay } from './MapLibreGpsRouteOverlay';
+import { MapLibreLegend } from './MapLibreLegend';
 import { ConteudoPopupParada, MapLibreParadasLayer } from './MapLibreParadasLayer';
 import { MapLibrePlannerOverlay } from './MapLibrePlannerOverlay';
 import { CardPredio, MapLibrePrediosLayer, type PredioInfo } from './MapLibrePrediosLayer';
@@ -344,6 +345,8 @@ export function MapLibreView({
           <MapLibreUserMarker localizacao={localizacaoUsuario} heading={headingUsuario ?? null} />
         )}
       </MapLibreMap>
+
+      <MapLibreLegend />
 
       {/* Controles de zoom e visão — lado esquerdo */}
       <div className="pointer-events-none absolute left-2 top-2 z-(--z-map-controls) flex flex-col items-center">
