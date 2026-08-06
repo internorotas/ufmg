@@ -107,11 +107,17 @@ export function Mapa({
                 String(linhaSelecionada.linha)}
             </span>
             <span className="min-w-0 flex flex-col">
-              <span className="truncate text-xs font-semibold text-text-primary">
+              <span
+                className="truncate text-xs font-semibold text-text-primary"
+                title={linhaSelecionada.nome}
+              >
                 {linhaSelecionada.nome}
               </span>
               {linhaSelecionada.sublinha && (
-                <span className="truncate text-micro text-text-secondary leading-tight">
+                <span
+                  className="truncate text-micro text-text-secondary leading-tight"
+                  title={linhaSelecionada.sublinha}
+                >
                   {linhaSelecionada.sublinha}
                 </span>
               )}

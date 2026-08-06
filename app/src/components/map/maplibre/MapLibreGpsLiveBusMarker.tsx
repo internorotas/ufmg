@@ -239,9 +239,14 @@ function BusPopup({
           {num}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-bold text-text-primary leading-tight">{linha.nome}</p>
+          <p className="truncate font-bold text-text-primary leading-tight" title={linha.nome}>
+            {linha.nome}
+          </p>
           {linha.sublinha && (
-            <p className="truncate text-micro text-text-secondary leading-tight">
+            <p
+              className="truncate text-micro text-text-secondary leading-tight"
+              title={linha.sublinha}
+            >
               {linha.sublinha}
             </p>
           )}

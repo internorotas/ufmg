@@ -214,12 +214,18 @@ export function GpsTrackingCard({
             >
               {numLinha(linha)}
             </span>
-            <p className="truncate text-micro font-semibold text-text-primary leading-tight">
+            <p
+              className="truncate text-micro font-semibold text-text-primary leading-tight"
+              title={linha.nome}
+            >
               {linha.nome}
             </p>
           </div>
           {linha.sublinha && (
-            <p className="truncate pl-5 text-micro text-text-tertiary leading-tight">
+            <p
+              className="truncate pl-5 text-micro text-text-tertiary leading-tight"
+              title={linha.sublinha}
+            >
               {linha.sublinha}
             </p>
           )}

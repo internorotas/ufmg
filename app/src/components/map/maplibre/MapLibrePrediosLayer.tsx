@@ -20,29 +20,95 @@ export interface PredioInfo {
 
 // Mapeamento OSM amenity → rótulo em português + categoria visual
 const AMENITY_LABELS: Record<string, { label: string; cor: string }> = {
-  restaurant: { label: 'Restaurante', cor: 'bg-orange-100 text-orange-700' },
-  library: { label: 'Biblioteca', cor: 'bg-blue-100 text-blue-700' },
-  school: { label: 'Escola / Colégio', cor: 'bg-purple-100 text-purple-700' },
-  university: { label: 'Universidade', cor: 'bg-indigo-100 text-indigo-700' },
-  clinic: { label: 'Clínica', cor: 'bg-red-100 text-red-700' },
-  hospital: { label: 'Hospital', cor: 'bg-red-100 text-red-700' },
-  veterinary: { label: 'Veterinário', cor: 'bg-green-100 text-green-700' },
-  pharmacy: { label: 'Farmácia', cor: 'bg-green-100 text-green-700' },
-  theatre: { label: 'Teatro', cor: 'bg-pink-100 text-pink-700' },
-  arts_centre: { label: 'Centro Cultural', cor: 'bg-pink-100 text-pink-700' },
-  cinema: { label: 'Cinema', cor: 'bg-pink-100 text-pink-700' },
-  gymnasium: { label: 'Ginásio', cor: 'bg-yellow-100 text-yellow-700' },
-  sports_centre: { label: 'Centro Esportivo', cor: 'bg-yellow-100 text-yellow-700' },
-  bank: { label: 'Banco', cor: 'bg-slate-100 text-slate-700' },
-  atm: { label: 'Caixa Eletrônico', cor: 'bg-slate-100 text-slate-700' },
-  post_office: { label: 'Correios', cor: 'bg-yellow-100 text-yellow-700' },
-  place_of_worship: { label: 'Local de Culto', cor: 'bg-amber-100 text-amber-700' },
-  parking: { label: 'Estacionamento', cor: 'bg-slate-100 text-slate-700' },
-  toilets: { label: 'Banheiros', cor: 'bg-slate-100 text-slate-700' },
-  drinking_water: { label: 'Água Potável', cor: 'bg-cyan-100 text-cyan-700' },
-  food_court: { label: 'Praça de Alimentação', cor: 'bg-orange-100 text-orange-700' },
-  conference_centre: { label: 'Centro de Conferências', cor: 'bg-indigo-100 text-indigo-700' },
-  research_institute: { label: 'Instituto de Pesquisa', cor: 'bg-indigo-100 text-indigo-700' },
+  restaurant: {
+    label: 'Restaurante',
+    cor: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  },
+  library: {
+    label: 'Biblioteca',
+    cor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  },
+  school: {
+    label: 'Escola / Colégio',
+    cor: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+  },
+  university: {
+    label: 'Universidade',
+    cor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+  },
+  clinic: { label: 'Clínica', cor: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' },
+  hospital: {
+    label: 'Hospital',
+    cor: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+  },
+  veterinary: {
+    label: 'Veterinário',
+    cor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+  },
+  pharmacy: {
+    label: 'Farmácia',
+    cor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+  },
+  theatre: {
+    label: 'Teatro',
+    cor: 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300',
+  },
+  arts_centre: {
+    label: 'Centro Cultural',
+    cor: 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300',
+  },
+  cinema: {
+    label: 'Cinema',
+    cor: 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300',
+  },
+  gymnasium: {
+    label: 'Ginásio',
+    cor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+  },
+  sports_centre: {
+    label: 'Centro Esportivo',
+    cor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+  },
+  bank: {
+    label: 'Banco',
+    cor: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  },
+  atm: {
+    label: 'Caixa Eletrônico',
+    cor: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  },
+  post_office: {
+    label: 'Correios',
+    cor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+  },
+  place_of_worship: {
+    label: 'Local de Culto',
+    cor: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+  },
+  parking: {
+    label: 'Estacionamento',
+    cor: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  },
+  toilets: {
+    label: 'Banheiros',
+    cor: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  },
+  drinking_water: {
+    label: 'Água Potável',
+    cor: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300',
+  },
+  food_court: {
+    label: 'Praça de Alimentação',
+    cor: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  },
+  conference_centre: {
+    label: 'Centro de Conferências',
+    cor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+  },
+  research_institute: {
+    label: 'Instituto de Pesquisa',
+    cor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+  },
 };
 
 function formatarAmenity(amenity: string): { label: string; cor: string } {

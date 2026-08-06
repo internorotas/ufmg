@@ -75,7 +75,9 @@ export function TripRatingCard({
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-text-primary">Como foi sua viagem?</p>
-            <p className="truncate text-micro text-text-secondary">{linhaNome}</p>
+            <p className="truncate text-micro text-text-secondary" title={linhaNome}>
+              {linhaNome}
+            </p>
           </div>
         </div>
 

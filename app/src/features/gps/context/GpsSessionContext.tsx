@@ -72,7 +72,9 @@ function GpsSessionCompletedCard({
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-success-text">{reasonLabel}</p>
-            <p className="truncate text-micro text-text-secondary">{session.linhaNome}</p>
+            <p className="truncate text-micro text-text-secondary" title={session.linhaNome}>
+              {session.linhaNome}
+            </p>
           </div>
           <button
             type="button"

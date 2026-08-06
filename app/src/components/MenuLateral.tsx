@@ -126,6 +126,9 @@ export function CategoryTabs({ categories, activeIndex, onSelect }: CategoryTabs
             key={categoria.id}
             value={String(categoria.id)}
             className={categoryTabVariants()}
+            // Filtro de categoria puro, sem TabsContent/painel associado —
+            // aria-controls automático do Tabs apontaria para um id inexistente.
+            aria-controls={undefined}
           >
             {categoria.displayName}
           </TabsTrigger>
