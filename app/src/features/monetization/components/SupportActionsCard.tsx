@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { CurrencyInput } from '@/components/ui/CurrencyInput';
 import { FeedbackBanner } from '@/components/ui/FeedbackBanner';
 import { Input } from '@/components/ui/Input';
 import {
@@ -86,13 +87,6 @@ function fallbackSupportHistory(
   }));
 }
 
-function selectedAmountFromCustom(value: string): number | null {
-  const amountCents = Math.round(Number(value.replace(',', '.')) * 100);
-  return Number.isInteger(amountCents) && amountCents >= 500 && amountCents <= 50_000
-    ? amountCents
-    : null;
-}
-
 function getFeedbackError(error: unknown): FeedbackState {
   return {
     type: 'error',
@@ -105,7 +99,8 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
   const { trackEvent } = useAnalytics();
   const [mode, setMode] = useState<SupportMode>('point');
   const [amountCents, setAmountCents] = useState<number>(1000);
-  const [customAmount, setCustomAmount] = useState('');
+  const [customAmountCents, setCustomAmountCents] = useState<number | null>(null);
+  const [usingCustomAmount, setUsingCustomAmount] = useState(false);
   const [billingEmail, setBillingEmail] = useState('');
   const [pendingAction, setPendingAction] = useState<'checkout' | 'cancel' | null>(null);
   const [feedback, setFeedback] = useState<FeedbackState | null>(null);
@@ -127,7 +122,8 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
     };
   }, []);
 
-  const effectiveAmountCents = customAmount ? selectedAmountFromCustom(customAmount) : amountCents;
+  const effectiveAmountCents = usingCustomAmount ? customAmountCents : amountCents;
+  const customAmountInvalid = usingCustomAmount && customAmountCents === null;
   const history = overview?.supports ?? fallbackSupportHistory(monetization.recentTransactions);
   const recurringSupport = overview?.recurringSupport ?? null;
   const recurringIsActive = overview?.recurringSupportActive === true;
@@ -157,10 +153,15 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
     setFeedback(null);
 
     try {
+      const idempotencyKey = crypto.randomUUID();
       const checkout =
         mode === 'point'
-          ? await createSupportCheckout(effectiveAmountCents)
-          : await createRecurringSupportCheckout(effectiveAmountCents, billingEmail.trim());
+          ? await createSupportCheckout(effectiveAmountCents, idempotencyKey)
+          : await createRecurringSupportCheckout(
+              effectiveAmountCents,
+              billingEmail.trim(),
+              idempotencyKey,
+            );
 
       trackEvent({
         category: 'engagement',
@@ -197,11 +198,11 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
               <HeartHandshake size={18} aria-hidden="true" />
-              Apoio ao projeto
+              Apoie o Interno Rotas
             </CardTitle>
             <CardDescription>
-              Apoio pontual ou mensal, processado pelo Mercado Pago. As funcionalidades essenciais
-              continuam gratuitas.
+              Seu apoio ajuda a manter o servidor, o domínio e o desenvolvimento do projeto. Escolha
+              um valor e conclua pelo Mercado Pago.
             </CardDescription>
           </div>
           {monetization.supporterBadgeUnlocked ? (
@@ -215,11 +216,16 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
       <CardContent className="space-y-5">
         {feedback ? <FeedbackBanner message={feedback.message} type={feedback.type} /> : null}
 
+        <p className="text-xs leading-5 text-text-secondary">
+          Apoiar é opcional. Mapa, horários, previsões e GPS colaborativo continuam disponíveis para
+          todos.
+        </p>
+
         <div className="grid gap-2 sm:grid-cols-2" role="tablist" aria-label="Modalidade de apoio">
           {(
             [
-              ['point', 'Apoio pontual', 'Uma contribuição única'],
-              ['monthly', 'Apoio mensal', 'Cobrança automática todo mês'],
+              ['point', 'Apoiar uma vez', 'Uma contribuição única'],
+              ['monthly', 'Apoiar todo mês', 'Cobrança automática todo mês'],
             ] as const
           ).map(([value, title, description]) => (
             <button
@@ -244,19 +250,22 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
         </div>
 
         <fieldset className="space-y-2">
-          <legend className="text-sm font-semibold text-text-primary">Escolha o valor</legend>
+          <legend className="text-sm font-semibold text-text-primary">
+            Quanto você quer apoiar?
+          </legend>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {AMOUNT_PRESETS.map((preset) => (
               <button
                 key={preset}
                 type="button"
-                aria-pressed={!customAmount && amountCents === preset}
+                aria-pressed={!usingCustomAmount && amountCents === preset}
                 onClick={() => {
                   setAmountCents(preset);
-                  setCustomAmount('');
+                  setUsingCustomAmount(false);
+                  setCustomAmountCents(null);
                 }}
                 className={`min-h-10 rounded-(--shape-sm) border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
-                  !customAmount && amountCents === preset
+                  !usingCustomAmount && amountCents === preset
                     ? 'border-focus bg-brand-primary text-text-inverse'
                     : 'border-card-border bg-background text-text-primary hover:bg-card-hover'
                 }`}
@@ -269,23 +278,24 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
             className="block text-xs font-medium text-text-secondary"
             htmlFor="support-custom-amount"
           >
-            Outro valor (de R$ 5 a R$ 500)
+            Outro valor
           </label>
-          <Input
+          <CurrencyInput
             id="support-custom-amount"
-            type="number"
-            min="5"
-            max="500"
-            step="0.01"
-            inputMode="decimal"
-            placeholder="Ex.: 15,00"
-            value={customAmount}
-            onChange={(event) => setCustomAmount(event.target.value)}
-            aria-describedby="support-amount-help"
+            valueCents={usingCustomAmount ? customAmountCents : null}
+            onValueCentsChange={(cents) => {
+              setUsingCustomAmount(true);
+              setCustomAmountCents(cents);
+            }}
+            placeholder="Digite um valor"
+            error={customAmountInvalid}
+            aria-describedby={customAmountInvalid ? 'support-amount-error' : undefined}
           />
-          <p id="support-amount-help" className="text-xs text-text-tertiary">
-            O valor é enviado em centavos para validação segura.
-          </p>
+          {customAmountInvalid ? (
+            <p id="support-amount-error" role="alert" className="text-xs text-danger-text">
+              Informe um valor válido maior que zero.
+            </p>
+          ) : null}
         </fieldset>
 
         {mode === 'monthly' ? (
@@ -312,7 +322,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
               required
             />
             <p className="text-xs leading-5 text-text-tertiary">
-              A cobrança é mensal automática e pode ser cancelada a qualquer momento.
+              O valor será cobrado todo mês pelo Mercado Pago. Você pode cancelar quando quiser.
             </p>
           </div>
         ) : null}
@@ -329,7 +339,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
           type="button"
           className="min-h-11 w-full"
           loading={pendingAction === 'checkout'}
-          disabled={effectiveAmountCents === null}
+          disabled={effectiveAmountCents === null || effectiveAmountCents <= 0}
           onClick={() => void handleCheckout()}
           leftIcon={
             mode === 'monthly' ? (
@@ -339,13 +349,13 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
             )
           }
         >
-          {mode === 'monthly' ? 'Continuar com apoio mensal' : 'Continuar com apoio pontual'}
+          {mode === 'monthly' ? 'Criar apoio mensal' : 'Apoiar uma vez'}
         </Button>
 
         <div className="rounded-(--shape-sm) border border-card-border bg-background px-4 py-3 text-xs leading-5 text-text-secondary">
-          <p>Processamento financeiro pelo Mercado Pago.</p>
+          <p>Pagamentos processados pelo Mercado Pago.</p>
           <p>
-            Projeto independente da UFMG. O apoio é voluntário e não muda a identidade da conta.
+            Projeto independente da UFMG. O apoio é voluntário e não altera seus dados de login.
           </p>
         </div>
 
@@ -356,7 +366,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 id="support-management-title" className="text-sm font-semibold text-text-primary">
-                Gerenciamento do apoio mensal
+                Seu apoio mensal
               </h3>
               {recurringSupport ? (
                 <Badge variant={recurringIsActive ? 'success' : 'neutral'}>
@@ -412,7 +422,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
               to="/sobre"
               className="inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-brand-primary hover:underline dark:text-brand-accent"
             >
-              Transparência
+              Como o projeto usa os apoios
               <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
           </div>

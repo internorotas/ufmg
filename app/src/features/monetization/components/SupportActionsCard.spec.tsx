@@ -105,11 +105,9 @@ describe('SupportActionsCard', () => {
       );
     });
 
-    await vi.waitFor(() =>
-      expect(container.textContent).toContain('Gerenciamento do apoio mensal'),
-    );
-    expect(container.textContent).toContain('Apoio pontual');
-    expect(container.textContent).toContain('Apoio mensal');
+    await vi.waitFor(() => expect(container.textContent).toContain('Seu apoio mensal'));
+    expect(container.textContent).toContain('Apoiar uma vez');
+    expect(container.textContent).toContain('Apoiar todo m\u00eas');
     const renderedText = container.textContent?.replace(/\u00a0/g, ' ');
     expect(renderedText).toContain('R$ 5,00');
     expect(renderedText).toContain('R$ 50,00');
@@ -130,7 +128,7 @@ describe('SupportActionsCard', () => {
       );
     });
 
-    await vi.waitFor(() => expect(container.textContent).toContain('Apoio pontual'));
+    await vi.waitFor(() => expect(container.textContent).toContain('Apoiar uma vez'));
     await act(async () => {
       container
         .querySelector<HTMLButtonElement>('button[role="tab"][aria-selected="false"]')
@@ -138,7 +136,7 @@ describe('SupportActionsCard', () => {
     });
 
     const monthlyButton = Array.from(container.querySelectorAll('button')).find((button) =>
-      button.textContent?.includes('Continuar com apoio mensal'),
+      button.textContent?.includes('Criar apoio mensal'),
     );
     expect(monthlyButton).toBeDefined();
 
@@ -162,15 +160,17 @@ describe('SupportActionsCard', () => {
     await act(async () => {
       monthlyButton?.click();
     });
-    await vi.waitFor(() =>
-      expect(fetchMock).toHaveBeenCalledWith(
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    const recurringCall = fetchMock.mock.calls.find(
+      ([input]) =>
+        new URL(String(input), window.location.origin).pathname ===
         '/v1/payments/support/recurring/checkout',
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ amountCents: 1000, billingEmail: 'cobranca@example.com' }),
-        }),
-      ),
     );
+    expect(recurringCall).toBeDefined();
+    const sentBody = JSON.parse(String(recurringCall?.[1]?.body));
+    expect(sentBody).toMatchObject({ amountCents: 1000, billingEmail: 'cobranca@example.com' });
+    expect(typeof sentBody.idempotencyKey).toBe('string');
+    expect(sentBody.idempotencyKey.length).toBeGreaterThan(0);
   });
 
   it('cancela a assinatura pelo endpoint de gerenciamento', async () => {

@@ -102,15 +102,23 @@ async function getJson<T>(pathname: string): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export function createSupportCheckout(amountCents: number): Promise<CreatedCheckoutResponse> {
-  return postJson('/v1/payments/support/checkout', { amountCents });
+export function createSupportCheckout(
+  amountCents: number,
+  idempotencyKey?: string,
+): Promise<CreatedCheckoutResponse> {
+  return postJson('/v1/payments/support/checkout', { amountCents, idempotencyKey });
 }
 
 export function createRecurringSupportCheckout(
   amountCents: number,
   billingEmail: string,
+  idempotencyKey?: string,
 ): Promise<CreatedCheckoutResponse> {
-  return postJson('/v1/payments/support/recurring/checkout', { amountCents, billingEmail });
+  return postJson('/v1/payments/support/recurring/checkout', {
+    amountCents,
+    billingEmail,
+    idempotencyKey,
+  });
 }
 
 export function getSupportOverview(): Promise<PaymentsOverview> {

@@ -92,7 +92,7 @@ export function AboutPage() {
               <p>
                 O foco do produto continua sendo mobilidade universitária: descobrir rotas,
                 acompanhar contexto operacional e aproveitar dados colaborativos sem transformar a
-                experiência em vitrine comercial.
+                experiência em espaço publicitário genérico.
               </p>
               <p>
                 O projeto prioriza clareza operacional, acessibilidade e uma interface direta para
@@ -108,8 +108,8 @@ export function AboutPage() {
                 Como o projeto se sustenta
               </CardTitle>
               <CardDescription>
-                O projeto é sustentado por apoio comunitário voluntário e um único slot
-                institucional.
+                O projeto é sustentado por apoio comunitário voluntário e um único espaço reservado
+                a parceiros.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-text-secondary">
@@ -130,7 +130,7 @@ export function AboutPage() {
               <div className="surface-card-sm bg-background px-3 py-3">
                 <p className="font-semibold text-text-primary">Parceiro institucional</p>
                 <p className="mt-1">
-                  Um slot público rotulado como Parceiro, controlado pelo admin, sem scripts,
+                  Um espaço público rotulado como Parceiro, controlado pelo admin, sem scripts,
                   pixels, iframes ou rotação publicitária agressiva.
                 </p>
               </div>
@@ -141,7 +141,7 @@ export function AboutPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <ShieldCheck size={18} aria-hidden="true" />
-                Privacidade e limites da monetização
+                Privacidade e limites do apoio financeiro
               </CardTitle>
               <CardDescription>
                 Transparência explícita sobre o que o app faz e o que ele não faz nesta fase.
@@ -158,7 +158,7 @@ export function AboutPage() {
               <div className="surface-card-sm bg-background px-3 py-3">
                 <p className="font-semibold text-text-primary">sem tracking de terceiros</p>
                 <p className="mt-1">
-                  O slot de Parceiro não injeta SDK externo, script, pixel ou iframe. O app só
+                  O espaço de Parceiro não injeta SDK externo, script, pixel ou iframe. O app só
                   registra analytics internos mínimos no clique.
                 </p>
               </div>

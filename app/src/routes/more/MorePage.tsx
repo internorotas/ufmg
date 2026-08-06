@@ -323,7 +323,7 @@ export function MorePage() {
         to: '/sobre',
         icon: Info,
         label: 'Sobre o projeto',
-        description: 'Como o app funciona, monetização e privacidade.',
+        description: 'Como o app funciona, apoio financeiro e privacidade.',
       },
       {
         kind: 'link',
