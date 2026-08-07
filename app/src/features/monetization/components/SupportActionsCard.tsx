@@ -1,5 +1,5 @@
 import { ArrowUpRight, Check, HeartHandshake, RefreshCw } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -105,6 +105,7 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
   const [pendingAction, setPendingAction] = useState<'checkout' | 'cancel' | null>(null);
   const [feedback, setFeedback] = useState<FeedbackState | null>(null);
   const [overview, setOverview] = useState<PaymentsOverview | null>(null);
+  const idempotencyRef = useRef<{ fingerprint: string; key: string } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -153,7 +154,15 @@ export function SupportActionsCard({ monetization }: SupportActionsCardProps) {
     setFeedback(null);
 
     try {
-      const idempotencyKey = crypto.randomUUID();
+      const fingerprint = JSON.stringify({
+        mode,
+        amountCents: effectiveAmountCents,
+        billingEmail: mode === 'monthly' ? billingEmail.trim().toLowerCase() : null,
+      });
+      if (idempotencyRef.current?.fingerprint !== fingerprint) {
+        idempotencyRef.current = { fingerprint, key: crypto.randomUUID() };
+      }
+      const idempotencyKey = idempotencyRef.current.key;
       const checkout =
         mode === 'point'
           ? await createSupportCheckout(effectiveAmountCents, idempotencyKey)

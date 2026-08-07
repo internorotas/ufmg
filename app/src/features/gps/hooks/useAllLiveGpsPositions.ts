@@ -1,44 +1,67 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/features/auth/store/authStore';
-import { getAllLiveGpsPositions, type LiveGpsBatchItem } from '@/features/gps/api/gpsClient';
-import { getApiStatus } from '@/hooks/useApiAvailability';
+import {
+  getAllLiveGpsPositions,
+  LiveGpsFetchError,
+  type LiveGpsBatchItem,
+  type LiveGpsFetchStatus,
+} from '@/features/gps/api/gpsClient';
 
 const POLL_INTERVAL_MS = 10_000;
+const LIVE_DATA_TTL_MS = 2 * 60 * 1000;
 
-// Overview de todas as linhas com GPS ao vivo (mapa colaborativo) — uma única
-// requisição em lote em vez de N chamadas por linha. Não substitui
-// useGpsLiveTracking (WebSocket + fallback), que segue exclusivo da linha
-// travada pela sessão do próprio usuário.
-export function useAllLiveGpsPositions(): Map<string, LiveGpsBatchItem> {
-  const [positions, setPositions] = useState<Map<string, LiveGpsBatchItem>>(new Map());
+export interface AllLiveGpsPositionsState {
+  positions: Map<string, LiveGpsBatchItem>;
+  status: LiveGpsFetchStatus | 'stale' | 'expired';
+  lastUpdatedAt: number | null;
+}
+
+export function useAllLiveGpsPositionsState(): AllLiveGpsPositionsState {
   const accessToken = useAuthStore((state) => state.accessToken);
+  const [now, setNow] = useState(() => Date.now());
+  const query = useQuery({
+    queryKey: ['gps', 'live', accessToken ? 'authenticated' : 'anonymous'],
+    queryFn: () => getAllLiveGpsPositions(accessToken ?? null),
+    staleTime: POLL_INTERVAL_MS,
+    refetchInterval: POLL_INTERVAL_MS,
+    refetchOnWindowFocus: true,
+    retry: false,
+  });
 
   useEffect(() => {
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | null = null;
+    const id = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
 
-    async function poll(): Promise<void> {
-      if (cancelled) return;
-      if (getApiStatus() !== 'offline') {
-        try {
-          const items = await getAllLiveGpsPositions(accessToken ?? null);
-          if (!cancelled) {
-            setPositions(new Map(items.map((item) => [item.linhaId, item])));
-          }
-        } catch {
-          // Falha transitória: mantém o último estado conhecido até a próxima tentativa.
-        }
-      }
-      if (!cancelled) timer = setTimeout(() => void poll(), POLL_INTERVAL_MS);
-    }
+  const lastUpdatedAt = query.dataUpdatedAt > 0 ? query.dataUpdatedAt : null;
+  const expired = lastUpdatedAt === null || now - lastUpdatedAt > LIVE_DATA_TTL_MS;
+  const positions = useMemo(
+    () =>
+      expired
+        ? new Map<string, LiveGpsBatchItem>()
+        : new Map((query.data ?? []).map((item) => [item.vehicleKey, item])),
+    [expired, query.data],
+  );
 
-    void poll();
+  let status: AllLiveGpsPositionsState['status'];
+  if (expired) {
+    status = 'expired';
+  } else if (query.error instanceof LiveGpsFetchError && query.data) {
+    status = 'stale';
+  } else if (query.error instanceof LiveGpsFetchError) {
+    status = query.error.fetchStatus;
+  } else if (query.data?.length === 0) {
+    status = 'success-empty';
+  } else {
+    status = 'success';
+  }
 
-    return () => {
-      cancelled = true;
-      if (timer) clearTimeout(timer);
-    };
-  }, [accessToken]);
+  return { positions, status, lastUpdatedAt };
+}
 
-  return positions;
+// Both map consumers use this hook, but TanStack Query deduplicates the HTTP
+// request and keeps one freshness/error state for the whole map.
+export function useAllLiveGpsPositions(): Map<string, LiveGpsBatchItem> {
+  return useAllLiveGpsPositionsState().positions;
 }

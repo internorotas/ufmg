@@ -1,15 +1,119 @@
 /* @vitest-environment jsdom */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 function jsonResponse(status: number, body: unknown, headers: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), { status, headers });
 }
 
+describe('gpsClient live positions', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('validates the live contract and keeps opaque vehicle keys', async () => {
+    const body = [
+      {
+        linhaId: '5102',
+        lat: -19.87,
+        lng: -43.96,
+        speedKmh: 22.5,
+        heading: 90,
+        routeProgress: 0.42,
+        confidence: 0.9,
+        updatedAt: '2026-01-01T00:00:00.000Z',
+        delayed: false,
+        vehicleKey: 'vehicle-hmac-1',
+        clusterKey: 'cluster-hmac-1',
+      },
+    ];
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(200, body));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { getAllLiveGpsPositions } = await import('./gpsClient');
+
+    await expect(getAllLiveGpsPositions(null)).resolves.toEqual(body);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/gps/live'),
+      expect.objectContaining({ headers: expect.anything() }),
+    );
+  });
+
+  it('rejects malformed live data instead of turning it into an empty list', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        jsonResponse(200, [
+          {
+            linhaId: '5102',
+            lat: -19.87,
+            lng: -43.96,
+            heading: null,
+            confidence: 0.9,
+            updatedAt: '2026-01-01T00:00:00.000Z',
+            delayed: false,
+            vehicleKey: 'vehicle-hmac-1',
+          },
+        ]),
+      ),
+    );
+
+    const { getAllLiveGpsPositions, LiveGpsFetchError } = await import('./gpsClient');
+
+    await expect(getAllLiveGpsPositions(null)).rejects.toMatchObject({
+      fetchStatus: 'invalid-response',
+    });
+    await expect(getAllLiveGpsPositions(null)).rejects.toBeInstanceOf(LiveGpsFetchError);
+  });
+
+  it.each([
+    [401, 'unauthorized'],
+    [500, 'server-error'],
+  ] as const)('preserves operational status %i as %s', async (status, fetchStatus) => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(status, null)));
+    const { getAllLiveGpsPositions } = await import('./gpsClient');
+
+    await expect(getAllLiveGpsPositions(null)).rejects.toMatchObject({ status, fetchStatus });
+  });
+
+  it('exposes Retry-After in the rate-limit state', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(jsonResponse(429, null, { 'Retry-After': '7' })),
+    );
+    const { getAllLiveGpsPositions } = await import('./gpsClient');
+
+    await expect(getAllLiveGpsPositions(null)).rejects.toMatchObject({
+      status: 429,
+      fetchStatus: 'rate-limited',
+      retryAfterMs: 7000,
+    });
+  });
+
+  it('classifies network failure as offline', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')));
+    const { getAllLiveGpsPositions } = await import('./gpsClient');
+
+    await expect(getAllLiveGpsPositions(null)).rejects.toMatchObject({
+      status: null,
+      fetchStatus: 'network-offline',
+    });
+  });
+});
+
 describe('gpsClient — mapeamento de erros públicos do backend', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('GPS_LINE_NOT_FOUND (404) mapeia para mensagem amigável e preserva code/requestId', async () => {

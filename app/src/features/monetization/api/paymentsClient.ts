@@ -55,6 +55,9 @@ function safePaymentError(status: number): Error {
   if (status === 401 || status === 403) {
     return new Error('Entre novamente para gerenciar seus apoios.');
   }
+  if (status === 409) {
+    return new Error('Esse identificador já foi usado com outros dados. Tente novamente.');
+  }
   if (status === 410 || status === 503) {
     return new Error('Este tipo de apoio está temporariamente indisponível.');
   }
@@ -104,7 +107,7 @@ async function getJson<T>(pathname: string): Promise<T> {
 
 export function createSupportCheckout(
   amountCents: number,
-  idempotencyKey?: string,
+  idempotencyKey: string,
 ): Promise<CreatedCheckoutResponse> {
   return postJson('/v1/payments/support/checkout', { amountCents, idempotencyKey });
 }
@@ -112,7 +115,7 @@ export function createSupportCheckout(
 export function createRecurringSupportCheckout(
   amountCents: number,
   billingEmail: string,
-  idempotencyKey?: string,
+  idempotencyKey: string,
 ): Promise<CreatedCheckoutResponse> {
   return postJson('/v1/payments/support/recurring/checkout', {
     amountCents,

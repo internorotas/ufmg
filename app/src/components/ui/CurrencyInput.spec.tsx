@@ -26,6 +26,9 @@ describe('parseAmountToCents', () => {
     'abc',
     'R$ -5',
     Number.NaN.toString(),
+    '10,123',
+    '10.123',
+    '1.234',
   ])('retorna null para entrada inválida: "%s"', (input) => {
     expect(parseAmountToCents(input)).toBeNull();
   });

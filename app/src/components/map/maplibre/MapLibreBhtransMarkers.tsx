@@ -1,4 +1,4 @@
-import { Bus, Clock, Radio, WifiOff } from 'lucide-react';
+import { Clock, Radio, WifiOff } from 'lucide-react';
 import { memo, useState } from 'react';
 import { Marker, Popup } from 'react-map-gl/maplibre';
 import { useAuthStore } from '@/features/auth/store/authStore';
@@ -48,12 +48,11 @@ function timeAgo(iso: string): string {
 export interface BhtransCardProps {
   linhaId: string;
   nome: string;
-  vehicleId: string;
   recordedAt: string;
   fetchedAt: string | null;
 }
 
-export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }: BhtransCardProps) {
+export function BhtransCard({ linhaId, nome, recordedAt, fetchedAt }: BhtransCardProps) {
   const cfg = getBhtransLineConfig(linhaId);
   // MOVE (#b3ff19) é claro demais para texto branco — escurece o badge.
   const badgeBg = cfg.color === '#b3ff19' ? '#5a6600' : cfg.color;
@@ -64,7 +63,7 @@ export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }:
           pr-9 reserva espaço para o botão × do MapLibre (24px + 6px gap). */}
       <div className="bg-brand-dark dark:bg-neutral-bg px-3 pr-9 py-1.5">
         <span className="text-xs font-bold text-text-inverse dark:text-text-primary">
-          BHTRANS (AO VIVO)
+          SERVIÇO EXTERNO · BHTRANS
         </span>
       </div>
 
@@ -95,17 +94,11 @@ export function BhtransCard({ linhaId, nome, vehicleId, recordedAt, fetchedAt }:
           </div>
         </div>
 
-        {/* Infos do veículo */}
+        {/* Informações da fonte externa — o identificador do veículo não é exibido. */}
         <div className="flex flex-col gap-1 text-xs text-text-secondary">
           <div className="flex items-center gap-1.5">
             <Radio size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
-            <span className="font-semibold text-text-primary">Posição ao vivo</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Bus size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
-            <span>
-              Veículo <strong className="text-text-primary">{vehicleId}</strong>
-            </span>
+            <span className="font-semibold text-text-primary">Posição de serviço externo</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Clock size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
@@ -188,7 +181,6 @@ export const MapLibreBhtransMarkers = memo(function MapLibreBhtransMarkers() {
           <BhtransCard
             linhaId={selected.linhaId}
             nome={selected.nome}
-            vehicleId={selected.vehicleId}
             recordedAt={selected.recordedAt}
             fetchedAt={fetchedAt}
           />

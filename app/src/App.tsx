@@ -31,6 +31,7 @@ import { useConsentGate } from './features/auth/hooks/useConsentGate';
 import { GpsLinePickerModal } from './features/gps/components/GpsLinePickerModal';
 import { GpsPositionWarningDialog } from './features/gps/components/GpsPositionWarningDialog';
 import { GpsSessionProvider, useGpsSession } from './features/gps/context/GpsSessionContext';
+import { GPS_AUTH_LOGOUT_EVENT } from './features/gps/gpsEvents';
 import { PlannerSummarySheet } from './features/planner/components/PlannerSummarySheet';
 import { usePlannerStore } from './features/planner/store/plannerStore';
 import { logout } from './features/profile/api/profileClient';
@@ -122,6 +123,9 @@ const ResearchDashboardPage = lazy(() =>
 );
 const SharedTripPage = lazy(() =>
   import('./routes/viagem/SharedTripPage').then((m) => ({ default: m.SharedTripPage })),
+);
+const SupportReturnPage = lazy(() =>
+  import('./routes/apoio/SupportReturnPage').then((m) => ({ default: m.SupportReturnPage })),
 );
 
 // Fallback genérico de carregamento de página (rotas lazy fora do mapa).
@@ -521,6 +525,7 @@ function AppContent() {
 
   const handleInactivityTimeout = useCallback(async () => {
     setIsInactivityWarningOpen(false);
+    window.dispatchEvent(new Event(GPS_AUTH_LOGOUT_EVENT));
     try {
       await logout();
     } catch {
@@ -846,6 +851,7 @@ function AuthenticatedAppShell() {
                       <Route path="/linhas" element={<LinhasPage />} />
                       <Route path="/proximos" element={<ProximosPage />} />
                       <Route path="/mais" element={<MorePage />} />
+                      <Route path="/apoio/retorno" element={<SupportReturnPage />} />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                   </Suspense>

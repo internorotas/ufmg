@@ -294,15 +294,17 @@ export function MapLibreView({
   // vira um marcador "AO VIVO" em MapLibreLiveGpsMarkers/MapLibreGpsLiveBusMarker.
   const posicoesAoVivo = useAllLiveGpsPositions();
   const linhasComGpsAoVivo = useMemo(() => {
-    const linhaMap = new Map(linhasAtivas.map((l) => [l.idRota, l]));
-    const excluidas = new Set<number>();
-    if (linhaGpsAtiva) excluidas.add(linhaGpsAtiva.linha);
-    for (const linhaId of posicoesAoVivo.keys()) {
-      const linha = linhaMap.get(linhaId);
-      if (linha) excluidas.add(linha.linha);
-    }
+    const excluidas = new Set<string>();
+    if (linhaGpsAtiva) excluidas.add(linhaGpsAtiva.idRota);
+    for (const position of posicoesAoVivo.values()) excluidas.add(position.linhaId);
     return excluidas;
-  }, [linhasAtivas, linhaGpsAtiva, posicoesAoVivo]);
+  }, [linhaGpsAtiva, posicoesAoVivo]);
+  const linhaGpsAtivaTemPosicoes = Boolean(
+    linhaGpsAtiva &&
+      Array.from(posicoesAoVivo.values()).some(
+        (position) => position.linhaId === linhaGpsAtiva.idRota,
+      ),
+  );
 
   return (
     <div className="relative h-full w-full">
@@ -345,17 +347,17 @@ export function MapLibreView({
         <MapLibreAllBusMarkers
           linhas={linhasAtivas}
           todasParadas={todasParadas}
-          linhasNumeroExcluidas={linhasComGpsAoVivo}
+          linhasExcluidas={linhasComGpsAoVivo}
         />
 
         <MapLibreLiveGpsMarkers
           linhas={linhasAtivas}
-          linhaExcluidaId={linhaGpsAtiva?.idRota ?? null}
+          linhaExcluidaId={linhaGpsAtivaTemPosicoes ? null : (linhaGpsAtiva?.idRota ?? null)}
         />
 
         <MapLibreBhtransMarkers />
 
-        {linhaGpsAtiva && (
+        {linhaGpsAtiva && !linhaGpsAtivaTemPosicoes && (
           <MapLibreGpsLiveBusMarker
             key={linhaGpsAtiva.idRota}
             linha={linhaGpsAtiva}

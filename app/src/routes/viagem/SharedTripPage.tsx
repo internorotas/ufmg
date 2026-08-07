@@ -219,6 +219,20 @@ function SharedTripPageContent({ token }: { token: string }) {
 export function SharedTripPage() {
   const { token } = useParams<{ token: string }>();
 
+  useEffect(() => {
+    const previousTitle = document.title;
+    const meta = document.createElement('meta');
+    meta.name = 'referrer';
+    meta.content = 'no-referrer';
+    document.head.appendChild(meta);
+    document.title = 'Viagem compartilhada — Interno Rotas';
+
+    return () => {
+      document.title = previousTitle;
+      meta.remove();
+    };
+  }, []);
+
   if (!token) {
     return (
       <div className="flex h-dvh w-full items-center justify-center bg-background p-6 text-center">

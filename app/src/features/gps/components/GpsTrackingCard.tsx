@@ -47,10 +47,10 @@ interface GpsTrackingCardProps {
 }
 
 function signalLabel(accuracyM: number | undefined): { label: string; ok: boolean } {
-  if (accuracyM === undefined) return { label: '—', ok: true };
-  if (accuracyM <= 20) return { label: 'Ótimo', ok: true };
-  if (accuracyM <= 50) return { label: `±${Math.round(accuracyM)}m`, ok: true };
-  return { label: `±${Math.round(accuracyM)}m`, ok: false };
+  if (accuracyM === undefined) return { label: 'Qualidade indisponível', ok: true };
+  if (accuracyM <= 20) return { label: 'Qualidade boa', ok: true };
+  if (accuracyM <= 50) return { label: 'Qualidade média', ok: true };
+  return { label: 'Qualidade baixa', ok: false };
 }
 
 export function GpsTrackingCard({
@@ -61,10 +61,19 @@ export function GpsTrackingCard({
   isMinimized,
   onToggleMinimize,
 }: GpsTrackingCardProps) {
-  const { sessionId, distanceKm, durationMs, snapshotsCount, queueSize, isSyncing, status, stop } =
-    rastreio;
-  const isStarting = status === 'starting';
-  const pontosEstimados = Math.max(1, Math.floor(snapshotsCount / 2));
+  const {
+    sessionId,
+    distanceKm,
+    durationMs,
+    acceptedPoints = 0,
+    rejectedPoints = 0,
+    queueSize,
+    isSyncing,
+    status,
+    stop,
+  } = rastreio;
+  const isStarting = status === 'starting' || status === 'requesting_permission';
+  const isEnding = status === 'ending';
   const signal = signalLabel(accuracyM);
   const hasQueue = queueSize > 0;
 
@@ -202,7 +211,7 @@ export function GpsTrackingCard({
               isStarting ? 'text-brand-primary dark:text-brand-accent' : 'text-danger-solid'
             }`}
           >
-            {isStarting ? 'Iniciando' : 'REC'}
+            {isStarting ? 'Iniciando' : isEnding ? 'Encerrando' : 'Compartilhando posição'}
           </span>
         </div>
 
@@ -240,9 +249,10 @@ export function GpsTrackingCard({
           <ChevronDown size={10} aria-hidden="true" />
         </button>
 
-        <button
-          type="button"
-          onClick={handleStopClick}
+          <button
+            type="button"
+            onClick={handleStopClick}
+            disabled={isEnding}
           aria-label={stopArmed ? 'Confirmar encerramento do rastreio' : 'Encerrar rastreio'}
           title={stopArmed ? 'Toque de novo para confirmar' : undefined}
           className={`pointer-events-auto flex min-h-11 shrink-0 items-center justify-center gap-1 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary active:scale-90 ${
@@ -284,15 +294,20 @@ export function GpsTrackingCard({
             </div>
           </div>
 
-          {/* Métricas linha 2: pontos + velocidade */}
+          {/* Métricas linha 2: pontos validados + velocidade */}
           <div className="flex items-center justify-between gap-1 px-2.5 pb-2 pt-1 text-micro">
             <div
               className="flex items-center gap-0.5 text-text-secondary"
-              title="Pontos estimados (sujeitos a validação)"
+              title="Pontos aceitos pelo servidor"
             >
               <Radio size={9} aria-hidden="true" />
-              <span>~{pontosEstimados} pts</span>
+              <span>{acceptedPoints} atualizações aceitas</span>
             </div>
+            {rejectedPoints > 0 && (
+              <span className="tabular-nums text-warning-text" title="Pontos rejeitados pelo servidor">
+                {rejectedPoints} recusadas
+              </span>
+            )}
             {speedKmh !== undefined && speedKmh > 0.5 && (
               <div className="flex items-center gap-0.5 text-text-secondary">
                 <span className="tabular-nums">{speedKmh.toFixed(0)} km/h</span>
@@ -306,7 +321,7 @@ export function GpsTrackingCard({
           <div className="flex items-center justify-between gap-1 px-2.5 py-1.5 text-micro">
             <span
               className={signal.ok ? 'text-success-text' : 'text-warning-text'}
-              title={`Precisão GPS: ${accuracyM !== undefined ? `±${Math.round(accuracyM)}m` : 'desconhecida'}`}
+              title="Qualidade estimada da posição"
             >
               {signal.label}
             </span>
@@ -318,12 +333,16 @@ export function GpsTrackingCard({
                 ) : (
                   <WifiOff size={8} aria-hidden="true" />
                 )}
-                <span>{queueSize > 0 ? `${queueSize} fila` : 'enviando'}</span>
+                <span>
+                  {isSyncing
+                    ? 'Enviando atualizações'
+                    : `${queueSize} atualizações aguardando envio`}
+                </span>
               </div>
             ) : (
               <div className="flex items-center gap-0.5 text-success-text">
                 <Wifi size={8} aria-hidden="true" />
-                <span>em dia</span>
+                <span>Posição atualizada</span>
               </div>
             )}
           </div>

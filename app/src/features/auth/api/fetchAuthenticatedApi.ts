@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { GPS_AUTH_LOGOUT_EVENT } from '@/features/gps/gpsEvents';
 import { withTenantHeaders } from '@/services/api/apiClient';
 import { refreshSession } from './authClient';
 
@@ -55,6 +56,7 @@ export async function fetchAuthenticatedApi(
 
     return makeRequest(refreshed.accessToken);
   } catch {
+    window.dispatchEvent(new Event(GPS_AUTH_LOGOUT_EVENT));
     useAuthStore.getState().resetSession();
     dispatchSessionExpired('Sessão expirada. Faça login novamente.');
     return response;

@@ -1,12 +1,10 @@
 import { AlertTriangle, Bus, Clock, Radar, Target } from 'lucide-react';
 import maplibregl from 'maplibre-gl';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup, useMap } from 'react-map-gl/maplibre';
 import { useBusPosition } from '@/features/gps/hooks/useBusPosition';
-import {
-  type LiveLocationPayload,
-  useGpsLiveTracking,
-} from '@/features/gps/hooks/useGpsLiveTracking';
+import type { LiveGpsBatchItem } from '@/features/gps/api/gpsClient';
+import { useAllLiveGpsPositionsState } from '@/features/gps/hooks/useAllLiveGpsPositions';
 import { numLinha } from '@/features/gps/lib/markerUtils';
 import { calcularPosicaoTeorica } from '@/lib/busPosition';
 import { getContrastingTextColor, hexToRgba } from '@/lib/utils';
@@ -27,6 +25,11 @@ interface MapLibreGpsLiveBusMarkerProps {
   todasParadas: Parada[];
 }
 
+type LiveLocationPayload = Pick<
+  LiveGpsBatchItem,
+  'lat' | 'lng' | 'heading' | 'confidence' | 'updatedAt' | 'delayed'
+>;
+
 function tempoDecorrido(updatedAt: string): string {
   const diff = Math.floor((Date.now() - new Date(updatedAt).getTime()) / 60000);
   if (diff < 1) return 'agora mesmo';
@@ -41,6 +44,7 @@ function criarIconeHtml(
   heading: number | null,
   isLive: boolean,
   isStale: boolean,
+  isDelayed: boolean,
 ): string {
   const cor = HEX_COLOR_RE.test(corHex) ? corHex : '#6b7280';
   const corTexto = getContrastingTextColor(cor);
@@ -49,7 +53,7 @@ function criarIconeHtml(
   const bg = isLive ? cor : hexToRgba(cor, 0.7);
   const pulseColor = hexToRgba(cor, 0.5);
   const pulseColor0 = hexToRgba(cor, 0);
-  const showPulse = isLive && !isStale;
+  const showPulse = isLive && !isStale && !isDelayed;
 
   if (showPulse) ensureGpsPulseStyle(pulseColor, pulseColor0);
 
@@ -67,7 +71,8 @@ function criarIconeHtml(
           <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4S4 2.5 4 6v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/>
         </svg>
       </div>
-      ${isLive && !isStale ? `<div style="position:absolute;bottom:-4px;right:-10px;background:var(--color-danger-solid);color:white;font-size:10px;font-weight:800;font-family:Poppins,sans-serif;letter-spacing:0.02em;padding:2px 4px;border-radius:var(--shape-xs);border:1px solid white;line-height:1.2;">AO VIVO</div>` : ''}
+      ${isLive && !isStale && !isDelayed ? `<div style="position:absolute;bottom:-4px;right:-10px;background:var(--color-danger-solid);color:white;font-size:10px;font-weight:800;font-family:Poppins,sans-serif;letter-spacing:0.02em;padding:2px 4px;border-radius:var(--shape-xs);border:1px solid white;line-height:1.2;">AO VIVO</div>` : ''}
+      ${isLive && !isStale && isDelayed ? `<div style="position:absolute;bottom:-4px;right:-10px;background:var(--color-warning-solid);color:white;font-size:10px;font-weight:800;font-family:Poppins,sans-serif;letter-spacing:0.02em;padding:2px 4px;border-radius:var(--shape-xs);border:1px solid white;line-height:1.2;">COM ATRASO</div>` : ''}
       ${isStale ? `<div style="position:absolute;bottom:-4px;right:-10px;background:var(--color-warning-solid);color:white;font-size:10px;font-weight:800;font-family:Poppins,sans-serif;letter-spacing:0.02em;padding:2px 4px;border-radius:var(--shape-xs);border:1px solid white;line-height:1.2;">ATR.</div>` : ''}
     </div>
   `;
@@ -88,7 +93,32 @@ export const MapLibreGpsLiveBusMarker = memo(function MapLibreGpsLiveBusMarker({
   const prevHeadingRef = useRef<number | null>(null);
   const [popupState, setPopupState] = useState<PopupState | null>(null);
 
-  const { position: livePos, isStale, hasConnectionError } = useGpsLiveTracking(linha.idRota);
+  const { positions, status } = useAllLiveGpsPositionsState();
+  const livePos = useMemo<LiveLocationPayload | null>(() => {
+    const candidates = Array.from(positions.values()).filter(
+      (position) => position.linhaId === linha.idRota,
+    );
+    const latest = candidates.sort(
+      (left, right) =>
+        new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
+    )[0];
+    return latest
+      ? {
+          lat: latest.lat,
+          lng: latest.lng,
+          heading: latest.heading,
+          confidence: latest.confidence,
+          updatedAt: latest.updatedAt,
+          delayed: latest.delayed,
+        }
+      : null;
+  }, [linha.idRota, positions]);
+  const isStale = livePos ? Date.now() - new Date(livePos.updatedAt).getTime() > 60_000 : false;
+  const hasConnectionError =
+    status !== 'success' &&
+    status !== 'success-empty' &&
+    status !== 'stale' &&
+    status !== 'expired';
   const theoreticalPos = useBusPosition(linha, todasParadas);
 
   // Posição inicial — calculada uma vez na montagem
@@ -114,7 +144,7 @@ export const MapLibreGpsLiveBusMarker = memo(function MapLibreGpsLiveBusMarker({
     el.style.width = '36px';
     el.style.height = '36px';
     el.style.cursor = 'pointer';
-    el.innerHTML = criarIconeHtml(linha.corHex, null, false, false);
+    el.innerHTML = criarIconeHtml(linha.corHex, null, false, false, false);
 
     el.addEventListener('click', () => {
       const m = markerRef.current;
@@ -145,6 +175,7 @@ export const MapLibreGpsLiveBusMarker = memo(function MapLibreGpsLiveBusMarker({
       livePos.heading,
       true,
       isStale,
+      livePos.delayed,
     );
   }, [livePos, linha.corHex, isStale]);
 
@@ -169,6 +200,7 @@ export const MapLibreGpsLiveBusMarker = memo(function MapLibreGpsLiveBusMarker({
           markerRef.current.getElement().innerHTML = criarIconeHtml(
             linha.corHex,
             pos.heading,
+            false,
             false,
             false,
           );
@@ -251,9 +283,14 @@ function BusPopup({
             </p>
           )}
         </div>
-        {isLive && !isStale && (
-          <span className="shrink-0 rounded bg-danger-solid px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
-            AO VIVO
+        {isLive && !isStale && !livePos?.delayed && (
+        <span className="shrink-0 rounded bg-danger-solid px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
+          AO VIVO
+        </span>
+        )}
+        {isLive && !isStale && livePos?.delayed && (
+          <span className="shrink-0 rounded bg-warning-solid px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
+            COM ATRASO
           </span>
         )}
         {isStale && (
@@ -282,16 +319,22 @@ function BusPopup({
         <div className="flex flex-col gap-1.5 text-xs text-text-secondary">
           <div className="flex items-center gap-1.5">
             <Radar size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
-            <span className="font-semibold text-text-primary">Posição em tempo real</span>
+            <span className="font-semibold text-text-primary">
+              {livePos.delayed ? 'Posição com atraso' : 'Posição ao vivo'}
+            </span>
           </div>
           <div className="flex items-center gap-1.5">
             <Target size={14} aria-hidden="true" className="shrink-0 text-text-secondary" />
             <span>
-              Confiança:{' '}
+              Qualidade da posição:{' '}
               <strong
                 className={livePos.confidence >= 0.7 ? 'text-success-text' : 'text-warning-text'}
               >
-                {Math.round(livePos.confidence * 100)}%
+                {livePos.confidence >= 0.7
+                  ? 'boa'
+                  : livePos.confidence >= 0.4
+                    ? 'média'
+                    : 'baixa'}
               </strong>
             </span>
           </div>

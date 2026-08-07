@@ -4,8 +4,9 @@ import { inputVariants } from './Input';
 
 /**
  * Interpreta um texto digitado/colado em reais (BRL) e devolve o valor em
- * centavos inteiros — nunca em float. Aceita formatos comuns em pt-BR e
- * en-US: "10", "10,5", "10,50", "10.50", "R$ 10,50", "1.234,56".
+ * centavos inteiros — nunca em float. Aceita pt-BR e o ponto decimal simples
+ * por compatibilidade: "10", "10,5", "10,50", "10.50", "R$ 10,50",
+ * "1.234,56". Formatos com mais de duas casas ou ponto ambíguo são rejeitados.
  *
  * Retorna `null` para qualquer entrada não numérica, negativa ou vazia —
  * nunca lança, o chamador decide o que fazer com `null` (campo inválido).
@@ -17,24 +18,48 @@ export function parseAmountToCents(raw: string): number | null {
   s = s.replace(/^R\$\s*/i, '').replace(/\s+/g, '');
   if (!s || !/^\d[\d.,]*$/.test(s)) return null;
 
+  let wholePart = s;
+  let fractionPart = '';
+
   if (s.includes(',')) {
-    // Vírgula é o separador decimal — qualquer ponto antes dela é milhar.
-    s = s.replace(/\./g, '').replace(',', '.');
+    const parts = s.split(',');
+    if (parts.length !== 2 || !parts[1] || parts[1].length > 2) return null;
+    [wholePart, fractionPart] = parts;
+    if (!/^\d+$/.test(fractionPart)) return null;
   } else if (s.includes('.')) {
     const parts = s.split('.');
-    const lastPart = parts[parts.length - 1];
-    // Ponto seguido de 3 dígitos = separador de milhar ("1.234"); qualquer
-    // outra contagem (1 ou 2 dígitos) = separador decimal ("10.5"/"10.50").
-    if (lastPart.length === 3) {
-      s = parts.join('');
+    const lastPart = parts[parts.length - 1] ?? '';
+    if (parts.length === 2 && lastPart.length <= 2) {
+      [wholePart, fractionPart] = parts;
+      if (!fractionPart) return null;
+    } else if (parts.length > 2 && parts.slice(1).every((part) => part.length === 3)) {
+      wholePart = parts.join('');
+    } else {
+      // "1.234" pode ser milhar ou três casas decimais; não adivinhar.
+      return null;
     }
   }
 
-  const value = Number(s);
-  if (!Number.isFinite(value) || value < 0) return null;
+  if (wholePart.includes('.')) {
+    const thousandGroups = wholePart.split('.');
+    if (
+      thousandGroups.length < 2 ||
+      !/^\d{1,3}$/.test(thousandGroups[0] ?? '') ||
+      !thousandGroups.slice(1).every((part) => /^\d{3}$/.test(part))
+    ) {
+      return null;
+    }
+    wholePart = thousandGroups.join('');
+  }
 
-  const cents = Math.round(value * 100);
-  return Number.isSafeInteger(cents) ? cents : null;
+  if (!/^\d+$/.test(wholePart)) return null;
+  const normalizedCents = `${wholePart}${fractionPart.padEnd(2, '0')}`;
+  try {
+    const cents = BigInt(normalizedCents);
+    return cents <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(cents) : null;
+  } catch {
+    return null;
+  }
 }
 
 /** Formata centavos inteiros como texto BRL sem o símbolo de moeda (ex: 123456 → "1.234,56"). */

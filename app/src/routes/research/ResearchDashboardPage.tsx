@@ -96,8 +96,8 @@ export function ResearchDashboardPage() {
               <CardTitle>Exploração pública</CardTitle>
               <CardDescription>
                 {isLoading
-                  ? 'Carregando snapshot público mais recente...'
-                  : `Snapshot semanal disponível: ${latestSnapshotWeek ?? 'indisponível'}`}
+                  ? 'Carregando os dados públicos mais recentes...'
+                  : `Versão semanal disponível: ${latestSnapshotWeek ?? 'indisponível'}`}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-text-secondary">

@@ -12,7 +12,7 @@ interface MapLibreAllBusMarkersProps {
   linhas: Linha[];
   todasParadas: Parada[];
   /** Números de linha a esconder — travada pela sessão + toda linha com GPS ao vivo (evita marcador duplicado) */
-  linhasNumeroExcluidas?: ReadonlySet<number>;
+  linhasExcluidas?: ReadonlySet<string>;
 }
 
 function BusIconMini({ corHex }: { corHex: string }) {
@@ -107,7 +107,7 @@ export function BusMarkerPopup({ linha, pos, onVerLinha }: BusMarkerPopupProps) 
 export const MapLibreAllBusMarkers = memo(function MapLibreAllBusMarkers({
   linhas,
   todasParadas,
-  linhasNumeroExcluidas,
+  linhasExcluidas,
 }: MapLibreAllBusMarkersProps) {
   const posicoes = useAllBusPositions(linhas, todasParadas);
   const [selectedIdRota, setSelectedIdRota] = useState<string | null>(null);
@@ -133,8 +133,7 @@ export const MapLibreAllBusMarkers = memo(function MapLibreAllBusMarkers({
     <>
       {Array.from(posicoes.entries())
         .filter(([idRota]) => {
-          const l = linhaMap.get(idRota);
-          return l ? !linhasNumeroExcluidas?.has(l.linha) : true;
+          return !linhasExcluidas?.has(idRota);
         })
         .map(([idRota, pos]) => {
           const linha = linhaMap.get(idRota);

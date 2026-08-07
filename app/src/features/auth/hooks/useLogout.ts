@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { logout as logoutRequest } from '@/features/profile/api/profileClient';
+import { GPS_AUTH_LOGOUT_EVENT } from '@/features/gps/gpsEvents';
 
 interface UseLogoutResult {
   logout: () => Promise<void>;
@@ -24,6 +25,7 @@ export function useLogout(): UseLogoutResult {
     setErrorMessage(null);
 
     try {
+      window.dispatchEvent(new Event(GPS_AUTH_LOGOUT_EVENT));
       await logoutRequest();
       resetSession();
       navigate('/', {

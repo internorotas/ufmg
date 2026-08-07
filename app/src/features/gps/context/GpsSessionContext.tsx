@@ -36,6 +36,8 @@ interface CompletedSession {
   distanceKm: number;
   durationMs: number;
   snapshotsCount: number;
+  acceptedPoints: number;
+  rejectedPoints: number;
   linhaNome: string;
   linhaCorHex: string;
   stopReason: string;
@@ -44,7 +46,7 @@ interface CompletedSession {
 const STOP_REASON_LABELS: Record<string, string> = {
   terminal: 'Chegou ao terminal!',
   saiu_rota: 'Encerrado: você saiu do trajeto',
-  parado: 'Encerrado: sem movimento por 5 min',
+  parado: 'Rastreio encerrado',
   timeout: 'Encerrado: limite de 1 hora atingido',
   manual: 'Rastreio encerrado',
 };
@@ -58,7 +60,6 @@ function GpsSessionCompletedCard({
   session: CompletedSession;
   onDismiss: () => void;
 }) {
-  const pontosEstimados = Math.max(1, Math.floor(session.snapshotsCount / 2));
   const reasonLabel = STOP_REASON_LABELS[session.stopReason] ?? 'Rastreio encerrado';
   const isAutoStop = session.stopReason !== 'manual';
 
@@ -124,10 +125,16 @@ function GpsSessionCompletedCard({
               className="mx-auto mb-0.5 text-brand-primary dark:text-brand-accent"
               aria-hidden="true"
             />
-            <p className="text-micro text-text-tertiary">Pontos</p>
-            <p className="text-micro font-bold text-text-primary">~{pontosEstimados}</p>
+            <p className="text-micro text-text-tertiary">Pontos aceitos</p>
+            <p className="text-micro font-bold text-text-primary">{session.acceptedPoints}</p>
           </div>
         </div>
+
+        {session.rejectedPoints > 0 && (
+          <p className="mb-3 text-center text-micro text-warning-text">
+            {session.rejectedPoints} ponto(s) rejeitado(s) pela validação.
+          </p>
+        )}
 
         <p className="flex items-center justify-center gap-1 text-micro text-text-secondary">
           <Heart size={9} className="text-danger-solid" fill="currentColor" aria-hidden="true" />
@@ -160,6 +167,16 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   });
 
   const { isActive, ingestSnapshot, status, rateLimitMessage, startError, conflict } = rastreio;
+  const linhaAtivaRef = useRef<typeof linhaSelecionada>(null);
+
+  useEffect(() => {
+    if (isActive && linhaSelecionada) {
+      linhaAtivaRef.current = linhaSelecionada;
+    }
+    if (!isActive && status === 'idle') {
+      linhaAtivaRef.current = null;
+    }
+  }, [isActive, linhaSelecionada, status]);
 
   // === Manter coleta viva ===
   useWakeLock(isActive);
@@ -184,7 +201,9 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     distanceKm: number;
     durationMs: number;
     snapshotsCount: number;
-  }>({ distanceKm: 0, durationMs: 0, snapshotsCount: 0 });
+    acceptedPoints: number;
+    rejectedPoints: number;
+  }>({ distanceKm: 0, durationMs: 0, snapshotsCount: 0, acceptedPoints: 0, rejectedPoints: 0 });
   const lastActiveSessionIdRef = useRef<string | null>(null);
 
   // Captura o motivo de parada antes do resetSession() zerá-lo
@@ -209,6 +228,8 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
         distanceKm: rastreio.distanceKm,
         durationMs: rastreio.durationMs,
         snapshotsCount: rastreio.snapshotsCount,
+        acceptedPoints: rastreio.acceptedPoints ?? 0,
+        rejectedPoints: rastreio.rejectedPoints ?? 0,
       };
       lastActiveSessionIdRef.current = rastreio.sessionId;
     }
@@ -217,6 +238,8 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
     rastreio.distanceKm,
     rastreio.durationMs,
     rastreio.snapshotsCount,
+    rastreio.acceptedPoints,
+    rastreio.rejectedPoints,
     rastreio.sessionId,
   ]);
 
@@ -237,9 +260,10 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   // Detecta fim de sessão
   useEffect(() => {
     const wasActive = prevIsActiveRef.current;
-    const nowIdle = status === 'idle';
+    const nowIdle = status === 'idle' || status === 'ended';
+    const completionLine = linhaSelecionada ?? linhaAtivaRef.current;
 
-    if (wasActive && nowIdle && linhaSelecionada) {
+    if (wasActive && nowIdle && completionLine) {
       const stats = lastActiveStatsRef.current;
       const stopReason = capturedStopReasonRef.current ?? 'manual';
       capturedStopReasonRef.current = null;
@@ -259,13 +283,13 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
           event: 'gps_session_completed',
           category: 'engagement',
           action: 'gps_session_completed',
-          label: linhaSelecionada.nome,
+          label: completionLine.nome,
           params: {
             stop_reason: stopReason,
             distance_km: Math.round(stats.distanceKm * 100) / 100,
             duration_s: Math.round(stats.durationMs / 1000),
             snapshots: stats.snapshotsCount,
-            linha_id: linhaSelecionada.idRota,
+          linha_id: completionLine.idRota,
           },
         });
 
@@ -274,10 +298,10 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
         const completed: CompletedSession = {
           sessionId: lastActiveSessionIdRef.current ?? '',
           ...stats,
-          linhaNome: linhaSelecionada.sublinha
-            ? `${linhaSelecionada.nome} · ${linhaSelecionada.sublinha}`
-            : linhaSelecionada.nome,
-          linhaCorHex: linhaSelecionada.corHex,
+          linhaNome: completionLine.sublinha
+            ? `${completionLine.nome} · ${completionLine.sublinha}`
+            : completionLine.nome,
+          linhaCorHex: completionLine.corHex,
           stopReason,
         };
         lastCompletedRef.current = completed;
@@ -334,15 +358,6 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
 
   // Linha capturada ao início da sessão — persiste enquanto ativa para que o
   // card não pisque se linhaSelecionada mudar (ex: usuário navega para outra rota).
-  const linhaAtivaRef = useRef<typeof linhaSelecionada>(null);
-  useEffect(() => {
-    if (isActive && linhaSelecionada) {
-      linhaAtivaRef.current = linhaSelecionada;
-    }
-    if (!isActive) {
-      linhaAtivaRef.current = null;
-    }
-  }, [isActive, linhaSelecionada]);
   const linhaParaCard = linhaAtivaRef.current ?? linhaSelecionada;
 
   // Restaura ao expandido quando sessão termina

@@ -1,5 +1,6 @@
 import { fetchAuthenticatedApi } from '@/features/auth/api/fetchAuthenticatedApi';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+import { z } from 'zod';
 
 export class RateLimitError extends Error {
   constructor(
@@ -97,6 +98,12 @@ export interface GpsBatchPayload {
   linhaId: string;
   isBatchSubmission: boolean;
   points: GpsPointPayload[];
+}
+
+export interface GpsBatchResult {
+  acceptedPoints: number;
+  rejectedPoints: number;
+  sessionId: string;
 }
 
 export interface GpsSessionPayload {
@@ -214,12 +221,28 @@ export async function abandonGpsSession(sessionId: string): Promise<void> {
   });
 }
 
-export async function submitGpsBatch(payload: GpsBatchPayload): Promise<void> {
-  await fetchGps('/v1/gps/batch', {
+export async function submitGpsBatch(payload: GpsBatchPayload): Promise<GpsBatchResult> {
+  const response = await fetchGps('/v1/gps/batch', {
     method: 'POST',
     body: JSON.stringify(payload),
     keepalive: true,
   });
+
+  const body = (await response.json().catch(() => null)) as Partial<GpsBatchResult> | null;
+  if (
+    !body ||
+    typeof body.sessionId !== 'string' ||
+    typeof body.acceptedPoints !== 'number' ||
+    typeof body.rejectedPoints !== 'number'
+  ) {
+    throw new GpsApiError(GPS_GENERIC_ERROR_MESSAGE, 502, 'GPS_INVALID_RESPONSE');
+  }
+
+  return {
+    sessionId: body.sessionId,
+    acceptedPoints: Math.max(0, Math.floor(body.acceptedPoints)),
+    rejectedPoints: Math.max(0, Math.floor(body.rejectedPoints)),
+  };
 }
 
 export async function finishGpsSession(sessionId: string, motivo: string): Promise<void> {
@@ -281,14 +304,55 @@ export interface LiveGpsBatchItem {
   linhaId: string;
   lat: number;
   lng: number;
+  speedKmh?: number | null;
   heading: number | null;
+  routeProgress?: number | null;
   confidence: number;
   updatedAt: string;
   delayed: boolean;
   // Opaco/derivado (HMAC) — nunca sessionId/userId/ownerKey. Só identifica o
   // marcador entre re-renders, não a pessoa por trás dele.
   vehicleKey: string;
+  clusterKey: string;
 }
+
+export type LiveGpsFetchStatus =
+  | 'success'
+  | 'success-empty'
+  | 'unauthorized'
+  | 'rate-limited'
+  | 'server-error'
+  | 'network-offline'
+  | 'invalid-response';
+
+export class LiveGpsFetchError extends Error {
+  constructor(
+    public readonly status: number | null,
+    public readonly fetchStatus: Exclude<LiveGpsFetchStatus, 'success' | 'success-empty'>,
+    public readonly retryAfterMs: number | null = null,
+  ) {
+    super('Não foi possível atualizar as posições ao vivo.');
+    this.name = 'LiveGpsFetchError';
+  }
+}
+
+const liveGpsBatchSchema = z.array(
+  z
+    .object({
+      linhaId: z.string().min(1),
+      lat: z.number().finite(),
+      lng: z.number().finite(),
+      speedKmh: z.number().finite().nullable().optional(),
+      heading: z.number().finite().nullable(),
+      routeProgress: z.number().finite().min(0).max(1).nullable().optional(),
+      confidence: z.number().finite().min(0).max(1),
+      updatedAt: z.string().datetime({ offset: true }),
+      delayed: z.boolean(),
+      vehicleKey: z.string().min(1),
+      clusterKey: z.string().min(1),
+    })
+    .strict(),
+);
 
 // GET /v1/gps/live — autenticado usa fetchAuthenticatedApi (sem atraso);
 // anônimo usa fetch simples (backend aplica atraso de 60s via
@@ -297,12 +361,40 @@ export async function getAllLiveGpsPositions(
   accessToken: string | null,
 ): Promise<LiveGpsBatchItem[]> {
   const url = resolveApiEndpoint('/v1/gps/live');
-  const response = accessToken
-    ? await fetchAuthenticatedApi(url)
-    : await fetch(url, { headers: withTenantHeaders() });
+  let response: Response;
+  try {
+    response = accessToken
+      ? await fetchAuthenticatedApi(url)
+      : await fetch(url, { headers: withTenantHeaders() });
+  } catch {
+    throw new LiveGpsFetchError(null, 'network-offline');
+  }
 
-  if (!response.ok) return [];
-  return (await response.json().catch(() => [])) as LiveGpsBatchItem[];
+  if (response.status === 401) {
+    throw new LiveGpsFetchError(401, 'unauthorized');
+  }
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('Retry-After');
+    const retryAfterMs = retryAfter ? Number.parseInt(retryAfter, 10) * 1000 : null;
+    throw new LiveGpsFetchError(
+      429,
+      'rate-limited',
+      Number.isFinite(retryAfterMs) ? retryAfterMs : null,
+    );
+  }
+  if (response.status >= 500) {
+    throw new LiveGpsFetchError(response.status, 'server-error');
+  }
+  if (!response.ok) {
+    throw new LiveGpsFetchError(response.status, 'invalid-response');
+  }
+
+  const body: unknown = await response.json().catch(() => null);
+  const parsed = liveGpsBatchSchema.safeParse(body);
+  if (!parsed.success) {
+    throw new LiveGpsFetchError(response.status, 'invalid-response');
+  }
+  return parsed.data;
 }
 
 // ---------------------------------------------------------------------------
@@ -365,7 +457,10 @@ function isValidSharedTripResponse(body: unknown): body is SharedTripResponse {
 export async function getSharedTrip(token: string): Promise<SharedTripResponse> {
   try {
     const url = resolveApiEndpoint(`/v1/shared-trips/${encodeURIComponent(token)}`);
-    const response = await fetch(url, { headers: withTenantHeaders() });
+    const response = await fetch(url, {
+      headers: withTenantHeaders(),
+      referrerPolicy: 'no-referrer',
+    });
     const body: unknown = await response.json().catch(() => null);
 
     if (!isValidSharedTripResponse(body)) {

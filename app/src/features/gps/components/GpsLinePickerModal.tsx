@@ -32,7 +32,15 @@ function LineNumberBadge({ numero, corHex }: { numero: string; corHex: string })
   );
 }
 
-function SublinhaRow({ linha, onSelect }: { linha: Linha; onSelect: (l: Linha) => void }) {
+function SublinhaRow({
+  linha,
+  onSelect,
+  isActiveNow,
+}: {
+  linha: Linha;
+  onSelect: (l: Linha) => void;
+  isActiveNow: boolean;
+}) {
   return (
     <button
       type="button"
@@ -47,6 +55,9 @@ function SublinhaRow({ linha, onSelect }: { linha: Linha; onSelect: (l: Linha) =
         {linha.sublinha ? (
           <p className="mt-0.5 truncate text-xs text-text-secondary">{linha.sublinha}</p>
         ) : null}
+        {!isActiveNow && (
+          <p className="mt-0.5 text-micro text-text-tertiary">Fora do horário previsto</p>
+        )}
       </div>
 
       <ChevronRight size={16} className="shrink-0 text-text-tertiary" aria-hidden="true" />
@@ -54,13 +65,30 @@ function SublinhaRow({ linha, onSelect }: { linha: Linha; onSelect: (l: Linha) =
   );
 }
 
-function GroupedRow({ group, onSelect }: { group: LinhaGroup; onSelect: (l: Linha) => void }) {
+function GroupedRow({
+  group,
+  onSelect,
+  activeLineIds,
+}: {
+  group: LinhaGroup;
+  onSelect: (l: Linha) => void;
+  activeLineIds: ReadonlySet<string>;
+}) {
   const first = group.linhas[0];
   const hasVariants = group.linhas.length > 1;
 
   if (!hasVariants) {
-    return first ? <SublinhaRow key={first.idRota} linha={first} onSelect={onSelect} /> : null;
+    return first ? (
+      <SublinhaRow
+        key={first.idRota}
+        linha={first}
+        onSelect={onSelect}
+        isActiveNow={activeLineIds.has(first.idRota)}
+      />
+    ) : null;
   }
+
+  const hasActiveVariant = group.linhas.some((linha) => activeLineIds.has(linha.idRota));
 
   return (
     <div className="flex flex-col">
@@ -72,17 +100,55 @@ function GroupedRow({ group, onSelect }: { group: LinhaGroup; onSelect: (l: Linh
         />
         <p className="text-tiny font-semibold text-text-tertiary">
           Linha {group.numero}: {group.linhas.length} variantes
+          {hasActiveVariant ? '' : ' · fora do horário previsto'}
         </p>
       </div>
       <div
-        className="flex flex-col pl-2 border-l-2 ml-3.5"
+        className="ml-3.5 flex flex-col border-l-2 pl-2"
         style={{ borderColor: `${first?.corHex}40` }}
       >
         {group.linhas.map((linha) => (
-          <SublinhaRow key={linha.idRota} linha={linha} onSelect={onSelect} />
+          <SublinhaRow
+            key={linha.idRota}
+            linha={linha}
+            onSelect={onSelect}
+            isActiveNow={activeLineIds.has(linha.idRota)}
+          />
         ))}
       </div>
     </div>
+  );
+}
+
+function GroupSection({
+  title,
+  groups,
+  activeLineIds,
+  onSelect,
+}: {
+  title: string;
+  groups: LinhaGroup[];
+  activeLineIds: ReadonlySet<string>;
+  onSelect: (linha: Linha) => void;
+}) {
+  if (groups.length === 0) return null;
+
+  return (
+    <section aria-label={title}>
+      <h3 className="px-2 pb-1 pt-3 text-tiny font-bold uppercase tracking-wide text-text-tertiary">
+        {title}
+      </h3>
+      <div className="flex flex-col gap-1">
+        {groups.map((group) => (
+          <GroupedRow
+            key={group.numero}
+            group={group}
+            activeLineIds={activeLineIds}
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -142,8 +208,13 @@ export function GpsLinePickerModal({
   }, [open, trackEvent]);
 
   const todasLinhas = useMemo(
-    () => linhasData.categoriasDias.flatMap((cat) => cat.linhas).filter(isLineActiveNow),
+    () => linhasData.categoriasDias.flatMap((cat) => cat.linhas),
     [linhasData],
+  );
+
+  const activeLineIds = useMemo(
+    () => new Set(todasLinhas.filter(isLineActiveNow).map((linha) => linha.idRota)),
+    [todasLinhas],
   );
 
   const filtradas = useMemo(() => {
@@ -168,6 +239,15 @@ export function GpsLinePickerModal({
       .sort((a, b) => Number(a[0]) - Number(b[0]))
       .map(([numero, linhas]) => ({ numero, linhas }));
   }, [filtradas]);
+
+  const gruposEmOperacao = useMemo(
+    () => grupos.filter((group) => group.linhas.some((linha) => activeLineIds.has(linha.idRota))),
+    [activeLineIds, grupos],
+  );
+  const outrosGrupos = useMemo(
+    () => grupos.filter((group) => !group.linhas.some((linha) => activeLineIds.has(linha.idRota))),
+    [activeLineIds, grupos],
+  );
 
   const handleSelect = (linha: Linha) => {
     trackEvent({
@@ -271,9 +351,18 @@ export function GpsLinePickerModal({
               </div>
             ) : (
               <div className="flex flex-col gap-1 pt-1">
-                {grupos.map((group) => (
-                  <GroupedRow key={group.numero} group={group} onSelect={handleSelect} />
-                ))}
+                  <GroupSection
+                    title="Provavelmente em operação agora"
+                    groups={gruposEmOperacao}
+                    activeLineIds={activeLineIds}
+                    onSelect={handleSelect}
+                  />
+                  <GroupSection
+                    title="Outras linhas"
+                    groups={outrosGrupos}
+                    activeLineIds={activeLineIds}
+                    onSelect={handleSelect}
+                  />
               </div>
             )}
           </div>

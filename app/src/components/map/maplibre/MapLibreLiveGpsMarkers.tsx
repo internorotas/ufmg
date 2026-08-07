@@ -1,7 +1,7 @@
 import { Radar } from 'lucide-react';
 import { memo, useMemo, useState } from 'react';
 import { Marker, Popup } from 'react-map-gl/maplibre';
-import { useAllLiveGpsPositions } from '@/features/gps/hooks/useAllLiveGpsPositions';
+import { useAllLiveGpsPositionsState } from '@/features/gps/hooks/useAllLiveGpsPositions';
 import { numLinha } from '@/features/gps/lib/markerUtils';
 import { getContrastingTextColor, hexToRgba } from '@/lib/utils';
 import type { Linha } from '@/types/data.types';
@@ -19,7 +19,15 @@ function tempoDecorrido(updatedAt: string): string {
   return `há ${diff} min`;
 }
 
-function LiveIcon({ corHex }: { corHex: string }) {
+function LiveIcon({
+  corHex,
+  delayed,
+  stale,
+}: {
+  corHex: string;
+  delayed: boolean;
+  stale: boolean;
+}) {
   const bg = hexToRgba(corHex, 0.9);
   return (
     <div style={{ position: 'relative', width: 32, height: 32, cursor: 'pointer' }}>
@@ -53,7 +61,8 @@ function LiveIcon({ corHex }: { corHex: string }) {
           position: 'absolute',
           bottom: -3,
           right: -8,
-          background: 'var(--color-danger-solid)',
+          background:
+            delayed || stale ? 'var(--color-warning-solid)' : 'var(--color-danger-solid)',
           color: 'white',
           fontSize: 8,
           fontWeight: 800,
@@ -63,7 +72,7 @@ function LiveIcon({ corHex }: { corHex: string }) {
           lineHeight: 1.2,
         }}
       >
-        AO VIVO
+        {stale ? 'POSIÇÃO ANTIGA' : delayed ? 'COM ATRASO' : 'AO VIVO'}
       </div>
     </div>
   );
@@ -78,22 +87,26 @@ export const MapLibreLiveGpsMarkers = memo(function MapLibreLiveGpsMarkers({
   linhas,
   linhaExcluidaId,
 }: MapLibreLiveGpsMarkersProps) {
-  const positions = useAllLiveGpsPositions();
+  const { positions } = useAllLiveGpsPositionsState();
   const linhaMap = useMemo(() => new Map(linhas.map((l) => [l.idRota, l])), [linhas]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const entries = Array.from(positions.entries()).filter(
-    ([linhaId]) => linhaId !== linhaExcluidaId && linhaMap.has(linhaId),
+  const entries = Array.from(positions.values()).filter(
+    (position) => position.linhaId !== linhaExcluidaId && linhaMap.has(position.linhaId),
   );
 
   const selected = selectedId ? positions.get(selectedId) : null;
-  const selectedLinha = selectedId ? linhaMap.get(selectedId) : null;
+  const selectedLinha = selected ? linhaMap.get(selected.linhaId) : null;
+  const selectedIsStale = selected
+    ? Date.now() - new Date(selected.updatedAt).getTime() > 60_000
+    : false;
 
   return (
     <>
-      {entries.map(([linhaId, pos]) => {
-        const linha = linhaMap.get(linhaId);
+      {entries.map((pos) => {
+        const linha = linhaMap.get(pos.linhaId);
         if (!linha) return null;
+        const stale = Date.now() - new Date(pos.updatedAt).getTime() > 60_000;
         return (
           <Marker
             key={pos.vehicleKey}
@@ -102,10 +115,10 @@ export const MapLibreLiveGpsMarkers = memo(function MapLibreLiveGpsMarkers({
             anchor="center"
             onClick={(e: { originalEvent: Event }) => {
               e.originalEvent.stopPropagation();
-              setSelectedId(linhaId);
+              setSelectedId(pos.vehicleKey);
             }}
           >
-            <LiveIcon corHex={linha.corHex} />
+            <LiveIcon corHex={linha.corHex} delayed={pos.delayed} stale={stale} />
           </Marker>
         );
       })}
@@ -137,7 +150,14 @@ export const MapLibreLiveGpsMarkers = memo(function MapLibreLiveGpsMarkers({
             <div className="border-t border-card-border" />
             <div className="flex items-center gap-1.5 text-xs text-text-secondary">
               <Radar size={14} aria-hidden="true" className="shrink-0" />
-              <span>Posição em tempo real, atualizado {tempoDecorrido(selected.updatedAt)}</span>
+              <span>
+                {selectedIsStale
+                  ? 'Posição antiga'
+                  : selected.delayed
+                    ? 'Posição com atraso'
+                    : 'Posição ao vivo'}, atualizado{' '}
+                {tempoDecorrido(selected.updatedAt)}
+              </span>
             </div>
           </div>
         </Popup>

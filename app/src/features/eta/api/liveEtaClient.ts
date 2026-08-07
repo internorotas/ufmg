@@ -7,6 +7,21 @@ export interface LiveEtaResponse {
   historicalP90DelaySeconds: number | null;
   samples: number;
   updatedAt: string | null;
+  delayed?: boolean;
+  source?: 'live' | 'historical' | 'external' | 'scheduled_fallback';
+  confidence?: number;
+  vehicles?: Array<{
+    etaMinutes: number;
+    etaP90Minutes: number | null;
+    routeProgress: number | null;
+    heading: number | null;
+    freshnessSeconds: number;
+    quality: number;
+    source: 'live';
+    confidence: number;
+    samples: number;
+    updatedAt: string;
+  }>;
 }
 
 export interface LiveLocationResponse {
