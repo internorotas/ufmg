@@ -1,4 +1,5 @@
-import { resolveApiEndpoint } from '@/services/api/apiClient';
+import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
+import { tenantSlug } from '@/tenants/tenantConfig';
 
 export interface GeoJsonFeatureCollection {
   type: 'FeatureCollection';
@@ -29,7 +30,11 @@ function ensureFeatureCollection(value: unknown): GeoJsonFeatureCollection {
   throw new Error('Resposta invalida para ufmg-predios');
 }
 
-async function fetchWithTimeout(url: string, timeoutMs = 10_000): Promise<Response> {
+async function fetchWithTimeout(
+  url: string,
+  headers?: HeadersInit,
+  timeoutMs = 10_000,
+): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -37,6 +42,7 @@ async function fetchWithTimeout(url: string, timeoutMs = 10_000): Promise<Respon
     const response = await fetch(url, {
       method: 'GET',
       cache: 'no-store',
+      headers,
       signal: controller.signal,
     });
     return response;
@@ -48,7 +54,7 @@ async function fetchWithTimeout(url: string, timeoutMs = 10_000): Promise<Respon
 export async function fetchUfmPredios(): Promise<GeoJsonFeatureCollection> {
   try {
     const endpoint = resolveApiEndpoint('/v1/map/ufmg-predios');
-    const response = await fetchWithTimeout(endpoint);
+    const response = await fetchWithTimeout(endpoint, withTenantHeaders());
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
@@ -58,6 +64,10 @@ export async function fetchUfmPredios(): Promise<GeoJsonFeatureCollection> {
     return ensureFeatureCollection(payload);
   } catch {
     // Backend indisponivel — fallback para arquivo estatico
+  }
+
+  if (tenantSlug !== 'ufmg') {
+    return { type: 'FeatureCollection', features: [] };
   }
 
   try {
