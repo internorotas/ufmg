@@ -6,6 +6,20 @@
 import { expect, test } from '@playwright/test';
 import { BASE, mockAuthAnonymous, skipOnboarding } from './helpers';
 
+// Hostname da API do PROJETO nesta execução — nunca hardcoded pro domínio de
+// produção, senão estes testes dão falso positivo ("Authorization vazou pra
+// domínio terceiro") ao rodar contra qualquer ambiente que não seja
+// produção (ex.: homologação, api-hml.internorotas.com). VITE_API_URL é a
+// mesma env var que o app usa em runtime (services/api/apiClient.ts).
+const PROJECT_API_HOSTNAME = new URL(process.env.VITE_API_URL ?? 'https://api.internorotas.com')
+  .hostname;
+
+function isProjectOrLocalRequest(url: string): boolean {
+  return (
+    url.includes(PROJECT_API_HOSTNAME) || url.includes('localhost') || url.includes('127.0.0.1')
+  );
+}
+
 test.beforeEach(async ({ page }) => {
   await skipOnboarding(page);
   await mockAuthAnonymous(page);
@@ -125,12 +139,7 @@ test('security – Authorization header não aparece em requests para domínios 
     const authHeader = req.headers().authorization;
     const url = req.url();
     // Qualquer request com Auth que não seja para a API do projeto
-    if (
-      authHeader &&
-      !url.includes('api.internorotas.com') &&
-      !url.includes('localhost') &&
-      !url.includes('127.0.0.1')
-    ) {
+    if (authHeader && !isProjectOrLocalRequest(url)) {
       leakedAuthRequests.push(url);
     }
   });
@@ -148,13 +157,7 @@ test('security – push subscription endpoint não é enviado a domínio externo
     const url = req.url();
     const body = req.postData() ?? '';
     // Se um request POST inclui "endpoint" no body indo para fora da API
-    if (
-      req.method() === 'POST' &&
-      body.includes('"endpoint"') &&
-      !url.includes('api.internorotas.com') &&
-      !url.includes('localhost') &&
-      !url.includes('127.0.0.1')
-    ) {
+    if (req.method() === 'POST' && body.includes('"endpoint"') && !isProjectOrLocalRequest(url)) {
       suspiciousPushRequests.push(url);
     }
   });
