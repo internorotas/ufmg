@@ -249,10 +249,10 @@ export function GpsTrackingCard({
           <ChevronDown size={10} aria-hidden="true" />
         </button>
 
-          <button
-            type="button"
-            onClick={handleStopClick}
-            disabled={isEnding}
+        <button
+          type="button"
+          onClick={handleStopClick}
+          disabled={isEnding}
           aria-label={stopArmed ? 'Confirmar encerramento do rastreio' : 'Encerrar rastreio'}
           title={stopArmed ? 'Toque de novo para confirmar' : undefined}
           className={`pointer-events-auto flex min-h-11 shrink-0 items-center justify-center gap-1 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-primary active:scale-90 ${
@@ -304,7 +304,10 @@ export function GpsTrackingCard({
               <span>{acceptedPoints} atualizações aceitas</span>
             </div>
             {rejectedPoints > 0 && (
-              <span className="tabular-nums text-warning-text" title="Pontos rejeitados pelo servidor">
+              <span
+                className="tabular-nums text-warning-text"
+                title="Pontos rejeitados pelo servidor"
+              >
                 {rejectedPoints} recusadas
               </span>
             )}

@@ -351,18 +351,18 @@ export function GpsLinePickerModal({
               </div>
             ) : (
               <div className="flex flex-col gap-1 pt-1">
-                  <GroupSection
-                    title="Provavelmente em operação agora"
-                    groups={gruposEmOperacao}
-                    activeLineIds={activeLineIds}
-                    onSelect={handleSelect}
-                  />
-                  <GroupSection
-                    title="Outras linhas"
-                    groups={outrosGrupos}
-                    activeLineIds={activeLineIds}
-                    onSelect={handleSelect}
-                  />
+                <GroupSection
+                  title="Provavelmente em operação agora"
+                  groups={gruposEmOperacao}
+                  activeLineIds={activeLineIds}
+                  onSelect={handleSelect}
+                />
+                <GroupSection
+                  title="Outras linhas"
+                  groups={outrosGrupos}
+                  activeLineIds={activeLineIds}
+                  onSelect={handleSelect}
+                />
               </div>
             )}
           </div>

@@ -3,8 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import {
   getAllLiveGpsPositions,
-  LiveGpsFetchError,
   type LiveGpsBatchItem,
+  LiveGpsFetchError,
   type LiveGpsFetchStatus,
 } from '@/features/gps/api/gpsClient';
 

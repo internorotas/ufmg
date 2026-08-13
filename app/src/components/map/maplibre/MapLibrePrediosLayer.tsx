@@ -80,16 +80,43 @@ export interface PredioInfo {
 
 // Mapeamento OSM amenity → rótulo em português + categoria visual
 const AMENITY_LABELS: Record<string, { label: string; cor: string }> = {
-  building: { label: 'Prédio', cor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' },
-  plaza: { label: 'Praça', cor: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' },
-  landmark: { label: 'Ponto de referência', cor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' },
-  food: { label: 'Alimentação', cor: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300' },
+  building: {
+    label: 'Prédio',
+    cor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  },
+  plaza: {
+    label: 'Praça',
+    cor: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+  },
+  landmark: {
+    label: 'Ponto de referência',
+    cor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+  },
+  food: {
+    label: 'Alimentação',
+    cor: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  },
   health: { label: 'Saúde', cor: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' },
-  sports: { label: 'Esportes', cor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300' },
-  parking: { label: 'Estacionamento', cor: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300' },
-  entrance: { label: 'Entrada', cor: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300' },
-  accessibility: { label: 'Acessibilidade', cor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' },
-  service: { label: 'Serviço', cor: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300' },
+  sports: {
+    label: 'Esportes',
+    cor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+  },
+  parking: {
+    label: 'Estacionamento',
+    cor: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  },
+  entrance: {
+    label: 'Entrada',
+    cor: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300',
+  },
+  accessibility: {
+    label: 'Acessibilidade',
+    cor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+  },
+  service: {
+    label: 'Serviço',
+    cor: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  },
   restaurant: {
     label: 'Restaurante',
     cor: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',

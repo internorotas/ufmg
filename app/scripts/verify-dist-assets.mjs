@@ -50,12 +50,17 @@ if (missing.size > 0) {
 }
 
 const { default: worker } = await import(pathToFileURL(workerPath).href);
-const fallbackResponse = await worker.fetch(new Request('https://internorotas.com/assets/ausente.js'), {
-  ASSETS: {
-    fetch: async () =>
-      new Response('<!doctype html>', { headers: { 'content-type': 'text/html; charset=utf-8' } }),
+const fallbackResponse = await worker.fetch(
+  new Request('https://internorotas.com/assets/ausente.js'),
+  {
+    ASSETS: {
+      fetch: async () =>
+        new Response('<!doctype html>', {
+          headers: { 'content-type': 'text/html; charset=utf-8' },
+        }),
+    },
   },
-});
+);
 
 if (
   fallbackResponse.status !== 404 ||

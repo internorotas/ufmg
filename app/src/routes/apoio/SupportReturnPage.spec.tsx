@@ -3,12 +3,12 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useGpsSession } from '@/features/gps/context/GpsSessionContext';
 import {
   getSupportOverview,
   type PaymentsOverview,
 } from '@/features/monetization/api/paymentsClient';
-import { useGpsSession } from '@/features/gps/context/GpsSessionContext';
-import { SupportReturnPage, resolveReturnState } from './SupportReturnPage';
+import { resolveReturnState, SupportReturnPage } from './SupportReturnPage';
 
 vi.mock('@/features/monetization/api/paymentsClient', () => ({
   getSupportOverview: vi.fn(),
@@ -18,9 +18,7 @@ vi.mock('@/features/gps/context/GpsSessionContext', () => ({
   useGpsSession: vi.fn(),
 }));
 
-function makeOverview(
-  overrides: Partial<PaymentsOverview> = {},
-): PaymentsOverview {
+function makeOverview(overrides: Partial<PaymentsOverview> = {}): PaymentsOverview {
   return {
     provider: 'mercadopago',
     recurringSupportActive: false,
@@ -32,7 +30,9 @@ function makeOverview(
 
 describe('SupportReturnPage', () => {
   beforeEach(() => {
-    vi.mocked(useGpsSession).mockReturnValue({ isActive: false } as ReturnType<typeof useGpsSession>);
+    vi.mocked(useGpsSession).mockReturnValue({ isActive: false } as ReturnType<
+      typeof useGpsSession
+    >);
     vi.mocked(getSupportOverview).mockResolvedValue(makeOverview());
   });
 
@@ -68,7 +68,9 @@ describe('SupportReturnPage', () => {
   });
 
   it('confirma pelo estado do servidor e avisa se o GPS continua ativo', async () => {
-    vi.mocked(useGpsSession).mockReturnValue({ isActive: true } as ReturnType<typeof useGpsSession>);
+    vi.mocked(useGpsSession).mockReturnValue({ isActive: true } as ReturnType<
+      typeof useGpsSession
+    >);
     vi.mocked(getSupportOverview).mockResolvedValue(
       makeOverview({
         supports: [
@@ -93,7 +95,9 @@ describe('SupportReturnPage', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => expect(screen.getByRole('heading').textContent).toContain('Apoio confirmado'));
+    await waitFor(() =>
+      expect(screen.getByRole('heading').textContent).toContain('Apoio confirmado'),
+    );
     expect(screen.getByText(/rastreio GPS continua ativo/i)).toBeTruthy();
   });
 });

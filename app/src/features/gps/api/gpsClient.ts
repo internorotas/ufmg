@@ -1,6 +1,6 @@
+import { z } from 'zod';
 import { fetchAuthenticatedApi } from '@/features/auth/api/fetchAuthenticatedApi';
 import { resolveApiEndpoint, withTenantHeaders } from '@/services/api/apiClient';
-import { z } from 'zod';
 
 export class RateLimitError extends Error {
   constructor(

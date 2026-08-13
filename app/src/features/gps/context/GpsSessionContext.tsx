@@ -289,7 +289,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
             distance_km: Math.round(stats.distanceKm * 100) / 100,
             duration_s: Math.round(stats.durationMs / 1000),
             snapshots: stats.snapshotsCount,
-          linha_id: completionLine.idRota,
+            linha_id: completionLine.idRota,
           },
         });
 

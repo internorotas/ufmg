@@ -1,11 +1,11 @@
 import { CheckCircle2, Clock3, HeartHandshake, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useGpsSession } from '@/features/gps/context/GpsSessionContext';
 import {
   getSupportOverview,
   type PaymentsOverview,
 } from '@/features/monetization/api/paymentsClient';
-import { useGpsSession } from '@/features/gps/context/GpsSessionContext';
 
 export type ReturnState =
   | 'loading'
@@ -73,7 +73,8 @@ export function SupportReturnPage() {
     unconfirmed: {
       icon: <XCircle size={24} aria-hidden="true" />,
       title: 'Apoio não confirmado',
-      message: 'Não encontramos uma confirmação para esta tentativa. Nenhuma cobrança foi presumida.',
+      message:
+        'Não encontramos uma confirmação para esta tentativa. Nenhuma cobrança foi presumida.',
     },
     cancelled: {
       icon: <XCircle size={24} aria-hidden="true" />,

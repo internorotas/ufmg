@@ -61,8 +61,7 @@ function LiveIcon({
           position: 'absolute',
           bottom: -3,
           right: -8,
-          background:
-            delayed || stale ? 'var(--color-warning-solid)' : 'var(--color-danger-solid)',
+          background: delayed || stale ? 'var(--color-warning-solid)' : 'var(--color-danger-solid)',
           color: 'white',
           fontSize: 8,
           fontWeight: 800,
@@ -155,8 +154,8 @@ export const MapLibreLiveGpsMarkers = memo(function MapLibreLiveGpsMarkers({
                   ? 'Posição antiga'
                   : selected.delayed
                     ? 'Posição com atraso'
-                    : 'Posição ao vivo'}, atualizado{' '}
-                {tempoDecorrido(selected.updatedAt)}
+                    : 'Posição ao vivo'}
+                , atualizado {tempoDecorrido(selected.updatedAt)}
               </span>
             </div>
           </div>

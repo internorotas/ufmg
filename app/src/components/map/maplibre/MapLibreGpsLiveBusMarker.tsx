@@ -2,9 +2,9 @@ import { AlertTriangle, Bus, Clock, Radar, Target } from 'lucide-react';
 import maplibregl from 'maplibre-gl';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup, useMap } from 'react-map-gl/maplibre';
-import { useBusPosition } from '@/features/gps/hooks/useBusPosition';
 import type { LiveGpsBatchItem } from '@/features/gps/api/gpsClient';
 import { useAllLiveGpsPositionsState } from '@/features/gps/hooks/useAllLiveGpsPositions';
+import { useBusPosition } from '@/features/gps/hooks/useBusPosition';
 import { numLinha } from '@/features/gps/lib/markerUtils';
 import { calcularPosicaoTeorica } from '@/lib/busPosition';
 import { getContrastingTextColor, hexToRgba } from '@/lib/utils';
@@ -99,8 +99,7 @@ export const MapLibreGpsLiveBusMarker = memo(function MapLibreGpsLiveBusMarker({
       (position) => position.linhaId === linha.idRota,
     );
     const latest = candidates.sort(
-      (left, right) =>
-        new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
+      (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
     )[0];
     return latest
       ? {
@@ -284,9 +283,9 @@ function BusPopup({
           )}
         </div>
         {isLive && !isStale && !livePos?.delayed && (
-        <span className="shrink-0 rounded bg-danger-solid px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
-          AO VIVO
-        </span>
+          <span className="shrink-0 rounded bg-danger-solid px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
+            AO VIVO
+          </span>
         )}
         {isLive && !isStale && livePos?.delayed && (
           <span className="shrink-0 rounded bg-warning-solid px-1.5 py-0.5 text-micro font-extrabold tracking-wide text-white">
@@ -330,11 +329,7 @@ function BusPopup({
               <strong
                 className={livePos.confidence >= 0.7 ? 'text-success-text' : 'text-warning-text'}
               >
-                {livePos.confidence >= 0.7
-                  ? 'boa'
-                  : livePos.confidence >= 0.4
-                    ? 'média'
-                    : 'baixa'}
+                {livePos.confidence >= 0.7 ? 'boa' : livePos.confidence >= 0.4 ? 'média' : 'baixa'}
               </strong>
             </span>
           </div>

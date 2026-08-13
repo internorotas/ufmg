@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/features/auth/store/authStore';
-import { logout as logoutRequest } from '@/features/profile/api/profileClient';
 import { GPS_AUTH_LOGOUT_EVENT } from '@/features/gps/gpsEvents';
+import { logout as logoutRequest } from '@/features/profile/api/profileClient';
 
 interface UseLogoutResult {
   logout: () => Promise<void>;
