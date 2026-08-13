@@ -8,14 +8,19 @@
 //   2. dist/_headers   — adiciona X-Robots-Tag noindex para /* (PRIMEIRO, antes de outros)
 //   3. dist/robots.txt — substitui por versão que bloqueia todos os crawlers
 //
-// No-op se VITE_MODE não for "hml" — garante que build de produção não seja afetado
-// quando invocado acidentalmente fora do pipeline HML.
+// Só transforma quando o comando informa explicitamente o modo HML — garante
+// que um build de produção não seja afetado por uma chamada acidental.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const NOINDEX = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
 const PROD_ROBOTS_CONTENT = 'index, follow';
 const GOOGLE_VERIFY_PATTERN = /<meta\s+name="google-site-verification"[^>]*\/?\s*>/gi;
+
+if (!process.argv.includes('--hml')) {
+  console.log('apply-hml-noindex: sem --hml — nenhuma alteração.');
+  process.exit(0);
+}
 
 const distDir = resolve('dist');
 
@@ -31,7 +36,7 @@ function requireFile(rel) {
 
 // 1. dist/index.html — substituir robots meta e remover google-site-verification
 const html = requireFile('index.html');
-if (!html.content.includes(PROD_ROBOTS_CONTENT)) {
+if (!html.content.includes(PROD_ROBOTS_CONTENT) && !html.content.includes(NOINDEX)) {
   throw new Error(
     `apply-hml-noindex: dist/index.html não contém "${PROD_ROBOTS_CONTENT}" — ` +
       'a tag robots mudou de formato; atualize este script.',
@@ -60,3 +65,45 @@ if (headers.content.includes('X-Robots-Tag')) {
 const robotsTxtPath = resolve(distDir, 'robots.txt');
 writeFileSync(robotsTxtPath, 'User-agent: *\nDisallow: /\n', 'utf8');
 console.log('apply-hml-noindex: dist/robots.txt — Disallow: / aplicado.');
+
+// 4. dist/_worker.js — proteger também respostas produzidas pelo Worker.
+const worker = requireFile('_worker.js');
+const workerMarker = 'HML_NOINDEX_WORKER';
+if (!worker.content.includes(workerMarker)) {
+  const responseReturn = '    return response;';
+  const responseReturnCount = worker.content.split(responseReturn).length - 1;
+  if (responseReturnCount !== 1) {
+    throw new Error(
+      'apply-hml-noindex: dist/_worker.js mudou; não foi possível localizar o retorno da resposta original.',
+    );
+  }
+
+  let workerContent = worker.content.replace(
+    responseReturn,
+    [
+      '    // HML_NOINDEX_WORKER: preserva status, corpo e headers da origem.',
+      '    const headers = new Headers(response.headers);',
+      `    headers.set('X-Robots-Tag', '${NOINDEX}');`,
+      '    return new Response(response.body, {',
+      '      status: response.status,',
+      '      statusText: response.statusText,',
+      '      headers,',
+      '    });',
+    ].join('\n'),
+  );
+
+  const fallbackContentType = "          'Content-Type': 'text/plain; charset=utf-8',";
+  if (!workerContent.includes(fallbackContentType)) {
+    throw new Error(
+      'apply-hml-noindex: dist/_worker.js mudou; não foi possível proteger o fallback de asset.',
+    );
+  }
+  workerContent = workerContent.replace(
+    fallbackContentType,
+    `${fallbackContentType}\n          'X-Robots-Tag': '${NOINDEX}',`,
+  );
+  writeFileSync(worker.path, workerContent, 'utf8');
+  console.log('apply-hml-noindex: dist/_worker.js — X-Robots-Tag aplicado ao Worker.');
+} else {
+  console.log('apply-hml-noindex: dist/_worker.js — X-Robots-Tag já presente, ignorado.');
+}

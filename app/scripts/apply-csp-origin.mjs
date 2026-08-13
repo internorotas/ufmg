@@ -16,6 +16,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const PRODUCTION_API_URL = 'https://api.internorotas.com';
+const HML_API_URL = 'https://api-hml.internorotas.com';
 const PRODUCTION_HTTP_ORIGIN = PRODUCTION_API_URL;
 const PRODUCTION_WS_ORIGIN = PRODUCTION_API_URL.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:');
 
@@ -29,7 +30,15 @@ function toWsOrigin(httpOrigin) {
   return httpOrigin.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:');
 }
 
-const apiUrl = (process.env.VITE_API_URL ?? PRODUCTION_API_URL).replace(/\/+$/, '');
+const hmlMode = process.argv.includes('--hml');
+const configuredApiUrl = process.env.VITE_API_URL?.trim();
+const apiUrl = (
+  hmlMode ? configuredApiUrl || HML_API_URL : (configuredApiUrl ?? PRODUCTION_API_URL)
+).replace(/\/+$/, '');
+
+if (hmlMode && apiUrl !== HML_API_URL) {
+  throw new Error(`apply-csp-origin: build HML exige ${HML_API_URL}; não use a origem ${apiUrl}.`);
+}
 const httpOrigin = apiUrl;
 const wsOrigin = toWsOrigin(apiUrl);
 

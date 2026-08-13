@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "pnpm run build",
+    "build": "node scripts/verify-root-build-script.mjs && pnpm --dir app run build",
+    "verify:root-build": "node scripts/verify-root-build-script.mjs",
     "format": "biome format --write .",
     "lint": "biome lint .",
     "check": "biome check --write --unsafe .",

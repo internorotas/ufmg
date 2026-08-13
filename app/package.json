@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/apply-csp-origin.mjs && node scripts/verify-dist-assets.mjs",
-    "build:hml": "tsc -b && vite build --mode hml && node scripts/apply-csp-origin.mjs && node scripts/apply-hml-noindex.mjs && node scripts/verify-dist-assets.mjs",
+    "build:hml": "tsc -b && vite build --mode hml && node scripts/apply-csp-origin.mjs --hml && node scripts/apply-hml-noindex.mjs --hml && node scripts/verify-hml-artifact.mjs && node scripts/verify-dist-assets.mjs",
     "preview": "vite preview",
     "deploy": "pnpm build && gh-pages -d dist",
     "quality": "pnpm lint && pnpm build",
