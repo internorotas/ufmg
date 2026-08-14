@@ -93,4 +93,4 @@ if (
   throw new Error('Worker HML perdeu o fallback 404 seguro de assets.');
 }
 
-console.log('verify-hml-artifact: HTML, headers, robots.txt e Worker HML verificados.');
+process.stdout.write('verify-hml-artifact: HTML, headers, robots.txt e Worker HML verificados.\n');

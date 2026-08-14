@@ -46,7 +46,9 @@ const productionPair = `${PRODUCTION_HTTP_ORIGIN} ${PRODUCTION_WS_ORIGIN}`;
 const targetPair = `${httpOrigin} ${wsOrigin}`;
 
 if (productionPair === targetPair) {
-  console.log('apply-csp-origin: VITE_API_URL é o domínio de produção — nenhuma alteração.');
+  process.stdout.write(
+    'apply-csp-origin: VITE_API_URL é o domínio de produção — nenhuma alteração.\n',
+  );
   process.exit(0);
 }
 
@@ -67,6 +69,6 @@ for (const target of targets) {
   changedFiles += 1;
 }
 
-console.log(
-  `apply-csp-origin: CSP de ${changedFiles} arquivo(s) atualizada para ${httpOrigin} (${wsOrigin}).`,
+process.stdout.write(
+  `apply-csp-origin: CSP de ${changedFiles} arquivo(s) atualizada para ${httpOrigin} (${wsOrigin}).\n`,
 );

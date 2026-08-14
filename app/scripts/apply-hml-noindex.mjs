@@ -18,7 +18,7 @@ const PROD_ROBOTS_CONTENT = 'index, follow';
 const GOOGLE_VERIFY_PATTERN = /<meta\s+name="google-site-verification"[^>]*\/?\s*>/gi;
 
 if (!process.argv.includes('--hml')) {
-  console.log('apply-hml-noindex: sem --hml — nenhuma alteração.');
+  process.stdout.write('apply-hml-noindex: sem --hml — nenhuma alteração.\n');
   process.exit(0);
 }
 
@@ -46,25 +46,25 @@ const newHtml = html.content
   .replace(`content="${PROD_ROBOTS_CONTENT}"`, `content="${NOINDEX}"`)
   .replace(GOOGLE_VERIFY_PATTERN, '');
 writeFileSync(html.path, newHtml, 'utf8');
-console.log(
-  'apply-hml-noindex: dist/index.html — robots=noindex, google-site-verification removida.',
+process.stdout.write(
+  'apply-hml-noindex: dist/index.html — robots=noindex, google-site-verification removida.\n',
 );
 
 // 2. dist/_headers — adicionar X-Robots-Tag para /*
 const headers = requireFile('_headers');
 const robotsHeaderLine = `/*\n  X-Robots-Tag: ${NOINDEX}`;
 if (headers.content.includes('X-Robots-Tag')) {
-  console.log('apply-hml-noindex: dist/_headers — X-Robots-Tag já presente, ignorado.');
+  process.stdout.write('apply-hml-noindex: dist/_headers — X-Robots-Tag já presente, ignorado.\n');
 } else {
   // Prepend: deve aparecer antes de qualquer outra regra /*
   writeFileSync(headers.path, `${robotsHeaderLine}\n\n${headers.content}`, 'utf8');
-  console.log('apply-hml-noindex: dist/_headers — X-Robots-Tag noindex adicionado.');
+  process.stdout.write('apply-hml-noindex: dist/_headers — X-Robots-Tag noindex adicionado.\n');
 }
 
 // 3. dist/robots.txt — substituir por versão que bloqueia tudo
 const robotsTxtPath = resolve(distDir, 'robots.txt');
 writeFileSync(robotsTxtPath, 'User-agent: *\nDisallow: /\n', 'utf8');
-console.log('apply-hml-noindex: dist/robots.txt — Disallow: / aplicado.');
+process.stdout.write('apply-hml-noindex: dist/robots.txt — Disallow: / aplicado.\n');
 
 // 4. dist/_worker.js — proteger também respostas produzidas pelo Worker.
 const worker = requireFile('_worker.js');
@@ -103,7 +103,9 @@ if (!worker.content.includes(workerMarker)) {
     `${fallbackContentType}\n          'X-Robots-Tag': '${NOINDEX}',`,
   );
   writeFileSync(worker.path, workerContent, 'utf8');
-  console.log('apply-hml-noindex: dist/_worker.js — X-Robots-Tag aplicado ao Worker.');
+  process.stdout.write('apply-hml-noindex: dist/_worker.js — X-Robots-Tag aplicado ao Worker.\n');
 } else {
-  console.log('apply-hml-noindex: dist/_worker.js — X-Robots-Tag já presente, ignorado.');
+  process.stdout.write(
+    'apply-hml-noindex: dist/_worker.js — X-Robots-Tag já presente, ignorado.\n',
+  );
 }

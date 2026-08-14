@@ -23,4 +23,4 @@ if (typeof appPackage.scripts?.build !== 'string' || appPackage.scripts.build.le
   throw new Error('app/package.json não possui um script build executável.');
 }
 
-console.log('verify-root-build-script: frontend/ delega o build para app/.');
+process.stdout.write('verify-root-build-script: frontend/ delega o build para app/.\n');

@@ -70,4 +70,6 @@ if (
   throw new Error('dist/_worker.js não protege assets ausentes contra fallback HTML.');
 }
 
-console.log(`Verificados ${visited.size} módulos/assets e o Worker do Cloudflare Pages.`);
+process.stdout.write(
+  `Verificados ${visited.size} módulos/assets e o Worker do Cloudflare Pages.\n`,
+);
