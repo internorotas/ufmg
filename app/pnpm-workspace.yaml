@@ -1,3 +1,5 @@
+overrides:
+  socket.io-parser: 4.2.7
 allowBuilds:
   '@swc/core': true
   esbuild: true

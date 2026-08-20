@@ -19,6 +19,7 @@ import { AuthRequestError, startGoogleLoginFlow } from '@/features/auth/api/auth
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { tenantConfig } from '@/tenants/tenantConfig';
+import { normalizeLoginDestination } from './loginDestination';
 
 type LoadingState = 'idle' | 'redirecting';
 
@@ -88,7 +89,7 @@ export function LoginPage() {
   // Apenas caminhos relativos são aceitos para evitar open redirect.
   const rawFrom =
     searchParams.get('from') ?? (location.state as { from?: string } | null)?.from ?? '/';
-  const from = rawFrom.startsWith('/') && !rawFrom.startsWith('//') ? rawFrom : '/';
+  const from = normalizeLoginDestination(rawFrom);
 
   // Erro vindo do callback do backend (?error=auth_failed | ?error=missing_params)
   const urlErrorCode = searchParams.get('error');
