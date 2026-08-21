@@ -165,7 +165,7 @@ export const MapLibreGpsLiveBusMarker = memo(function MapLibreGpsLiveBusMarker({
     };
   }, [mapInstance, initialPos, linha.corHex]);
 
-  // Atualiza posição via GPS ao vivo (WebSocket), refletindo stale no ícone
+  // Atualiza posição via GPS ao vivo (lote HTTP), refletindo stale no ícone
   useEffect(() => {
     if (!livePos || !markerRef.current) return;
     markerRef.current.setLngLat([livePos.lng, livePos.lat]);
