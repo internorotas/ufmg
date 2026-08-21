@@ -180,10 +180,9 @@ export const MapLibreGpsLiveBusMarker = memo(function MapLibreGpsLiveBusMarker({
 
   // Mantém popup sincronizado com a posição GPS ao vivo
   useEffect(() => {
-    if (!livePos || !popupState) return;
-    setPopupState({ lng: livePos.lng, lat: livePos.lat });
-    // popupState intencionalmente omitido — queremos reagir ao livePos, não criar loop
-  }, [livePos, popupState]);
+    if (!livePos) return;
+    setPopupState((current) => (current ? { lng: livePos.lng, lat: livePos.lat } : current));
+  }, [livePos]);
 
   // Posição teórica atualizada a cada 5s quando não há GPS ao vivo
   useEffect(() => {

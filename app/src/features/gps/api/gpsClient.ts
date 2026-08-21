@@ -355,17 +355,20 @@ const liveGpsBatchSchema = z.array(
 );
 
 // GET /v1/gps/live — autenticado usa fetchAuthenticatedApi (sem atraso);
-// anônimo usa fetch simples (backend aplica atraso de 60s via
-// X-Gps-Delay-Seconds), mesmo contrato de useGpsLiveTracking.
+// anônimo usa fetch simples (backend aplica atraso de 60s via o campo
+// `delayed`). O token real fica somente no auth wrapper; este cliente recebe
+// apenas o modo de autenticação para não carregar uma cópia potencialmente
+// obsoleta do token entre render e execução da query.
 export async function getAllLiveGpsPositions(
-  accessToken: string | null,
+  isAuthenticated: boolean,
+  signal?: AbortSignal,
 ): Promise<LiveGpsBatchItem[]> {
   const url = resolveApiEndpoint('/v1/gps/live');
   let response: Response;
   try {
-    response = accessToken
-      ? await fetchAuthenticatedApi(url)
-      : await fetch(url, { headers: withTenantHeaders() });
+    response = isAuthenticated
+      ? await fetchAuthenticatedApi(url, { signal })
+      : await fetch(url, { headers: withTenantHeaders(), signal });
   } catch {
     throw new LiveGpsFetchError(null, 'network-offline');
   }
