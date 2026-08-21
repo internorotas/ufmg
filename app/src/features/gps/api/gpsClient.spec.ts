@@ -103,6 +103,34 @@ describe('gpsClient live positions', () => {
     await expect(getAllLiveGpsPositions(false)).rejects.toBeInstanceOf(LiveGpsFetchError);
   });
 
+  it('rejeita identificadores privados extras no payload público', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        jsonResponse(200, [
+          {
+            linhaId: '5102',
+            lat: -19.87,
+            lng: -43.96,
+            heading: null,
+            confidence: 0.9,
+            updatedAt: '2026-01-01T00:00:00.000Z',
+            delayed: false,
+            vehicleKey: 'vehicle-hmac-1',
+            clusterKey: 'cluster-hmac-1',
+            sessionId: 'private-session-id',
+          },
+        ]),
+      ),
+    );
+
+    const { getAllLiveGpsPositions } = await import('./gpsClient');
+
+    await expect(getAllLiveGpsPositions(false)).rejects.toMatchObject({
+      fetchStatus: 'invalid-response',
+    });
+  });
+
   it.each([
     [401, 'unauthorized'],
     [500, 'server-error'],
