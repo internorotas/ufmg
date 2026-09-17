@@ -5,6 +5,31 @@ import { refreshSession } from './authClient';
 
 export const SESSION_EXPIRED_EVENT = 'auth:session-expired';
 
+let refreshingPromise: Promise<string> | null = null;
+
+function refreshAccessTokenSingleFlight(): Promise<string> {
+  if (!refreshingPromise) {
+    refreshingPromise = refreshSession()
+      .then((refreshed) => {
+        if (!refreshed.accessToken) {
+          throw new Error('refresh retornou token nulo');
+        }
+
+        useAuthStore.getState().setAuthenticatedSession({
+          accessToken: refreshed.accessToken,
+          user: refreshed.user ?? null,
+        });
+
+        return refreshed.accessToken;
+      })
+      .finally(() => {
+        refreshingPromise = null;
+      });
+  }
+
+  return refreshingPromise;
+}
+
 function dispatchSessionExpired(message: string) {
   window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT, { detail: { message } }));
 }
@@ -42,19 +67,17 @@ export async function fetchAuthenticatedApi(
     return response;
   }
 
-  // Tenta refresh uma vez
+  // Outra requisicao pode ter renovado o token enquanto esta resposta 401
+  // ainda estava em voo. Nesse caso, repete com o token novo sem rotacionar
+  // novamente o refresh cookie.
+  const latestToken = useAuthStore.getState().accessToken;
+  if (latestToken && latestToken !== currentToken) {
+    return makeRequest(latestToken);
+  }
+
   try {
-    const refreshed = await refreshSession();
-    if (!refreshed.accessToken) {
-      throw new Error('refresh retornou token nulo');
-    }
-
-    useAuthStore.getState().setAuthenticatedSession({
-      accessToken: refreshed.accessToken,
-      user: refreshed.user ?? null,
-    });
-
-    return makeRequest(refreshed.accessToken);
+    const refreshedToken = await refreshAccessTokenSingleFlight();
+    return makeRequest(refreshedToken);
   } catch {
     window.dispatchEvent(new Event(GPS_AUTH_LOGOUT_EVENT));
     useAuthStore.getState().resetSession();
