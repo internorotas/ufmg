@@ -100,7 +100,7 @@ describe('isWeekday', () => {
     ['sábado', 6, false],
     ['domingo', 0, false],
   ])('%s (getDay=%i) → %s', (_label, dayOfWeek, expected) => {
-    const d = new Date(2026, 6, 5); // base: domingo 5 jul 2026
+    const d = makeDay(2026, 7, 5); // base: domingo 5 jul 2026
     // Advance to desired day
     d.setDate(5 + (dayOfWeek === 0 ? 0 : dayOfWeek));
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(d);
