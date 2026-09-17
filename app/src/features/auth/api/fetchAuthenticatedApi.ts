@@ -67,7 +67,7 @@ export async function fetchAuthenticatedApi(
     return response;
   }
 
-  // Outra requisicao pode ter renovado o token enquanto esta resposta 401
+  // Outra requisição pode ter renovado o token enquanto esta resposta 401
   // ainda estava em voo. Nesse caso, repete com o token novo sem rotacionar
   // novamente o refresh cookie.
   const latestToken = useAuthStore.getState().accessToken;

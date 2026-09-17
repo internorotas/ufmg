@@ -63,4 +63,46 @@ describe('fetchAuthenticatedApi', () => {
     expect(fetchMock).toHaveBeenCalledTimes(4);
     expect(useAuthStore.getState().accessToken).toBe('token-novo');
   });
+
+  it('repete 401 atrasado com o token ja renovado sem novo refresh', async () => {
+    let resolveDelayedResponse!: (response: Response) => void;
+    const delayedResponse = new Promise<Response>((resolve) => {
+      resolveDelayedResponse = resolve;
+    });
+    authClientMock.refreshSession.mockResolvedValue({
+      accessToken: 'token-novo',
+      expiresIn: 900,
+      tokenType: 'Bearer',
+      user: null,
+    } satisfies RefreshResponse);
+
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const authorization = new Headers(init?.headers).get('Authorization');
+
+      if (authorization === 'Bearer token-novo') {
+        return Promise.resolve(new Response(null, { status: 200 }));
+      }
+
+      if (String(input) === '/atrasado') {
+        return delayedResponse;
+      }
+
+      return Promise.resolve(new Response(null, { status: 401 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const refreshRequest = fetchAuthenticatedApi('/renova');
+    const delayedRequest = fetchAuthenticatedApi('/atrasado');
+
+    await vi.waitFor(() => {
+      expect(useAuthStore.getState().accessToken).toBe('token-novo');
+    });
+    resolveDelayedResponse(new Response(null, { status: 401 }));
+
+    const responses = await Promise.all([refreshRequest, delayedRequest]);
+
+    expect(responses.map((response) => response.status)).toEqual([200, 200]);
+    expect(authClientMock.refreshSession).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+  });
 });

@@ -105,6 +105,19 @@ describe('GpsSessionProvider', () => {
     expect(gpsMocks.stop).not.toHaveBeenCalled();
     expect(view.container.querySelector('button[aria-label="Fechar aviso"]')).toBeNull();
 
+    gpsMocks.tracking.rateLimitMessage = 'Novo aviso de limite.';
+    view.rerender(
+      <GpsSessionProvider>
+        <div>conteudo</div>
+      </GpsSessionProvider>,
+    );
+
+    expect(view.container.textContent).toContain('Novo aviso de limite.');
+    expect(
+      view.container.querySelector<HTMLButtonElement>('button[aria-label="Fechar aviso"]'),
+    ).not.toBeNull();
+    expect(gpsMocks.stop).not.toHaveBeenCalled();
+
     view.unmount();
   });
 });
