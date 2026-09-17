@@ -103,9 +103,7 @@ describe('GpsSessionProvider', () => {
     });
 
     expect(gpsMocks.stop).not.toHaveBeenCalled();
-    expect(
-      view.container.querySelector('button[aria-label="Fechar aviso"]'),
-    ).toBeNull();
+    expect(view.container.querySelector('button[aria-label="Fechar aviso"]')).toBeNull();
 
     view.unmount();
   });

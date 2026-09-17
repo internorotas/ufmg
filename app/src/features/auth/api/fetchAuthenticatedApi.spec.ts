@@ -8,9 +8,9 @@ vi.mock('./authClient', () => ({
   refreshSession: authClientMock.refreshSession,
 }));
 
+import { useAuthStore } from '../store/authStore';
 import type { RefreshResponse } from './authClient';
 import { fetchAuthenticatedApi } from './fetchAuthenticatedApi';
-import { useAuthStore } from '../store/authStore';
 
 describe('fetchAuthenticatedApi', () => {
   beforeEach(() => {
