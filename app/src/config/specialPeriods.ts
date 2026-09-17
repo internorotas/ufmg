@@ -5,7 +5,7 @@
  * a manutenção e atualização das datas de férias e recessos.
  */
 
-import { getSaoPauloDayOfWeek, getSaoPauloNow } from '../lib/time';
+import { getSaoPauloDayOfWeek, getSaoPauloNow, toSaoPauloDate } from '../lib/time';
 import { fetchSpecialPeriods } from '../services/api/specialPeriodsApi';
 import { CategoriaDia } from '../types/data.types';
 
@@ -96,7 +96,7 @@ export function isHolidayToday(): boolean {
 }
 
 function findCurrentPeriod(periods: SpecialPeriod[]): SpecialPeriod | null {
-  const nowSp = getSaoPauloNow();
+  const nowSp = toSaoPauloDate(getSaoPauloNow());
   const now = new Date(nowSp.getFullYear(), nowSp.getMonth(), nowSp.getDate(), 0, 0, 0, 0);
 
   for (const period of periods) {

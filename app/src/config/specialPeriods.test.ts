@@ -36,10 +36,9 @@ import {
 // ---------------------------------------------------------------------------
 
 function makeDay(year: number, month: number, day: number, _dayOfWeek?: number): Date {
-  // We construct a local Date whose getDay() matches dayOfWeek when provided.
-  // month is 1-indexed for readability.
-  const d = new Date(year, month - 1, day, 0, 0, 0, 0);
-  return d;
+  // Meio-dia UTC preserva a mesma data civil em São Paulo e torna o teste
+  // independente do fuso configurado no runner.
+  return new Date(Date.UTC(year, month - 1, day, 15, 0, 0, 0));
 }
 
 // ---------------------------------------------------------------------------
