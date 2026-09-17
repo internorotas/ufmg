@@ -167,7 +167,14 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   });
 
   const { isActive, ingestSnapshot, status, rateLimitMessage, startError, conflict } = rastreio;
+  const [dismissedRateLimitMessage, setDismissedRateLimitMessage] = useState<string | null>(null);
   const linhaAtivaRef = useRef<typeof linhaSelecionada>(null);
+
+  useEffect(() => {
+    if (rateLimitMessage === null) {
+      setDismissedRateLimitMessage(null);
+    }
+  }, [rateLimitMessage]);
 
   useEffect(() => {
     if (isActive && linhaSelecionada) {
@@ -369,7 +376,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
   // fixa na tela, então só um é renderizado por vez, por ordem de prioridade. ===
   const activeToast = startError
     ? { kind: 'startError' as const, message: startError }
-    : rateLimitMessage
+    : rateLimitMessage && rateLimitMessage !== dismissedRateLimitMessage
       ? { kind: 'rateLimit' as const, message: rateLimitMessage }
       : earlyStopReason
         ? { kind: 'earlyStop' as const, message: earlyStopReason }
@@ -517,7 +524,7 @@ export function GpsSessionProvider({ children }: { children: ReactNode }) {
             {activeToast.kind === 'rateLimit' && (
               <button
                 type="button"
-                onClick={() => rastreio.stop()}
+                onClick={() => setDismissedRateLimitMessage(rateLimitMessage)}
                 aria-label="Fechar aviso"
                 className="flex size-5 shrink-0 items-center justify-center rounded text-warning-text/70 hover:text-warning-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-warning-text"
               >

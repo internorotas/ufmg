@@ -36,10 +36,9 @@ import {
 // ---------------------------------------------------------------------------
 
 function makeDay(year: number, month: number, day: number, _dayOfWeek?: number): Date {
-  // We construct a local Date whose getDay() matches dayOfWeek when provided.
-  // month is 1-indexed for readability.
-  const d = new Date(year, month - 1, day, 0, 0, 0, 0);
-  return d;
+  // Meio-dia UTC preserva a mesma data civil em São Paulo e torna o teste
+  // independente do fuso configurado no runner.
+  return new Date(Date.UTC(year, month - 1, day, 15, 0, 0, 0));
 }
 
 // ---------------------------------------------------------------------------
@@ -101,7 +100,7 @@ describe('isWeekday', () => {
     ['sábado', 6, false],
     ['domingo', 0, false],
   ])('%s (getDay=%i) → %s', (_label, dayOfWeek, expected) => {
-    const d = new Date(2026, 6, 5); // base: domingo 5 jul 2026
+    const d = makeDay(2026, 7, 5); // base: domingo 5 jul 2026
     // Advance to desired day
     d.setDate(5 + (dayOfWeek === 0 ? 0 : dayOfWeek));
     vi.mocked(timeMod.getSaoPauloNow).mockReturnValue(d);
