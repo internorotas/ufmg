@@ -74,7 +74,7 @@ function encodeTransitFixture(): ArrayBuffer {
   });
 
   const bytes = TransitData.encode(message).finish();
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
 
 describe('transitApi', () => {
