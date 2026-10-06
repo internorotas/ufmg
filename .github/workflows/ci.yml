@@ -53,6 +53,9 @@ jobs:
       - name: Check app formatting
         run: pnpm --dir app exec biome check .
 
+      - name: ShellCheck hooks
+        run: shellcheck .husky/commit-msg .husky/pre-commit
+
       - name: Test app
         run: pnpm --dir app test
 
