@@ -50,6 +50,9 @@ jobs:
       - name: Lint app
         run: pnpm --dir app lint
 
+      - name: Check app formatting
+        run: pnpm --dir app exec biome check .
+
       - name: Test app
         run: pnpm --dir app test
 
