@@ -69,6 +69,7 @@ async function mockLiveGpsBatch(context: BrowserContext): Promise<void> {
           updatedAt: new Date().toISOString(),
           delayed: false,
           vehicleKey: 'e2e-vehicle-key-1',
+          clusterKey: 'e2e-cluster-key-1',
         },
       ]),
     }),

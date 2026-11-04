@@ -64,7 +64,11 @@ interface ProtoLinha {
   horarios: string[];
   itinerarioParadasIds: string[];
   coordenadasTrajeto: Array<{ lat: number; lng: number }>;
-  trajetoDetalhado: Array<{ idParada: string; tempoDoAnteriorMinutos: number }>;
+  trajetoDetalhado: Array<{
+    idParada: string;
+    tempoDoAnteriorMinutos: number;
+    isTrechoExterno?: boolean;
+  }>;
 }
 
 interface ProtoDadosLinhas {
@@ -113,6 +117,7 @@ function decodeTransitProto(buffer: ArrayBuffer): {
             trajetoDetalhado: (l.trajetoDetalhado ?? []).map((t) => ({
               idParada: t.idParada,
               tempoDoAnteriorMinutos: t.tempoDoAnteriorMinutos,
+              isTrechoExterno: t.isTrechoExterno ?? false,
             })),
           }),
         ),

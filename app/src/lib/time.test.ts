@@ -1,5 +1,24 @@
-import { describe, expect, it } from 'vitest';
-import { getSaoPauloDayOfWeek, getSaoPauloMinutesOfDay, toSaoPauloDate } from './time';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  getSaoPauloDayOfWeek,
+  getSaoPauloMinutesOfDay,
+  getSaoPauloNow,
+  toSaoPauloDate,
+} from './time';
+
+describe('getSaoPauloNow', () => {
+  it('preserva o instante atual para evitar conversão dupla de fuso', () => {
+    vi.useFakeTimers();
+    const now = new Date('2026-07-10T03:00:00Z');
+    vi.setSystemTime(now);
+
+    try {
+      expect(getSaoPauloNow().getTime()).toBe(now.getTime());
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
 
 // ---------------------------------------------------------------------------
 // toSaoPauloDate

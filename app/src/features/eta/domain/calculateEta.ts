@@ -1,6 +1,6 @@
 import { isLineAvailableToday } from '@/config/specialPeriods';
 import { obterMultiplicadorTrafego } from '@/config/trafegoConfig';
-import { getSaoPauloMinutesOfDay, getSaoPauloNow, toSaoPauloDate } from '@/lib/time';
+import { getSaoPauloMinutesOfDay, getSaoPauloNow } from '@/lib/time';
 import {
   converterHoraParaMinutos,
   converterMinutosParaHora,
@@ -50,14 +50,13 @@ export function calcularPrevisaoChegada(
     return null;
   }
 
-  const agoraSaoPaulo = toSaoPauloDate(agora);
-  const horariosSaida = obterHorariosLinhaNoDia(linha, agoraSaoPaulo);
+  const horariosSaida = obterHorariosLinhaNoDia(linha, agora);
 
   if (horariosSaida.length === 0) {
     return null;
   }
 
-  const horaAtualMinutos = getSaoPauloMinutesOfDay(agoraSaoPaulo);
+  const horaAtualMinutos = getSaoPauloMinutesOfDay(agora);
   const multiplicadorTrafego = obterMultiplicadorTrafego(horaAtualMinutos);
 
   let tempoViagemReal = 0;

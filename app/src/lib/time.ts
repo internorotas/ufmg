@@ -36,8 +36,15 @@ export function toSaoPauloDate(date: Date): Date {
   return new Date(year, month - 1, day, hour, minute, second);
 }
 
+/**
+ * Retorna o instante atual sem pré-aplicar o fuso horário.
+ *
+ * As funções de leitura abaixo normalizam o instante uma única vez para
+ * São Paulo. Manter o Date como instante real evita deslocar dia e horário
+ * quando o navegador ou o runner está em outro fuso.
+ */
 export function getSaoPauloNow(): Date {
-  return toSaoPauloDate(new Date());
+  return new Date();
 }
 
 export function getSaoPauloMinutesOfDay(date: Date): number {

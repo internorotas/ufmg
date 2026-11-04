@@ -19,13 +19,15 @@ export interface AllLiveGpsPositionsState {
 
 export function useAllLiveGpsPositionsState(): AllLiveGpsPositionsState {
   const accessToken = useAuthStore((state) => state.accessToken);
+  const isAuthenticated = Boolean(accessToken);
   const [now, setNow] = useState(() => Date.now());
   const query = useQuery({
-    queryKey: ['gps', 'live', accessToken ? 'authenticated' : 'anonymous'],
-    queryFn: () => getAllLiveGpsPositions(accessToken ?? null),
+    queryKey: ['gps', 'live', isAuthenticated ? 'authenticated' : 'anonymous'],
+    queryFn: ({ signal }) => getAllLiveGpsPositions(isAuthenticated, signal),
     staleTime: POLL_INTERVAL_MS,
     refetchInterval: POLL_INTERVAL_MS,
     refetchOnWindowFocus: true,
+    refetchIntervalInBackground: false,
     retry: false,
   });
 
