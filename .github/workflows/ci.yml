@@ -5,9 +5,11 @@ on:
     branches:
       - feat/integracao-geral
       - main
+      - homolog
   push:
     branches:
       - feat/integracao-geral
+      - homolog
 
 permissions:
   contents: read
